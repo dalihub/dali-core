@@ -27,7 +27,7 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Integration
 {
@@ -233,4 +233,4 @@ Core::Core()
 
 } // namespace Integration
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

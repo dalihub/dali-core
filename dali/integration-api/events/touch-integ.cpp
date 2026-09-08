@@ -17,7 +17,7 @@
 #include <dali/integration-api/events/touch-integ.h>
 #include <dali/internal/event/events/touch-event-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Integration
 {
@@ -36,4 +36,4 @@ Dali::TouchEvent NewTouchEvent(uint32_t timeStamp, const Dali::Integration::Poin
 
 } // namespace Integration
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

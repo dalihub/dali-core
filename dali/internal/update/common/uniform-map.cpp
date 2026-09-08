@@ -17,7 +17,7 @@
 // CLASS HEADER
 #include <dali/internal/update/common/uniform-map.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -79,4 +79,4 @@ const PropertyInputImpl* UniformMap::Find(ConstString uniformName) const
 
 } // namespace SceneGraph
 } // namespace Internal
-} // namespace Dali
+} //namespace DALI_NAMESPACE

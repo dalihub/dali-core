@@ -22,7 +22,7 @@
 #include <dali/public-api/common/dali-utility.h> ///< Dali::Min , Dali::Max
 #include <dali/public-api/math/math-utils.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @addtogroup dali_core_math
@@ -401,6 +401,6 @@ inline bool Rect<float>::IsEmpty() const
 /**
  * @}
  */
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_RECT_H

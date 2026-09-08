@@ -2,7 +2,7 @@
 #define DALI_THREAD_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@
 /**
  * The top level DALi namespace
  */
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /*
  * @brief Abstract class for thread functionality. Can be used for worker threads.
@@ -76,6 +76,6 @@ private:
   ThreadImpl* mImpl;
 };
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_THREAD_H

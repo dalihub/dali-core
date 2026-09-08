@@ -22,7 +22,7 @@
 #include <dali/public-api/object/property.h>
 #include <dali/public-api/object/ref-object.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @addtogroup dali_core_object
@@ -135,6 +135,6 @@ private:
 /**
  * @}
  */
-} // Namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INDIRECT_VALUE_H

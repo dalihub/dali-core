@@ -28,7 +28,7 @@
 #include "test-graphics-pipeline.h"
 #include "test-trace-call-stack.h"
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 class TestGraphicsTexture;
 class TestGraphicsBuffer;
@@ -1307,6 +1307,6 @@ private:
   std::vector<Command> mCommands;
 };
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TEST_GRAPHICS_COMMAND_BUFFER_H

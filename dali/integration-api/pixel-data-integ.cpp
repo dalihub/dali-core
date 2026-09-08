@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/event/images/pixel-data-impl.h>
 
-namespace Dali::Integration
+namespace DALI_NAMESPACE::Integration
 {
 void ReleasePixelDataBuffer(Dali::PixelData pixelData)
 {
@@ -53,4 +53,4 @@ bool IsPixelDataReleaseAfterUpload(const Dali::PixelData& pixelData)
   const Internal::PixelData& pixelDataImpl = GetImplementation(pixelData);
   return pixelDataImpl.IsPixelDataReleaseAfterUpload();
 }
-} // namespace Dali::Integration
+} //namespace DALI_NAMESPACE::Integration

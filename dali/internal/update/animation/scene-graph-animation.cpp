@@ -78,7 +78,7 @@ bool CompareAnimatorEndTimes(const Dali::Internal::SceneGraph::AnimatorBase* lhs
 
 } // unnamed namespace
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -616,4 +616,4 @@ void Animation::UpdateAnimators(bool bake, bool animationFinished)
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

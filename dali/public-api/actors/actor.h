@@ -32,7 +32,7 @@
 
 #undef SIZE_WIDTH // Defined in later versions of cstdint but is used in this header
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @addtogroup dali_core_actors
@@ -3132,6 +3132,6 @@ inline void UnparentAndReset(Actor& actor)
 /**
  * @}
  */
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_ACTOR_H

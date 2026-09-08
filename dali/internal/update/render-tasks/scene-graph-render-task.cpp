@@ -30,7 +30,7 @@
 
 #include <dali/internal/update/render-tasks/scene-graph-render-task-debug.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -654,4 +654,4 @@ void RenderTask::SetActiveStatus()
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

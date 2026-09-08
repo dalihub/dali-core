@@ -30,7 +30,7 @@
 #include <dali/internal/event/events/touch-event-impl.h>
 #include <dali/internal/event/render-tasks/render-task-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -412,4 +412,4 @@ Actor* GestureDetector::GetCurrentGesturedActor()
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@
 Debug::Filter* gUniformBufferLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_UNIFORM_BUFFER");
 #endif
 
-namespace Dali::Internal::Render
+namespace DALI_NAMESPACE::Internal::Render
 {
 namespace
 {
@@ -374,4 +374,4 @@ void UniformBufferV2::UnmapGPU()
   DALI_LOG_INFO(gUniformBufferLogFilter, Debug::Verbose, "GPU buffer is unmapped\n");
 }
 
-} // namespace Dali::Internal::Render
+} //namespace DALI_NAMESPACE::Internal::Render

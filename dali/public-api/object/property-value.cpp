@@ -62,7 +62,7 @@
  * 7. We keep the Type information along with the Object to keep the size as 16byte (using common initial sequence(CIS) ).
  */
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 struct Property::Value::Impl
 {
@@ -1639,4 +1639,4 @@ std::ostream& operator<<(std::ostream& stream, const Property::Value& value)
   return stream;
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

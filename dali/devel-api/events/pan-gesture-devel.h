@@ -22,7 +22,7 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/events/pan-gesture.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace DevelPanGesture
 {
@@ -90,6 +90,6 @@ DALI_CORE_API void SetNumberOfTouches(Dali::PanGesture& gesture, uint32_t number
 
 } // namespace DevelPanGesture
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_PAN_GESTURE_DEVEL_H

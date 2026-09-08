@@ -26,7 +26,7 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/type-traits.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @addtogroup dali_core_math
@@ -363,6 +363,6 @@ struct TypeTraits<Uint16Pair> : public BasicTypes<Uint16Pair>
 /**
  * @}
  */
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INT_PAIR_H

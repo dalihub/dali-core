@@ -24,7 +24,7 @@
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/render/renderers/render-texture-key.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -171,6 +171,6 @@ inline void SetSamplerMessage(EventThreadServices& eventThreadServices, const Te
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif //  DALI_INTERNAL_SCENE_GRAPH_TEXTURE_SET_H

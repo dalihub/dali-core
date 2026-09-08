@@ -29,7 +29,7 @@
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/render-tasks/render-task.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 class Actor;
 struct Vector2;
@@ -253,6 +253,6 @@ inline const Internal::TouchEvent& GetImplementation(const Dali::TouchEvent& tou
   return static_cast<const Internal::TouchEvent&>(object);
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_TOUCH_EVENT_H

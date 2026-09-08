@@ -19,11 +19,12 @@
  */
 
 #include <dali/devel-api/common/vector-wrapper.h>
+#include <dali/public-api/common/dali-namespace.h>
 #include <algorithm>
 #include <cstdint>
 #include <string>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace AddOns
 {
@@ -139,6 +140,6 @@ struct DispatchTable
 
 } // namespace AddOns
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_ADDON_DISPATCH_TABLE_H

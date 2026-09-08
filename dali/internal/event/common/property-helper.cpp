@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 // HEADER
 #include <dali/internal/event/common/property-helper.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -71,4 +71,4 @@ bool CompareTokens(const char* first, const char* second, uint32_t& size)
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

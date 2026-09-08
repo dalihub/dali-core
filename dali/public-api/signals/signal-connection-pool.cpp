@@ -26,7 +26,7 @@
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/signals/connection-tracker-interface.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 SignalConnectionPool::~SignalConnectionPool()
 {
@@ -162,4 +162,4 @@ void SignalConnectionPool::Free(SignalConnectionNode* node)
   mFreeHead                       = node;
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

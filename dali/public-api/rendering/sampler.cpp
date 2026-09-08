@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/event/rendering/sampler-impl.h> // Dali::Internal::Sampler
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 Sampler Sampler::New()
 {
@@ -66,4 +66,4 @@ Sampler::Sampler(Internal::Sampler* pointer)
 {
 }
 
-} //namespace Dali
+} //namespace DALI_NAMESPACE

@@ -33,7 +33,7 @@
 
 using Dali::Integration::ToStdStringView;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -219,4 +219,4 @@ Actor* RotationGestureDetector::GetCurrentGesturedActor()
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

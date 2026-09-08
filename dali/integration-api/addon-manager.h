@@ -28,7 +28,7 @@
 #include <string>
 #include <vector>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 // Type of extensions (may be used internally)
 enum class AddOnType
@@ -276,6 +276,6 @@ protected:
   static AddOnManager* mSingleton; ///< Singleton storing an instance of AddOnManager
 };
 } // namespace Integration
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTEGRATION_ADDON_MANAGER

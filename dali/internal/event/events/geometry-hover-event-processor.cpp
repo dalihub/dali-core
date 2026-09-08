@@ -37,7 +37,7 @@
 #include <dali/internal/event/events/hover-event-processor-common.h>
 #include <dali/internal/event/events/multi-point-event-util.h>
 
-namespace Dali::Internal
+namespace DALI_NAMESPACE::Internal
 {
 namespace
 {
@@ -523,4 +523,4 @@ void GeometryHoverEventProcessor::OnObservedActorDisconnected(Actor* actor)
     }
   }
 }
-} // namespace Dali::Internal
+} //namespace DALI_NAMESPACE::Internal

@@ -25,7 +25,7 @@
 #include <dali/integration-api/debug.h>
 #include <dali/internal/update/animation/scene-graph-constraint-base.h>
 
-namespace Dali::Internal::SceneGraph
+namespace DALI_NAMESPACE::Internal::SceneGraph
 {
 namespace
 {
@@ -120,4 +120,4 @@ void ConstraintContainer::Apply()
     mDeactiveConstraints.PushBack(mActiveConstraints.Release(iter));
   }
 }
-} // namespace Dali::Internal::SceneGraph
+} //namespace DALI_NAMESPACE::Internal::SceneGraph

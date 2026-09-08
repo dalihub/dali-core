@@ -26,7 +26,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/event/common/scene-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Integration
 {
@@ -347,4 +347,4 @@ Scene::WheelEventGeneratedSignalType& Scene::WheelEventGeneratedSignal()
 
 } // namespace Integration
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

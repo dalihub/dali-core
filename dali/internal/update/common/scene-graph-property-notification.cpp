@@ -24,7 +24,7 @@
 #include <dali/internal/update/common/property-owner.h>
 #include <dali/internal/update/common/scene-graph-property-notification.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -181,4 +181,4 @@ bool PropertyNotification::GetValidity() const
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

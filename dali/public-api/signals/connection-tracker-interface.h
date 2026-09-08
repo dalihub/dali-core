@@ -2,7 +2,7 @@
 #define DALI_CONNECTION_TRACKER_INTERFACE_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/signals/signal-slot-observers.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @addtogroup dali_core_signals
@@ -85,6 +85,6 @@ private:
 /**
  * @}
  */
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_CONNECTION_TRACKER_INTERFACE_H

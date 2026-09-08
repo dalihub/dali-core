@@ -18,7 +18,7 @@
 // FILE HEADER
 #include "memory-pool-relayout-container.h"
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -93,4 +93,4 @@ void MemoryPoolRelayoutContainer::Clear()
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

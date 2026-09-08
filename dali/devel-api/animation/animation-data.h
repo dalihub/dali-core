@@ -28,7 +28,7 @@
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/object/property-value.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @brief This object stores description data that can be used to generate an Animation.
@@ -97,6 +97,6 @@ private:
   AnimationDataList mAnimationDataList; ///< A vector of individual property animations from which to generate a Dali::Animation.
 };
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_ANIMATION_DATA_H

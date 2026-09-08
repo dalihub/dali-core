@@ -23,7 +23,7 @@
 #include <dali/public-api/math/vector4.h>
 #include <dali/public-api/rendering/renderer.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -138,6 +138,6 @@ private:
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_BLENDING_OPTIONS_H

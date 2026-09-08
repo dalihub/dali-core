@@ -22,7 +22,7 @@
 #include <dali/internal/event/rendering/vertex-buffer-impl.h> // Dali::Internal::VertexBuffer
 #include <dali/public-api/object/property-map.h>              // Dali::Property::Map
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 struct VertexBufferUpdateCallback::Impl
 {
@@ -59,9 +59,9 @@ uint32_t VertexBufferUpdateCallback::Invoke(void* data, size_t size)
   return mImpl->Invoke(data, size);
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 VertexBuffer VertexBuffer::New(Dali::Property::Map& bufferFormat)
 {
@@ -112,4 +112,4 @@ VertexBuffer::VertexBuffer(Internal::VertexBuffer* pointer)
 {
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

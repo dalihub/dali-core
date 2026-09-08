@@ -26,7 +26,7 @@
 #include <dali/public-api/common/unique-ptr.h>
 #include <dali/public-api/signals/functor-delegate.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @addtogroup dali_core_signals
@@ -1731,6 +1731,6 @@ private:
 /**
  * @}
  */
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_CALLBACK_H

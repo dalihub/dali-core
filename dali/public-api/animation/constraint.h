@@ -30,7 +30,7 @@
 #include <dali/public-api/object/property.h>
 #include <dali/public-api/signals/callback.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @addtogroup dali_core_animation
@@ -662,6 +662,6 @@ private: // Not intended for use by Application developers
 /**
  * @}
  */
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_CONSTRAINT_H

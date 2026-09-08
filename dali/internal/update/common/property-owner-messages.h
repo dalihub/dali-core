@@ -28,7 +28,7 @@
 #include <dali/internal/update/animation/scene-graph-constraint-base.h>
 #include <dali/internal/update/common/property-owner.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -335,6 +335,6 @@ inline void ReservePropertiesMessage(EventThreadServices& eventThreadServices, c
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_SCENE_GRAPH_PROPERTY_OWNER_MESSAGES_H

@@ -38,7 +38,7 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/dali-vector.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -323,4 +323,4 @@ const Graphics::UniformInfo* Program::GetDefaultUniform(DefaultUniformIndex defa
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

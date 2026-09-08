@@ -25,7 +25,7 @@
 #include <cstdlib> ///< for srand() and rand()
 #include <ctime>   ///< for time(nullptr)
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @addtogroup dali_core_math
@@ -93,6 +93,6 @@ inline Vector4 Axis()
 /**
  * @}
  */
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_RANDOM_H

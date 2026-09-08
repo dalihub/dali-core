@@ -43,7 +43,7 @@ inline const std::string_view& GetView(const void* storage)
 
 } // unnamed namespace
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 
 StringView::StringView()
@@ -136,4 +136,4 @@ bool StringView::operator==(const String& rhs) const
   return GetView(mStorage) == (cstr ? std::string_view(cstr, rhs.Size()) : std::string_view());
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

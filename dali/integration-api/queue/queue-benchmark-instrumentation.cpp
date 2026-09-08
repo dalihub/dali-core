@@ -22,7 +22,7 @@
 #include <cstdio>
 #include <string>
 
-namespace Dali::Internal::QueueBenchmark
+namespace DALI_NAMESPACE::Internal::QueueBenchmark
 {
 const char* ChannelName(Channel channel)
 {
@@ -238,4 +238,4 @@ void DumpToFile(std::string_view path)
   std::fclose(file);
 }
 
-} // namespace Dali::Internal::QueueBenchmark
+} //namespace DALI_NAMESPACE::Internal::QueueBenchmark

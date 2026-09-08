@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/integration-api/events/multi-point-event-integ.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Integration
 {
@@ -68,6 +68,6 @@ struct DALI_CORE_API TouchEvent : public MultiPointEvent
 
 } // namespace Integration
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTEGRATION_TOUCH_EVENT_H

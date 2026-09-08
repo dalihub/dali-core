@@ -6,7 +6,7 @@
 using Dali::Internal::GestureEventProcessor;
 using Dali::Internal::ThreadLocalStorage;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Integration
 {
@@ -192,4 +192,4 @@ float GetTapGestureMaximumMotionDistance()
 
 } // namespace Integration
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

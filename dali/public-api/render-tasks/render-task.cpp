@@ -26,7 +26,7 @@
 #include <dali/public-api/common/dali-utility.h>
 #include <dali/public-api/rendering/frame-buffer.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 static bool DefaultScreenToFrameBufferFunction(Vector2& coordinates)
 {
@@ -364,4 +364,4 @@ RenderTask::RenderTask(Internal::RenderTask* internal)
 {
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

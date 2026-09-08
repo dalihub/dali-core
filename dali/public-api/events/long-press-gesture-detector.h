@@ -2,7 +2,7 @@
 #define DALI_LONG_PRESS_GESTURE_DETECTOR_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@
 #include <dali/public-api/events/gesture-detector.h>
 #include <dali/public-api/signals/dali-signal.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @addtogroup dali_core_events
@@ -63,7 +63,7 @@ class LongPressGesture;
  */
 class DALI_CORE_API LongPressGestureDetector : public GestureDetector
 {
-public:                                                                    // Typedefs
+public:                                                             // Typedefs
   using DetectedSignalType = Signal<void(Actor, LongPressGesture)>; ///< Gesture detected signal type @SINCE_1_0.0
 
 public: // Creation & Destruction
@@ -237,6 +237,6 @@ public: // Not intended for Application developers
 /**
  * @}
  */
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_LONG_PRESS_GESTURE_DETECTOR_H

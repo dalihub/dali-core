@@ -23,7 +23,7 @@
 #include <dali/devel-api/threading/mutex.h>
 #include <dali/public-api/common/dali-common.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -458,4 +458,4 @@ void FixedSizeMemoryPool::ResetMemoryPool()
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

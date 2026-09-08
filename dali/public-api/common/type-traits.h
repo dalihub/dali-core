@@ -18,6 +18,9 @@
  *
  */
 
+// INTERNAL INCLUDES
+#include <dali/public-api/common/dali-namespace.h>
+
 /*
  * Definitions for basic type traits built-in macro
  */
@@ -29,7 +32,7 @@
 #define DALI_HAS_TRIVIAL_DESTRUCTOR(Type) __has_trivial_destructor(Type)
 #endif
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @addtogroup dali_core_common
@@ -841,6 +844,6 @@ inline Type&& Forward(typename RemoveReference<Type>::type&& arg) noexcept
  * @}
  */
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TYPE_TRAITS_H

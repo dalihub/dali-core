@@ -23,7 +23,7 @@
 #include <dali/internal/event/events/gesture-processor.h>
 #include <dali/internal/event/events/tap-gesture/tap-gesture-detector-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -183,6 +183,6 @@ private:
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_TAP_GESTURE_EVENT_PROCESSOR_H

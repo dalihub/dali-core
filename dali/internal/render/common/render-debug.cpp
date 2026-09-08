@@ -32,7 +32,7 @@
 using Dali::Internal::SceneGraph::Node;
 using Dali::Internal::SceneGraph::RenderList;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -108,4 +108,4 @@ void PrintRendererCount(unsigned int frameCount, unsigned int rendererCount)
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

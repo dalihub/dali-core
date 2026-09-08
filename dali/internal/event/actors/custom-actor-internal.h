@@ -26,7 +26,7 @@
 #include <dali/public-api/actors/custom-actor.h>
 #include <dali/public-api/animation/animation.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -374,6 +374,6 @@ inline const Internal::CustomActor& GetImpl(const Dali::CustomActor& actor)
   return static_cast<const Internal::CustomActor&>(handle);
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_CUSTOM_ACTOR_H

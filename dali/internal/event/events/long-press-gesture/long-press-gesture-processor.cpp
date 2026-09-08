@@ -35,7 +35,7 @@
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/common/dali-common.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -394,4 +394,4 @@ void LongPressGestureProcessor::EmitGestureSignal(Actor* actor, const GestureDet
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

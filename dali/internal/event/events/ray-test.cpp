@@ -50,7 +50,7 @@ constexpr float GetEpsilon(const float targetScale)
 }
 } // namespace
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -270,4 +270,4 @@ bool RayTest::ActorBoundingBoxTest(const Internal::Actor& actor, const Vector4& 
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

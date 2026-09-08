@@ -27,7 +27,7 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/object/base-object.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -253,6 +253,6 @@ inline const Internal::ConstraintBase& GetImplementation(const Dali::Constraint&
   return static_cast<const Internal::ConstraintBase&>(handle);
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_ACTIVE_CONSTRAINT_BASE_H

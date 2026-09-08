@@ -26,7 +26,7 @@
 #include <dali/internal/event/common/property-helper.h>
 #include <dali/public-api/object/property-array.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -468,4 +468,4 @@ void Path::ClearControlPoints()
 }
 
 } // namespace Internal
-} // namespace Dali
+} //namespace DALI_NAMESPACE

@@ -27,7 +27,7 @@
 #include <dali/internal/update/manager/update-manager.h>
 #include <dali/internal/update/manager/update-proxy-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -204,6 +204,6 @@ public:
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_UPDATE_PROXY_PROPERTY_MODIFIER_H

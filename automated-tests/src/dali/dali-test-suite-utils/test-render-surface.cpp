@@ -16,8 +16,9 @@
  */
 
 #include "test-render-surface.h"
+#include <dali/public-api/common/dali-namespace.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 TestRenderSurface::TestRenderSurface(Dali::PositionSize positionSize)
 : mPositionSize(positionSize),
@@ -111,4 +112,4 @@ void TestRenderSurface::MakeContextCurrent()
 {
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

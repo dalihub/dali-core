@@ -23,7 +23,7 @@
 #include <dali/public-api/events/gesture-enumerations.h>
 #include <dali/public-api/math/vector2.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -62,6 +62,6 @@ struct PanGestureProfiling
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_PAN_GESTURE_PROFILING_H

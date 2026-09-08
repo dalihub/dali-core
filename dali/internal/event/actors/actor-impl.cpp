@@ -65,7 +65,7 @@ using Dali::Internal::SceneGraph::PropertyBase;
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_DEPTH_TIMER");
 #endif
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -2384,4 +2384,4 @@ void Actor::InsertChild(Actor& child, Actor& target, bool above)
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

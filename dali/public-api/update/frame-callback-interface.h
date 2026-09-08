@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 class UpdateProxy;
 
@@ -105,6 +105,6 @@ private:
   /// @endcond
 };
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_FRAME_CALLBACK_INTERFACE_H

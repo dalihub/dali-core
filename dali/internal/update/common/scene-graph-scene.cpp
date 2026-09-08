@@ -22,7 +22,7 @@
 #include <dali/internal/update/render-tasks/scene-graph-render-task-list.h>
 #include <dali/public-api/common/dali-utility.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -355,4 +355,4 @@ bool Scene::IsPartialUpdateEnabled() const
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

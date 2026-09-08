@@ -29,7 +29,7 @@
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/object/ref-object.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -632,6 +632,6 @@ inline const Internal::Animation& GetImplementation(const Dali::Animation& anima
   return static_cast<const Internal::Animation&>(handle);
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_ANIMATION_H

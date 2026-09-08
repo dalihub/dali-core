@@ -32,7 +32,7 @@
 // EXTERNAL INCLUDES
 #include <utility>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @class RenderCallbackInput
@@ -292,6 +292,6 @@ private:
   Dali::Vector<Dali::Texture>   mTextureResources{};
   mutable Dali::Mutex           mTextureResourcesMutex{}; ///< Guards mTextureResources across threads
 };
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_RENDER_CALLBACK_H

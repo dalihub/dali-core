@@ -23,7 +23,7 @@
 #include <dali/internal/render/common/render-manager.h> ///< TODO : Could we remove it?
 #include <dali/internal/render/renderers/render-texture.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -359,4 +359,4 @@ void FrameBuffer::UpdateFramebufferRenderbufferUsage()
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

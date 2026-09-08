@@ -18,7 +18,7 @@
 // CLASS HEADER
 #include <dali/internal/update/common/property-owner-messages.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -34,4 +34,4 @@ PropertyOwnerMessageBase::~PropertyOwnerMessageBase() = default;
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

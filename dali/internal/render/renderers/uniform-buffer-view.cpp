@@ -23,7 +23,7 @@
 #include <dali/internal/render/renderers/uniform-buffer.h>
 #include <dali/internal/update/common/scene-graph-memory-pool-collection.h>
 
-namespace Dali::Internal::Render
+namespace DALI_NAMESPACE::Internal::Render
 {
 namespace
 {
@@ -88,4 +88,4 @@ Graphics::Buffer* UniformBufferView::GetBuffer() const
   return mUniformBuffer->GetGraphicsBuffer();
 }
 
-} // Namespace Dali::Internal::Render
+} //namespace DALI_NAMESPACE::Internal::Render

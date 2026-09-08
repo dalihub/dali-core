@@ -22,7 +22,7 @@
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/signals/callback.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 
 namespace Integration
@@ -59,6 +59,6 @@ protected:
 
 } // namespace Integration
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTEGRATION_PLATFORM_ABSTRACTION_H

@@ -26,7 +26,7 @@
 #include <dali/public-api/events/pan-gesture.h>
 #include <dali/public-api/math/vector2.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 class TouchEvent;
 struct Radian;
@@ -331,6 +331,6 @@ inline const Internal::PanGestureDetector& GetImplementation(const Dali::PanGest
   return static_cast<const Internal::PanGestureDetector&>(handle);
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_PAN_GESTURE_DETECTOR_H

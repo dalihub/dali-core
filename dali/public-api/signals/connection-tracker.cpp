@@ -49,7 +49,7 @@ using CallbackMap = Dali::Integration::OpenHashMap<Dali::CallbackBase*, Dali::Sl
 
 } // unnamed namespace
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 struct ConnectionTracker::Impl
 {
@@ -214,4 +214,4 @@ uint32_t ConnectionTracker::GetConnectionCount() const
   return mCacheImpl ? mCacheImpl->GetSize() : 0u;
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

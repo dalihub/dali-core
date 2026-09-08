@@ -24,7 +24,7 @@
 #include <dali/public-api/common/dali-common.h>
 #include <cstring>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -110,4 +110,4 @@ void GpuBuffer::Destroy()
 
 } // namespace Internal
 
-} //namespace Dali
+} //namespace DALI_NAMESPACE

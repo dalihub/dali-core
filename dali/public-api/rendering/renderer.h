@@ -24,7 +24,7 @@
 #include <dali/public-api/rendering/geometry.h>           // Dali::Geometry
 #include <dali/public-api/rendering/texture-set.h>        // Dali::TextureSet
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @addtogroup dali_core_rendering_effects
@@ -654,6 +654,6 @@ public:
 /**
  * @}
  */
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_RENDERER_H

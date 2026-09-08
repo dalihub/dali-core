@@ -38,7 +38,7 @@
 #include <test-compare-types.h>
 #include <test-trace-call-stack.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 struct UniformData
 {
@@ -2928,7 +2928,7 @@ inline Matrix3 TestGlAbstraction::ProgramUniformValue<Matrix3>::GetZero() const
   return Matrix3(Matrix());
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 bool BlendEnabled(const Dali::TraceCallStack& callStack);
 bool BlendDisabled(const Dali::TraceCallStack& callStack);

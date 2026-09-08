@@ -33,7 +33,7 @@
 #include <dali/internal/event/rendering/texture-impl.h>
 #include <dali/internal/render/renderers/render-sampler.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -348,6 +348,6 @@ private:
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif //  DALI_INTERNAL_RENDER_TEXTURE_H

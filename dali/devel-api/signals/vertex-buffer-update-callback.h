@@ -25,7 +25,7 @@
 // EXTERNAL INCLUDES
 #include <cstdint> ///< for uint32_t, size_t
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @class VertexBufferUpdateCallback
@@ -89,6 +89,6 @@ private:
   explicit VertexBufferUpdateCallback(UniquePtr<VertexBufferUpdateCallback::Impl>&& impl);
   UniquePtr<Impl> mImpl;
 };
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_VERTEX_BUFFER_UPDATE_CALLBACK_H

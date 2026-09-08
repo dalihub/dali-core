@@ -45,7 +45,7 @@ Debug::Filter* gLogRender = Debug::Filter::New(Debug::Concise, false, "LOG_RENDE
 }
 #endif
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -1346,4 +1346,4 @@ RenderTask::~RenderTask()
 
 } // namespace Internal
 
-} //namespace Dali
+} //namespace DALI_NAMESPACE

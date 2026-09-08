@@ -73,7 +73,7 @@ struct DEPTH_STENCIL_ATTACHMENT_TYPE
 } // namespace
 //namespace
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 TestGraphicsFramebuffer::TestGraphicsFramebuffer(
   TraceCallStack&                        callStack,
@@ -252,4 +252,4 @@ void TestGraphicsFramebuffer::PrepareRenderBuffer()
   }
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

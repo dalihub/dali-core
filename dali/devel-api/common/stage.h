@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/object/base-handle.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 struct Vector2;
 
@@ -97,6 +97,6 @@ public:
   void KeepRendering(float durationSeconds);
 };
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_STAGE_H

@@ -39,7 +39,7 @@
 using Dali::Integration::ToStdStringView;
 using Dali::Internal::SceneGraph::UpdateManager;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace
 {
@@ -499,4 +499,4 @@ bool Layer::DoAction(BaseObject* object, const Dali::String& actionName, const P
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

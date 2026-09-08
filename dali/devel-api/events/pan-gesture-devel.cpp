@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/event/events/pan-gesture/pan-gesture-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace DevelPanGesture
 {
@@ -72,4 +72,4 @@ void SetNumberOfTouches(Dali::PanGesture& gesture, uint32_t numberOfTouches)
 
 } // namespace DevelPanGesture
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

@@ -19,7 +19,7 @@
 #include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/internal/event/rendering/renderer-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace DevelRenderer
 {
@@ -52,4 +52,4 @@ void AddDrawCommand(Dali::Renderer renderer, const DrawCommand& drawCommand)
 }
 
 } // namespace DevelRenderer
-} // namespace Dali
+} //namespace DALI_NAMESPACE

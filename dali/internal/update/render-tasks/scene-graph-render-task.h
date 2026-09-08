@@ -27,7 +27,7 @@
 #include <dali/public-api/math/viewport.h>
 #include <dali/public-api/render-tasks/render-task.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -451,6 +451,6 @@ private:
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_SCENE_GRAPH_RENDER_TASK_H

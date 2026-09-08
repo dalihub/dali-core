@@ -28,7 +28,7 @@
 #include <dali/public-api/math/rect.h>
 #include <dali/public-api/update/update-proxy.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 class Layer;
 class ObjectRegistry;
@@ -572,6 +572,6 @@ private:
 
 } // namespace Integration
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTEGRATION_CORE_H

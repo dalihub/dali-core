@@ -22,7 +22,7 @@
 #include <dali/internal/update/manager/render-instruction-processor.h>
 #include <dali/internal/update/manager/sorted-layers.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -78,6 +78,6 @@ private:
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_SCENE_GRAPH_RENDER_TASK_PROCESSOR_H

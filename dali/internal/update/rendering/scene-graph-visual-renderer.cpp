@@ -21,7 +21,7 @@
 #include <dali/internal/update/common/property-resetter.h>
 #include <dali/internal/update/rendering/scene-graph-renderer.h>
 
-namespace Dali::Internal::SceneGraph
+namespace DALI_NAMESPACE::Internal::SceneGraph
 {
 #ifdef DEBUG_ENABLED
 extern Debug::Filter* gSceneGraphRendererLogFilter; ///< Defined at scene-graph-renderer.cpp
@@ -166,4 +166,4 @@ bool DecoratedVisualBorderlineProperties::PrepareProperties()
 }
 
 } // namespace VisualRenderer
-} // namespace Dali::Internal::SceneGraph
+} //namespace DALI_NAMESPACE::Internal::SceneGraph

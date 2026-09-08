@@ -22,7 +22,7 @@
 #include <dali/public-api/object/handle.h>
 #include <dali/public-api/object/property.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @addtogroup dali_core_animation
@@ -136,6 +136,6 @@ struct DALI_CORE_API ConstraintSource
 /**
  * @}
  */
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_CONSTRAINT_SOURCE_H

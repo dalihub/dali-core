@@ -26,7 +26,7 @@
 #include <dali/internal/update/rendering/scene-graph-visual-renderer.h>
 #include <dali/public-api/common/extents.h>
 
-namespace Dali::Internal::SceneGraph
+namespace DALI_NAMESPACE::Internal::SceneGraph
 {
 class TextureSet;
 
@@ -378,6 +378,6 @@ inline void SetDecoratedVisualBorderlinePropertiesMessage(EventThreadServices& e
   new(slot) LocalType(&renderer, &Renderer::SetDecoratedVisualBorderlineProperties, decoratedVisualBorderlineProperties);
 }
 
-} // namespace Dali::Internal::SceneGraph
+} //namespace DALI_NAMESPACE::Internal::SceneGraph
 
 #endif // DALI_INTERNAL_SCENE_GRAPH_RENDERER_MESSAGES_H

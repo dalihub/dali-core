@@ -28,7 +28,7 @@
 #include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/signals/callback.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Graphics
 {
@@ -1745,6 +1745,6 @@ MakeUnique(Args&&... args)
 }
 
 } // namespace Graphics
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_GRAPHICS_API_TYPES_H

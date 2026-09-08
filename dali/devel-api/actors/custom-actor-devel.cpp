@@ -21,7 +21,7 @@
 #include <dali/internal/event/actors/custom-actor-internal.h>
 #include <dali/public-api/actors/custom-actor-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace DevelCustomActor
 {
@@ -32,4 +32,4 @@ const Dali::TypeInfo GetTypeInfo(CustomActor actor)
 
 } // namespace DevelCustomActor
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

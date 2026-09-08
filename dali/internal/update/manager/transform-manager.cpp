@@ -32,7 +32,7 @@
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/trace.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -1169,4 +1169,4 @@ void TransformManager::SetIgnored(TransformId id, bool value)
 
 } // namespace SceneGraph
 } // namespace Internal
-} // namespace Dali
+} //namespace DALI_NAMESPACE

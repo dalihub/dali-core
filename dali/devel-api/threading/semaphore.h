@@ -28,7 +28,7 @@
 #include <sstream>
 #include <stdexcept>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @brief  Class that implements a C++20 counting_semaphore like interface
@@ -179,4 +179,4 @@ private:
   std::mutex              mLock;
   std::ptrdiff_t          mCount;
 };
-} // namespace Dali
+} //namespace DALI_NAMESPACE

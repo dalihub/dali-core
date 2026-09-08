@@ -17,7 +17,7 @@
 #include <dali/devel-api/rendering/vertex-buffer-devel.h>
 #include <dali/internal/event/rendering/vertex-buffer-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace DevelVertexBuffer
 {
@@ -31,4 +31,4 @@ void ClearVertexBufferUpdateCallback(Dali::VertexBuffer vertexBuffer)
   GetImplementation(vertexBuffer).ClearVertexBufferUpdateCallback();
 }
 } // namespace DevelVertexBuffer
-} // namespace Dali
+} //namespace DALI_NAMESPACE

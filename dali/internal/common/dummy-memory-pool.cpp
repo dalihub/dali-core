@@ -23,7 +23,7 @@
 #include <dali/public-api/common/dali-common.h>
 #include <cmath>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -120,4 +120,4 @@ void DummyMemoryPool::ResetMemoryPool()
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

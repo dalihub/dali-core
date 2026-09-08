@@ -22,7 +22,7 @@
 #include <dali/integration-api/events/multi-point-event-integ.h>
 #include <dali/public-api/events/hover-event.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Integration
 {
@@ -69,6 +69,6 @@ struct DALI_CORE_API HoverEvent : public MultiPointEvent
 
 } // namespace Integration
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTEGRATION_HOVER_EVENT_H

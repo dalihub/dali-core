@@ -95,7 +95,7 @@ DALI_INIT_TIME_CHECKER_FILTER_WITH_DEFAULT_THRESHOLD(gTimeCheckerFilter, DALI_UP
 using namespace Dali::Integration;
 using Dali::Internal::Update::MessageQueue;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -1756,4 +1756,4 @@ void UpdateManager::RemoveFrameBuffer(Render::FrameBuffer* frameBuffer)
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

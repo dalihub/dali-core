@@ -22,7 +22,7 @@
 #include <dali/internal/render/shaders/program.h>
 #include <dali/public-api/common/dali-utility.h>
 
-namespace Dali::Internal::Render
+namespace DALI_NAMESPACE::Internal::Render
 {
 namespace
 {
@@ -344,4 +344,4 @@ Graphics::PrimitiveTopology Geometry::GetTopology() const
   return topology;
 }
 
-} // namespace Dali::Internal::Render
+} //namespace DALI_NAMESPACE::Internal::Render

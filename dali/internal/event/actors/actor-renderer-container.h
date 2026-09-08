@@ -22,7 +22,7 @@
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/public-api/rendering/renderer.h>
 
-namespace Dali::Internal
+namespace DALI_NAMESPACE::Internal
 {
 using RendererPtr = IntrusivePtr<Renderer>;
 class Renderer;
@@ -108,6 +108,6 @@ private:
   bool mIsCache : 1; /// The container is for cache renderers
 };
 
-} // namespace Dali::Internal
+} //namespace DALI_NAMESPACE::Internal
 
 #endif //DALI_INTERNAL_ACTORS_ACTOR_RENDERER_CONTAINER_H

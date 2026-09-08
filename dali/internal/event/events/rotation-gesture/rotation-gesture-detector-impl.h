@@ -24,7 +24,7 @@
 #include <dali/public-api/events/rotation-gesture-detector.h>
 #include <dali/public-api/events/rotation-gesture.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -179,6 +179,6 @@ inline const Internal::RotationGestureDetector& GetImplementation(const Dali::Ro
   return static_cast<const Internal::RotationGestureDetector&>(handle);
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_ROTATION_GESTURE_DETECTOR_H

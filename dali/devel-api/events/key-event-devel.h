@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/events/key-event.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace DevelKeyEvent
 {
@@ -76,6 +76,6 @@ DALI_CORE_API void SetInterceptProcessed(KeyEvent keyEvent, bool interceptProces
 
 } // namespace DevelKeyEvent
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_KEY_EVENT_DEVEL_H

@@ -22,7 +22,7 @@
 #include <dali/internal/common/type-abstraction.h>
 #include <type_traits>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -77,7 +77,7 @@ inline bool IsValidObject(const T* obj)
   }
   else
   {
-    (void)obj; // Suppress unused parameter warning for types without IsValid()
+    (void)obj;   // Suppress unused parameter warning for types without IsValid()
     return true; // Objects without IsValid() are always considered valid
   }
 }
@@ -792,6 +792,6 @@ private:
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_MESSAGE_H

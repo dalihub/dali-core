@@ -18,7 +18,7 @@
 // CLASS HEADER
 #include <dali/public-api/object/property-types.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace
 {
@@ -57,4 +57,4 @@ DALI_CORE_API const char* GetName(Property::Type type)
 
 }; // namespace PropertyTypes
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

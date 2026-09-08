@@ -32,7 +32,7 @@
 
 using Dali::Integration::Event;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -204,4 +204,4 @@ void EventProcessor::SendInterruptedEvents(Dali::Internal::Actor* actor)
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

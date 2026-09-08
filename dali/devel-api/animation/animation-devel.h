@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/animation/animation.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace DevelAnimation
 {
@@ -65,6 +65,6 @@ DALI_CORE_API Animation GetAnimationAt(uint32_t index);
 
 } // namespace DevelAnimation
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_ANIMATION_DEVEL_H

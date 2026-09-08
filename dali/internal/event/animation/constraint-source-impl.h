@@ -23,7 +23,7 @@
 #include <dali/internal/event/common/object-impl.h>
 #include <dali/public-api/animation/constraint-source.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -71,6 +71,6 @@ struct Source
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_CONSTRAINT_SOURCE_H

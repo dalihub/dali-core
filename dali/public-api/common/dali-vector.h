@@ -34,7 +34,7 @@
 #include <dali/public-api/common/dali-vector-complex-types.h>
 #include <dali/public-api/common/dali-vector-trivial-types.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @addtogroup dali_core_common
@@ -827,7 +827,7 @@ public: // API
 /**
  * @}
  */
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #if defined(DALI_VECTOR_RESTORE_COPY_MEMORY_MACRO)
 #pragma pop_macro("CopyMemory")

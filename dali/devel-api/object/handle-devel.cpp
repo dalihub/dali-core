@@ -23,7 +23,7 @@
 #include <dali/internal/event/common/type-info-impl.h>
 #include <dali/public-api/object/property-key.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace DevelHandle
 {
@@ -34,4 +34,4 @@ void SetTypeInfo(Handle& handle, const TypeInfo& typeInfo)
 
 } // namespace DevelHandle
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

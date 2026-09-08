@@ -28,7 +28,7 @@
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/events/gesture.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Integration
 {
@@ -392,6 +392,6 @@ private:
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_GESTURE_EVENT_PROCESSOR_H

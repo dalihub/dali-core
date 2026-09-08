@@ -31,7 +31,7 @@
 #include <dali/internal/update/rendering/scene-graph-renderer-messages.h>
 #include <dali/internal/update/rendering/scene-graph-renderer.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -1379,4 +1379,4 @@ void Renderer::TerminateRenderCallback(bool invokeCallback)
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

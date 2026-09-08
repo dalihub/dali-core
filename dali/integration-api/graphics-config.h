@@ -20,7 +20,7 @@
 
 #include <dali/public-api/rendering/renderer.h>
 
-namespace Dali::Integration
+namespace DALI_NAMESPACE::Integration
 {
 /**
  * GraphicsConfig is an abstract interface, used to access OpenGRAPHICS services.
@@ -72,6 +72,6 @@ public:
   virtual std::string GetFragmentShaderPrefix() = 0;
 };
 
-} // namespace Dali::Integration
+} //namespace DALI_NAMESPACE::Integration
 
 #endif

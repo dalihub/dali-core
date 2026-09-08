@@ -24,7 +24,7 @@
 #include <dali/devel-api/object/type-info.h>
 #include <dali/public-api/common/dali-common.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Integration
 {
@@ -299,6 +299,6 @@ DALI_CORE_API float GetTapGestureMaximumMotionDistance();
 
 } // namespace Integration
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTEGRATION_INPUT_OPTIONS_H

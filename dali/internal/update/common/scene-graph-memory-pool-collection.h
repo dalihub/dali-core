@@ -24,8 +24,9 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/common/memory-pool-interface.h>
+#include <dali/public-api/common/dali-namespace.h>
 
-namespace Dali::Internal::SceneGraph
+namespace DALI_NAMESPACE::Internal::SceneGraph
 {
 /**
  * The container of memory pools that SceneGraph using.
@@ -75,6 +76,6 @@ private:
   std::unique_ptr<Impl> mImpl{nullptr};
 };
 
-} // namespace Dali::Internal::SceneGraph
+} //namespace DALI_NAMESPACE::Internal::SceneGraph
 
 #endif // DALI_INTERNAL_SCENEGRAPH_MEMORY_POOL_COLLECTION_H

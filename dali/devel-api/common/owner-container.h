@@ -25,7 +25,7 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/dali-vector.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * OwnerContainer is a vector which own heap-allocated objects.
@@ -239,6 +239,6 @@ private:
   }
 };
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif //DALI_OWNER_CONTAINER_H

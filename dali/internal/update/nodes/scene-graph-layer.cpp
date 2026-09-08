@@ -22,7 +22,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -97,4 +97,4 @@ void Layer::ClearRenderables()
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

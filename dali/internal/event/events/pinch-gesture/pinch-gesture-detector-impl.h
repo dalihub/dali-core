@@ -24,7 +24,7 @@
 #include <dali/public-api/events/pinch-gesture-detector.h>
 #include <dali/public-api/events/pinch-gesture.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -177,6 +177,6 @@ inline const Internal::PinchGestureDetector& GetImplementation(const Dali::Pinch
   return static_cast<const Internal::PinchGestureDetector&>(handle);
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_PINCH_GESTURE_DETECTOR_H

@@ -29,7 +29,7 @@
 #include <dali/public-api/math/viewport.h>
 #include <dali/public-api/render-tasks/render-task.h>
 
-namespace Dali::Internal::SceneGraph
+namespace DALI_NAMESPACE::Internal::SceneGraph
 {
 // Messages for RenderTask
 inline void SetFrameBufferMessage(EventThreadServices& eventThreadServices, const RenderTask& task, Render::FrameBuffer* frameBuffer)
@@ -174,6 +174,6 @@ inline void SetRenderedScaleFactorMessage(EventThreadServices& eventThreadServic
   new(slot) LocalType(&task, &RenderTask::SetRenderedScaleFactor, scaleFactor);
 }
 
-} // namespace Dali::Internal::SceneGraph
+} //namespace DALI_NAMESPACE::Internal::SceneGraph
 
 #endif // DALI_INTERNAL_SCENE_GRAPH_RENDER_TASK_MESSAGES_H

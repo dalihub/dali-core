@@ -31,7 +31,7 @@
 #include "test-render-controller.h"
 #include "test-render-surface.h"
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 class TestApplication : public ConnectionTracker
 {
@@ -130,6 +130,6 @@ protected:
   static bool mLoggingEnabled;
 };
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TEST_APPLICATION_H

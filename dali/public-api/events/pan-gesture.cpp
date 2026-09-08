@@ -22,7 +22,7 @@
 #include <dali/internal/event/events/pan-gesture/pan-gesture-impl.h>
 #include <dali/public-api/common/dali-common.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 PanGesture::PanGesture(Internal::PanGesture* internal)
 : Gesture(internal)
@@ -96,4 +96,4 @@ float PanGesture::GetScreenDistance() const
   return GetImplementation(*this).GetScreenDistance();
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

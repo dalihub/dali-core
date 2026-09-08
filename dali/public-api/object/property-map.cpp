@@ -34,7 +34,7 @@ using Dali::Integration::ToDaliString;
 using Dali::Integration::ToDaliStringView;
 using Dali::Integration::ToStdStringView;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace
 {
@@ -651,4 +651,4 @@ std::ostream& operator<<(std::ostream& stream, const Property::Map& map)
   return stream;
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

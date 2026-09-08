@@ -34,7 +34,7 @@
 #include <dali/internal/event/events/multi-point-event-util.h>
 #include <dali/public-api/math/vector2.h>
 
-namespace Dali::Internal
+namespace DALI_NAMESPACE::Internal
 {
 namespace
 {
@@ -447,4 +447,4 @@ void ParentHoverEventProcessor::OnObservedActorDisconnected(Actor* actor)
 {
   SendInterruptedHoverEvent(actor);
 }
-} // namespace Dali::Internal
+} //namespace DALI_NAMESPACE::Internal

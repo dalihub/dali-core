@@ -21,7 +21,7 @@
 #include <dali/integration-api/scene.h>
 #include <dali/public-api/actors/actor.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 class RenderTask;
 
@@ -156,6 +156,6 @@ DALI_CORE_API bool BuildPickingRay(RenderTask renderTask, const Vector2& screenC
 
 } // namespace HitTestAlgorithm
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // __DALI_HIT_TEST_ALGORITHM_H__

@@ -133,7 +133,7 @@
   if(::Dali::Internal::QueueBenchmark::IsEnabled()) \
   ::Dali::Internal::QueueBenchmark::DumpToFile(path)
 
-namespace Dali::Internal::QueueBenchmark
+namespace DALI_NAMESPACE::Internal::QueueBenchmark
 {
 /**
  * @brief Check if queue benchmark is enabled via environment variable.
@@ -148,7 +148,7 @@ inline bool IsEnabled()
 {
 #if defined(_MSC_VER)
   char*       environmentVariableValue = nullptr;
-  std::size_t length = 0u;
+  std::size_t length                   = 0u;
   if(_dupenv_s(&environmentVariableValue, &length, "DALI_QUEUE_BENCHMARK") != 0 || environmentVariableValue == nullptr)
   {
     return false;
@@ -292,7 +292,7 @@ inline ChannelLog* GetLogs()
   static ChannelLog     logs[static_cast<std::size_t>(Channel::COUNT)];
   static std::once_flag initFlag;
   std::call_once(initFlag, []
-                 {
+  {
     for(auto& log : logs)
     {
       log.Init();
@@ -328,7 +328,7 @@ inline ChannelLog* GetValueLogs()
   static ChannelLog     logs[static_cast<std::size_t>(ValueChannel::COUNT)];
   static std::once_flag initFlag;
   std::call_once(initFlag, []
-                 {
+  {
     for(auto& log : logs)
     {
       log.Init();
@@ -500,6 +500,6 @@ DALI_CORE_API double Percentile(std::vector<std::int64_t>& sorted, double p);
  */
 DALI_CORE_API double RawPercentile(std::vector<std::int64_t>& sorted, double p);
 
-} // namespace Dali::Internal::QueueBenchmark
+} //namespace DALI_NAMESPACE::Internal::QueueBenchmark
 
 #endif // DALI_INTERNAL_QUEUE_BENCHMARK_INSTRUMENTATION_H

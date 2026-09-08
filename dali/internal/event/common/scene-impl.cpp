@@ -41,7 +41,7 @@
 
 using Dali::Internal::SceneGraph::Node;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -746,4 +746,4 @@ Integration::Scene::WheelEventGeneratedSignalType& Scene::WheelEventGeneratedSig
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

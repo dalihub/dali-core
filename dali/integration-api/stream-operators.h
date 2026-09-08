@@ -31,7 +31,7 @@
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/object/property-value.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 class String;
 
@@ -236,4 +236,4 @@ DALI_CORE_API std::ostream& operator<<(std::ostream& stream, const Property::Key
  * @}
  */
 
-} //namespace Dali
+} //namespace DALI_NAMESPACE

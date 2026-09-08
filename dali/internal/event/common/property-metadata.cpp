@@ -32,7 +32,7 @@
 #include <dali/public-api/object/property-map.h>
 #include <dali/public-api/object/property.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -519,4 +519,4 @@ void PropertyMetadata::AdjustPropertyValueBy(const Property::Value& relativeProp
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

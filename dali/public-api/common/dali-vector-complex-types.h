@@ -26,7 +26,7 @@
 #include <dali/public-api/common/dali-vector-base.h>
 #include <dali/public-api/common/dali-vector-trivial-types.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /// @cond internal
 /**
@@ -319,6 +319,6 @@ private:
 };
 /// @endcond
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_VECTOR_COMPLEX_TYPE_H

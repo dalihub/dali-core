@@ -23,7 +23,7 @@
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/math/vector3.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @addtogroup dali_core_math
@@ -313,6 +313,6 @@ struct TypeTraits<Matrix3> : public BasicTypes<Matrix3>
 /**
  * @}
  */
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif //DALI_MATRIX3_H

@@ -26,7 +26,7 @@
 #include <dali/internal/update/gestures/pan-gesture-profiling.h>
 #include <dali/public-api/common/dali-utility.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -1271,4 +1271,4 @@ bool PanGesture::NewAlgorithm(unsigned int lastVSyncTime, unsigned int nextVSync
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

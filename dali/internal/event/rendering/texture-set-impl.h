@@ -31,7 +31,7 @@
 #include <dali/public-api/common/intrusive-ptr.h>       // Dali::IntrusivePtr
 #include <dali/public-api/rendering/texture-set.h>      // Dali::TextureSet
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -150,6 +150,6 @@ inline const Internal::TextureSet& GetImplementation(const Dali::TextureSet& han
   return static_cast<const Internal::TextureSet&>(object);
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_TEXTURE_SET_H

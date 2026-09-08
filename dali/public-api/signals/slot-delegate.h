@@ -25,7 +25,7 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/signals/connection-tracker.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @addtogroup dali_core_signals
@@ -153,6 +153,6 @@ private:
 /**
  * @}
  */
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_SLOT_DELEGATE_H

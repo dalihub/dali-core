@@ -25,7 +25,7 @@
 #include "test-graphics-reflection.h"
 #include "test-graphics-sync-impl.h"
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 std::ostream& operator<<(std::ostream& o, const Graphics::BufferCreateInfo& bufferCreateInfo);
 std::ostream& operator<<(std::ostream& o, const Graphics::CommandBufferCreateInfo& commandBufferCreateInfo);
@@ -593,6 +593,6 @@ public:
   std::map<Graphics::DeviceCapability, uint32_t>            mDeviceLimitations;
 };
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // TEST_GRAPHICS_CONTROLLER_H

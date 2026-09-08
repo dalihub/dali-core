@@ -28,7 +28,7 @@ using Dali::Integration::ToDaliStringView;
 #include <dali-test-suite-utils.h>
 #include "mesh-builder.h"
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace
 {
@@ -167,4 +167,4 @@ void DirtyRectChecker(const std::vector<BoundsInteger>& damagedRects, std::multi
   DALI_TEST_EQUALS(expectedRectList.empty(), true, testLocation);
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

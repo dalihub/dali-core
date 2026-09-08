@@ -18,7 +18,7 @@
 #include <dali/public-api/object/handle.h>
 #include <dali/public-api/object/indirect-value.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 IndirectValue::IndirectValue(Handle& handle, Property::Index index)
 : mHandle(handle.GetObjectPtr()),
@@ -41,4 +41,4 @@ IndirectValue& IndirectValue::operator=(IndirectValue&&) noexcept = default;
 
 IndirectValue::IndirectValue(IndirectValue&&) noexcept = default;
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@
 #include <dali/internal/event/common/scene-impl.h>
 #include <dali/internal/event/events/gesture-requests.h>
 #include <dali/internal/event/events/pan-gesture/pan-gesture-event.h>
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -363,7 +363,7 @@ bool PanGestureRecognizer::SendPan(GestureState state, const Integration::TouchE
     gesture.timeDelta        = 0;
   }
 
-  gesture.time            = currentEvent.time;
+  gesture.time         = currentEvent.time;
   gesture.triggerPoint = mTriggerPoint;
 
   if(mScene)
@@ -399,4 +399,4 @@ void PanGestureRecognizer::SetMinimumPanEvents(int32_t minimumPanEvents)
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

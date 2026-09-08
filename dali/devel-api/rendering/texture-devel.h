@@ -24,7 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/rendering/texture.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace DevelTexture
 {
@@ -104,6 +104,6 @@ bool DALI_CORE_API UploadSubPixelData(Dali::Texture   texture,
                                       uint32_t        height);
 
 } // namespace DevelTexture
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TEXTURE_DEVEL_H

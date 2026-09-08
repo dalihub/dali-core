@@ -26,7 +26,7 @@
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/update/common/property-owner.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -142,6 +142,6 @@ inline void UpdateShaderDataMessage(EventThreadServices& eventThreadServices, co
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_RENDER_SHADER_H

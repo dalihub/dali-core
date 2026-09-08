@@ -36,7 +36,7 @@
 #include <dali/internal/update/manager/update-manager.h>
 #include <memory>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -476,6 +476,6 @@ protected:
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_ACTIVE_CONSTRAINT_H

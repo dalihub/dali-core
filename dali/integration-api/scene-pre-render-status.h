@@ -30,7 +30,7 @@
 #include <dali/public-api/math/vector4.h>
 #include <dali/public-api/object/handle.h>
 
-namespace Dali::Integration
+namespace DALI_NAMESPACE::Integration
 {
 /**
  * The status of the Core::PreRenderScene operation.
@@ -84,6 +84,6 @@ private:
   bool isRenderingSkipped : 1;
 };
 
-} // namespace Dali::Integration
+} //namespace DALI_NAMESPACE::Integration
 
 #endif // DALI_SCENE_PRE_RENDER_STATUS_H

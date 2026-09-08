@@ -22,7 +22,7 @@
 #include <dali/public-api/events/key-event.h>
 #include <dali/public-api/object/base-object.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -339,6 +339,6 @@ inline const Internal::KeyEvent& GetImplementation(const Dali::KeyEvent& keyEven
   return static_cast<const Internal::KeyEvent&>(object);
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_KEY_EVENT_H

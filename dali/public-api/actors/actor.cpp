@@ -35,7 +35,7 @@
 #include <dali/internal/event/rendering/renderer-impl.h>
 #include <dali/internal/event/size-negotiation/relayout-controller-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 Actor::Actor() = default;
 
@@ -1023,4 +1023,4 @@ Actor::Actor(Internal::Actor* internal)
 {
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

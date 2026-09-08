@@ -26,7 +26,7 @@
 
 #include <unordered_map>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 using Mask = Dali::FrameBuffer::Attachment::Mask;
 
@@ -249,6 +249,6 @@ private:
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_RENDER_FRAME_BUFFER_H

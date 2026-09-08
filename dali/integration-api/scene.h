@@ -31,7 +31,7 @@
 #include <dali/public-api/math/vector4.h>
 #include <dali/public-api/object/handle.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 class Actor;
 class KeyEvent;
@@ -659,6 +659,6 @@ public: // Not intended for application developers
 
 } // namespace Integration
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_SCENE_H

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
 #include <dali/internal/event/animation/constraint-impl.h>
 #include <dali/internal/event/common/object-impl.h>
 
-namespace Dali::Integration
+namespace DALI_NAMESPACE::Integration
 {
 void ConstraintSetInternalTag(Dali::Constraint& constraint, const uint32_t tag)
 {
@@ -46,4 +46,4 @@ void HandleRemoveConstraints(Dali::Handle& handle, uint32_t tagBegin, uint32_t t
   DALI_ASSERT_ALWAYS(ConstraintTagRanges::INTERNAL_CONSTRAINT_TAG_START <= tagBegin && tagEnd <= ConstraintTagRanges::INTERNAL_CONSTRAINT_TAG_MAX + 1u && "Out of tag range!");
   GetImplementation(handle).RemoveConstraints(tagBegin, tagEnd);
 }
-} // namespace Dali::Integration
+} //namespace DALI_NAMESPACE::Integration

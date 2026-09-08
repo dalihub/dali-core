@@ -21,11 +21,11 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/math/radian.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 Degree::Degree(Radian radian)
 : degree(radian * Math::ONE80_OVER_PI)
 {
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

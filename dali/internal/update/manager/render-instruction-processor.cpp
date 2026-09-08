@@ -42,7 +42,7 @@ Debug::Filter* gRenderListLogFilter = Debug::Filter::New(Debug::NoLogging, false
 #endif
 } // namespace
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -245,8 +245,8 @@ inline void AddRendererToRenderList(uint32_t                  renderPass,
     {
       const bool isVisualRendererUnder3D = (isLayer3d && !!(renderable.mRenderer && renderable.mRenderer->GetVisualProperties()));
 
-      const Renderer::OpacityType opacityType = rendererExist ? (isVisualRendererUnder3D ? Renderer::TRANSLUCENT : renderable.mRenderer->GetOpacityType(renderPass, *node)) : Renderer::OPAQUE;
-      const bool drawOffscreenRenderingCache = hasFrameBuffer && (node->GetCacheRendererCount() > 0u);
+      const Renderer::OpacityType opacityType                 = rendererExist ? (isVisualRendererUnder3D ? Renderer::TRANSLUCENT : renderable.mRenderer->GetOpacityType(renderPass, *node)) : Renderer::OPAQUE;
+      const bool                  drawOffscreenRenderingCache = hasFrameBuffer && (node->GetCacheRendererCount() > 0u);
 
       // We can skip render when node is not clipping and transparent
       // We must not skip when node is a stopper
@@ -714,4 +714,4 @@ void RenderInstructionProcessor::Prepare(SortedLayerPointers&        sortedLayer
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

@@ -31,7 +31,7 @@
 #include <dali/internal/event/events/pinch-gesture/pinch-gesture-detector-impl.h>
 #include <dali/internal/update/gestures/scene-graph-pan-gesture.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -423,4 +423,4 @@ const RotationGestureProcessor& GestureEventProcessor::GetRotationGestureProcess
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

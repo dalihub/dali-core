@@ -23,7 +23,7 @@
 #include <dali/internal/event/events/actor-observer.h>
 #include <dali/internal/event/render-tasks/render-task-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Integration
 {
@@ -70,6 +70,6 @@ private:
   struct Impl;
 };
 } // namespace Internal
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_PARENT_HOVER_EVENT_PROCESSOR_H

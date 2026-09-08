@@ -2,7 +2,7 @@
 #define DALI_BASE_OBJECT_IMPL_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali/integration-api/ordered-set.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @brief Holds the Implementation for the BaseObject class
@@ -91,6 +91,6 @@ private:
   bool mObserverNotifying : 1; ///< Whether we are currently notifying observers.
 };
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_BASE_OBJECT_IMPL_H

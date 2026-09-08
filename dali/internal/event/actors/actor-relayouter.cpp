@@ -32,7 +32,7 @@
 Debug::Filter* gLogRelayoutFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_RELAYOUT_TIMER");
 #endif
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -428,4 +428,4 @@ bool ActorSizer::Relayouter::IsLayoutNegotiated(Dimension::Type dimension) const
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

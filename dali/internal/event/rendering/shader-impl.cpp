@@ -34,7 +34,7 @@
 
 using Dali::Integration::ToStdStringView;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -501,4 +501,4 @@ std::string Shader::GenerateTaggedShaderPrefix(const std::string& shaderPrefix)
 }
 
 } // namespace Internal
-} // namespace Dali
+} //namespace DALI_NAMESPACE

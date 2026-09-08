@@ -44,7 +44,7 @@
 #include <dali/public-api/object/property-notification.h>
 #include <dali/public-api/object/property.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 class PropertyNotification;
 
@@ -658,7 +658,7 @@ private:
 
   Handle::PropertySetSignalType mPropertySetSignal;
 
-  PropertyBatch* mPropertyBatch;  ///< 8 bytes, initially nullptr. Lazily allocated from thread-local free-list.
+  PropertyBatch* mPropertyBatch; ///< 8 bytes, initially nullptr. Lazily allocated from thread-local free-list.
 
   // Friend declarations for property batching free-list functions
   friend void LinkIntoDirtyList(Object* object);
@@ -692,6 +692,6 @@ inline const Internal::Object& GetImplementation(const Dali::Handle& object)
   return static_cast<const Internal::Object&>(handle);
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_OBJECT_H

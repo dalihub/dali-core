@@ -29,7 +29,7 @@
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/math/radian.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 using Internal::PerformanceMonitor;
 
@@ -530,4 +530,4 @@ void Quaternion::SetFromAxes(const Vector3& xAxis, const Vector3& yAxis, const V
   Normalize();
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

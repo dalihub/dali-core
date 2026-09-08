@@ -26,7 +26,7 @@
 #include <dali/public-api/object/handle.h>       // Dali::Handle
 #include <dali/public-api/object/property-map.h> // Dali::Property::Map
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @addtogroup dali_core_rendering_effects
@@ -207,6 +207,6 @@ public:
 /**
  * @}
  */
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_VERTEX_BUFFER_H

@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-vector.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace
 {
@@ -267,4 +267,4 @@ void KeyEvent::SetReceiveTime(uint32_t time)
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

@@ -30,7 +30,7 @@
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/common/dali-common.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -306,6 +306,6 @@ inline void SetApplyRateMessage(EventThreadServices& eventThreadServices, const 
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_SCENE_GRAPH_CONSTRAINT_BASE_H

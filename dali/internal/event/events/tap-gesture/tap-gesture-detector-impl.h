@@ -24,7 +24,7 @@
 #include <dali/public-api/events/tap-gesture-detector.h>
 #include <dali/public-api/events/tap-gesture.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -232,6 +232,6 @@ inline const Internal::TapGestureDetector& GetImplementation(const Dali::TapGest
   return static_cast<const Internal::TapGestureDetector&>(handle);
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_TAP_GESTURE_DETECTOR_H

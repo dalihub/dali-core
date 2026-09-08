@@ -28,7 +28,7 @@
 #include <dali/internal/render/renderers/render-texture-key.h>
 #include <dali/internal/render/renderers/render-texture.h>
 
-namespace Dali::Internal::Render
+namespace DALI_NAMESPACE::Internal::Render
 {
 inline void UploadTextureMessage(EventThreadServices& eventThreadServices, Render::TextureKey texture, PixelDataPtr pixelData, const Graphics::UploadParams& params)
 {
@@ -73,6 +73,6 @@ inline void SetTextureFormatMessage(EventThreadServices& eventThreadServices, Re
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new(slot) LocalType(texture.Get(), &Render::Texture::SetPixelFormat, pixelFormat);
 }
-} // namespace Dali::Internal::Render
+} //namespace DALI_NAMESPACE::Internal::Render
 
 #endif //  DALI_INTERNAL_RENDER_TEXTURE_MESSAGES_H

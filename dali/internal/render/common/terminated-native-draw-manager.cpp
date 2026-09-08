@@ -23,7 +23,7 @@
 // INTERNAL INCLUDES
 #include <dali/graphics-api/graphics-controller.h>
 
-namespace Dali::Internal::Render
+namespace DALI_NAMESPACE::Internal::Render
 {
 TerminatedNativeDrawManager::TerminatedNativeDrawManager(Graphics::Controller& graphicsController)
 : mGraphicsController(&graphicsController),
@@ -151,4 +151,4 @@ void TerminatedNativeDrawManager::RenderTargetGraphicsObjectsDestroyed(const Sce
   }
 }
 
-} // namespace Dali::Internal::Render
+} //namespace DALI_NAMESPACE::Internal::Render

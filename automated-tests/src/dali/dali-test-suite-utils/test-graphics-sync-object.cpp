@@ -16,7 +16,7 @@
 
 #include "test-graphics-sync-object.h"
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 TestGraphicsSyncObject::TestGraphicsSyncObject(TestGraphicsSyncImplementation& syncImpl, const Graphics::SyncObjectCreateInfo& createInfo)
 : mSyncImplementation(syncImpl),
@@ -45,4 +45,4 @@ bool TestGraphicsSyncObject::IsSynced()
   return synced;
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

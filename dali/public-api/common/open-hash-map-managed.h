@@ -26,7 +26,7 @@
 #include <dali/public-api/common/type-traits.h>
 #include <dali/public-api/math/math-utils.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @addtogroup dali_core_common
@@ -1296,6 +1296,6 @@ private:
  * @}
  */
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_PUBLIC_API_COMMON_OPEN_HASH_MAP_MANAGED_H

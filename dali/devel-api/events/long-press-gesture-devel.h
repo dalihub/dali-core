@@ -2,7 +2,7 @@
 #define DALI_LONG_PRESS_GESTURE_DEVEL_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/events/long-press-gesture.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace DevelLongPressGesture
 {
@@ -35,6 +35,6 @@ DALI_CORE_API LongPressGesture New(GestureState state);
 
 } // namespace DevelLongPressGesture
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_LONG_PRESS_GESTURE_DEVEL_H

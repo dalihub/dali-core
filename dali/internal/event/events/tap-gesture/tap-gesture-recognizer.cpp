@@ -30,7 +30,7 @@
 #include <dali/internal/event/common/scene-impl.h>
 #include <dali/internal/event/events/gesture-requests.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -276,4 +276,4 @@ Dali::Actor TapGestureRecognizer::GetCurrentGesturedActor()
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

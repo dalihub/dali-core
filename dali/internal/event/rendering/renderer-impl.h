@@ -31,7 +31,7 @@
 #include <dali/public-api/common/intrusive-ptr.h>           // Dali::IntrusivePtr
 #include <dali/public-api/rendering/renderer.h>             // Dali::Renderer
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -348,6 +348,6 @@ inline const Internal::Renderer& GetImplementation(const Dali::Renderer& handle)
   return static_cast<const Internal::Renderer&>(object);
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_RENDERER_H

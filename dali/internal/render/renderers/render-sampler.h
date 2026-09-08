@@ -21,7 +21,7 @@
 #include <dali/public-api/rendering/sampler.h>
 #include <dali/public-api/rendering/sampling.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -182,6 +182,6 @@ public:
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif //  DALI_INTERNAL_RENDER_SAMPLER_H

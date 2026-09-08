@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/rendering/renderer.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @addtogroup dali_core_rendering_effects
@@ -316,6 +316,6 @@ public:
 /**
  * @}
  */
-} //namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_VISUAL_RENDERER_H

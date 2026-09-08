@@ -25,7 +25,7 @@
 
 #include <iostream>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 template<typename T>
 struct UtcCoverageIntrusivePtr
@@ -51,6 +51,6 @@ struct UtcCoverageIntrusivePtr
   };
 };
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // TEST_INTRUSIVE_PTR_H

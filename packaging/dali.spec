@@ -104,6 +104,9 @@ cmake \
 %if 0%{?enable_gpu_memory_profile}
       -DENABLE_GPU_MEMORY_PROFILE=ON \
 %endif
+%if 0%{?enable_tizen_namespace}
+      -DENABLE_TIZEN_NAMESPACE=ON \
+%endif
       -DCMAKE_INSTALL_PREFIX=%{_prefix} \
       -DCMAKE_INSTALL_LIBDIR=%{_libdir} \
       -DCMAKE_INSTALL_INCLUDEDIR=%{_includedir}

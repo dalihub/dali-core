@@ -52,9 +52,10 @@ inline bool __sync_bool_compare_and_swap(T* pointer, U oldValue, V newValue)
 #endif
 
 // INTERNAL INCLUDES
+#include <dali/public-api/common/dali-namespace.h>
 #include <dali/public-api/common/type-traits.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @addtogroup dali_core_common
@@ -968,4 +969,4 @@ bool operator>=(const SharedPtr<Type>& lhs, const SharedPtr<Type>& rhs) noexcept
  * @}
  */
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

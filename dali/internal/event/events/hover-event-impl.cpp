@@ -18,7 +18,7 @@
 // CLASS HEADER
 #include <dali/internal/event/events/hover-event-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -144,4 +144,4 @@ void HoverEvent::AddPoint(const Integration::Point& point)
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/event/events/rotation-gesture/rotation-gesture-detector-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 RotationGestureDetector::RotationGestureDetector(Internal::RotationGestureDetector* internal)
 : GestureDetector(internal)
@@ -57,4 +57,4 @@ RotationGestureDetector::DetectedSignalType& RotationGestureDetector::DetectedSi
   return GetImplementation(*this).DetectedSignal();
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

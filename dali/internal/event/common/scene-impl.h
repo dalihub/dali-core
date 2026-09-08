@@ -28,7 +28,7 @@
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Integration
 {
@@ -578,6 +578,6 @@ inline const Internal::Scene& GetImplementation(const Dali::Integration::Scene& 
   return static_cast<const Internal::Scene&>(object);
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_SCENE_H

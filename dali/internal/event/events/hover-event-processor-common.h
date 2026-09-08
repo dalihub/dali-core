@@ -26,7 +26,7 @@
 #include <dali/internal/event/actors/layer-impl.h>
 #include <dali/internal/event/events/hit-test-algorithm-impl.h>
 
-namespace Dali::Internal::HoverEventProcessorCommon
+namespace DALI_NAMESPACE::Internal::HoverEventProcessorCommon
 {
 inline constexpr const char* POINT_STATE_NAME[PointState::INTERRUPTED + 1] =
   {
@@ -77,6 +77,6 @@ inline uint32_t GetMilliSeconds()
 
   return static_cast<uint32_t>(duration.count());
 }
-} // namespace Dali::Internal::HoverEventProcessorCommon
+} //namespace DALI_NAMESPACE::Internal::HoverEventProcessorCommon
 
 #endif // DALI_INTERNAL_HOVER_EVENT_PROCESSOR_COMMON_H

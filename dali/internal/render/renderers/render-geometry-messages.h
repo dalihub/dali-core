@@ -24,7 +24,7 @@
 #include <dali/internal/render/renderers/render-geometry.h>
 #include <dali/internal/render/renderers/render-vertex-buffer.h>
 
-namespace Dali::Internal::Render
+namespace DALI_NAMESPACE::Internal::Render
 {
 inline void AttachVertexBufferMessage(EventThreadServices& eventThreadServices, Render::Geometry& geometry, const Render::VertexBuffer& vertexBuffer)
 {
@@ -114,6 +114,6 @@ inline void SetGeometryTypeMessage(EventThreadServices& eventThreadServices, Ren
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new(slot) LocalType(&geometry, &Render::Geometry::SetType, geometryType);
 }
-} // namespace Dali::Internal::Render
+} //namespace DALI_NAMESPACE::Internal::Render
 
 #endif //  DALI_INTERNAL_RENDER_GEOMETRY_MESSAGES_H

@@ -27,7 +27,7 @@
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/events/touch-event.h>
 
-namespace Dali::Internal
+namespace DALI_NAMESPACE::Internal
 {
 namespace
 {
@@ -371,4 +371,4 @@ void GeometryTouchStreamRouter::Clear()
   mSceneActiveDeviceIds.clear();
 }
 
-} // namespace Dali::Internal
+} //namespace DALI_NAMESPACE::Internal

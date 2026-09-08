@@ -46,7 +46,7 @@
 #include <dali/public-api/render-tasks/render-task.h>
 #include <dali/public-api/rendering/renderer.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 class KeyEvent;
 class TouchData;
@@ -2747,6 +2747,6 @@ struct EnableBitMaskOperators<OffScreenRenderable::Type>
   static const bool ENABLE = true;
 };
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_ACTOR_H

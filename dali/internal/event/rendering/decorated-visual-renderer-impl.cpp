@@ -33,7 +33,7 @@
 #include <dali/internal/update/rendering/scene-graph-renderer.h>
 #include <dali/internal/update/rendering/scene-graph-visual-renderer.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -942,4 +942,4 @@ void DecoratedVisualRenderer::EnsureDecoratedVisualPropertiesAndCache(uint8_t ne
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

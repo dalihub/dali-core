@@ -25,7 +25,7 @@
 using Dali::Integration::ToDaliStringView;
 using Dali::Integration::ToStdString;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 UniformBlock UniformBlock::New(Dali::String blockName)
 {
@@ -77,4 +77,4 @@ UniformBlock::UniformBlock(Internal::UniformBlock* object)
 {
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

@@ -18,7 +18,10 @@
  *
  */
 
-namespace Dali
+// INTERNAL INCLUDES
+#include <dali/public-api/common/dali-namespace.h>
+
+namespace DALI_NAMESPACE
 {
 /**
  * @addtogroup dali_core_events
@@ -96,6 +99,6 @@ enum Type
 /**
  * @}
  */
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif //DALI_KEY_EVENT_DEVEL_H

@@ -23,7 +23,7 @@
 #include <dali/internal/event/events/hover-event-impl.h>
 #include <dali/public-api/actors/actor.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 HoverEvent HoverEvent::New(uint32_t time)
 {
@@ -127,4 +127,4 @@ HoverEvent::HoverEvent(Internal::HoverEvent* internal)
 {
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

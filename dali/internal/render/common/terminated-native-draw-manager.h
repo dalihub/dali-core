@@ -27,7 +27,7 @@
 #include <dali/graphics-api/graphics-command-buffer.h>                  ///< for Graphics::DrawNativeInfo
 #include <dali/internal/render/common/render-target-graphics-objects.h> ///< For RenderTargetGraphicsObjects::LifecycleObserver
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Graphics
 {
@@ -123,6 +123,6 @@ private:
   TerminatedRenderTargetsContainer mTerminatedRenderTargets;
 };
 } // namespace Internal::Render
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_RENDER_TERMINATED_NATIVE_DRAW_MANAGER_H

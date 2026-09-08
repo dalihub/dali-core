@@ -19,11 +19,12 @@
 #define DALI_INTEGRATION_API_LOCALE_NUMERIC_GUARD_H
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/dali-namespace.h>
 #include <clocale> ///< for setlocale
 #include <cstdlib> ///< for free
 #include <cstring> ///< for strdup
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 
 /**
@@ -80,6 +81,6 @@ private:
   char* mPreviousLocale;
 };
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTEGRATION_API_LOCALE_NUMERIC_GUARD_H

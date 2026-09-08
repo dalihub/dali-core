@@ -25,7 +25,7 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/type-traits.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @addtogroup dali_core_math
@@ -630,6 +630,6 @@ struct TypeTraits<Vector3> : public BasicTypes<Vector3>
 /**
  * @}
  */
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_VECTOR_3_H

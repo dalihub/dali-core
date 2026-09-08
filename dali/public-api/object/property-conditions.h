@@ -26,7 +26,7 @@
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/object/property.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @addtogroup dali_core_object
@@ -206,6 +206,6 @@ DALI_CORE_API PropertyCondition VariableStepCondition(const Dali::Vector<float>&
 /**
  * @}
  */
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_PROPERTY_CONDITIONS_H

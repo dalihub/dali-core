@@ -25,7 +25,7 @@
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/events/multi-point-event-util.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -120,4 +120,4 @@ bool IsActuallySensitive(Actor* actor)
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

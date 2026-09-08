@@ -24,7 +24,7 @@
 #include <list>
 #include <vector>
 
-namespace Dali::Internal
+namespace DALI_NAMESPACE::Internal
 {
 enum class GeometryTouchStreamPhase : uint8_t
 {
@@ -60,6 +60,6 @@ struct GeometryTouchStreamState
   std::vector<GeometryTouchRecipient> recipientsInDispatchOrder;
 };
 
-} // namespace Dali::Internal
+} //namespace DALI_NAMESPACE::Internal
 
 #endif // DALI_INTERNAL_GEOMETRY_TOUCH_STREAM_STATE_H

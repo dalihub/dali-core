@@ -23,7 +23,7 @@
 #include <dali/internal/event/events/long-press-gesture/long-press-gesture-event.h>
 #include <dali/public-api/events/long-press-gesture-detector.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -226,6 +226,6 @@ inline const Internal::LongPressGestureDetector& GetImplementation(const Dali::L
   return static_cast<const Internal::LongPressGestureDetector&>(handle);
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_LONG_PRESS_GESTURE_DETECTOR_IMPL_H

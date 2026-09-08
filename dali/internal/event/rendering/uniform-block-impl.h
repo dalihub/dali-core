@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_UNIFORM_BLOCK_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@
 #include <dali/public-api/common/intrusive-ptr.h>   // Dali::IntrusivePtr
 #include <dali/public-api/rendering/uniform-block.h>
 
-namespace Dali::Internal
+namespace DALI_NAMESPACE::Internal
 {
 namespace Render
 {
@@ -135,9 +135,9 @@ private:
   std::string_view mUniformBlockName; ///< The name of uniform blocks. String owned by scene object.
 };
 
-}; // namespace Dali::Internal
+}; //namespace DALI_NAMESPACE::Internal
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 // Helpers for public-api forwarding methods
 inline Internal::UniformBlock& GetImplementation(Dali::UniformBlock& handle)
@@ -158,6 +158,6 @@ inline const Internal::UniformBlock& GetImplementation(const Dali::UniformBlock&
   return static_cast<const Internal::UniformBlock&>(object);
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_UNIFORM_BLOCK_H

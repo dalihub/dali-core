@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/devel-api/object/type-info.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -52,4 +52,4 @@ Dali::TypeInfo CustomActor::GetTypeInfo()
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

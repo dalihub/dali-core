@@ -32,7 +32,7 @@
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/render/renderers/render-vertex-buffer.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 class VertexBuffer;
 namespace Internal
@@ -201,6 +201,6 @@ inline const Internal::VertexBuffer& GetImplementation(const Dali::VertexBuffer&
   return static_cast<const Internal::VertexBuffer&>(object);
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_VERTEX_BUFFER_H

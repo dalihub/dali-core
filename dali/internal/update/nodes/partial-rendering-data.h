@@ -21,7 +21,7 @@
 #include <dali/public-api/math/vector3.h>
 #include <dali/public-api/math/vector4.h>
 
-namespace Dali::Internal::SceneGraph
+namespace DALI_NAMESPACE::Internal::SceneGraph
 {
 /**
  * Structure contains partial rendering data used in order to determine
@@ -31,10 +31,10 @@ struct PartialRenderingData
 {
   struct NodeInfomations
   {
-    Matrix  modelMatrix{};         /// Model matrix
-    Vector4 worldColorMultiplier{};          /// World Color
-    Vector4 updatedPositionSize{}; /// Updated position/size (x, y, width, height)
-    Vector3 size{};                /// Size
+    Matrix  modelMatrix{};          /// Model matrix
+    Vector4 worldColorMultiplier{}; /// World Color
+    Vector4 updatedPositionSize{};  /// Updated position/size (x, y, width, height)
+    Vector3 size{};                 /// Size
 
     mutable size_t hash{0u}; /// Last frame's hash
 
@@ -77,10 +77,10 @@ struct PartialRenderingData
     {
       if(this != &rhs)
       {
-        modelMatrix         = std::move(rhs.modelMatrix);
-        worldColorMultiplier          = std::move(rhs.worldColorMultiplier);
-        updatedPositionSize = std::move(rhs.updatedPositionSize);
-        size                = std::move(rhs.size);
+        modelMatrix          = std::move(rhs.modelMatrix);
+        worldColorMultiplier = std::move(rhs.worldColorMultiplier);
+        updatedPositionSize  = std::move(rhs.updatedPositionSize);
+        size                 = std::move(rhs.size);
 
         hash     = rhs.hash;
         rhs.hash = 0u;
@@ -133,7 +133,7 @@ struct PartialRenderingData
     {
       size_t hash = NodeInfomations::CalculateHash(worldColorMultiplier, updatedPositionSize, size, modelMatrix);
 
-      mUpdated = !(mNodeInfomations.GetHash() == hash &&        ///< Hash comparision first
+      mUpdated = !(mNodeInfomations.GetHash() == hash &&                            ///< Hash comparision first
                    mNodeInfomations.worldColorMultiplier == worldColorMultiplier && ///< Full comparision one more time.
                    mNodeInfomations.updatedPositionSize == updatedPositionSize &&
                    mNodeInfomations.size == size &&
@@ -182,6 +182,6 @@ struct PartialRenderingData
   }
 };
 
-} // namespace Dali::Internal::SceneGraph
+} //namespace DALI_NAMESPACE::Internal::SceneGraph
 
 #endif // DALI_INTERNAL_SCENE_GRAPH_PARTIAL_RENDERING_DATA_H

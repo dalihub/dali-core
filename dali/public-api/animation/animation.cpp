@@ -25,7 +25,7 @@
 #include <dali/public-api/animation/alpha-function.h>
 #include <dali/public-api/animation/time-period.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 Animation::Animation() = default;
 
@@ -323,4 +323,4 @@ float Animation::GetBlendPoint() const
   return GetImplementation(*this).GetBlendPoint();
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

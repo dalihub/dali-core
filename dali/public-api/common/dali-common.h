@@ -20,6 +20,9 @@
 
 // EXTERNAL INCLUDES
 
+// INTERNAL INCLUDES
+#include <dali/public-api/common/dali-namespace.h>
+
 /*
  * Definitions for shared library support.
  *
@@ -95,7 +98,7 @@
  * @brief The DALi namespace.
  * @SINCE_1_0.0
  */
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @addtogroup dali_core_common
@@ -144,7 +147,7 @@ public:
 /**
  * @}
  */
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 /**
  * @brief An invariant concurrent assertion to ensure its argument always evaluates TRUE.

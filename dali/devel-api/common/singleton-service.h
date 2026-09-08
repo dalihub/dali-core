@@ -22,7 +22,7 @@
 #include <dali/public-api/object/base-handle.h>
 #include <typeinfo>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal DALI_INTERNAL
 {
@@ -96,6 +96,6 @@ public: // Not intended for application developers
   explicit DALI_INTERNAL SingletonService(Internal::ThreadLocalStorage* singletonService);
 };
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_SINGELTON_SERVICE_H

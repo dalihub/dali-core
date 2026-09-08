@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
 
 #include "test-native-image.h"
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 TestNativeImagePointer TestNativeImage::New(uint32_t width, uint32_t height)
 {
@@ -43,4 +43,4 @@ TestNativeImage::~TestNativeImage()
 {
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

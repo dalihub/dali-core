@@ -22,7 +22,7 @@
 #include <dali/integration-api/stream-operators.h> // Ensures operator<<(ostream&, const Property::Key&) is exported (DALI_CORE_API)
 #include <dali/integration-api/string-utils.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 
 Property::Key::Key(const Dali::String& key)
@@ -124,4 +124,4 @@ std::ostream& operator<<(std::ostream& stream, const Property::Key& key)
   return stream;
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

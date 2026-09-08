@@ -24,7 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/object/property-value.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @brief Creates a Property::Value (as a Map) from an initializer_list.
@@ -43,6 +43,6 @@ namespace Dali
  * @endcode
  */
 DALI_CORE_API Property::Value CreatePropertyValue(std::initializer_list<KeyValuePair> values);
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_DEVEL_API_OBJECT_PROPERTY_VALUE_DEVEL_H

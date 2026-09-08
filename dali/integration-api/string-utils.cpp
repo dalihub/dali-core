@@ -18,7 +18,7 @@
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/common/dali-common.h>
 
-namespace Dali::Integration
+namespace DALI_NAMESPACE::Integration
 {
 
 std::string ToStdString(String&& string)
@@ -53,4 +53,4 @@ String ToDaliString(std::string&& string)
   return Internal::StringImpl::ToDaliString(std::move(string));
 }
 
-} // namespace Dali::Integration
+} //namespace DALI_NAMESPACE::Integration

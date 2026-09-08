@@ -26,7 +26,7 @@
 #include <dali/integration-api/debug.h>
 #include <dali/internal/common/mutex-trace.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * Data members for ConditionalWait
@@ -173,4 +173,4 @@ unsigned int ConditionalWait::GetWaitCount() const
   return mImpl->count;
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

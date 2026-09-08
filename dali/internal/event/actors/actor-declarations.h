@@ -24,7 +24,7 @@
 
 #include <dali/internal/event/rendering/renderer-impl.h> ///< DevNote : This fix compile error at clang-18 + C++26.
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -44,6 +44,6 @@ using ActorConstIter = ActorContainer::const_iterator;
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_ACTOR_DECLARATIONS_H

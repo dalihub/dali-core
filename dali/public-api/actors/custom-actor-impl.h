@@ -31,7 +31,7 @@
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/render-tasks/render-task.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @addtogroup dali_core_actors
@@ -416,6 +416,6 @@ private:
 /**
  * @}
  */
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_CUSTOM_ACTOR_IMPL_H

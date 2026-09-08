@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/signals/dali-signal.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @addtogroup dali_core_object
@@ -39,6 +39,6 @@ using PropertyNotifySignalType = Signal<void(PropertyNotification)>;
 /**
  * @}
  */
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_PROPERTY_NOTIFICATION_DECLARATIONS_H

@@ -71,7 +71,7 @@ uint64_t GetNanoseconds()
 #endif
 } // namespace
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -279,4 +279,4 @@ Dali::Animation AnimationPlaylist::GetAnimationAt(uint32_t index)
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

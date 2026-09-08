@@ -22,7 +22,7 @@
 #include <dali/internal/event/images/pixel-data-impl.h> // Dali::Internal::PixelData
 #include <dali/internal/event/rendering/texture-impl.h> // Dali::Internal::Texture
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 Texture Texture::New(TextureType::Type type, Pixel::Format format, uint32_t width, uint32_t height)
 {
@@ -102,4 +102,4 @@ Texture::Texture(Internal::Texture* pointer)
 {
 }
 
-} //namespace Dali
+} //namespace DALI_NAMESPACE

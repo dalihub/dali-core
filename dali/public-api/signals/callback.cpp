@@ -18,7 +18,7 @@
 // CLASS HEADER
 #include <dali/public-api/signals/callback.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 // CallbackBase
 
@@ -68,4 +68,4 @@ void CallbackBase::Reset()
   mStaticFunction = nullptr;
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

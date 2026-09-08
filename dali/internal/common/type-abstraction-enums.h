@@ -24,7 +24,7 @@
 #include <dali/internal/common/type-abstraction.h>
 #include <dali/public-api/rendering/renderer.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -87,6 +87,6 @@ struct ParameterType<Dali::WrapMode::Type> : public BasicType<Dali::WrapMode::Ty
 
 } //namespace Internal
 
-} //namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_TYPE_ABSTRACTION_ENUMS_H

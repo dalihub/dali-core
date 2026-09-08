@@ -28,7 +28,7 @@
 
 #include <list>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 class Actor;
 struct Vector2;
@@ -123,6 +123,6 @@ private:
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_GEOMETRY_TOUCH_EVENT_PROCESSOR_H

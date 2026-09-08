@@ -36,7 +36,7 @@
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/public-api/object/object-registry.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -535,4 +535,4 @@ void RelayoutController::GetMemoryPoolCapacity(uint32_t& cap, uint32_t& size)
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

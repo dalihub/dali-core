@@ -21,7 +21,7 @@
 
 // INTERNAL INCLUDES
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 Path Path::New()
 {
@@ -86,4 +86,4 @@ uint32_t Path::GetPointCount() const
   return GetImplementation(*this).GetPointCount();
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

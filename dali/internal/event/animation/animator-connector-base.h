@@ -26,7 +26,7 @@
 #include <dali/public-api/animation/time-period.h>
 #include <dali/public-api/common/dali-common.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -194,6 +194,6 @@ protected:
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_ANIMATOR_CONNECTOR_BASE_H

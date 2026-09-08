@@ -55,7 +55,7 @@ uint64_t GetNanoseconds()
 #endif
 } // namespace
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -151,14 +151,14 @@ bool FrameCallbackProcessor::Update(float elapsedSeconds)
 #endif
 
     DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_FRAME_CALLBACK_UPDATE", [&](std::ostringstream& oss)
-                                            { oss << "[" << mFrameCallbacks.size() << "]"; });
+    { oss << "[" << mFrameCallbacks.size() << "]"; });
 
     DALI_TIME_CHECKER_BEGIN(gTimeCheckerFilter);
 
     // If any of the FrameCallback::Update calls returns false, then they are no longer required & can be removed.
     auto iter = std::remove_if(
       mFrameCallbacks.begin(), mFrameCallbacks.end(), [&](OwnerPointer<FrameCallback>& frameCallback)
-      {
+    {
 #ifdef TRACE_ENABLED
       if(gTraceFilter && gTraceFilter->IsTraceEnabled())
       {
@@ -178,10 +178,10 @@ bool FrameCallbackProcessor::Update(float elapsedSeconds)
     mFrameCallbacks.erase(iter, mFrameCallbacks.end());
 
     DALI_TIME_CHECKER_END_WITH_MESSAGE_GENERATOR(gTimeCheckerFilter, [&](std::ostringstream& oss)
-                                                 { oss << "DALI_FRAME_CALLBACK_UPDATE. [" << mFrameCallbacks.size() << "]"; });
+    { oss << "DALI_FRAME_CALLBACK_UPDATE. [" << mFrameCallbacks.size() << "]"; });
 
     DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_FRAME_CALLBACK_UPDATE", [&](std::ostringstream& oss)
-                                          {
+    {
       oss << "[" << mFrameCallbacks.size() << ",";
 
       std::sort(frameCallbackTimeChecker.rbegin(), frameCallbackTimeChecker.rend());
@@ -226,4 +226,4 @@ SceneGraphTravelerPtr FrameCallbackProcessor::GetSceneGraphTraveler(Node* rootNo
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

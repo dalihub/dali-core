@@ -27,7 +27,7 @@
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/common/type-registry-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 BaseObject::BaseObject()
 : mImpl(new Impl(*this))
@@ -144,4 +144,4 @@ bool BaseObject::DoConnectSignal(ConnectionTrackerInterface* connectionTracker, 
   return false;
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

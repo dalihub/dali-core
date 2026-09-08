@@ -36,7 +36,7 @@
 #include <memory>
 #include <sstream>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace
 {
@@ -1626,4 +1626,4 @@ void TestGraphicsController::UpdateRenderTarget(Graphics::RenderTarget& renderTa
   testRenderTarget->mCreateInfo.preTransform = renderTargetCreateInfo.preTransform;
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

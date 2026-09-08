@@ -65,7 +65,7 @@ struct CallbackBaseEqual
 };
 } // unnamed namespace
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @brief Lazy cache for large signals. Only allocated when block count >= CACHE_BLOCK_THRESHOLD.
@@ -436,4 +436,4 @@ bool BaseSignal::EmitGuard::ErrorOccurred()
   return (nullptr == mFlag);
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

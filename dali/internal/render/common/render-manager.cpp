@@ -53,7 +53,7 @@
 
 #include <dali/public-api/common/dali-utility.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -1506,4 +1506,4 @@ Integration::GraphicsConfig& RenderManager::GetGraphicsConfig() const
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

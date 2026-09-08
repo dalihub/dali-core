@@ -31,7 +31,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-vector-base.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /// @cond internal
 /**
@@ -207,7 +207,7 @@ protected: // API for deriving classes
 };
 /// @endcond
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #if defined(DALI_VECTOR_TRIVIAL_RESTORE_COPY_MEMORY_MACRO)
 #pragma pop_macro("CopyMemory")

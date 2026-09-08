@@ -18,6 +18,9 @@
  *
  */
 
+// INTERNAL INCLUDES
+#include <dali/public-api/common/dali-namespace.h>
+
 // define this to print information about the items rendered each frame
 #undef DALI_PRINT_RENDER_INFO
 
@@ -50,7 +53,7 @@
 #define DALI_PRINT_RENDERER_COUNT(x, y)
 #endif // DALI_PRINT_RENDERERS
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -112,6 +115,6 @@ void DumpNode(const SceneGraph::Node* node, unsigned int indent = 0);
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_RENDER_DEBUG_H

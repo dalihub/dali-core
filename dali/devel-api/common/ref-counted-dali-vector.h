@@ -2,7 +2,7 @@
 #define REF_COUNTED_DALI_VECTOR_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/object/ref-object.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @brief A reference counting wrapper for a vector class that allows
@@ -69,6 +69,6 @@ private:
   Vector<T> mVector; ///< The vector of data
 };
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // REF_COUNTED_DALI_VECTOR_H

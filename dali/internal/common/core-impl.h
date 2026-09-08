@@ -28,7 +28,7 @@
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/update/update-proxy.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 class FrameCallbackInterface;
 
@@ -437,6 +437,6 @@ private:
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_CORE_H

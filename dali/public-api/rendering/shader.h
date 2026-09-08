@@ -57,7 +57,7 @@
  */
 #define DALI_COMPOSE_SHADER(STR) #STR
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @addtogroup dali_core_rendering_effects
@@ -254,6 +254,6 @@ public:
 /**
  * @}
  */
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_SHADER_H

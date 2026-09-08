@@ -25,7 +25,7 @@
 #include <dali/public-api/events/touch-event.h>
 #include <dali/public-api/render-tasks/render-task.h>
 
-namespace Dali::Internal
+namespace DALI_NAMESPACE::Internal
 {
 namespace
 {
@@ -168,4 +168,4 @@ bool TouchRecipientDispatcher::IsGeometryInterceptDispatchable(const Actor& acto
   return touchEvent.GetPointCount() > 0u && ShouldDispatchGeometry(actor, touchEvent, touchEvent.GetState(0u), true);
 }
 
-} // namespace Dali::Internal
+} //namespace DALI_NAMESPACE::Internal

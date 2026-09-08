@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/event/rendering/renderer-impl.h> // Dali::Internal::Renderer
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 Renderer Renderer::New(Geometry& geometry, Shader& shader)
 {
@@ -107,4 +107,4 @@ Renderer::Renderer(Internal::Renderer* pointer)
 {
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

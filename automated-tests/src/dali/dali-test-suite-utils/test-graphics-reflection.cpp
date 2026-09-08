@@ -30,7 +30,7 @@ void tet_printf(const char* format, ...);
 
 using Dali::Integration::ToStdString;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace
 {
@@ -407,4 +407,4 @@ Graphics::ShaderLanguage TestGraphicsReflection::GetLanguage() const
   return Graphics::ShaderLanguage::GLSL_3_1;
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

@@ -40,7 +40,7 @@
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/signals/callback.h>
 
-namespace Dali::Internal
+namespace DALI_NAMESPACE::Internal
 {
 namespace
 {
@@ -959,4 +959,4 @@ void GeometryTouchEventProcessor::Clear(bool keepLastPrimaryObserver)
   mObservedActorDisconnected = false;
 }
 
-} // namespace Dali::Internal
+} //namespace DALI_NAMESPACE::Internal

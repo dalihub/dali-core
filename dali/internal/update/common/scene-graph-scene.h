@@ -38,7 +38,7 @@
 #include <dali/internal/update/nodes/scene-graph-layer.h>
 #include <dali/public-api/math/compile-time-math.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -579,6 +579,6 @@ inline void SetForceRenderingFramesCountMessage(EventThreadServices& eventThread
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_SCENE_GRAPH_SCENE_H

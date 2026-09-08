@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/rendering/renderer.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 class RenderCallback;
 
@@ -212,6 +212,6 @@ DALI_CORE_API bool IsAdvancedBlendEquationApplied(const Renderer& renderer);
 
 } // namespace DevelRenderer
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_RENDERER_DEVEL_H

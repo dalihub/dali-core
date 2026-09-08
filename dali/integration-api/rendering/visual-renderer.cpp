@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/event/rendering/visual-renderer-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 VisualRenderer VisualRenderer::New(Geometry& geometry, Shader& shader)
 {
@@ -53,4 +53,4 @@ VisualRenderer::VisualRenderer(Internal::VisualRenderer* pointer)
 {
 }
 
-} //namespace Dali
+} //namespace DALI_NAMESPACE

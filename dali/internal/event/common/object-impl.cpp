@@ -44,7 +44,7 @@
 using Dali::Internal::SceneGraph::AnimatableProperty;
 using Dali::Internal::SceneGraph::PropertyBase;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -1790,4 +1790,4 @@ void Object::SetSceneGraphProperty(Property::Index index, const PropertyMetadata
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

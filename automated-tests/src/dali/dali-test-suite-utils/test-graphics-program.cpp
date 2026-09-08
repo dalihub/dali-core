@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 #include "test-graphics-program.h"
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 TestGraphicsProgramImpl::TestGraphicsProgramImpl(TestGraphicsController& controller, TestGlAbstraction& gl, const Graphics::ProgramCreateInfo& createInfo, Property::Array& vertexFormats, std::vector<UniformData>& customUniforms, std::vector<TestGraphicsReflection::TestUniformBlockInfo>& customUniformBlocks)
 : mController(controller),
@@ -43,4 +43,4 @@ TestGraphicsProgram::TestGraphicsProgram(std::shared_ptr<TestGraphicsProgramImpl
   mImpl = impl;
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

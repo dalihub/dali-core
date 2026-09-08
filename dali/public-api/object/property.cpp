@@ -22,7 +22,7 @@
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/object/handle.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 Property::Property(Handle& obj, Property::Index propIndex)
 : object(obj),
@@ -39,4 +39,4 @@ Property::Property(Handle& obj, Dali::String propertyName)
 
 Property::~Property() = default;
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
