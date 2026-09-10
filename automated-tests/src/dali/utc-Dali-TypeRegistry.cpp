@@ -1075,9 +1075,9 @@ int UtcDaliTypeRegistryPropertyRegistrationP(void)
   // Ensure indices returned from actor and customActor differ by two
   Actor actor = Actor::New();
   actor.GetPropertyIndices(indices);
-  unsigned int actorIndices = indices.Size();
+  unsigned int actorIndices = static_cast<unsigned int>(indices.Size());
   customActor.GetPropertyIndices(indices);
-  unsigned int customActorIndices = indices.Size();
+  unsigned int customActorIndices = static_cast<unsigned int>(indices.Size());
   DALI_TEST_EQUALS(actorIndices + 2u, customActorIndices, TEST_LOCATION); // Custom property + registered property
   END_TEST;
 }
@@ -1164,9 +1164,9 @@ int UtcDaliTypeRegistryAnimatablePropertyRegistrationP01(void)
   // Ensure indices returned from actor and customActor differ by one
   Actor actor = Actor::New();
   actor.GetPropertyIndices(indices);
-  unsigned int actorIndices = indices.Size();
+  unsigned int actorIndices = static_cast<unsigned int>(indices.Size());
   customActor.GetPropertyIndices(indices);
-  unsigned int customActorIndices = indices.Size();
+  unsigned int customActorIndices = static_cast<unsigned int>(indices.Size());
   DALI_TEST_EQUALS(actorIndices + 1u, customActorIndices, TEST_LOCATION); // Custom property + registered property
 
   // check that the property is animatable
@@ -1244,9 +1244,9 @@ int UtcDaliTypeRegistryAnimatablePropertyRegistrationP02(void)
   // Ensure indices returned from actor and customActor differ by one
   Actor actor = Actor::New();
   actor.GetPropertyIndices(indices);
-  unsigned int actorIndices = indices.Size();
+  unsigned int actorIndices = static_cast<unsigned int>(indices.Size());
   customActor.GetPropertyIndices(indices);
-  unsigned int customActorIndices = indices.Size();
+  unsigned int customActorIndices = static_cast<unsigned int>(indices.Size());
   DALI_TEST_EQUALS(actorIndices + 1u, customActorIndices, TEST_LOCATION); // Custom property + registered property
 
   // check that the property is animatable
@@ -1371,9 +1371,9 @@ int UtcDaliTypeRegistryAnimatablePropertyRegistrationWithDefaultP(void)
   // Ensure indices returned from actor and customActor differ by one
   Actor actor = Actor::New();
   actor.GetPropertyIndices(indices);
-  unsigned int actorIndices = indices.Size();
+  unsigned int actorIndices = static_cast<unsigned int>(indices.Size());
   customActor.GetPropertyIndices(indices);
-  unsigned int customActorIndices = indices.Size();
+  unsigned int customActorIndices = static_cast<unsigned int>(indices.Size());
   DALI_TEST_EQUALS(actorIndices + 1u, customActorIndices, TEST_LOCATION); // Custom property + registered property
 
   // check that the property is animatable
@@ -1541,9 +1541,9 @@ int UtcDaliTypeRegistryAnimatablePropertyComponentRegistrationP(void)
   // Ensure indices returned from actor and customActor differ by three
   Actor actor = Actor::New();
   actor.GetPropertyIndices(indices);
-  unsigned int actorIndices = indices.Size();
+  unsigned int actorIndices = static_cast<unsigned int>(indices.Size());
   customActor.GetPropertyIndices(indices);
-  unsigned int customActorIndices = indices.Size();
+  unsigned int customActorIndices = static_cast<unsigned int>(indices.Size());
   DALI_TEST_EQUALS(actorIndices + 3u, customActorIndices, TEST_LOCATION); // Custom property + registered property
 
   application.GetScene().Add(customActor);
@@ -2685,6 +2685,7 @@ int UtcDaliPropertyRegistrationFunctions(void)
   }
   catch(DaliException& e)
   {
+    (void)e;
     tet_result(TET_FAIL);
   }
 
@@ -4233,8 +4234,8 @@ int UtcDaliTypeRegistryDifferentHandleObjectNameTestProperties(void)
   DALI_TEST_EQUALS(handle.GetProperty<float>(THProp::PROPERTY_ANIMATABLE_Y), 7.34f, TEST_LOCATION);
 
   DALI_TEST_EQUALS(handle.GetProperty<Vector2>(THProp::PROPERTY_ANIMATABLE_WITH_DEFAULT), Vector2(10.5f, 20.5f), TEST_LOCATION);
-  handle.SetProperty(THProp::PROPERTY_ANIMATABLE_WITH_DEFAULT, Vector2(9.865, 1.34f));
-  DALI_TEST_EQUALS(handle.GetProperty<Vector2>(THProp::PROPERTY_ANIMATABLE_WITH_DEFAULT), Vector2(9.865, 1.34f), TEST_LOCATION);
+  handle.SetProperty(THProp::PROPERTY_ANIMATABLE_WITH_DEFAULT, Vector2(9.865f, 1.34f));
+  DALI_TEST_EQUALS(handle.GetProperty<Vector2>(THProp::PROPERTY_ANIMATABLE_WITH_DEFAULT), Vector2(9.865f, 1.34f), TEST_LOCATION);
 
   END_TEST;
 }

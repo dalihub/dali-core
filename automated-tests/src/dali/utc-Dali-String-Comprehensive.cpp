@@ -438,7 +438,7 @@ int UtcDaliStringOperatorIndex_ReadAll(void)
 
   for(size_t i = 0; i < str.Size(); ++i)
   {
-    DALI_TEST_CHECK(str[i] == "Hello"[i]);
+    DALI_TEST_CHECK(str[static_cast<uint32_t>(i)] == "Hello"[i]);
   }
   END_TEST;
 }

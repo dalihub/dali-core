@@ -861,7 +861,7 @@ int UtcDaliSignalConnectAndEmit01P(void)
     signals.SignalFloat2Value().Connect(&handlers, &TestSlotHandler::FloatSlotFloatValueFloatValue);
     DALI_TEST_EQUALS(handlers.mHandled, false, TEST_LOCATION);
     handlers.mFloatReturn = 27.0f;
-    float f               = signals.EmitFloat2VSignal(5, 33.0f);
+    float f               = signals.EmitFloat2VSignal(5, 33);
     DALI_TEST_EQUALS(f, 27.0f, TEST_LOCATION);
     DALI_TEST_EQUALS(handlers.mHandled, true, TEST_LOCATION);
     DALI_TEST_EQUALS(handlers.mFloatParam1, 5.0f, TEST_LOCATION);
@@ -1039,7 +1039,7 @@ int UtcDaliSignalDisconnect(void)
     DALI_TEST_EQUALS(handlers.mHandled, false, TEST_LOCATION);
     handlers.mIntReturn = 27;
     signals.SignalInt2Value().Disconnect(&handlers, &TestSlotHandler::IntSlotFloatValueIntValue);
-    signals.EmitIntSignalFloatValueIntValue(5, 33.0f);
+    signals.EmitIntSignalFloatValueIntValue(5, 33);
     DALI_TEST_EQUALS(handlers.mHandled, false, TEST_LOCATION);
     DALI_TEST_EQUALS(handlers.mIntParam1, 0, TEST_LOCATION);
     DALI_TEST_EQUALS(handlers.mFloatParam2, 0.0f, 0.001f, TEST_LOCATION);
@@ -1063,7 +1063,7 @@ int UtcDaliSignalDisconnect(void)
     DALI_TEST_EQUALS(handlers.mHandled, false, TEST_LOCATION);
     handlers.mFloatReturn = 27.0f;
     signals.SignalFloat2Value().Disconnect(&handlers, &TestSlotHandler::FloatSlotFloatValueFloatValue);
-    signals.EmitFloat2VSignal(5, 33.0f);
+    signals.EmitFloat2VSignal(5, 33);
     DALI_TEST_EQUALS(handlers.mHandled, false, TEST_LOCATION);
     DALI_TEST_EQUALS(handlers.mFloatParam1, 0.0f, 0.001f, TEST_LOCATION);
     DALI_TEST_EQUALS(handlers.mFloatParam2, 0.0f, 0.001f, TEST_LOCATION);
@@ -1133,7 +1133,7 @@ int UtcDaliSignalDisconnect2(void)
     TestSlotHandler handlers;
     handlers.mIntReturn = 27;
     signals.SignalInt2Value().Disconnect(&handlers, &TestSlotHandler::IntSlotFloatValueIntValue);
-    signals.EmitIntSignalFloatValueIntValue(5, 33.0f);
+    signals.EmitIntSignalFloatValueIntValue(5, 33);
     DALI_TEST_EQUALS(handlers.mHandled, false, TEST_LOCATION);
     DALI_TEST_EQUALS(handlers.mIntParam1, 0, TEST_LOCATION);
     DALI_TEST_EQUALS(handlers.mFloatParam2, 0.0f, 0.001f, TEST_LOCATION);
@@ -1143,7 +1143,7 @@ int UtcDaliSignalDisconnect2(void)
     TestSlotHandler handlers;
     handlers.mFloatReturn = 27.0f;
     signals.SignalFloat2Value().Disconnect(&handlers, &TestSlotHandler::FloatSlotFloatValueFloatValue);
-    signals.EmitFloat2VSignal(5, 33.0f);
+    signals.EmitFloat2VSignal(5, 33);
     DALI_TEST_EQUALS(handlers.mHandled, false, TEST_LOCATION);
     DALI_TEST_EQUALS(handlers.mFloatParam1, 0.0f, 0.001f, TEST_LOCATION);
     DALI_TEST_EQUALS(handlers.mFloatParam2, 0.0f, 0.001f, TEST_LOCATION);
@@ -1259,7 +1259,7 @@ int UtcDaliSignalCustomConnectionTracker(void)
       customTracker3.RemoveNullCallback();
       tet_result(TET_FAIL);
     }
-    catch(Dali::DaliException& e)
+    catch(const Dali::DaliException&)
     {
       tet_result(TET_PASS);
     }
@@ -2093,7 +2093,7 @@ int UtcDaliSlotDelegateConnection(void)
     signals.SignalFloat2Value().Connect(handlers.mSlotDelegate, &TestSlotDelegateHandler::FloatSlotFloatValueFloatValue);
     DALI_TEST_EQUALS(handlers.mHandled, false, TEST_LOCATION);
     handlers.mFloatReturn = 27.0f;
-    float f               = signals.EmitFloat2VSignal(5, 33.0f);
+    float f               = signals.EmitFloat2VSignal(5, 33);
     DALI_TEST_EQUALS(f, 27.0f, TEST_LOCATION);
     DALI_TEST_EQUALS(handlers.mHandled, true, TEST_LOCATION);
     DALI_TEST_EQUALS(handlers.mFloatParam1, 5.0f, TEST_LOCATION);
@@ -2354,7 +2354,7 @@ int UtcDaliSlotHandlerDisconnect(void)
     DALI_TEST_EQUALS(handlers.mHandled, false, TEST_LOCATION);
     handlers.mIntReturn = 27;
     signals.SignalInt2Value().Disconnect(handlers.mSlotDelegate, &TestSlotDelegateHandler::IntSlotFloatValueIntValue);
-    signals.EmitIntSignalFloatValueIntValue(5, 33.0f);
+    signals.EmitIntSignalFloatValueIntValue(5, 33);
     DALI_TEST_EQUALS(handlers.mHandled, false, TEST_LOCATION);
     DALI_TEST_EQUALS(handlers.mIntParam1, 0, TEST_LOCATION);
     DALI_TEST_EQUALS(handlers.mFloatParam2, 0.0f, 0.001f, TEST_LOCATION);
@@ -2378,7 +2378,7 @@ int UtcDaliSlotHandlerDisconnect(void)
     DALI_TEST_EQUALS(handlers.mHandled, false, TEST_LOCATION);
     handlers.mFloatReturn = 27.0f;
     signals.SignalFloat2Value().Disconnect(handlers.mSlotDelegate, &TestSlotDelegateHandler::FloatSlotFloatValueFloatValue);
-    signals.EmitFloat2VSignal(5, 33.0f);
+    signals.EmitFloat2VSignal(5, 33);
     DALI_TEST_EQUALS(handlers.mHandled, false, TEST_LOCATION);
     DALI_TEST_EQUALS(handlers.mFloatParam1, 0.0f, 0.001f, TEST_LOCATION);
     DALI_TEST_EQUALS(handlers.mFloatParam2, 0.0f, 0.001f, TEST_LOCATION);

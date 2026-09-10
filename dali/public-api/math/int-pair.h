@@ -312,7 +312,7 @@ public:
   {
     DALI_ASSERT_DEBUG(from.x + 0.5f < 65536.0f);
     DALI_ASSERT_DEBUG(from.y + 0.5f < 65536.0f);
-    return Uint16Pair(from.x + 0.5f, from.y + 0.5f);
+    return Uint16Pair(static_cast<uint16_t>(from.x + 0.5f), static_cast<uint16_t>(from.y + 0.5f));
   }
 
   /**
@@ -330,7 +330,7 @@ public:
   {
     DALI_ASSERT_DEBUG(from[0] + 0.5f < 65536.0f);
     DALI_ASSERT_DEBUG(from[1] + 0.5f < 65536.0f);
-    return Uint16Pair(from[0] + 0.5f, from[1] + 0.5f);
+    return Uint16Pair(static_cast<uint16_t>(from[0] + 0.5f), static_cast<uint16_t>(from[1] + 0.5f));
   }
 
 public:

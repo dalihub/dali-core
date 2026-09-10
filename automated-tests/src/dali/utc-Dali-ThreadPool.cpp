@@ -86,7 +86,7 @@ int UtcDaliThreadPoolMultipleTasks(void)
   std::fill(outputs.begin(), outputs.end(), 0);
 
   // submit
-  auto future = ForEachMT(&gThreadPool, 0, inputs.size(), [&inputs, &outputs](uint32_t workerIndex, uint32_t begin, uint32_t end)
+  auto future = ForEachMT(&gThreadPool, 0, static_cast<uint32_t>(inputs.size()), [&inputs, &outputs](uint32_t workerIndex, uint32_t begin, uint32_t end)
   {
     for(auto i = begin; i < end; ++i)
     {

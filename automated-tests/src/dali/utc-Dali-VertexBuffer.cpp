@@ -50,7 +50,7 @@ struct VertexBufferUpdater
     diagnostics.counter++;
 
     promise.set_value(diagnostics);
-    return returnSize;
+    return static_cast<uint32_t>(returnSize);
   }
 
   void SetCallbackReturnValue(size_t size)
@@ -368,6 +368,7 @@ int UtcDaliVertexBufferMapInitializerList(void)
   }
   catch(Dali::DaliException& e)
   {
+    (void)e;
     // Shouldn't assert any more
     tet_result(TET_FAIL);
   }
@@ -509,6 +510,7 @@ int UtcDaliVertexBufferSetDataWithZeroLength(void)
   }
   catch(Dali::DaliException& e)
   {
+    (void)e;
     DALI_TEST_CHECK(false); // Should not get here
   }
   END_TEST;

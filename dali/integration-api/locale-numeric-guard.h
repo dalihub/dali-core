@@ -55,7 +55,11 @@ public:
     mPreviousLocale = setlocale(LC_NUMERIC, nullptr);
     if(mPreviousLocale)
     {
-      mPreviousLocale = strdup(mPreviousLocale);
+#if defined(_MSC_VER)
+    mPreviousLocale = _strdup(mPreviousLocale);
+#else
+    mPreviousLocale = strdup(mPreviousLocale);
+#endif
     }
     // Set LC_NUMERIC to "C" for locale-independent numeric formatting
     setlocale(LC_NUMERIC, "C");

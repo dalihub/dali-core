@@ -410,7 +410,7 @@ int UtcDaliTapGestureSignalReceptionPositive(void)
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(1u, data.receivedGesture.GetNumberOfTaps(), TEST_LOCATION);
   DALI_TEST_EQUALS(1u, data.receivedGesture.GetNumberOfTouches(), TEST_LOCATION);
-  DALI_TEST_EQUALS(Vector2(50.0f, 50.0f), data.receivedGesture.GetLocalPoint(), 0.1, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(50.0f, 50.0f), data.receivedGesture.GetLocalPoint(), 0.1f, TEST_LOCATION);
   END_TEST;
 }
 
@@ -439,7 +439,7 @@ int UtcDaliTapGestureSignalReceptionDetach(void)
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(1u, data.receivedGesture.GetNumberOfTaps(), TEST_LOCATION);
   DALI_TEST_EQUALS(1u, data.receivedGesture.GetNumberOfTouches(), TEST_LOCATION);
-  DALI_TEST_EQUALS(Vector2(20.0f, 20.0f), data.receivedGesture.GetLocalPoint(), 0.1, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(20.0f, 20.0f), data.receivedGesture.GetLocalPoint(), 0.1f, TEST_LOCATION);
 
   // repeat the tap within the actor's area - we should still receive the signal
   data.Reset();
@@ -447,7 +447,7 @@ int UtcDaliTapGestureSignalReceptionDetach(void)
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(1u, data.receivedGesture.GetNumberOfTaps(), TEST_LOCATION);
   DALI_TEST_EQUALS(1u, data.receivedGesture.GetNumberOfTouches(), TEST_LOCATION);
-  DALI_TEST_EQUALS(Vector2(50.0f, 50.0f), data.receivedGesture.GetLocalPoint(), 0.1, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(50.0f, 50.0f), data.receivedGesture.GetLocalPoint(), 0.1f, TEST_LOCATION);
 
   // Detach actor
   detector.DetachAll();
@@ -529,7 +529,7 @@ int UtcDaliTapGestureSignalReceptionRotatedActor(void)
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(1u, data.receivedGesture.GetNumberOfTaps(), TEST_LOCATION);
   DALI_TEST_EQUALS(1u, data.receivedGesture.GetNumberOfTouches(), TEST_LOCATION);
-  DALI_TEST_EQUALS(Vector2(5.0f, 5.0f), data.receivedGesture.GetScreenPoint(), 0.1, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(5.0f, 5.0f), data.receivedGesture.GetScreenPoint(), 0.1f, TEST_LOCATION);
 
   // Rotate actor again and render
   actor.SetProperty(Actor::Property::ORIENTATION, Quaternion(Dali::Degree(180.0f), Vector3::ZAXIS));
@@ -542,7 +542,7 @@ int UtcDaliTapGestureSignalReceptionRotatedActor(void)
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(1u, data.receivedGesture.GetNumberOfTaps(), TEST_LOCATION);
   DALI_TEST_EQUALS(1u, data.receivedGesture.GetNumberOfTouches(), TEST_LOCATION);
-  DALI_TEST_EQUALS(Vector2(5.0f, 5.0f), data.receivedGesture.GetScreenPoint(), 0.1, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(5.0f, 5.0f), data.receivedGesture.GetScreenPoint(), 0.1f, TEST_LOCATION);
 
   // Rotate actor again and render
   actor.SetProperty(Actor::Property::ORIENTATION, Quaternion(Dali::Degree(90.0f), Vector3::YAXIS));
@@ -1462,7 +1462,7 @@ int UtcDaliTapGestureSignalReceptionWithGeometryHittest(void)
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(1u, data.receivedGesture.GetNumberOfTaps(), TEST_LOCATION);
   DALI_TEST_EQUALS(1u, data.receivedGesture.GetNumberOfTouches(), TEST_LOCATION);
-  DALI_TEST_EQUALS(Vector2(20.0f, 20.0f), data.receivedGesture.GetLocalPoint(), 0.1, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(20.0f, 20.0f), data.receivedGesture.GetLocalPoint(), 0.1f, TEST_LOCATION);
 
   // repeat the tap within the actor's area - we should still receive the signal
   data.Reset();
@@ -1470,7 +1470,7 @@ int UtcDaliTapGestureSignalReceptionWithGeometryHittest(void)
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(1u, data.receivedGesture.GetNumberOfTaps(), TEST_LOCATION);
   DALI_TEST_EQUALS(1u, data.receivedGesture.GetNumberOfTouches(), TEST_LOCATION);
-  DALI_TEST_EQUALS(Vector2(50.0f, 50.0f), data.receivedGesture.GetLocalPoint(), 0.1, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(50.0f, 50.0f), data.receivedGesture.GetLocalPoint(), 0.1f, TEST_LOCATION);
 
   // Detach actor
   detector.DetachAll();

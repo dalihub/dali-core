@@ -241,7 +241,7 @@ int UtcDaliPropertyValueConstructorsMatrixTypeP(void)
 
 int UtcDaliPropertyValueConstructorsRectP(void)
 {
-  Rect<int>       v(1.0, 1.0, 1.0, 1.0);
+  Rect<int>       v(1, 1, 1, 1);
   Property::Value value(v);
 
   DALI_TEST_EQUALS(value.GetType(), Property::RECTANGLE, TEST_LOCATION);
@@ -279,7 +279,7 @@ int UtcDaliPropertyValueConstructorsQuaternionP(void)
   Property::Value value(v);
 
   DALI_TEST_CHECK(value.GetType() == Property::ROTATION);
-  DALI_TEST_EQUALS(v, value.Get<Quaternion>(), 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(v, value.Get<Quaternion>(), 0.001f, TEST_LOCATION);
 
   END_TEST;
 }
@@ -462,7 +462,7 @@ int UtcDaliPropertyValueCopyConstructorMatrixP(void)
 
 int UtcDaliPropertyValueCopyConstructorRectP(void)
 {
-  CheckCopyCtorP<Rect<int>> check(Rect<int>(1.0, 1.0, 1.0, 1.0));
+  CheckCopyCtorP<Rect<int>> check(Rect<int>(1, 1, 1, 1));
   END_TEST;
 }
 
@@ -720,11 +720,11 @@ int UtcDaliPropertyValueAssignmentOperatorQuaternionP(void)
   Quaternion      result(Radian(Math::PI_2), Vector3::YAXIS);
   value = Property::Value(result);
 
-  DALI_TEST_EQUALS(value.Get<Quaternion>(), result, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(value.Get<Quaternion>(), result, 0.001f, TEST_LOCATION);
 
   Property::Value copy(Property::ROTATION);
   copy = value; // match
-  DALI_TEST_EQUALS(copy.Get<Quaternion>(), result, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(copy.Get<Quaternion>(), result, 0.001f, TEST_LOCATION);
   END_TEST;
 }
 

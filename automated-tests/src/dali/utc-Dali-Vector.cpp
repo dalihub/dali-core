@@ -847,7 +847,7 @@ int UtcDaliVectorAcidTest(void)
   int*                ptr       = NULL;
   for(unsigned int i = 0; i < acidCount; ++i)
   {
-    pairvector.PushBack(std::make_pair(i, i));
+    pairvector.PushBack(std::make_pair(static_cast<float>(i), static_cast<float>(i)));
     doublevector.PushBack((double)i);
     intptrvector.PushBack((int*)ptr);
     actorptrvector.PushBack((Dali::Actor*)ptr);

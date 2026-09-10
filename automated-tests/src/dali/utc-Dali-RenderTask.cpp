@@ -1439,7 +1439,7 @@ int UtcDaliRenderTaskSetExclusive(void)
 
   if(boundTextures.size())
   {
-    int a = boundTextures.size() - 1;
+    int a = static_cast<int>(boundTextures.size()) - 1;
     DALI_TEST_EQUALS(boundTextures[a], 8u /*unique to actor1*/, TEST_LOCATION);
   }
 
@@ -1464,8 +1464,8 @@ int UtcDaliRenderTaskSetExclusive(void)
 
   if(boundTextures.size() >= 2)
   {
-    int a = boundTextures.size() - 2;
-    int b = boundTextures.size() - 1;
+    int a = static_cast<int>(boundTextures.size()) - 2;
+    int b = static_cast<int>(boundTextures.size()) - 1;
     DALI_TEST_EQUALS(boundTextures[a], 9u /*unique to actor2*/, TEST_LOCATION);
     DALI_TEST_EQUALS(boundTextures[b], 8u /*unique to actor1*/, TEST_LOCATION);
   }
@@ -1490,9 +1490,9 @@ int UtcDaliRenderTaskSetExclusive(void)
 
   if(boundTextures.size() >= 3)
   {
-    int a = boundTextures.size() - 3;
-    int b = boundTextures.size() - 2;
-    int c = boundTextures.size() - 1;
+    int a = static_cast<int>(boundTextures.size()) - 3;
+    int b = static_cast<int>(boundTextures.size()) - 2;
+    int c = static_cast<int>(boundTextures.size()) - 1;
     DALI_TEST_EQUALS(boundTextures[a], 10u /*unique to actor3*/, TEST_LOCATION);
     DALI_TEST_EQUALS(boundTextures[b], 9u /*unique to actor2*/, TEST_LOCATION);
     DALI_TEST_EQUALS(boundTextures[c], 8u /*unique to actor1*/, TEST_LOCATION);
@@ -1518,10 +1518,10 @@ int UtcDaliRenderTaskSetExclusive(void)
   if(boundTextures.size() >= 4)
   {
     // Test that task 1 renders actor3, then actor2 & then actor1
-    int a = boundTextures.size() - 4;
-    int b = boundTextures.size() - 3;
-    int c = boundTextures.size() - 2;
-    int d = boundTextures.size() - 1;
+    int a = static_cast<int>(boundTextures.size()) - 4;
+    int b = static_cast<int>(boundTextures.size()) - 3;
+    int c = static_cast<int>(boundTextures.size()) - 2;
+    int d = static_cast<int>(boundTextures.size()) - 1;
     DALI_TEST_EQUALS(boundTextures[a], 10u /*unique to actor3*/, TEST_LOCATION);
     DALI_TEST_EQUALS(boundTextures[b], 9u /*unique to actor2*/, TEST_LOCATION);
     DALI_TEST_EQUALS(boundTextures[c], 8u /*unique to actor1*/, TEST_LOCATION);
@@ -2321,7 +2321,7 @@ int UtcDaliRenderTaskGetViewportP01(void)
 
   // By default the viewport should match the scene width/height
   Vector2  sceneSize = application.GetScene().GetSize();
-  Viewport expectedViewport(0, 0, sceneSize.width, sceneSize.height);
+  Viewport expectedViewport(0, 0, static_cast<int>(sceneSize.width), static_cast<int>(sceneSize.height));
   DALI_TEST_CHECK(viewport == expectedViewport);
   END_TEST;
 }
@@ -2338,7 +2338,7 @@ int UtcDaliRenderTaskGetViewportP02(void)
 
   // By default the viewport should match the scene width/height
   Vector2  sceneSize = application.GetScene().GetSize();
-  Viewport expectedViewport(0, 0, sceneSize.width, sceneSize.height);
+  Viewport expectedViewport(0, 0, static_cast<int>(sceneSize.width), static_cast<int>(sceneSize.height));
   DALI_TEST_CHECK(viewport == expectedViewport);
   END_TEST;
 }
@@ -2373,7 +2373,7 @@ int UtcDaliRenderTaskSetViewportP(void)
 
   RenderTask task      = taskList.GetTask(0u);
   Vector2    sceneSize = application.GetScene().GetSize();
-  Viewport   newViewport(0, 0, sceneSize.width * 0.5f, sceneSize.height * 0.5f);
+  Viewport   newViewport(0, 0, static_cast<int>(sceneSize.width * 0.5f), static_cast<int>(sceneSize.height * 0.5f));
   task.SetViewport(newViewport);
 
   // Update (viewport is a property)
@@ -2396,7 +2396,7 @@ int UtcDaliRenderTaskSetViewportN(void)
   try
   {
     Vector2  sceneSize = application.GetScene().GetSize();
-    Viewport newViewport(0, 0, sceneSize.width * 0.5f, sceneSize.height * 0.5f);
+    Viewport newViewport(0, 0, static_cast<int>(sceneSize.width * 0.5f), static_cast<int>(sceneSize.height * 0.5f));
     task.SetViewport(newViewport);
   }
   catch(Dali::DaliException& e)
@@ -2423,7 +2423,7 @@ int UtcDaliRenderTaskSetViewportPosition(void)
   // By default the viewport should match the scene width/height
 
   Vector2  sceneSize = application.GetScene().GetSize();
-  Viewport expectedViewport(0, 0, sceneSize.width, sceneSize.height);
+  Viewport expectedViewport(0, 0, static_cast<int>(sceneSize.width), static_cast<int>(sceneSize.height));
   DALI_TEST_CHECK(viewport == expectedViewport);
 
   // 'Setter' test
@@ -2498,7 +2498,7 @@ int UtcDaliRenderTaskSetViewportSize(void)
   // By default the viewport should match the scene width/height
 
   Vector2  sceneSize = application.GetScene().GetSize();
-  Viewport expectedViewport(0, 0, sceneSize.width, sceneSize.height);
+  Viewport expectedViewport(0, 0, static_cast<int>(sceneSize.width), static_cast<int>(sceneSize.height));
   DALI_TEST_CHECK(viewport == expectedViewport);
 
   Vector2 newSize(128.0f, 64.0f);
