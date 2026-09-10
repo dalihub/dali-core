@@ -326,14 +326,20 @@ void GestureEventProcessor::SetPanGestureMultitapSmoothingRange(int32_t value)
 
 void GestureEventProcessor::SetPanGestureMinimumDistance(int32_t value)
 {
-  envOptionMinimumPanDistance = value;
-  mPanGestureProcessor.SetMinimumDistance(value);
+  if(value >= 0)
+  {
+    envOptionMinimumPanDistance = value;
+    mPanGestureProcessor.SetMinimumDistance(value);
+  }
 }
 
 void GestureEventProcessor::SetPanGestureMinimumPanEvents(int32_t value)
 {
-  envOptionMinimumPanEvents = value;
-  mPanGestureProcessor.SetMinimumPanEvents(value);
+  if(value >= 1)
+  {
+    envOptionMinimumPanEvents = value;
+    mPanGestureProcessor.SetMinimumPanEvents(value);
+  }
 }
 
 void GestureEventProcessor::SetPinchGestureMinimumDistance(float value)

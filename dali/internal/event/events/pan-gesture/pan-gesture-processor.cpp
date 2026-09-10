@@ -27,6 +27,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/input-options.h>
 #include <dali/integration-api/trace.h>
 #include <dali/internal/event/common/scene-impl.h>
 #include <dali/internal/event/events/gesture-requests.h>
@@ -131,8 +132,8 @@ PanGestureProcessor::PanGestureProcessor(SceneGraph::UpdateManager& updateManage
   mMinTouchesRequired(1),
   mMaxTouchesRequired(1),
   mMaxMotionEventAge(std::numeric_limits<uint32_t>::max()),
-  mMinimumDistance(-1),
-  mMinimumPanEvents(-1),
+  mMinimumDistance(Integration::DEFAULT_PAN_GESTURE_MINIMUM_DISTANCE),
+  mMinimumPanEvents(Integration::DEFAULT_PAN_GESTURE_MINIMUM_PAN_EVENTS),
   mCurrentPanEvent(nullptr),
   mCurrentScene(nullptr),
   mSceneObject(SceneGraph::PanGesture::New()) // Create scene object to store pan information.
@@ -469,26 +470,32 @@ void PanGestureProcessor::SetMultitapSmoothingRange(int value)
 
 void PanGestureProcessor::SetMinimumDistance(int32_t value)
 {
-  if(mGestureRecognizer)
+  if(value >= 0)
   {
-    mMinimumDistance                    = value;
-    PanGestureRecognizer* panRecognizer = dynamic_cast<PanGestureRecognizer*>(mGestureRecognizer.Get());
-    if(panRecognizer)
+    mMinimumDistance = value;
+    if(mGestureRecognizer)
     {
-      panRecognizer->SetMinimumDistance(value);
+      PanGestureRecognizer* panRecognizer = dynamic_cast<PanGestureRecognizer*>(mGestureRecognizer.Get());
+      if(panRecognizer)
+      {
+        panRecognizer->SetMinimumDistance(value);
+      }
     }
   }
 }
 
 void PanGestureProcessor::SetMinimumPanEvents(int32_t value)
 {
-  if(mGestureRecognizer)
+  if(value >= 1)
   {
-    mMinimumPanEvents                   = value;
-    PanGestureRecognizer* panRecognizer = dynamic_cast<PanGestureRecognizer*>(mGestureRecognizer.Get());
-    if(panRecognizer)
+    mMinimumPanEvents = value;
+    if(mGestureRecognizer)
     {
-      panRecognizer->SetMinimumPanEvents(value);
+      PanGestureRecognizer* panRecognizer = dynamic_cast<PanGestureRecognizer*>(mGestureRecognizer.Get());
+      if(panRecognizer)
+      {
+        panRecognizer->SetMinimumPanEvents(value);
+      }
     }
   }
 }
