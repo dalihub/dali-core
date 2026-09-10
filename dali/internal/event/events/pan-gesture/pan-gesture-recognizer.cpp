@@ -25,6 +25,7 @@
 #include <dali/devel-api/events/touch-point.h>
 
 #include <dali/integration-api/events/touch-event-integ.h>
+#include <dali/integration-api/input-options.h>
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/common/scene-impl.h>
@@ -36,11 +37,11 @@ namespace Internal
 {
 namespace
 {
-constexpr float         MINIMUM_MOTION_DISTANCE_BEFORE_PAN(15.0f);
+constexpr float         MINIMUM_MOTION_DISTANCE_BEFORE_PAN(static_cast<float>(Integration::DEFAULT_PAN_GESTURE_MINIMUM_DISTANCE));
 constexpr float         MINIMUM_MOTION_DISTANCE_BEFORE_PAN_SQUARED(MINIMUM_MOTION_DISTANCE_BEFORE_PAN* MINIMUM_MOTION_DISTANCE_BEFORE_PAN);
 constexpr float         MINIMUM_MOTION_DISTANCE_TO_THRESHOLD_ADJUSTMENTS_RATIO(2.0f / 3.0f);
 constexpr unsigned long MINIMUM_TIME_BEFORE_THRESHOLD_ADJUSTMENTS(100);
-constexpr unsigned int  MINIMUM_MOTION_EVENTS_BEFORE_PAN(2);
+constexpr unsigned int  MINIMUM_MOTION_EVENTS_BEFORE_PAN(static_cast<unsigned int>(Integration::DEFAULT_PAN_GESTURE_MINIMUM_PAN_EVENTS - 1));
 
 uint32_t GetMilliSeconds()
 {
