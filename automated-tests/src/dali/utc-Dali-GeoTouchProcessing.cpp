@@ -2646,7 +2646,7 @@ int UtcDaliGeoTouchAreaOffset(void)
   data.Reset();
 
   // set a bigger touch area
-  actor.SetProperty(Actor::Property::TOUCH_HIT_AREA_MARGIN, Extents(70, 70, 70, 70)); // left, right, top, bottom
+  actor.SetProperty(Actor::Property::TOUCH_HIT_AREA_MARGIN, Insets(70.0f, 70.0f, 70.0f, 70.0f)); // left, right, top, bottom
 
   // Render and notify
   application.SendNotification();
@@ -2662,7 +2662,7 @@ int UtcDaliGeoTouchAreaOffset(void)
   data.Reset();
 
   // set a offset touch area
-  actor.SetProperty(Actor::Property::TOUCH_HIT_AREA_MARGIN, Extents(-50, 100, 0, -50)); // left, right, top, bottom
+  actor.SetProperty(Actor::Property::TOUCH_HIT_AREA_MARGIN, Insets(-50.0f, 100.0f, 0.0f, -50.0f)); // left, right, top, bottom
 
   // Render and notify
   application.SendNotification();
@@ -2678,7 +2678,7 @@ int UtcDaliGeoTouchAreaOffset(void)
   data.Reset();
 
   // set a smaller touch area
-  actor.SetProperty(Actor::Property::TOUCH_HIT_AREA_MARGIN, Extents(-50, 0, -50, 0));
+  actor.SetProperty(Actor::Property::TOUCH_HIT_AREA_MARGIN, Insets(-50.0f, 0.0f, -50.0f, 0.0f));
 
   // Render and notify
   application.SendNotification();

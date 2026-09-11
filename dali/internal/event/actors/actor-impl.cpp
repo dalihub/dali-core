@@ -128,7 +128,7 @@ DALI_PROPERTY("clippingMode", STRING, true, false, false, Dali::Actor::Property:
 DALI_PROPERTY("name", STRING, true, false, false, Dali::Actor::Property::NAME)
 DALI_PROPERTY("sensitive", BOOLEAN, true, false, false, Dali::Actor::Property::SENSITIVE)
 DALI_PROPERTY("leaveRequired", BOOLEAN, true, false, false, Dali::Actor::Property::LEAVE_REQUIRED)
-DALI_PROPERTY("touchHitAreaMargin", EXTENTS, true, false, false, Dali::Actor::Property::TOUCH_HIT_AREA_MARGIN)
+DALI_PROPERTY("touchHitAreaMargin", INSETS, true, false, false, Dali::Actor::Property::TOUCH_HIT_AREA_MARGIN)
 DALI_PROPERTY("allowSelfInitiatedTouchOnly", BOOLEAN, true, false, false, Dali::Actor::Property::ALLOW_SELF_INITIATED_TOUCH_ONLY)
 DALI_PROPERTY("dispatchTouchMotion", BOOLEAN, true, false, false, Dali::Actor::Property::DISPATCH_TOUCH_MOTION)
 DALI_PROPERTY("dispatchHoverMotion", BOOLEAN, true, false, false, Dali::Actor::Property::DISPATCH_HOVER_MOTION)
@@ -1571,7 +1571,7 @@ Actor::Actor(DerivedType derivedType, const SceneGraph::Node& node)
   mTargetPosition(Vector3::ZERO),
   mTargetScale(Vector3::ONE),
   mUpdateAreaHint(Vector4::ZERO),
-  mTouchHitAreaMargin(0, 0, 0, 0),
+  mTouchHitAreaMargin(),
   mName(),
   mSortedDepth(0u),
   mDepth(0u),

@@ -24,7 +24,7 @@
 #include <dali/internal/update/manager/update-manager.h>
 #include <dali/internal/update/rendering/scene-graph-renderer.h>
 #include <dali/internal/update/rendering/scene-graph-visual-renderer.h>
-#include <dali/public-api/common/extents.h>
+#include <dali/public-api/common/insets.h>
 
 namespace DALI_NAMESPACE::Internal::SceneGraph
 {
@@ -334,11 +334,11 @@ inline void SetInstanceCountMessage(EventThreadServices& eventThreadServices, co
   new(slot) LocalType(&renderer, &SceneGraph::Renderer::SetInstanceCount, instanceCount);
 }
 
-inline void SetUpdateAreaExtentsMessage(EventThreadServices& eventThreadServices, const Renderer& renderer, const Extents& updateAreaExtents)
+inline void SetUpdateAreaMarginMessage(EventThreadServices& eventThreadServices, const Renderer& renderer, const Insets& updateAreaMargin)
 {
-  using LocalType = MessageValue1<SceneGraph::Renderer, Extents>;
+  using LocalType = MessageValue1<SceneGraph::Renderer, Insets>;
   uint32_t* slot  = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
-  new(slot) LocalType(&renderer, &SceneGraph::Renderer::SetUpdateAreaExtents, updateAreaExtents);
+  new(slot) LocalType(&renderer, &SceneGraph::Renderer::SetUpdateAreaMargin, updateAreaMargin);
 }
 
 inline void EnableSharedUniformBlockMessage(EventThreadServices& eventThreadServices, const Renderer& renderer, bool enabled)

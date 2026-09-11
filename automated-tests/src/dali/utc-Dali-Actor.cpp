@@ -2874,7 +2874,7 @@ int UtcDaliActorRotateBy02(void)
 
   Actor actor = Actor::New();
 
-  Radian angle(static_cast<float>(M_PI) * 0.25f);
+  Radian     angle(static_cast<float>(M_PI) * 0.25f);
   Quaternion rotation(angle, Vector3::ZAXIS);
   actor.RotateBy(rotation);
   // flush the queue and render once
@@ -14761,12 +14761,12 @@ int UtcDaliActorTouchAreaOffsetPropertyP(void)
 {
   TestApplication application;
 
-  Actor   actor              = Actor::New();
-  Extents touchHitAreaMargin = actor.GetProperty(Actor::Property::TOUCH_HIT_AREA_MARGIN).Get<Extents>();
-  DALI_TEST_EQUALS(Extents(), touchHitAreaMargin, TEST_LOCATION);
-  actor.SetProperty(Actor::Property::TOUCH_HIT_AREA_MARGIN, Extents(10, 20, 30, 40));
-  touchHitAreaMargin = actor.GetProperty(Actor::Property::TOUCH_HIT_AREA_MARGIN).Get<Extents>();
-  DALI_TEST_EQUALS(Extents(10, 20, 30, 40), touchHitAreaMargin, TEST_LOCATION);
+  Actor  actor              = Actor::New();
+  Insets touchHitAreaMargin = actor.GetProperty(Actor::Property::TOUCH_HIT_AREA_MARGIN).Get<Insets>();
+  DALI_TEST_EQUALS(Insets(), touchHitAreaMargin, TEST_LOCATION);
+  actor.SetProperty(Actor::Property::TOUCH_HIT_AREA_MARGIN, Insets(10.0f, 20.0f, 30.0f, 40.0f));
+  touchHitAreaMargin = actor.GetProperty(Actor::Property::TOUCH_HIT_AREA_MARGIN).Get<Insets>();
+  DALI_TEST_EQUALS(Insets(10.0f, 20.0f, 30.0f, 40.0f), touchHitAreaMargin, TEST_LOCATION);
   END_TEST;
 }
 
@@ -17881,7 +17881,7 @@ int UtcDaliActorSetGetTouchHitAreaMarginNewP(void)
   Actor           actor = Actor::New();
   application.GetScene().Add(actor);
 
-  Extents margin(10, 20, 30, 40);
+  Insets margin(10.0f, 20.0f, 30.0f, 40.0f);
   actor.SetTouchHitAreaMargin(margin);
   DALI_TEST_EQUALS(actor.GetTouchHitAreaMargin(), margin, TEST_LOCATION);
 

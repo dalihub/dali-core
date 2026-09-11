@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/actors/actor-enumerations.h>
+#include <dali/public-api/common/insets.h>
 #include <dali/public-api/math/radian.h>
 #include <dali/public-api/math/rect.h>
 #include <dali/public-api/object/handle.h>
@@ -714,14 +715,15 @@ public:
       /**
        * @brief Extends the touch hit area of an actor beyond (positive) or within (negative) its visual bounds.
        *        Affects only touch detection, not rendering or layout.
-       * @details Name "touchHitAreaMargin", type Property::EXTENTS (start, end, top, bottom in pixels).
+       * @details Name "touchHitAreaMargin", type Property::INSETS (start, end, top, bottom in pixels).
        *          Positive values expand the hit area outward; negative values shrink it inward.
+       *          Start and end are the left and right edges; they are not swapped for a right-to-left layout direction.
        * @SINCE_2_5.29
        * For example
        * @code{.cpp}
        *  Actor actor = Actor::New();
        *  actor.SetProperty(Actor::Property::SIZE, Vector2(20.0f, 20.0f));
-       *  actor.SetProperty(Actor::Property::TOUCH_HIT_AREA_MARGIN, Extents(10, 20, 30, 40));
+       *  actor.SetProperty(Actor::Property::TOUCH_HIT_AREA_MARGIN, Insets(10.0f, 20.0f, 30.0f, 40.0f));
        *  actor.TouchEventSignal().Connect(OnTouchCallback);
        *
        * +---------------------+
@@ -2092,23 +2094,24 @@ public:
    * @brief Sets the touch hit area margin.
    *
    * Extends (positive values) or shrinks (negative values) the actor's touch hit area beyond its visual
-   * bounds. This affects only touch detection, not rendering or layout.
+   * bounds. This affects only touch detection, not rendering or layout. Start and end are the left and
+   * right edges; they are not swapped for a right-to-left layout direction.
    *
    * @param[in] margin The margin (start, end, top, bottom in pixels) applied around the actor's bounds
    * @pre The actor has been initialized.
    * @see Actor::Property::TOUCH_HIT_AREA_MARGIN
-   * @SINCE_2_5.30
+   * @SINCE_2_5.40
    */
-  void SetTouchHitAreaMargin(const Extents& margin);
+  void SetTouchHitAreaMargin(const Insets& margin);
 
   /**
    * @brief Gets the touch hit area margin.
    * @return The touch hit area margin (start, end, top, bottom in pixels)
    * @pre The actor has been initialized.
    * @see Actor::Property::TOUCH_HIT_AREA_MARGIN
-   * @SINCE_2_5.30
+   * @SINCE_2_5.40
    */
-  Extents GetTouchHitAreaMargin() const;
+  Insets GetTouchHitAreaMargin() const;
 
   /**
    * @brief Sets whether the actor only receives touch events that originated on itself.

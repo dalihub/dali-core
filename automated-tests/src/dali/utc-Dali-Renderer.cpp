@@ -312,7 +312,7 @@ int UtcDaliRendererDefaultProperties(void)
   DALI_PROPERTY("renderingBehavior", INTEGER, true, false, false, Dali::DevelRenderer::Property::RENDERING_BEHAVIOR)
   DALI_PROPERTY("blendEquation", INTEGER, true, false, false, Dali::DevelRenderer::Property::BLEND_EQUATION)
   DALI_PROPERTY("instanceCount", INTEGER, true, false, false, Dali::DevelRenderer::Property::INSTANCE_COUNT)
-  DALI_PROPERTY("updateAreaMargin", EXTENTS, true, false, false, Dali::DevelRenderer::Property::UPDATE_AREA_MARGIN)
+  DALI_PROPERTY("updateAreaMargin", INSETS, true, false, false, Dali::DevelRenderer::Property::UPDATE_AREA_MARGIN)
 */
 
   Geometry geometry = CreateQuadGeometry();
@@ -352,7 +352,7 @@ int UtcDaliRendererDefaultProperties(void)
   TEST_RENDERER_PROPERTY(renderer, "renderingBehavior", Property::INTEGER, true, false, false, DevelRenderer::Property::RENDERING_BEHAVIOR, TEST_LOCATION);
   TEST_RENDERER_PROPERTY(renderer, "blendEquation", Property::INTEGER, true, false, false, DevelRenderer::Property::BLEND_EQUATION, TEST_LOCATION);
   TEST_RENDERER_PROPERTY(renderer, "instanceCount", Property::INTEGER, true, false, false, DevelRenderer::Property::INSTANCE_COUNT, TEST_LOCATION);
-  TEST_RENDERER_PROPERTY(renderer, "updateAreaMargin", Property::EXTENTS, true, false, false, DevelRenderer::Property::UPDATE_AREA_MARGIN, TEST_LOCATION);
+  TEST_RENDERER_PROPERTY(renderer, "updateAreaMargin", Property::INSETS, true, false, false, DevelRenderer::Property::UPDATE_AREA_MARGIN, TEST_LOCATION);
 
   END_TEST;
 }
@@ -6194,9 +6194,9 @@ int utcDaliRendererPartialUpdateUpdateAreaExtents(void)
   clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
-  // Set update area extents
-  renderer.SetProperty(DevelRenderer::Property::UPDATE_AREA_MARGIN, Dali::Extents(8u, 40u, 24u, 72u));
-  DALI_TEST_EQUALS(renderer.GetProperty<Extents>(DevelRenderer::Property::UPDATE_AREA_MARGIN), Dali::Extents(8u, 40u, 24u, 72u), TEST_LOCATION);
+  // Set update area margin
+  renderer.SetProperty(DevelRenderer::Property::UPDATE_AREA_MARGIN, Dali::Insets(8.0f, 40.0f, 24.0f, 72.0f));
+  DALI_TEST_EQUALS(renderer.GetProperty<Insets>(DevelRenderer::Property::UPDATE_AREA_MARGIN), Dali::Insets(8.0f, 40.0f, 24.0f, 72.0f), TEST_LOCATION);
   application.SendNotification();
 
   damagedRects.clear();

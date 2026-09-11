@@ -1745,18 +1745,18 @@ public:
 
   /**
    * Sets the touch hit area margin of an actor.
-   * @param [in] offset The new extents of area.
+   * @param [in] margin The new margin of the touch hit area.
    */
-  void SetTouchHitAreaMargin(const Extents& extents)
+  void SetTouchHitAreaMargin(const Insets& margin)
   {
-    mTouchHitAreaMargin = extents;
+    mTouchHitAreaMargin = margin;
   }
 
   /**
    * Retrieve the Actor's touch hit area margin.
    * @return The Actor's touch hit area margin.
    */
-  const Extents& GetTouchHitAreaMargin() const
+  const Insets& GetTouchHitAreaMargin() const
   {
     return mTouchHitAreaMargin;
   }
@@ -2653,7 +2653,7 @@ protected:
   Vector3    mTargetPosition;     ///< Event-side storage for position (not a pointer as most actors will have a position)
   Vector3    mTargetScale;        ///< Event-side storage for scale
   Vector4    mUpdateAreaHint;     ///< Event-side storage for update area hint
-  Extents    mTouchHitAreaMargin; ///< Extents info of touch hit area margin
+  Insets     mTouchHitAreaMargin; ///< Margin of the touch hit area
 
   struct Annotation
   {
