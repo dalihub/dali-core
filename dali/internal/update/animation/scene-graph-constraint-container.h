@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/devel-api/common/owner-container.h>
 
-namespace Dali::Internal::SceneGraph
+namespace DALI_NAMESPACE::Internal::SceneGraph
 {
 class ConstraintBase;
 
@@ -74,6 +74,6 @@ private:
   ConstraintOwnerContainer mDeactiveConstraints; ///< List of APPLY_ONCE applied constraints.
 };
 
-} // namespace Dali::Internal::SceneGraph
+} //namespace DALI_NAMESPACE::Internal::SceneGraph
 
 #endif // DALI_INTERNAL_SCENE_GRAPH_CONSTRAINT_CONTAINER_H

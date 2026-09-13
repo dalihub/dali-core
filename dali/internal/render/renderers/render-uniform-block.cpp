@@ -25,7 +25,7 @@
 #include <dali/internal/render/renderers/uniform-buffer-view.h>
 #include <dali/internal/render/shaders/program.h>
 
-namespace Dali::Internal::Render
+namespace DALI_NAMESPACE::Internal::Render
 {
 UniformBlock::~UniformBlock()
 {
@@ -223,4 +223,4 @@ void UniformBlock::WriteDynUniform(
   }
 }
 
-} // namespace Dali::Internal::Render
+} //namespace DALI_NAMESPACE::Internal::Render

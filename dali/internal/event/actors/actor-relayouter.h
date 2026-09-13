@@ -25,7 +25,7 @@
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector3.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -135,6 +135,6 @@ public:
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_ACTOR_RELAYOUTER_H

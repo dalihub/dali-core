@@ -19,9 +19,10 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/public-api/common/dali-namespace.h>
 #include "render-surface-interface.h"
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * Concrete implementation of the RenderSurface class.
@@ -142,6 +143,6 @@ private:
   Vector4            mBackgroundColor; ///< The background color of the surface
 };
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // TEST_RENDER_SURFACE_H

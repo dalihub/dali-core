@@ -19,7 +19,7 @@
 #include <dali/internal/update/manager/update-manager.h>
 #include <dali/internal/update/nodes/node-messages.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -38,4 +38,4 @@ NodePropertyMessageBase::~NodePropertyMessageBase() = default;
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

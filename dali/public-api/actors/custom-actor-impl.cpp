@@ -23,7 +23,7 @@
 #include <dali/internal/event/rendering/renderer-impl.h>
 #include <dali/public-api/common/dali-common.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 CustomActor CustomActorImpl::Self() const
 {
@@ -125,4 +125,4 @@ bool CustomActorImpl::IsTransparent() const
   return mOwner->IsTransparent();
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

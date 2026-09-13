@@ -27,7 +27,7 @@
 #include <dali/public-api/math/vector4.h>
 #include <dali/public-api/object/property-input.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @addtogroup dali_core_animation
@@ -253,6 +253,6 @@ inline void LookAt(Dali::Quaternion& current, const Dali::PropertyInputContainer
 /**
  * @}
  */
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_CONSTRAINTS_H

@@ -26,7 +26,7 @@
 #include <dali/internal/event/common/notifier-interface.h>
 #include <dali/internal/update/animation/scene-graph-animator.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -560,6 +560,6 @@ inline void SetLoopingModeMessage(EventThreadServices& eventThreadServices, cons
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_SCENE_GRAPH_ANIMATION_H

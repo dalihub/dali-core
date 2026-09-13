@@ -27,7 +27,7 @@
 #include <dali/public-api/events/device.h>
 #include <dali/public-api/object/base-handle.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal DALI_INTERNAL
 {
@@ -414,6 +414,6 @@ public: // Not intended for application developers
 /**
  * @}
  */
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_KEY_EVENT_H

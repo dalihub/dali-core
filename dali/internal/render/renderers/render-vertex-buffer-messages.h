@@ -22,7 +22,7 @@
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/render/renderers/render-vertex-buffer.h>
 
-namespace Dali::Internal::Render
+namespace DALI_NAMESPACE::Internal::Render
 {
 inline void SetVertexBufferFormatMessage(EventThreadServices& eventThreadServices, Render::VertexBuffer& vertexBuffer, OwnerPointer<Render::VertexBuffer::Format>& format)
 {
@@ -65,6 +65,6 @@ inline void SetVertexBufferUpdateCallbackMessage(EventThreadServices& eventThrea
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new(slot) LocalType(&vertexBuffer, &Render::VertexBuffer::SetVertexBufferUpdateCallback, callback);
 }
-} // namespace Dali::Internal::Render
+} //namespace DALI_NAMESPACE::Internal::Render
 
 #endif //  DALI_INTERNAL_RENDER_VERTEX_BUFFER_MESSAGES_H

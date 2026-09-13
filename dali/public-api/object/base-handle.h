@@ -28,7 +28,7 @@
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/signals/functor-delegate.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @addtogroup dali_core_object
@@ -373,6 +373,6 @@ inline bool operator<(const BaseHandle& lhs, const BaseHandle& rhs)
 /**
  * @}
  */
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_BASE_HANDLE_H

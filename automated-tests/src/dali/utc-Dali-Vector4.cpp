@@ -103,9 +103,9 @@ int UtcDaliVector4CopyConstructor(void)
   TestApplication application;
   Vector4         vec0(10.f, 20.f, 30.0f, 40.0f);
   Vector4         vec1(vec0);
-  DALI_TEST_EQUALS(vec1.x, 10.0f, 0.001, TEST_LOCATION);
-  DALI_TEST_EQUALS(vec1.y, 20.0f, 0.001, TEST_LOCATION);
-  DALI_TEST_EQUALS(vec1.z, 30.0f, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(vec1.x, 10.0f, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(vec1.y, 20.0f, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(vec1.z, 30.0f, 0.001f, TEST_LOCATION);
   DALI_TEST_EQUALS(vec1.w, 40.0f, TEST_LOCATION);
   END_TEST;
 }
@@ -115,9 +115,9 @@ int UtcDaliVector4MoveConstructor(void)
   TestApplication application;
   Vector4         vec0(10.f, 20.f, 30.0f, 40.0f);
   Vector4         vec1 = std::move(vec0);
-  DALI_TEST_EQUALS(vec1.x, 10.0f, 0.001, TEST_LOCATION);
-  DALI_TEST_EQUALS(vec1.y, 20.0f, 0.001, TEST_LOCATION);
-  DALI_TEST_EQUALS(vec1.z, 30.0f, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(vec1.x, 10.0f, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(vec1.y, 20.0f, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(vec1.z, 30.0f, 0.001f, TEST_LOCATION);
   DALI_TEST_EQUALS(vec1.w, 40.0f, TEST_LOCATION);
 
   END_TEST;
@@ -129,9 +129,9 @@ int UtcDaliVector4CopyAssignment(void)
   Vector4         vec0(10.f, 20.f, 30.0f, 40.0f);
   Vector4         vec1;
   vec1 = vec0;
-  DALI_TEST_EQUALS(vec1.x, 10.0f, 0.001, TEST_LOCATION);
-  DALI_TEST_EQUALS(vec1.y, 20.0f, 0.001, TEST_LOCATION);
-  DALI_TEST_EQUALS(vec1.z, 30.0f, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(vec1.x, 10.0f, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(vec1.y, 20.0f, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(vec1.z, 30.0f, 0.001f, TEST_LOCATION);
   DALI_TEST_EQUALS(vec1.w, 40.0f, TEST_LOCATION);
 
   END_TEST;
@@ -143,9 +143,9 @@ int UtcDaliVector4MoveAssignment(void)
   Vector4         vec0(10.f, 20.f, 30.0f, 40.0f);
   Vector4         vec1;
   vec1 = std::move(vec0);
-  DALI_TEST_EQUALS(vec1.x, 10.0f, 0.001, TEST_LOCATION);
-  DALI_TEST_EQUALS(vec1.y, 20.0f, 0.001, TEST_LOCATION);
-  DALI_TEST_EQUALS(vec1.z, 30.0f, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(vec1.x, 10.0f, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(vec1.y, 20.0f, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(vec1.z, 30.0f, 0.001f, TEST_LOCATION);
   DALI_TEST_EQUALS(vec1.w, 40.0f, TEST_LOCATION);
 
   END_TEST;

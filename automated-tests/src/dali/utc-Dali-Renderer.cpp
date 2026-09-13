@@ -312,7 +312,7 @@ int UtcDaliRendererDefaultProperties(void)
   DALI_PROPERTY("renderingBehavior", INTEGER, true, false, false, Dali::DevelRenderer::Property::RENDERING_BEHAVIOR)
   DALI_PROPERTY("blendEquation", INTEGER, true, false, false, Dali::DevelRenderer::Property::BLEND_EQUATION)
   DALI_PROPERTY("instanceCount", INTEGER, true, false, false, Dali::DevelRenderer::Property::INSTANCE_COUNT)
-  DALI_PROPERTY("updateAreaMargin", EXTENTS, true, false, false, Dali::DevelRenderer::Property::UPDATE_AREA_MARGIN)
+  DALI_PROPERTY("updateAreaMargin", INSETS, true, false, false, Dali::DevelRenderer::Property::UPDATE_AREA_MARGIN)
 */
 
   Geometry geometry = CreateQuadGeometry();
@@ -352,7 +352,7 @@ int UtcDaliRendererDefaultProperties(void)
   TEST_RENDERER_PROPERTY(renderer, "renderingBehavior", Property::INTEGER, true, false, false, DevelRenderer::Property::RENDERING_BEHAVIOR, TEST_LOCATION);
   TEST_RENDERER_PROPERTY(renderer, "blendEquation", Property::INTEGER, true, false, false, DevelRenderer::Property::BLEND_EQUATION, TEST_LOCATION);
   TEST_RENDERER_PROPERTY(renderer, "instanceCount", Property::INTEGER, true, false, false, DevelRenderer::Property::INSTANCE_COUNT, TEST_LOCATION);
-  TEST_RENDERER_PROPERTY(renderer, "updateAreaMargin", Property::EXTENTS, true, false, false, DevelRenderer::Property::UPDATE_AREA_MARGIN, TEST_LOCATION);
+  TEST_RENDERER_PROPERTY(renderer, "updateAreaMargin", Property::INSETS, true, false, false, DevelRenderer::Property::UPDATE_AREA_MARGIN, TEST_LOCATION);
 
   END_TEST;
 }
@@ -2750,7 +2750,7 @@ int UtcDaliRendererSetIndexRange(void)
     DALI_TEST_CHECK(value.Get(convertedValue));
     DALI_TEST_CHECK(convertedValue == 5);
 
-    sprintf(buffer, "%u, 5, %u, indices", GL_LINE_LOOP, GL_UNSIGNED_SHORT);
+    snprintf(buffer, sizeof(buffer), "%u, 5, %u, indices", GL_LINE_LOOP, GL_UNSIGNED_SHORT);
     bool result = gl.GetDrawTrace().FindMethodAndParams("DrawElements", buffer);
     DALI_TEST_CHECK(result);
   }
@@ -2758,7 +2758,7 @@ int UtcDaliRendererSetIndexRange(void)
   // LINE_LOOP, first 5, count 10
   {
     renderer.SetIndexRange(5, 10);
-    sprintf(buffer, "%u, 10, %u, indices", GL_LINE_LOOP, GL_UNSIGNED_SHORT);
+    snprintf(buffer, sizeof(buffer), "%u, 10, %u, indices", GL_LINE_LOOP, GL_UNSIGNED_SHORT);
     application.SendNotification();
     application.Render();
     bool result = gl.GetDrawTrace().FindMethodAndParams("DrawElements", buffer);
@@ -2769,7 +2769,7 @@ int UtcDaliRendererSetIndexRange(void)
   {
     renderer.SetIndexRange(15, 6);
     geometry.SetType(Geometry::LINE_STRIP);
-    sprintf(buffer, "%u, 6, %u, indices", GL_LINE_STRIP, GL_UNSIGNED_SHORT);
+    snprintf(buffer, sizeof(buffer), "%u, 6, %u, indices", GL_LINE_STRIP, GL_UNSIGNED_SHORT);
     application.SendNotification();
     application.Render();
     bool result = gl.GetDrawTrace().FindMethodAndParams("DrawElements", buffer);
@@ -2780,7 +2780,7 @@ int UtcDaliRendererSetIndexRange(void)
   {
     renderer.SetIndexRange(15, 30);
     geometry.SetType(Geometry::LINE_STRIP);
-    sprintf(buffer, "%u, 6, %u, indices", GL_LINE_STRIP, GL_UNSIGNED_SHORT);
+    snprintf(buffer, sizeof(buffer), "%u, 6, %u, indices", GL_LINE_STRIP, GL_UNSIGNED_SHORT);
     application.SendNotification();
     application.Render();
     bool result = gl.GetDrawTrace().FindMethodAndParams("DrawElements", buffer);
@@ -2791,7 +2791,7 @@ int UtcDaliRendererSetIndexRange(void)
   {
     renderer.SetIndexRange(15, 0);
     geometry.SetType(Geometry::LINE_STRIP);
-    sprintf(buffer, "%u, 6, %u, indices", GL_LINE_STRIP, GL_UNSIGNED_SHORT);
+    snprintf(buffer, sizeof(buffer), "%u, 6, %u, indices", GL_LINE_STRIP, GL_UNSIGNED_SHORT);
     application.SendNotification();
     application.Render();
     bool result = gl.GetDrawTrace().FindMethodAndParams("DrawElements", buffer);
@@ -3857,7 +3857,7 @@ int UtcDaliRendererMixColor(void)
   DALI_TEST_CHECK(gl.GetUniformValue<Vector4>("uActorColor", actualActorColor));
   DALI_TEST_EQUALS(actualActorColor, Vector4::ONE * actorColor, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
 
-  Vector4 targetValue(0.2, 0.3f, 0.4f, 0.5f);
+  Vector4 targetValue(0.2f, 0.3f, 0.4f, 0.5f);
   renderer.SetProperty(Dali::Renderer::Property::MIX_COLOR, targetValue);
 
   application.SendNotification();
@@ -3937,7 +3937,7 @@ int UtcDaliRendererMixColorAnimation01(void)
   DALI_TEST_EQUALS(mixColorBlue, 1.0f, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
   DALI_TEST_EQUALS(opacity, 1.0f, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
 
-  Vector4   targetValue(0.2, 0.3f, 0.4f, 0.5f);
+  Vector4   targetValue(0.2f, 0.3f, 0.4f, 0.5f);
   Animation animation = Animation::New(1.0f);
   animation.AnimateTo(Property(renderer, Dali::Renderer::Property::MIX_COLOR), targetValue);
   animation.Play();
@@ -4041,7 +4041,7 @@ int UtcDaliRendererMixColorAnimation02(void)
   DALI_TEST_EQUALS(mixColorBlue, 1.0f, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
   DALI_TEST_EQUALS(opacity, 1.0f, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
 
-  Vector4   targetValue(0.2, 0.3f, 0.4f, 0.5f);
+  Vector4   targetValue(0.2f, 0.3f, 0.4f, 0.5f);
   Animation animation = Animation::New(1.0f);
   animation.AnimateTo(Property(renderer, Dali::Renderer::Property::MIX_COLOR_RED), targetValue.r);
   animation.AnimateTo(Property(renderer, Dali::Renderer::Property::MIX_COLOR_GREEN), targetValue.g);
@@ -4744,14 +4744,14 @@ int UtcDaliRendererUniformArrayOfStruct(void)
     oss.str("");
     oss.clear();
     oss << "arrayof[" << i << "].position";
-    Vector2 pos(i, 10 + i * 5);
+    Vector2 pos(static_cast<float>(i), static_cast<float>(10 + i * 5));
     index = renderer.RegisterProperty(ToDaliString(oss.str()), pos);
     uniformIndices.emplace_back(index, oss.str());
 
     oss.str("");
     oss.clear();
     oss << "arrayof[" << i << "].normal";
-    Vector3 normal(i, i * 10, i * 100);
+    Vector3 normal(static_cast<float>(i), static_cast<float>(i * 10), static_cast<float>(i * 100));
     index = renderer.RegisterProperty(ToDaliString(oss.str()), normal);
     uniformIndices.emplace_back(index, oss.str());
     oss.str("");
@@ -5487,7 +5487,7 @@ int UtcDaliRendererUniformBlocks01(void)
       DALI_TEST_CHECK(bufferPtr->memory.size() >= skinningBlockSize);
       found        = true;
       Matrix* mPtr = reinterpret_cast<Dali::Matrix*>(&bufferPtr->memory[0] + sizeof(Dali::Matrix) * 299);
-      DALI_TEST_EQUALS(*mPtr, n, 0.0001, TEST_LOCATION);
+      DALI_TEST_EQUALS(*mPtr, n, 0.0001f, TEST_LOCATION);
       break;
     }
   }
@@ -5556,7 +5556,7 @@ int UtcDaliRendererUniformBlocks02(void)
     DALI_TEST_CHECK(graphics.mAllocatedBuffers.size() == (i == 0 ? 4 : 5));
     DALI_TEST_CHECK(bufferPtr != nullptr);
     Matrix* mPtr = reinterpret_cast<Dali::Matrix*>(&bufferPtr->memory[0] + sizeof(Dali::Matrix) * 299);
-    DALI_TEST_EQUALS(*mPtr, n, 0.0001, TEST_LOCATION);
+    DALI_TEST_EQUALS(*mPtr, n, 0.0001f, TEST_LOCATION);
 
     float* wPtr1 = reinterpret_cast<float*>(&bufferPtr->memory[MORPH_BLOCK_OFFSET] + sizeof(float) * 1);
     float* wPtr2 = reinterpret_cast<float*>(&bufferPtr->memory[MORPH_BLOCK_OFFSET] + sizeof(float) * 56);
@@ -5570,7 +5570,7 @@ int UtcDaliRendererUniformBlocks02(void)
     DALI_TEST_EQUALS(*wPtr2, w2, 0.0001f, TEST_LOCATION);
     DALI_TEST_EQUALS(*wPtr3, w3, 0.0001f, TEST_LOCATION);
 
-    n.SetTransformComponents(Vector3(2.f, 2.f, 2.f), Quaternion(Radian(i * 0.3f), Vector3::YAXIS), Vector3(200.0f + i * 10.0f, -i, 20.0f));
+    n.SetTransformComponents(Vector3(2.f, 2.f, 2.f), Quaternion(Radian(static_cast<float>(i) * 0.3f), Vector3::YAXIS), Vector3(200.0f + static_cast<float>(i) * 10.0f, static_cast<float>(-i), 20.0f));
     renderer["uBone[299]"] = n;
 
     w1 += 0.005f;
@@ -5656,7 +5656,7 @@ int UtcDaliRendererUniformBlocksWithStride(void)
     DALI_TEST_CHECK(bufferPtr != nullptr);
     auto    offset0 = sizeof(Dali::Matrix) * 299;
     Matrix* mPtr    = reinterpret_cast<Dali::Matrix*>(&bufferPtr->memory[0] + offset0);
-    DALI_TEST_EQUALS(*mPtr, n, 0.0001, TEST_LOCATION);
+    DALI_TEST_EQUALS(*mPtr, n, 0.0001f, TEST_LOCATION);
 
     const auto size         = morphBlock.members[1].elementStride;
     const auto memberOffset = morphBlock.members[1].offsets[0];
@@ -5672,7 +5672,7 @@ int UtcDaliRendererUniformBlocksWithStride(void)
     DALI_TEST_EQUALS(*wPtr2, w2, 0.0001f, TEST_LOCATION);
     DALI_TEST_EQUALS(*wPtr3, w3, 0.0001f, TEST_LOCATION);
 
-    n.SetTransformComponents(Vector3(2.f, 2.f, 2.f), Quaternion(Radian(i * 0.3f), Vector3::YAXIS), Vector3(200.0f + i * 10.0f, -i, 20.0f));
+    n.SetTransformComponents(Vector3(2.f, 2.f, 2.f), Quaternion(Radian(static_cast<float>(i) * 0.3f), Vector3::YAXIS), Vector3(200.0f + static_cast<float>(i) * 10.0f, static_cast<float>(-i), 20.0f));
     renderer["uBone[299]"] = n;
 
     w1 += 0.005f;
@@ -6194,9 +6194,9 @@ int utcDaliRendererPartialUpdateUpdateAreaExtents(void)
   clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
-  // Set update area extents
-  renderer.SetProperty(DevelRenderer::Property::UPDATE_AREA_MARGIN, Dali::Extents(8u, 40u, 24u, 72u));
-  DALI_TEST_EQUALS(renderer.GetProperty<Extents>(DevelRenderer::Property::UPDATE_AREA_MARGIN), Dali::Extents(8u, 40u, 24u, 72u), TEST_LOCATION);
+  // Set update area margin
+  renderer.SetProperty(DevelRenderer::Property::UPDATE_AREA_MARGIN, Dali::Insets(8.0f, 40.0f, 24.0f, 72.0f));
+  DALI_TEST_EQUALS(renderer.GetProperty<Insets>(DevelRenderer::Property::UPDATE_AREA_MARGIN), Dali::Insets(8.0f, 40.0f, 24.0f, 72.0f), TEST_LOCATION);
   application.SendNotification();
 
   damagedRects.clear();

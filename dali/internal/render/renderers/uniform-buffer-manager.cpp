@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ namespace
 uint32_t CPU_MEMORY_ALIGNMENT{256};
 }
 
-namespace Dali::Internal::Render
+namespace DALI_NAMESPACE::Internal::Render
 {
 UniformBufferManager::UniformBufferManager(Dali::Graphics::Controller* controller)
 : mController(controller)
@@ -209,4 +209,4 @@ UniformBufferManager::UBOSet::UBOSet(UniformBufferManager::UBOSet&& rhs)
   gpuBufferOffScreen.swap(rhs.gpuBufferOffScreen);
 }
 
-} // namespace Dali::Internal::Render
+} //namespace DALI_NAMESPACE::Internal::Render

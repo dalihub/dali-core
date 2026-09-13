@@ -22,7 +22,7 @@
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/math/vector2.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 class RelayoutContainer;
 using RelayoutContainerPtr = RelayoutContainer*;
@@ -52,6 +52,6 @@ public:
   virtual void Add(const Actor& actor, const Vector2& size) = 0;
 };
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_RELAYOUT_CONTAINER_H

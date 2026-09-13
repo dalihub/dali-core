@@ -17,9 +17,10 @@
  * limitations under the License.
  */
 
+#include <dali/public-api/common/dali-namespace.h>
 #include <dali/public-api/common/type-traits.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * Type traits and methods to enable type safe bit field operators for an enum.
@@ -105,6 +106,6 @@ inline typename EnableIf<EnableBitMaskOperators<EnumType>::ENABLE, EnumType>::ty
   return static_cast<EnumType>(~(static_cast<UnderlyingType>(bitfield)));
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_BITWISE_ENUM_H

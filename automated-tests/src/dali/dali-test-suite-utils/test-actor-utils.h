@@ -25,7 +25,7 @@
 #include <set> // For std::multiset
 #include <string>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 class Actor;
 class Texture;
@@ -88,6 +88,6 @@ struct RectSorter
 
 void DirtyRectChecker(const std::vector<BoundsInteger>& damagedRects, std::multiset<BoundsInteger, RectSorter> expectedRectList, bool checkRectsExact, const char* testLocation);
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TEST_ACTOR_UTILS_H

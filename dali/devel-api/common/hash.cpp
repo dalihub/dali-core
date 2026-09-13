@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/common/hash-utils.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 std::size_t CalculateHash(const std::string& toHash)
 {
@@ -97,4 +97,4 @@ std::size_t CalculateHash(const Dali::Vector<std::uint8_t>& toHash)
   return hash;
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/event/events/touch-event-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Integration
 {
@@ -57,4 +57,4 @@ TouchEvent::~TouchEvent() = default;
 
 } // namespace Integration
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

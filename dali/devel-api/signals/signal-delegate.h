@@ -23,7 +23,7 @@
 #include <dali/public-api/common/dali-string-view.h>
 #include <dali/public-api/signals/connection-tracker-interface.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @brief The SignalDelegate object allows direct connection to a signal that has been pre-configured internally.
@@ -158,6 +158,6 @@ private:
   std::string mSignalName;   ///< The name of the signal to connect to.
 };
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_SIGNAL_DELEGATE_H

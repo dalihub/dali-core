@@ -24,7 +24,7 @@
 #include <dali/internal/update/nodes/node-helper.h> ///< For property wrapper macro
 #include <dali/internal/update/rendering/scene-graph-visual-renderer-property.h>
 
-namespace Dali::Internal::SceneGraph
+namespace DALI_NAMESPACE::Internal::SceneGraph
 {
 class Node;
 namespace VisualRenderer
@@ -198,6 +198,6 @@ public: // Default properties
   // Properties that don't give any effort to coefficient.
 };
 } // namespace VisualRenderer
-} // namespace Dali::Internal::SceneGraph
+} //namespace DALI_NAMESPACE::Internal::SceneGraph
 
 #endif // DALI_INTERNAL_SCENE_GRAPH_VISUAL_RENDERER_H

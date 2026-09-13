@@ -27,7 +27,7 @@
 #include <dali/internal/render/renderers/render-uniform-block.h>
 #include <dali/internal/render/shaders/program.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -169,4 +169,4 @@ void Shader::ResetUpdated()
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

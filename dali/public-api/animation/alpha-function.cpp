@@ -52,7 +52,7 @@ Dali::SpringData GetSpringDefaultData(Dali::AlphaFunction::SpringType springType
 }
 } //namespace
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 
 struct AlphaFunction::Impl
@@ -242,4 +242,4 @@ const Dali::SpringData& AlphaFunction::GetSpringData() const
   return defaultSpringData;
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

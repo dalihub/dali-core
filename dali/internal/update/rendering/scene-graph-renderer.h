@@ -34,7 +34,7 @@
 
 #include <unordered_map>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -479,16 +479,16 @@ public:
   }
 
   /**
-   * @brief Set the extents of update area. It will be used when we calculate damaged rect.
+   * @brief Set the margin added around the update area. It will be used when we calculate damaged rect.
    */
-  void SetUpdateAreaExtents(const Dali::Extents& updateAreaExtents);
+  void SetUpdateAreaMargin(const Dali::Insets& updateAreaMargin);
 
   /**
-   * @brief Get the extents of update area. It will be used when we calculate damaged rect.
+   * @brief Get the margin added around the update area. It will be used when we calculate damaged rect.
    */
-  Dali::Extents GetUpdateAreaExtents() const
+  const Dali::Insets& GetUpdateAreaMargin() const
   {
-    return mUpdateAreaExtents;
+    return mUpdateAreaMargin;
   }
 
   /**
@@ -683,7 +683,7 @@ private:
   UniformMap::SizeType mUniformMapChangeCounter{0u}; ///< Value to check if uniform data should be updated
   UniformMap::SizeType mShaderMapChangeCounter{0u};  ///< Value to check if uniform data should be updated
 
-  Dali::Extents mUpdateAreaExtents;
+  Dali::Insets mUpdateAreaMargin;
 
   BlendMode::Type                mBlendMode : 4;            ///< Local copy of the mode of blending
   DevelRenderer::Rendering::Type mRenderingBehavior : 2;    ///< The rendering behavior
@@ -708,6 +708,6 @@ public:
 
 } // namespace SceneGraph
 } // namespace Internal
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_SCENE_GRAPH_RENDERER_H

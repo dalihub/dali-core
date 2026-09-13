@@ -31,7 +31,7 @@
 
 // INTERNAL INCLUDES
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -265,7 +265,7 @@ void PinchGestureRecognizer::SendPinch(GestureState state, const Integration::To
     gesture.state = GestureState::CANCELLED;
   }
 
-  gesture.time           = currentEvent.time;
+  gesture.time         = currentEvent.time;
   gesture.triggerPoint = mTriggerPoint;
 
   if(mScene)
@@ -289,4 +289,4 @@ void PinchGestureRecognizer::SetMinimumTouchEventsAfterStart(uint32_t value)
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

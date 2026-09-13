@@ -26,7 +26,7 @@
 #include <dali/integration-api/stream-operators.h>
 #include <dali/internal/common/hash-utils.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace
 {
@@ -276,4 +276,4 @@ std::ostream& operator<<(std::ostream& stream, const Property::Array& array)
   return stream;
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

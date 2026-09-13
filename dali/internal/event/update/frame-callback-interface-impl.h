@@ -22,7 +22,7 @@
 #include <dali/internal/update/manager/scene-graph-frame-callback.h>
 #include <dali/public-api/update/frame-callback-interface.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -92,6 +92,6 @@ private:
   Internal::SceneGraph::FrameCallback* mSceneGraphFrameCallback{nullptr}; ///< Pointer to the scene-graph object, not owned.
 };
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_FRAME_CALLBACK_INTERFACE_IMPL_H

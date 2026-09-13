@@ -28,7 +28,7 @@
 #include <dali/internal/render/renderers/render-vertex-buffer.h>
 #include <dali/internal/render/shaders/program.h>
 
-namespace Dali::Internal::Render
+namespace DALI_NAMESPACE::Internal::Render
 {
 namespace
 {
@@ -807,4 +807,4 @@ Graphics::ColorBlendState PipelineCache::ConvertColorBlendState(bool blendEnable
   return colorBlendState;
 }
 
-} // namespace Dali::Internal::Render
+} //namespace DALI_NAMESPACE::Internal::Render

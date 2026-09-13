@@ -18,7 +18,7 @@
 // CLASS HEADER
 #include <dali/public-api/animation/constraint-source.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 LocalSource::LocalSource(Property::Index index)
 : propertyIndex(index)
@@ -55,4 +55,4 @@ ConstraintSource::ConstraintSource(ParentSource parent)
 {
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

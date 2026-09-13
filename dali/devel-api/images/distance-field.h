@@ -24,7 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 struct Vector2;
 
@@ -49,6 +49,6 @@ DALI_CORE_API void GenerateDistanceFieldMap(
   const Vector2&       maxSize,
   bool                 highQuality = true);
 
-} //namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_DISTANCE_FIELD_H

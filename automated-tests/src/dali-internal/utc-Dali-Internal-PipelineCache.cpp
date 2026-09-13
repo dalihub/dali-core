@@ -52,7 +52,7 @@ Ret InvokeReturnNext(Object* obj, Args... args)
 }
 
 static Dali::Internal::Render::PipelineCache* gPipelineCache{nullptr};
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -69,7 +69,7 @@ PipelineCache::PipelineCache(Dali::Graphics::Controller& controller)
 
 } // namespace Render
 } // namespace Internal
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 int UtcDaliCorePipelineCacheTest(void)
 {

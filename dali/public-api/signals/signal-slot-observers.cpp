@@ -18,7 +18,7 @@
 // CLASS HEADER
 #include <dali/public-api/signals/signal-slot-observers.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 SignalObserver::SignalObserver() = default;
 
@@ -28,4 +28,4 @@ SlotObserver::SlotObserver() = default;
 
 SlotObserver::~SlotObserver() = default;
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

@@ -31,7 +31,7 @@
 #include <dali/internal/event/events/pinch-gesture/pinch-gesture-detector-impl.h>
 #include <dali/internal/update/gestures/scene-graph-pan-gesture.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -326,14 +326,20 @@ void GestureEventProcessor::SetPanGestureMultitapSmoothingRange(int32_t value)
 
 void GestureEventProcessor::SetPanGestureMinimumDistance(int32_t value)
 {
-  envOptionMinimumPanDistance = value;
-  mPanGestureProcessor.SetMinimumDistance(value);
+  if(value >= 0)
+  {
+    envOptionMinimumPanDistance = value;
+    mPanGestureProcessor.SetMinimumDistance(value);
+  }
 }
 
 void GestureEventProcessor::SetPanGestureMinimumPanEvents(int32_t value)
 {
-  envOptionMinimumPanEvents = value;
-  mPanGestureProcessor.SetMinimumPanEvents(value);
+  if(value >= 1)
+  {
+    envOptionMinimumPanEvents = value;
+    mPanGestureProcessor.SetMinimumPanEvents(value);
+  }
 }
 
 void GestureEventProcessor::SetPinchGestureMinimumDistance(float value)
@@ -423,4 +429,4 @@ const RotationGestureProcessor& GestureEventProcessor::GetRotationGestureProcess
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

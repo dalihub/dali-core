@@ -2206,7 +2206,7 @@ int UtcDaliCameraActorCheckLookAtAndFreeLookViews01(void)
         freeLookCameraActor.GetProperty(CameraActor::CameraActor::Property::VIEW_MATRIX).Get(freeLookViewMatrix);
         lookAtCameraActor.GetProperty(CameraActor::CameraActor::Property::VIEW_MATRIX).Get(lookAtViewMatrix);
 
-        DALI_TEST_EQUALS(freeLookViewMatrix, lookAtViewMatrix, 0.01, TEST_LOCATION);
+        DALI_TEST_EQUALS(freeLookViewMatrix, lookAtViewMatrix, 0.01f, TEST_LOCATION);
       }
     }
   }

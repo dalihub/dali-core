@@ -26,7 +26,7 @@
 #include <dali/public-api/math/quaternion.h>
 #include <dali/public-api/math/vector3.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -79,23 +79,23 @@ namespace TransformComponentBitField
  */
 using FlagType = uint8_t;
 
-static constexpr uint32_t COMPONENT_DIRTY_BITS_COUNT            = 2u;
-static constexpr uint32_t WORLD_MATRIX_DIRTY_BITS_COUNT         = 1u;
-static constexpr uint32_t INHERITANCE_MODE_BITS_COUNT           = 3u;
-static constexpr uint32_t IGNORED_BITS_COUNT                    = 1u;
+static constexpr uint32_t COMPONENT_DIRTY_BITS_COUNT     = 2u;
+static constexpr uint32_t WORLD_MATRIX_DIRTY_BITS_COUNT  = 1u;
+static constexpr uint32_t INHERITANCE_MODE_BITS_COUNT    = 3u;
+static constexpr uint32_t IGNORED_BITS_COUNT             = 1u;
 static constexpr uint32_t POSITION_USES_PIVOT_BITS_COUNT = 1u;
 
 static_assert(COMPONENT_DIRTY_BITS_COUNT + WORLD_MATRIX_DIRTY_BITS_COUNT + INHERITANCE_MODE_BITS_COUNT + IGNORED_BITS_COUNT + POSITION_USES_PIVOT_BITS_COUNT <= 8 * sizeof(FlagType));
 
-static constexpr uint32_t WORLD_MATRIX_DIRTY_SHIFT         = COMPONENT_DIRTY_BITS_COUNT;
-static constexpr uint32_t INHERITANCE_MODE_SHIFT           = WORLD_MATRIX_DIRTY_SHIFT + WORLD_MATRIX_DIRTY_BITS_COUNT;
-static constexpr uint32_t IGNORED_SHIFT                    = INHERITANCE_MODE_SHIFT + INHERITANCE_MODE_BITS_COUNT;
+static constexpr uint32_t WORLD_MATRIX_DIRTY_SHIFT  = COMPONENT_DIRTY_BITS_COUNT;
+static constexpr uint32_t INHERITANCE_MODE_SHIFT    = WORLD_MATRIX_DIRTY_SHIFT + WORLD_MATRIX_DIRTY_BITS_COUNT;
+static constexpr uint32_t IGNORED_SHIFT             = INHERITANCE_MODE_SHIFT + INHERITANCE_MODE_BITS_COUNT;
 static constexpr uint32_t POSITION_USES_PIVOT_SHIFT = IGNORED_SHIFT + IGNORED_BITS_COUNT;
 
-static constexpr uint32_t COMPONENT_DIRTY_MASK            = ((1u << COMPONENT_DIRTY_BITS_COUNT) - 1u);
-static constexpr uint32_t WORLD_MATRIX_DIRTY_MASK         = ((1u << WORLD_MATRIX_DIRTY_BITS_COUNT) - 1u);
-static constexpr uint32_t INHERITANCE_MODE_MASK           = ((1u << INHERITANCE_MODE_BITS_COUNT) - 1u);
-static constexpr uint32_t IGNORED_MASK                    = ((1u << IGNORED_BITS_COUNT) - 1u);
+static constexpr uint32_t COMPONENT_DIRTY_MASK     = ((1u << COMPONENT_DIRTY_BITS_COUNT) - 1u);
+static constexpr uint32_t WORLD_MATRIX_DIRTY_MASK  = ((1u << WORLD_MATRIX_DIRTY_BITS_COUNT) - 1u);
+static constexpr uint32_t INHERITANCE_MODE_MASK    = ((1u << INHERITANCE_MODE_BITS_COUNT) - 1u);
+static constexpr uint32_t IGNORED_MASK             = ((1u << IGNORED_BITS_COUNT) - 1u);
 static constexpr uint32_t POSITION_USES_PIVOT_MASK = ((1u << POSITION_USES_PIVOT_BITS_COUNT) - 1u);
 
 /**
@@ -582,6 +582,6 @@ private:
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_TRANSFORM_MANAGER_H

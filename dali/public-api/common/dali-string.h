@@ -24,7 +24,7 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/platform-defines.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @addtogroup dali_core_common
@@ -350,4 +350,4 @@ struct DALI_CORE_API StringEqual
 /**
  * @}
  */
-} // namespace Dali
+} //namespace DALI_NAMESPACE

@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/event/common/type-registry-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace CSharpTypeRegistry
 {
@@ -48,4 +48,4 @@ bool RegisterProperty(const std::string&                  objectName,
 
 } // namespace CSharpTypeRegistry
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

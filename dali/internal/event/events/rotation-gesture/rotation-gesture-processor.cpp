@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/input-options.h>
 #include <dali/integration-api/trace.h>
 #include <dali/internal/event/common/scene-impl.h>
 #include <dali/internal/event/events/gesture-requests.h>
@@ -34,15 +35,13 @@
 #include <dali/public-api/events/rotation-gesture.h>
 #include <dali/public-api/math/vector2.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
 namespace
 {
 DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_PERFORMANCE_MARKER, false);
-const uint32_t MINIMUM_TOUCH_EVENTS_REQUIRED             = 4u;
-const uint32_t MINIMUM_TOUCH_EVENTS_REQUIRED_AFTER_START = 4u;
 
 /**
  * Creates a RotationGesture and asks the specified detector to emit its detected signal.
@@ -124,8 +123,8 @@ RotationGestureProcessor::RotationGestureProcessor()
   mRotationGestureDetectors(),
   mCurrentRotationEmitters(),
   mCurrentRotationEvent(nullptr),
-  mMinimumTouchEvents(MINIMUM_TOUCH_EVENTS_REQUIRED),
-  mMinimumTouchEventsAfterStart(MINIMUM_TOUCH_EVENTS_REQUIRED_AFTER_START)
+  mMinimumTouchEvents(Integration::DEFAULT_ROTATION_GESTURE_MINIMUM_TOUCH_EVENTS),
+  mMinimumTouchEventsAfterStart(Integration::DEFAULT_ROTATION_GESTURE_MINIMUM_TOUCH_EVENTS_AFTER_START)
 {
 }
 
@@ -338,4 +337,4 @@ void RotationGestureProcessor::EmitGestureSignal(Actor* actor, const GestureDete
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

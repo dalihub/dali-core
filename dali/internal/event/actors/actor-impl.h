@@ -46,7 +46,7 @@
 #include <dali/public-api/render-tasks/render-task.h>
 #include <dali/public-api/rendering/renderer.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 class KeyEvent;
 class TouchData;
@@ -1745,18 +1745,18 @@ public:
 
   /**
    * Sets the touch hit area margin of an actor.
-   * @param [in] offset The new extents of area.
+   * @param [in] margin The new margin of the touch hit area.
    */
-  void SetTouchHitAreaMargin(const Extents& extents)
+  void SetTouchHitAreaMargin(const Insets& margin)
   {
-    mTouchHitAreaMargin = extents;
+    mTouchHitAreaMargin = margin;
   }
 
   /**
    * Retrieve the Actor's touch hit area margin.
    * @return The Actor's touch hit area margin.
    */
-  const Extents& GetTouchHitAreaMargin() const
+  const Insets& GetTouchHitAreaMargin() const
   {
     return mTouchHitAreaMargin;
   }
@@ -1786,24 +1786,6 @@ public:
   bool IsDispatchHoverMotionEnabled() const
   {
     return mDispatchHoverMotion;
-  }
-
-  /**
-   * @brief Sets the hover state of actor
-   * @param state The PointState
-   */
-  void SetHoverState(PointState::Type state)
-  {
-    mHoverState = state;
-  }
-
-  /**
-   * @brief Gets the hover state of actor
-   * @return PointState::Type
-   */
-  PointState::Type GetHoverState() const
-  {
-    return mHoverState;
   }
 
   // Gestures
@@ -2671,7 +2653,7 @@ protected:
   Vector3    mTargetPosition;     ///< Event-side storage for position (not a pointer as most actors will have a position)
   Vector3    mTargetScale;        ///< Event-side storage for scale
   Vector4    mUpdateAreaHint;     ///< Event-side storage for update area hint
-  Extents    mTouchHitAreaMargin; ///< Extents info of touch hit area margin
+  Insets     mTouchHitAreaMargin; ///< Margin of the touch hit area
 
   struct Annotation
   {
@@ -2680,11 +2662,11 @@ protected:
     Dali::String annotationInfo;
   };
 
-  std::string                   mName;       ///< Name of the actor
-  std::unique_ptr<Annotation>   mAnnotation; ///< Optional application-defined metadata
-  uint32_t    mSortedDepth; ///< The sorted depth index. A combination of tree traversal and sibling order.
-  int16_t     mDepth;       ///< The depth in the hierarchy of the actor. Only 32,767 levels of depth are supported
-  int32_t     mDepthIndex;  ///< Render(draw) order sort key among siblings (Property::DEPTH_INDEX). Does NOT change sibling order.
+  std::string                 mName;        ///< Name of the actor
+  std::unique_ptr<Annotation> mAnnotation;  ///< Optional application-defined metadata
+  uint32_t                    mSortedDepth; ///< The sorted depth index. A combination of tree traversal and sibling order.
+  int16_t                     mDepth;       ///< The depth in the hierarchy of the actor. Only 32,767 levels of depth are supported
+  int32_t                     mDepthIndex;  ///< Render(draw) order sort key among siblings (Property::DEPTH_INDEX). Does NOT change sibling order.
 
   int16_t mLayer3DParentsCount; ///< The number of layer with 3D behaviour in ancestors include this. It will be 0 if actor is not on scene.
 
@@ -2722,9 +2704,7 @@ protected:
 
   DevelActor::ChildrenDepthIndexPolicy::Type mChildrenDepthIndexPolicy : 2; ///< Children's depth index generation policy. Only works under LAYER_UI
   ClippingMode::Type                         mClippingMode : 3;             ///< Cached: Determines which clipping mode (if any) to use.
-  PointState::Type                           mHoverState : 3;               ///< Stores the HoverEvent state of actor.
-
-  Dali::BlendEquation::Type mBlendEquation : 17; ///< Cached: Determines which blend equation will be used to render renderers.
+  Dali::BlendEquation::Type                  mBlendEquation : 17;           ///< Cached: Determines which blend equation will be used to render renderers.
 
   uint8_t mOffScreenRenderableBitField; ///< Bit field to store the offscreen renderable type of this actor. 0xf0 is backward, 0x0f is forward.
 
@@ -2767,6 +2747,6 @@ struct EnableBitMaskOperators<OffScreenRenderable::Type>
   static const bool ENABLE = true;
 };
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_ACTOR_H

@@ -29,7 +29,7 @@
 #include <dali/public-api/signals/signal-connection-pool.h>
 #include <dali/public-api/signals/signal-slot-connections.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @addtogroup dali_core_signals
@@ -416,6 +416,6 @@ private:
 /**
  * @}
  */
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_BASE_SIGNAL_H

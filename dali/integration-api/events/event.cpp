@@ -18,7 +18,7 @@
 // INTERNAL INCLUDES
 #include <dali/integration-api/events/event.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Integration
 {
@@ -31,4 +31,4 @@ Event::Event(Type eventType)
 
 } // namespace Integration
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

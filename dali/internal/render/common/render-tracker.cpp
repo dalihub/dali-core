@@ -24,7 +24,7 @@
 
 // EXTERNAL INCLUDES
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -91,4 +91,4 @@ void RenderTracker::SetSyncFlag()
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

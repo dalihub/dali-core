@@ -26,7 +26,7 @@
 #include <dali/public-api/actors/camera-actor.h>
 #include <dali/public-api/math/rect.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -478,6 +478,6 @@ public:                                                                         
 
 } // namespace SceneGraph
 } // namespace Internal
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_SCENE_GRAPH_CAMERA_H

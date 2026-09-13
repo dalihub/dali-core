@@ -25,7 +25,7 @@
 #undef FALSE
 #undef TRUE
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Integration
 {
@@ -92,6 +92,6 @@ struct EnableBitMaskOperators<Integration::CorePolicyFlags>
 {
   static const bool ENABLE = true;
 };
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTEGRATION_CORE_ENUMERATIONS_H

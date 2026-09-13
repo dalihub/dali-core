@@ -31,7 +31,7 @@
 #include <dali/internal/update/rendering/scene-graph-renderer-messages.h>
 #include <dali/internal/update/rendering/scene-graph-renderer.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -73,7 +73,7 @@ DALI_PROPERTY("rendererOpacity", FLOAT, true, true, true, Dali::Renderer::Proper
 DALI_PROPERTY("renderingBehavior", INTEGER, true, false, false, Dali::DevelRenderer::Property::RENDERING_BEHAVIOR)
 DALI_PROPERTY("blendEquation", INTEGER, true, false, false, Dali::DevelRenderer::Property::BLEND_EQUATION)
 DALI_PROPERTY("instanceCount", INTEGER, true, false, false, Dali::DevelRenderer::Property::INSTANCE_COUNT)
-DALI_PROPERTY("updateAreaMargin", EXTENTS, true, false, false, Dali::DevelRenderer::Property::UPDATE_AREA_MARGIN)
+DALI_PROPERTY("updateAreaMargin", INSETS, true, false, false, Dali::DevelRenderer::Property::UPDATE_AREA_MARGIN)
 DALI_PROPERTY_TABLE_END(DEFAULT_RENDERER_PROPERTY_START_INDEX, RendererDefaultProperties)
 
 // Property string to enumeration tables:
@@ -760,13 +760,13 @@ void Renderer::SetDefaultProperty(Property::Index        index,
     }
     case DevelRenderer::Property::UPDATE_AREA_MARGIN:
     {
-      Extents updateAreaMargin;
+      Insets updateAreaMargin;
       if(propertyValue.Get(updateAreaMargin))
       {
         if(mUpdateAreaMargin != updateAreaMargin)
         {
           mUpdateAreaMargin = updateAreaMargin;
-          SetUpdateAreaExtentsMessage(GetEventThreadServices(), GetRendererSceneObject(), mUpdateAreaMargin);
+          SetUpdateAreaMarginMessage(GetEventThreadServices(), GetRendererSceneObject(), mUpdateAreaMargin);
         }
       }
       break;
@@ -1379,4 +1379,4 @@ void Renderer::TerminateRenderCallback(bool invokeCallback)
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

@@ -25,7 +25,7 @@
 #include <dali/graphics-api/graphics-types.h>
 #include <dali/public-api/math/compile-time-math.h>
 
-namespace Dali::Internal
+namespace DALI_NAMESPACE::Internal
 {
 class Program;
 
@@ -118,6 +118,6 @@ private:
   struct Impl;
   std::unique_ptr<Impl> mImpl{nullptr};
 };
-} // namespace Dali::Internal
+} //namespace DALI_NAMESPACE::Internal
 
 #endif // DALI_INTERNAL_SHARED_UNIFORM_BUFFER_VIEW_CONTAINER_H

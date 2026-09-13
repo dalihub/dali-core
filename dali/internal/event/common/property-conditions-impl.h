@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_PROPERTY_CONDITIONS_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@
 #include <dali/public-api/object/property-conditions.h>
 #include <dali/public-api/object/property-value.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -93,6 +93,6 @@ inline const Internal::PropertyCondition& GetImplementation(const Dali::Property
   return static_cast<const Internal::PropertyCondition&>(handle);
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_PROPERTY_CONDITIONS_H

@@ -22,7 +22,7 @@
 #include <dali/public-api/object/property-value.h>
 #include <dali/public-api/object/property.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -60,7 +60,10 @@ struct PropertyBatchEntry
    * @brief Default constructor.
    */
   PropertyBatchEntry()
-  : property(nullptr), propertyIndex(0), type(Property::NONE), value()
+  : property(nullptr),
+    propertyIndex(0),
+    type(Property::NONE),
+    value()
   {
   }
 
@@ -101,7 +104,8 @@ struct PropertyBatchEntry
     float   v4[4];
     void*   ptr; // For MATRIX/MATRIX3 heap allocation (see §8.3)
 
-    PropertyValue(): ptr(nullptr)
+    PropertyValue()
+    : ptr(nullptr)
     {
     }
   } value;
@@ -129,7 +133,13 @@ public:
    * Initializes with inline buffer, no heap allocation.
    */
   PropertyBatch()
-  : mEntries(mInlineBuffer), mCount(0), mCapacity(INLINE_CAPACITY), mIsHeapAllocated(false), mNextDirty(nullptr), mPrevDirty(nullptr), mOwningList(nullptr)
+  : mEntries(mInlineBuffer),
+    mCount(0),
+    mCapacity(INLINE_CAPACITY),
+    mIsHeapAllocated(false),
+    mNextDirty(nullptr),
+    mPrevDirty(nullptr),
+    mOwningList(nullptr)
   {
   }
 
@@ -451,6 +461,6 @@ private:
 };
 
 } // namespace Internal
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_UPDATE_COMMON_PROPERTY_BATCH_H

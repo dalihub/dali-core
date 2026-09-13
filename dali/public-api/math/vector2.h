@@ -26,7 +26,7 @@
 #include <dali/public-api/common/type-traits.h>
 #include <dali/public-api/math/int-pair.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 
 /**
@@ -552,6 +552,6 @@ struct TypeTraits<Vector2> : public BasicTypes<Vector2>
 /**
  * @}
  */
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_VECTOR_2_H

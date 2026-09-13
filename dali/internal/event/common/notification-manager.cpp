@@ -32,7 +32,7 @@
 #include <dali/internal/event/common/property-notification-impl.h>
 #include <dali/public-api/common/dali-common.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -286,7 +286,7 @@ void NotificationManager::ProcessMessages()
     if(!batch->messages.Empty())
     {
       DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_NOTIFICATION_PROCESS_MESSAGE", [&](std::ostringstream& oss)
-                                              { oss << "[" << batch->messages.Count() << "]"; });
+      { oss << "[" << batch->messages.Count() << "]"; });
       for(auto iter = batch->messages.Begin(), end = batch->messages.End(); iter != end; ++iter)
       {
         MessageBase* message = *iter;
@@ -297,13 +297,13 @@ void NotificationManager::ProcessMessages()
         }
       }
       DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_NOTIFICATION_PROCESS_MESSAGE", [&](std::ostringstream& oss)
-                                            { oss << "[" << batch->messages.Count() << "]"; });
+      { oss << "[" << batch->messages.Count() << "]"; });
     }
 
     if(!batch->interfaces.empty())
     {
       DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_NOTIFICATION_NOTIFY_COMPLETED", [&](std::ostringstream& oss)
-                                              { oss << "[" << batch->interfaces.size() << "]"; });
+      { oss << "[" << batch->interfaces.size() << "]"; });
       for(auto& pair : batch->interfaces)
       {
         CompleteNotificationInterface* iface = pair.first;
@@ -314,7 +314,7 @@ void NotificationManager::ProcessMessages()
         }
       }
       DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_NOTIFICATION_NOTIFY_COMPLETED", [&](std::ostringstream& oss)
-                                            { oss << "[" << batch->interfaces.size() << "]"; });
+      { oss << "[" << batch->interfaces.size() << "]"; });
     }
 
     // Clear() deletes the now-processed MessageBase* pointers (OwnerContainer
@@ -331,4 +331,4 @@ void NotificationManager::ProcessMessages()
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

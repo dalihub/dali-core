@@ -21,7 +21,7 @@
 #include <dali/internal/update/common/animatable-property.h>
 #include <dali/internal/update/manager/transform-manager.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -774,6 +774,6 @@ private:
 
 } // namespace SceneGraph
 } // namespace Internal
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_UPDATE_TRANSFORM_MANAGER_PROPERTY_H

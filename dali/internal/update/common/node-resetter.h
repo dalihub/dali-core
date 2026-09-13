@@ -25,7 +25,7 @@
 #include <dali/internal/update/common/property-owner.h>
 #include <dali/internal/update/nodes/node.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -169,6 +169,6 @@ protected:
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif //DALI_INTERNAL_SCENEGRAPH_NODE_RESETTER_H

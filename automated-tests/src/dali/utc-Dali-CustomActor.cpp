@@ -2037,7 +2037,7 @@ int UtcDaliCustomActorSetGetActorPropertyActionSignal(void)
   animation.Play();
 
   application.SendNotification();
-  application.Render(1000.f);
+  application.Render(1000u);
 
   DALI_TEST_EQUALS(Vector3(100.0f, 150.0f, 200.0f), custom.GetProperty(Actor::Property::POSITION).Get<Vector3>(), TEST_LOCATION);
   DALI_TEST_EQUALS(Vector3(100.0f, 150.0f, 200.0f), custom.GetCurrentProperty<Vector3>(Actor::Property::POSITION), TEST_LOCATION);

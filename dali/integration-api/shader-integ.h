@@ -28,7 +28,7 @@
 #include <dali/public-api/rendering/shader.h>
 #include <dali/public-api/rendering/uniform-block.h>
 
-namespace Dali::Integration
+namespace DALI_NAMESPACE::Integration
 {
 /**
  * @brief Creates Shader and connect by given uniform blocks
@@ -66,6 +66,6 @@ DALI_CORE_API Dali::Shader ShaderNewWithUniformBlock(Dali::Property::Value shade
  */
 DALI_CORE_API std::string GenerateTaggedShaderPrefix(const std::string& shaderPrefix);
 
-} // namespace Dali::Integration
+} //namespace DALI_NAMESPACE::Integration
 
 #endif // DALI_SHADER_INTEG_H

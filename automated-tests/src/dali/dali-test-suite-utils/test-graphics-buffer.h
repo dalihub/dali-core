@@ -24,7 +24,7 @@
 #include "test-gl-abstraction.h"
 #include "test-trace-call-stack.h"
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 class TestGraphicsProgram;
 class TestGraphicsController;
@@ -61,6 +61,6 @@ public:
   bool                       mCpuOnly{false};
 };
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif //DALI_TEST_GRAPHICS_BUFFER_H

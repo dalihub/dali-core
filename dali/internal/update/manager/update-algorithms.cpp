@@ -33,7 +33,7 @@
 
 #include <dali/integration-api/debug.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -261,4 +261,4 @@ void UpdateLayerTree(Layer& layer)
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

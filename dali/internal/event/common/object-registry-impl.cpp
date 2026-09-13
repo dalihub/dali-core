@@ -30,7 +30,7 @@
 
 using Dali::Integration::ToStdStringView;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -96,4 +96,4 @@ bool ObjectRegistry::DoConnectSignal(BaseObject* object, ConnectionTrackerInterf
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

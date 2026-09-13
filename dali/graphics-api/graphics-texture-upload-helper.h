@@ -2,7 +2,7 @@
 #define DALI_GRAPHICS_TEXTURE_UPLOAD_INTERFACE_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@
 // INTERNAL INCLUDES
 #include "graphics-types.h"
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Graphics
 {
@@ -220,6 +220,6 @@ constexpr Graphics::TextureType ConvertTextureType(Dali::TextureType::Type type)
 }
 
 } // namespace Graphics
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_GRAPHICS_TEXTURE_UPLOAD_INTERFACE_H

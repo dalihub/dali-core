@@ -32,7 +32,7 @@
 #include <dali/internal/update/rendering/scene-graph-renderer.h>
 #include <dali/internal/update/rendering/scene-graph-visual-renderer.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -863,4 +863,4 @@ void VisualRenderer::EnsureVisualPropertiesAndCache() const
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

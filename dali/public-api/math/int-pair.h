@@ -26,7 +26,7 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/type-traits.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @addtogroup dali_core_math
@@ -312,7 +312,7 @@ public:
   {
     DALI_ASSERT_DEBUG(from.x + 0.5f < 65536.0f);
     DALI_ASSERT_DEBUG(from.y + 0.5f < 65536.0f);
-    return Uint16Pair(from.x + 0.5f, from.y + 0.5f);
+    return Uint16Pair(static_cast<uint16_t>(from.x + 0.5f), static_cast<uint16_t>(from.y + 0.5f));
   }
 
   /**
@@ -330,7 +330,7 @@ public:
   {
     DALI_ASSERT_DEBUG(from[0] + 0.5f < 65536.0f);
     DALI_ASSERT_DEBUG(from[1] + 0.5f < 65536.0f);
-    return Uint16Pair(from[0] + 0.5f, from[1] + 0.5f);
+    return Uint16Pair(static_cast<uint16_t>(from[0] + 0.5f), static_cast<uint16_t>(from[1] + 0.5f));
   }
 
 public:
@@ -363,6 +363,6 @@ struct TypeTraits<Uint16Pair> : public BasicTypes<Uint16Pair>
 /**
  * @}
  */
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INT_PAIR_H

@@ -24,7 +24,7 @@
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/math/rect.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -300,6 +300,6 @@ inline void OwnerPointer<Dali::Internal::SceneGraph::Layer>::Reset()
 }
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_SCENE_GRAPH_LAYER_H

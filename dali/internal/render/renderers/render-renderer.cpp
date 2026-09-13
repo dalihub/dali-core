@@ -45,7 +45,7 @@
 #include <dali/internal/update/common/scene-graph-memory-pool-collection.h>
 #include <dali/internal/update/common/uniform-map.h>
 
-namespace Dali::Internal
+namespace DALI_NAMESPACE::Internal
 {
 Dali::Matrix* testMVP;
 uint32_t      mvpBufferIndex;
@@ -619,9 +619,9 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
     }
 
     // pass render callback input
-    renderCallbackInput.size       = size;
-    renderCallbackInput.view       = viewMatrix;
-    renderCallbackInput.projection = projectionMatrix;
+    renderCallbackInput.size                 = size;
+    renderCallbackInput.view                 = viewMatrix;
+    renderCallbackInput.projection           = projectionMatrix;
     renderCallbackInput.worldColorMultiplier = worldColorMultiplier;
 
     MatrixUtils::MultiplyProjectionMatrix(renderCallbackInput.mvp, modelViewMatrix, projectionMatrix);
@@ -990,7 +990,7 @@ void Renderer::WriteUniformBuffer(
     WriteDefaultUniformV2(program->GetDefaultUniform(Program::DefaultUniformIndex::SCALE), uboViews, scale);
 
     const Vector4& mixColor   = mRenderDataProvider->GetMixColor(); ///< Renderer's mix color
-    Vector4        finalColor = worldColorMultiplier * mixColor;              ///< Applied Actor's original color to renderer's mix color
+    Vector4        finalColor = worldColorMultiplier * mixColor;    ///< Applied Actor's original color to renderer's mix color
     if(mPremultipliedAlphaEnabled)
     {
       const float alpha = finalColor.a;
@@ -1452,4 +1452,4 @@ void Renderer::TerminateRenderCallback(bool invokeCallback)
 
 } // namespace Render
 
-} // namespace Dali::Internal
+} //namespace DALI_NAMESPACE::Internal

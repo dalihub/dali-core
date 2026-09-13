@@ -21,7 +21,7 @@
 #include <dali/graphics-api/graphics-reflection.h>
 #include "test-gl-abstraction.h"
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 class TestGraphicsController;
 
@@ -97,6 +97,6 @@ public: // Test methods
   std::vector<TestUniformBlockInfo> mUniformBlocks{};       ///< List of uniform blocks
 };
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TEST_GRAPHICS_REFLECTION_H

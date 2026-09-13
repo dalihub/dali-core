@@ -28,7 +28,7 @@
 #include <dali/public-api/animation/animation.h>
 #include <dali/public-api/common/dali-vector.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -144,6 +144,6 @@ inline MessageBase* NotifyProgressReachedMessage(CompleteNotificationInterface& 
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_ANIMATION_PLAYLIST_H

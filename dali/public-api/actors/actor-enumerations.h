@@ -20,7 +20,7 @@
 
 #include <dali/public-api/common/dali-common.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @addtogroup dali_core_actors
@@ -188,6 +188,6 @@ enum class VisibilityChangeType
 /**
  * @}
  */
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_ACTOR_ENUMERATIONS_H

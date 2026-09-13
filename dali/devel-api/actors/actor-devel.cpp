@@ -21,7 +21,7 @@
 #include <dali/internal/event/actors/actor-coords.h>
 #include <dali/internal/event/actors/actor-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace DevelActor
 {
@@ -143,4 +143,4 @@ Vector3 GetNaturalSize(const Actor& actor)
 
 } // namespace DevelActor
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

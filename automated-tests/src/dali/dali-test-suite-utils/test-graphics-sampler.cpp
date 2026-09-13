@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 #include "test-graphics-sampler.h"
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 std::map<uint32_t, GLint> TestGraphicsSampler::mParamCache;
 
@@ -180,4 +180,4 @@ void TestGraphicsSampler::SetTexParameter(TestGlAbstraction& glAbstraction, GLui
   }
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

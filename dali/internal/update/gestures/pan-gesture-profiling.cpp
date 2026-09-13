@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -50,4 +50,4 @@ void PanGestureProfiling::ClearData()
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

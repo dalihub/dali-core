@@ -37,7 +37,7 @@
 
 #include <dali/integration-api/debug.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -52,16 +52,16 @@ namespace // unnamed namespace
 Dali::Internal::SceneGraph::MemoryPoolCollection*                                 gMemoryPoolCollection = nullptr;
 static constexpr Dali::Internal::SceneGraph::MemoryPoolCollection::MemoryPoolType gMemoryPoolType       = Dali::Internal::SceneGraph::MemoryPoolCollection::MemoryPoolType::RENDERER;
 
-inline Vector4 AdjustExtents(const Vector4& updateArea, const Dali::Extents& updateAreaExtents)
+inline Vector4 AddUpdateAreaMargin(const Vector4& updateArea, const Dali::Insets& updateAreaMargin)
 {
-  if(DALI_LIKELY(updateAreaExtents == Dali::Extents()))
+  if(DALI_LIKELY(updateAreaMargin == Dali::Insets()))
   {
     return updateArea;
   }
-  const float left   = updateArea.x - updateArea.z * 0.5f - static_cast<float>(updateAreaExtents.start);
-  const float right  = updateArea.x + updateArea.z * 0.5f + static_cast<float>(updateAreaExtents.end);
-  const float top    = updateArea.y - updateArea.w * 0.5f - static_cast<float>(updateAreaExtents.top);
-  const float bottom = updateArea.y + updateArea.w * 0.5f + static_cast<float>(updateAreaExtents.bottom);
+  const float left   = updateArea.x - updateArea.z * 0.5f - updateAreaMargin.start;
+  const float right  = updateArea.x + updateArea.z * 0.5f + updateAreaMargin.end;
+  const float top    = updateArea.y - updateArea.w * 0.5f - updateAreaMargin.top;
+  const float bottom = updateArea.y + updateArea.w * 0.5f + updateAreaMargin.bottom;
   return Vector4((left + right) * 0.5f, (top + bottom) * 0.5f, (right - left), (bottom - top));
 }
 
@@ -161,7 +161,7 @@ Renderer::Renderer()
   mVisualProperties(nullptr),
   mDecoratedVisualCornerRadiusProperties(nullptr),
   mDecoratedVisualBorderlineProperties(nullptr),
-  mUpdateAreaExtents(),
+  mUpdateAreaMargin(),
   mBlendMode(BlendMode::AUTO),
   mRenderingBehavior(DevelRenderer::Rendering::IF_REQUIRED),
   mUpdateDecay(Renderer::Decay::INITIAL),
@@ -501,11 +501,11 @@ void Renderer::SetStencilOperationOnZPass(StencilOperation::Type stencilOperatio
   CallRenderFunction(mRenderer, &Render::Renderer::SetStencilOperationOnZPass, stencilOperationOnZPass);
 }
 
-void Renderer::SetUpdateAreaExtents(const Dali::Extents& updateAreaExtents)
+void Renderer::SetUpdateAreaMargin(const Dali::Insets& updateAreaMargin)
 {
-  if(mUpdateAreaExtents != updateAreaExtents)
+  if(mUpdateAreaMargin != updateAreaMargin)
   {
-    mUpdateAreaExtents = updateAreaExtents;
+    mUpdateAreaMargin = updateAreaMargin;
     SetUpdated(true);
   }
 }
@@ -846,7 +846,7 @@ Vector4 Renderer::GetVisualTransformedUpdateArea(const Vector4& originalUpdateAr
   {
     mDecoratedVisualBorderlineProperties->GetVisualTransformedUpdateArea(updateArea);
   }
-  return AdjustExtents(updateArea, mUpdateAreaExtents);
+  return AddUpdateAreaMargin(updateArea, mUpdateAreaMargin);
 }
 
 bool Renderer::IsObservingNodeDeactivated() const
@@ -897,4 +897,4 @@ uint8_t Renderer::GetUpdatedFlag() const
 
 } // namespace SceneGraph
 } // namespace Internal
-} // namespace Dali
+} //namespace DALI_NAMESPACE

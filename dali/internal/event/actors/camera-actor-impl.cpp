@@ -36,7 +36,7 @@
 
 #include <dali/public-api/common/dali-utility.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -1125,4 +1125,4 @@ void CameraActor::OnPropertySet(Property::Index index, const Property::Value& pr
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

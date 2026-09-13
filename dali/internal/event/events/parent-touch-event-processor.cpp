@@ -28,7 +28,7 @@
 #include <dali/public-api/render-tasks/render-task.h>
 #include <dali/public-api/signals/callback.h>
 
-namespace Dali::Internal
+namespace DALI_NAMESPACE::Internal
 {
 namespace
 {
@@ -484,4 +484,4 @@ void ParentTouchEventProcessor::Clear()
   mLastPrimaryPointState = PointState::FINISHED;
 }
 
-} // namespace Dali::Internal
+} //namespace DALI_NAMESPACE::Internal

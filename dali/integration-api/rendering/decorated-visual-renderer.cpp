@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/event/rendering/decorated-visual-renderer-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 DecoratedVisualRenderer DecoratedVisualRenderer::New(Geometry& geometry, Shader& shader)
 {
@@ -53,4 +53,4 @@ DecoratedVisualRenderer::DecoratedVisualRenderer(Internal::DecoratedVisualRender
 {
 }
 
-} //namespace Dali
+} //namespace DALI_NAMESPACE

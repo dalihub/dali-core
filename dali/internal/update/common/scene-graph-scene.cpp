@@ -22,7 +22,7 @@
 #include <dali/internal/update/render-tasks/scene-graph-render-task-list.h>
 #include <dali/public-api/common/dali-utility.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -42,7 +42,6 @@ Scene::Scene(const Graphics::RenderTargetCreateInfo& createInfo)
   mNeedFullUpdate(false),
   mDepthBufferEnabled(false),
   mStencilBufferEnabled(false),
-  mMSAAEnabled(false),
   mPartialUpdateEnabled(false),
   mHasRenderInstructionToScene(false),
   mRenderPassDirty(false)
@@ -68,7 +67,6 @@ void Scene::SetScenePolicyFlags(ScenePolicyFlagBits flags)
   mDepthBufferEnabled   = newDepth;
   mStencilBufferEnabled = newStencil;
   mPartialUpdateEnabled = (flags & ScenePolicyFlagBits::PARTIAL_UPDATE_ENABLED);
-  mMSAAEnabled          = (flags & ScenePolicyFlagBits::MULTI_SAMPLING_ENABLED);
 }
 
 void Scene::Initialize(Graphics::Controller& graphicsController)
@@ -348,11 +346,6 @@ bool Scene::IsStencilBufferEnabled() const
   return mStencilBufferEnabled;
 }
 
-bool Scene::IsMultiSampledAntiAliasingEnabled() const
-{
-  return mMSAAEnabled;
-}
-
 bool Scene::IsPartialUpdateEnabled() const
 {
   return mPartialUpdateEnabled;
@@ -362,4 +355,4 @@ bool Scene::IsPartialUpdateEnabled() const
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

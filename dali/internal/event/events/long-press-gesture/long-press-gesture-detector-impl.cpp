@@ -32,7 +32,7 @@
 
 using Dali::Integration::ToStdStringView;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -313,4 +313,4 @@ Actor* LongPressGestureDetector::GetCurrentGesturedActor()
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

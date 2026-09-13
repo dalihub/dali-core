@@ -22,7 +22,7 @@
 #include <dali/internal/common/owner-key-type.h>
 #include <dali/internal/render/renderers/render-renderer.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -101,6 +101,6 @@ private:
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_SCENE_GRAPH_RENDER_MESSAGE_DISPATCHER_H

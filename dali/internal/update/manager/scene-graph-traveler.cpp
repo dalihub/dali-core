@@ -26,7 +26,7 @@
 #include <dali/internal/update/manager/update-manager.h>
 #include <dali/internal/update/nodes/node.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -135,4 +135,4 @@ void SceneGraphTraveler::Clear()
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

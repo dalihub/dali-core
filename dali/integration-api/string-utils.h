@@ -28,7 +28,7 @@
 #include <dali/public-api/object/property-array.h>
 #include <dali/public-api/object/property-map.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Integration
 {
@@ -311,7 +311,7 @@ inline String ToDaliString(const String& str)
 }
 
 } // namespace Integration
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 // Add std::hash specialization for Dali::StringView
 // This enables use of Dali::StringView as key in std::unordered_map

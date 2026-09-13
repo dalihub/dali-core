@@ -83,6 +83,7 @@ int UtcDaliTouchEventCombinerConstructorsNegative(void)
   }
   catch(Dali::DaliException& e)
   {
+    (void)e;
     tet_result(TET_PASS);
   }
 
@@ -94,6 +95,7 @@ int UtcDaliTouchEventCombinerConstructorsNegative(void)
   }
   catch(Dali::DaliException& e)
   {
+    (void)e;
     tet_result(TET_PASS);
   }
 
@@ -105,6 +107,7 @@ int UtcDaliTouchEventCombinerConstructorsNegative(void)
   }
   catch(Dali::DaliException& e)
   {
+    (void)e;
     tet_result(TET_PASS);
   }
 
@@ -116,6 +119,7 @@ int UtcDaliTouchEventCombinerConstructorsNegative(void)
   }
   catch(Dali::DaliException& e)
   {
+    (void)e;
     tet_result(TET_PASS);
   }
   END_TEST;
@@ -171,6 +175,7 @@ int UtcDaliTouchEventCombinerSettersNegative(void)
   }
   catch(Dali::DaliException& e)
   {
+    (void)e;
     tet_result(TET_PASS);
   }
 
@@ -182,6 +187,7 @@ int UtcDaliTouchEventCombinerSettersNegative(void)
   }
   catch(Dali::DaliException& e)
   {
+    (void)e;
     tet_result(TET_PASS);
   }
 
@@ -193,6 +199,7 @@ int UtcDaliTouchEventCombinerSettersNegative(void)
   }
   catch(Dali::DaliException& e)
   {
+    (void)e;
     tet_result(TET_PASS);
   }
 
@@ -204,6 +211,7 @@ int UtcDaliTouchEventCombinerSettersNegative(void)
   }
   catch(Dali::DaliException& e)
   {
+    (void)e;
     tet_result(TET_PASS);
   }
 
@@ -215,6 +223,7 @@ int UtcDaliTouchEventCombinerSettersNegative(void)
   }
   catch(Dali::DaliException& e)
   {
+    (void)e;
     tet_result(TET_PASS);
   }
   END_TEST;

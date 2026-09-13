@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/event/common/thread-local-storage.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Capabilities
 {
@@ -33,4 +33,4 @@ bool IsBlendEquationSupported(BlendEquation::Type blendEquation)
 
 } // namespace Capabilities
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

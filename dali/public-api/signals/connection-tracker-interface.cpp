@@ -18,10 +18,10 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/signals/connection-tracker-interface.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 ConnectionTrackerInterface::ConnectionTrackerInterface() = default;
 
 ConnectionTrackerInterface::~ConnectionTrackerInterface() = default;
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

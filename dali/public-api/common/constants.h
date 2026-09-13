@@ -26,7 +26,7 @@
 #include <dali/public-api/math/vector3.h>
 #include <dali/public-api/math/vector4.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @addtogroup dali_core_common
@@ -265,8 +265,8 @@ static constexpr float MACHINE_EPSILON_10000 = Epsilon<10000>::value;
 static constexpr float PI            = 3.14159265358979323846f; ///< Pi
 static constexpr float PI_2          = PI * 0.5f;               ///< Pi/2
 static constexpr float PI_4          = PI * 0.25f;              ///< Pi/4
-static constexpr float PI_OVER_180   = Dali::Math::PI / 180.0f;    ///< Constant used to convert degree to radian
-static constexpr float ONE80_OVER_PI = 180.0f / Dali::Math::PI;    ///< Constant used to convert radian to degree
+static constexpr float PI_OVER_180   = Dali::Math::PI / 180.0f; ///< Constant used to convert degree to radian
+static constexpr float ONE80_OVER_PI = 180.0f / Dali::Math::PI; ///< Constant used to convert radian to degree
 
 } // namespace Math
 
@@ -277,6 +277,6 @@ static constexpr Vector4 DEBUG_BACKGROUND_COLOR(0.2f, 0.5f, 0.2f, 1.0f); ///< Da
 /**
  * @}
  */
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_CONSTANTS_H

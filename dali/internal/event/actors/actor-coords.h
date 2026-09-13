@@ -24,7 +24,7 @@
 #include <dali/public-api/math/vector3.h>
 #include <dali/public-api/math/viewport.h>
 
-namespace Dali::Internal
+namespace DALI_NAMESPACE::Internal
 {
 /**
  * Convert screen coordinates to local coordinates
@@ -348,6 +348,6 @@ bool CalculateActorOnSceneVisible(const Actor& actor);
  */
 Quaternion CalculateActorLookAtOrientation(const Actor& actor, Vector3 target, Vector3 up, Vector3 localForward, Vector3 localUp);
 
-} // namespace Dali::Internal
+} //namespace DALI_NAMESPACE::Internal
 
 #endif // DALI_INTERNAL_EVENT_ACTORS_ACTOR_COORDS_H

@@ -24,7 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/object/property-array.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @brief Creates a Property::Array from an initializer_list.
@@ -40,6 +40,6 @@ namespace Dali
  * @endcode
  */
 DALI_CORE_API Property::Array CreatePropertyArray(std::initializer_list<Property::Value> values);
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_DEVEL_API_OBJECT_PROPERTY_ARRAY_DEVEL_H

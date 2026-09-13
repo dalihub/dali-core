@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 // CLASS HEADER
 #include <dali/internal/event/events/long-press-gesture/long-press-gesture-event.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -32,4 +32,4 @@ LongPressGestureEvent::~LongPressGestureEvent() = default;
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

@@ -24,7 +24,7 @@
 #include <dali/public-api/object/property-notification-declarations.h>
 #include <dali/public-api/object/property.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @addtogroup dali_core_object
@@ -205,6 +205,6 @@ public: // Not intended for use by Application developers
 /**
  * @}
  */
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_PROPERTY_NOTIFICATION_H

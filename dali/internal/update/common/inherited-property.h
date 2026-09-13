@@ -27,7 +27,7 @@
 #include <dali/public-api/object/property-types.h>
 #include <dali/public-api/object/property.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -278,6 +278,6 @@ private:
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_SCENE_GRAPH_INHERITED_PROPERTY_H

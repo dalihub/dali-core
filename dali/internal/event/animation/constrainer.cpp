@@ -24,7 +24,7 @@
 #include <dali/internal/event/animation/constraint-source-impl.h>
 #include <dali/public-api/animation/constraint.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -163,4 +163,4 @@ uint32_t Constrainer::GetTag()
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

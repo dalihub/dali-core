@@ -27,7 +27,7 @@
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/events/touch-event.h>
 
-namespace Dali::Internal
+namespace DALI_NAMESPACE::Internal
 {
 namespace
 {
@@ -231,6 +231,12 @@ void GeometryTouchStreamRouter::ProcessTouchEvent(const Integration::TouchEvent&
         const uint32_t      initialRoutingGroup = initialHit->actor->GetId();
         const TouchStreamId streamId            = FindOrCreateStream(initialRoutingGroup, std::move(initialHit));
         auto                stream              = mTouchStreams.find(streamId);
+        if(DALI_UNLIKELY(stream == mTouchStreams.end()))
+        {
+          DALI_LOG_ERROR("Failed to find geometry touch stream. streamId(%llu)\n", static_cast<unsigned long long>(streamId));
+          continue;
+        }
+
         stream->second.activeDeviceIds.insert(deviceId);
         mDeviceRoutes.insert_or_assign(deviceId, streamId);
       }
@@ -365,4 +371,4 @@ void GeometryTouchStreamRouter::Clear()
   mSceneActiveDeviceIds.clear();
 }
 
-} // namespace Dali::Internal
+} //namespace DALI_NAMESPACE::Internal

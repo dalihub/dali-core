@@ -18,10 +18,11 @@
 #define DALI_PAIR_H
 
 // INTERNAL INCLUDES
+#include <dali/public-api/common/dali-namespace.h>
 #include <dali/public-api/common/dali-utility.h>
 #include <dali/public-api/common/type-traits.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @addtogroup dali_core_common
@@ -333,6 +334,6 @@ inline void Swap(Pair<T1, T2>& lhs, Pair<T1, T2>& rhs)
  * @}
  */
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_PAIR_H

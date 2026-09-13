@@ -23,7 +23,7 @@
 #include <dali/public-api/common/unique-ptr.h>
 #include <dali/public-api/rendering/vertex-buffer.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace DevelVertexBuffer
 {
@@ -48,6 +48,6 @@ void DALI_CORE_API SetVertexBufferUpdateCallback(Dali::VertexBuffer vertexBuffer
  */
 void DALI_CORE_API ClearVertexBufferUpdateCallback(Dali::VertexBuffer vertexBuffer);
 } // namespace DevelVertexBuffer
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_VERTEX_BUFFER_DEVEL_H

@@ -56,6 +56,7 @@ struct TraceEntry
   std::vector<int32_t>          hitActorIds;
   std::vector<Vector2>          localPositions;
   std::vector<Vector2>          screenPositions;
+  RenderTask                    renderTask;
 };
 
 struct TouchTrace
@@ -63,8 +64,9 @@ struct TouchTrace
   void Record(const char* receiver, CallbackKind kind, TouchEvent touch)
   {
     TraceEntry entry;
-    entry.receiver = receiver;
-    entry.kind     = kind;
+    entry.receiver   = receiver;
+    entry.kind       = kind;
+    entry.renderTask = touch.GetRenderTask();
     for(uint32_t i = 0u; i < touch.GetPointCount(); ++i)
     {
       Actor hitActor = touch.GetHitActor(i);
@@ -160,6 +162,31 @@ struct TouchTraceFunctor
   CallbackKind kind;
 };
 
+struct PanTrace
+{
+  uint32_t Count(GestureState state) const
+  {
+    return static_cast<uint32_t>(std::count(states.begin(), states.end(), state));
+  }
+
+  std::vector<GestureState> states;
+};
+
+struct PanTraceFunctor
+{
+  explicit PanTraceFunctor(PanTrace& trace)
+  : trace(trace)
+  {
+  }
+
+  void operator()(Actor, PanGesture pan)
+  {
+    trace.states.push_back(pan.GetState());
+  }
+
+  PanTrace& trace;
+};
+
 struct MutableTouchTraceFunctor
 {
   MutableTouchTraceFunctor(TouchTrace& trace, const char* receiver, bool& consume)
@@ -222,6 +249,30 @@ struct RemoveSelfOnDownFunctor
 
   TouchTrace& trace;
   const char* receiver;
+};
+
+struct RemoveActorOnInterruptedFunctor
+{
+  RemoveActorOnInterruptedFunctor(TouchTrace& trace, const char* receiver, Actor actorToRemove)
+  : trace(trace),
+    receiver(receiver),
+    actorToRemove(actorToRemove)
+  {
+  }
+
+  bool operator()(Actor, TouchEvent touch)
+  {
+    trace.Record(receiver, CallbackKind::TOUCH, touch);
+    if(touch.GetState(0u) == PointState::INTERRUPTED)
+    {
+      actorToRemove.Unparent();
+    }
+    return false;
+  }
+
+  TouchTrace& trace;
+  const char* receiver;
+  Actor       actorToRemove;
 };
 
 struct SceneTraceFunctor
@@ -444,7 +495,45 @@ int UtcDaliGeoTouchStreamLateConsumerTrace(void)
   END_TEST;
 }
 
-int UtcDaliGeoTouchStreamOwnerRemovalCharacterization(void)
+int UtcDaliGeoTouchStreamLateOwnerBindsBeforeTerminationCallbacks(void)
+{
+  TestApplication application;
+  TouchTrace      trace;
+
+  Actor root(application.GetScene().GetRootLayer());
+  Actor parent = CreateTouchableActor("parent");
+  Actor child  = CreateTouchableActor("child");
+  parent.Add(child);
+  application.GetScene().Add(parent);
+
+  bool                            parentConsumes = false;
+  TouchTraceFunctor               childObserver(trace, "child", false);
+  MutableTouchTraceFunctor        parentObserver(trace, "parent", parentConsumes);
+  RemoveActorOnInterruptedFunctor rootObserver(trace, "root", child);
+  child.TouchEventSignal().Connect(&application, childObserver);
+  parent.TouchEventSignal().Connect(&application, parentObserver);
+  root.TouchEventSignal().Connect(&application, rootObserver);
+  PrepareScene(application);
+
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
+  trace.Clear();
+
+  // The parent becomes owner on this motion. Terminating the root removes the initial hit actor
+  // reentrantly, after the owner route should already have replaced its observers.
+  parentConsumes = true;
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 20.0f)));
+  DALI_TEST_EQUALS(1u, trace.Count("root", CallbackKind::TOUCH, PointState::INTERRUPTED), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, trace.Count("parent", CallbackKind::TOUCH, PointState::INTERRUPTED), TEST_LOCATION);
+  trace.Clear();
+
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(200.0f, 200.0f)));
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(200.0f, 200.0f)));
+  DALI_TEST_EQUALS(1u, trace.Count("parent", CallbackKind::TOUCH, PointState::MOTION), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, trace.Count("parent", CallbackKind::TOUCH, PointState::UP), TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliGeoTouchStreamPrimaryRemovalKeepsOwnerActive(void)
 {
   TestApplication application;
   TouchTrace      trace;
@@ -464,7 +553,176 @@ int UtcDaliGeoTouchStreamOwnerRemovalCharacterization(void)
   DALI_TEST_EQUALS(1u, trace.Count("child", CallbackKind::TOUCH, PointState::INTERRUPTED), TEST_LOCATION);
   trace.Clear();
 
+  // The child is the primary hit actor, but the parent owns the stream.
   child.Unparent();
+
+  DALI_TEST_EQUALS(0u, trace.Count("child", CallbackKind::TOUCH, PointState::INTERRUPTED), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, trace.Count("parent", CallbackKind::TOUCH, PointState::INTERRUPTED), TEST_LOCATION);
+
+  // No actor is hit here. The established owner still receives the remainder of the stream.
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(200.0f, 200.0f)));
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(200.0f, 200.0f)));
+
+  DALI_TEST_EQUALS(1u, trace.Count("parent", CallbackKind::TOUCH, PointState::MOTION), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, trace.Count("parent", CallbackKind::TOUCH, PointState::UP), TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliGeoTouchStreamOwnerRenderTaskRemainsStable(void)
+{
+  TestApplication application;
+  TouchTrace      trace;
+
+  Actor parent = CreateTouchableActor("parent");
+  Actor child  = CreateTouchableActor("child");
+  parent.Add(child);
+  application.GetScene().Add(parent);
+
+  TouchTraceFunctor childFunctor(trace, "child", false);
+  TouchTraceFunctor parentFunctor(trace, "parent", true);
+  child.TouchEventSignal().Connect(&application, childFunctor);
+  parent.TouchEventSignal().Connect(&application, parentFunctor);
+  PrepareScene(application);
+
+  RenderTask ownerRenderTask = application.GetScene().GetRenderTaskList().GetTask(0u);
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
+  child.Unparent();
+
+  // A second input-enabled task renders the owner in a displaced viewport. Without a stable owner
+  // route, a hit in this viewport replaces the task used to deliver the stream.
+  RenderTask alternateRenderTask = application.GetScene().GetRenderTaskList().CreateTask();
+  alternateRenderTask.SetViewport(Viewport(200, 0, 100, 100));
+  alternateRenderTask.SetInputEnabled(true);
+  application.SendNotification();
+  application.Render();
+  trace.Clear();
+
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(210.0f, 10.0f)));
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(210.0f, 10.0f)));
+
+  const TraceEntry* parentMotion = trace.Find("parent", CallbackKind::TOUCH, PointState::MOTION);
+  const TraceEntry* parentUp     = trace.Find("parent", CallbackKind::TOUCH, PointState::UP);
+  DALI_TEST_CHECK(parentMotion);
+  DALI_TEST_CHECK(parentUp);
+  DALI_TEST_CHECK(parentMotion->renderTask == ownerRenderTask);
+  DALI_TEST_CHECK(parentMotion->renderTask != alternateRenderTask);
+  DALI_TEST_EQUALS(Vector2(210.0f, 10.0f), parentMotion->localPositions[0], 0.1f, TEST_LOCATION);
+  DALI_TEST_CHECK(parentUp->renderTask == ownerRenderTask);
+  DALI_TEST_EQUALS(Vector2(210.0f, 10.0f), parentUp->localPositions[0], 0.1f, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliGeoTouchStreamRecycledPrimaryDoesNotReplaceOwnerRoute(void)
+{
+  TestApplication application;
+  TouchTrace      trace;
+
+  Actor parent = CreateTouchableActor("parent");
+  Actor child  = CreateTouchableActor("child");
+  parent.Add(child);
+  application.GetScene().Add(parent);
+
+  TouchTraceFunctor childFunctor(trace, "child", false);
+  TouchTraceFunctor parentFunctor(trace, "parent", true);
+  child.TouchEventSignal().Connect(&application, childFunctor);
+  parent.TouchEventSignal().Connect(&application, parentFunctor);
+  PrepareScene(application);
+
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
+  trace.Clear();
+
+  child.Unparent();
+  child.SetProperty(Actor::Property::POSITION, Vector2(150.0f, 0.0f));
+  parent.Add(child);
+  application.SendNotification();
+  application.Render();
+  child.Unparent();
+
+  DALI_TEST_EQUALS(0u, trace.Count("parent", CallbackKind::TOUCH, PointState::INTERRUPTED), TEST_LOCATION);
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(200.0f, 200.0f)));
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(200.0f, 200.0f)));
+  DALI_TEST_EQUALS(1u, trace.Count("parent", CallbackKind::TOUCH, PointState::MOTION), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, trace.Count("parent", CallbackKind::TOUCH, PointState::UP), TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliGeoTouchStreamOwnerRemovalAfterPrimaryRemovalInterruptsOnce(void)
+{
+  TestApplication application;
+  TouchTrace      trace;
+
+  Actor parent = CreateTouchableActor("parent");
+  Actor child  = CreateTouchableActor("child");
+  parent.Add(child);
+  application.GetScene().Add(parent);
+
+  TouchTraceFunctor childFunctor(trace, "child", false);
+  TouchTraceFunctor parentFunctor(trace, "parent", true);
+  child.TouchEventSignal().Connect(&application, childFunctor);
+  parent.TouchEventSignal().Connect(&application, parentFunctor);
+  PrepareScene(application);
+
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
+  trace.Clear();
+
+  child.Unparent();
+  parent.Unparent();
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(10.0f, 10.0f)));
+
+  DALI_TEST_EQUALS(0u, trace.Count("child", CallbackKind::TOUCH, PointState::INTERRUPTED), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, trace.Count("parent", CallbackKind::TOUCH, PointState::INTERRUPTED), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, trace.Count("parent", CallbackKind::TOUCH, PointState::UP), TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliGeoTouchStreamInterruptionAfterPrimaryRemovalInterruptsOnce(void)
+{
+  TestApplication application;
+  TouchTrace      trace;
+
+  Actor parent = CreateTouchableActor("parent");
+  Actor child  = CreateTouchableActor("child");
+  parent.Add(child);
+  application.GetScene().Add(parent);
+
+  TouchTraceFunctor childFunctor(trace, "child", false);
+  TouchTraceFunctor parentFunctor(trace, "parent", true);
+  child.TouchEventSignal().Connect(&application, childFunctor);
+  parent.TouchEventSignal().Connect(&application, parentFunctor);
+  PrepareScene(application);
+
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
+  trace.Clear();
+
+  child.Unparent();
+  application.ProcessEvent(GenerateSingleTouch(PointState::INTERRUPTED, Vector2(200.0f, 200.0f)));
+  application.ProcessEvent(GenerateSingleTouch(PointState::INTERRUPTED, Vector2(200.0f, 200.0f)));
+
+  DALI_TEST_EQUALS(0u, trace.Count("child", CallbackKind::TOUCH, PointState::INTERRUPTED), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, trace.Count("parent", CallbackKind::TOUCH, PointState::INTERRUPTED), TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliGeoTouchStreamOwnerRemovalInterruptsStream(void)
+{
+  TestApplication application;
+  TouchTrace      trace;
+
+  Actor parent = CreateTouchableActor("parent");
+  Actor child  = CreateTouchableActor("child");
+  parent.Add(child);
+  application.GetScene().Add(parent);
+
+  TouchTraceFunctor childFunctor(trace, "child", false);
+  TouchTraceFunctor parentFunctor(trace, "parent", true);
+  child.TouchEventSignal().Connect(&application, childFunctor);
+  parent.TouchEventSignal().Connect(&application, parentFunctor);
+  PrepareScene(application);
+
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
+  trace.Clear();
+
+  parent.Unparent();
 
   DALI_TEST_EQUALS(0u, trace.Count("child", CallbackKind::TOUCH, PointState::INTERRUPTED), TEST_LOCATION);
   DALI_TEST_EQUALS(1u, trace.Count("parent", CallbackKind::TOUCH, PointState::INTERRUPTED), TEST_LOCATION);
@@ -676,6 +934,82 @@ int UtcDaliGeoTouchStreamPartialUpKeepsRemainingDeviceActive(void)
   END_TEST;
 }
 
+int UtcDaliGeoTouchStreamPrimaryRemovalKeepsRemainingDeviceActive(void)
+{
+  TestApplication application;
+  TouchTrace      trace;
+
+  Actor parent = CreateTouchableActor("parent");
+  Actor child  = CreateTouchableActor("child");
+  parent.Add(child);
+  application.GetScene().Add(parent);
+
+  TouchTraceFunctor childFunctor(trace, "child", false);
+  TouchTraceFunctor parentFunctor(trace, "parent", true);
+  child.TouchEventSignal().Connect(&application, childFunctor);
+  parent.TouchEventSignal().Connect(&application, parentFunctor);
+  PrepareScene(application);
+
+  application.ProcessEvent(GenerateDoubleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
+  trace.Clear();
+  child.Unparent();
+
+  application.ProcessEvent(GenerateTwoTouches(PointState::UP,
+                                              Vector2(200.0f, 200.0f),
+                                              4,
+                                              PointState::STATIONARY,
+                                              Vector2(210.0f, 210.0f),
+                                              7));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(220.0f, 220.0f), 7));
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(220.0f, 220.0f), 7));
+
+  DALI_TEST_EQUALS(0u, trace.Count("parent", CallbackKind::TOUCH, PointState::INTERRUPTED), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, trace.CountDevice("parent", CallbackKind::TOUCH, PointState::UP, 4), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, trace.CountDevice("parent", CallbackKind::TOUCH, PointState::MOTION, 7), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, trace.CountDevice("parent", CallbackKind::TOUCH, PointState::UP, 7), TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliGeoTouchStreamPanFinishesAfterPrimaryRemoval(void)
+{
+  TestApplication application;
+  TouchTrace      touchTrace;
+  PanTrace        panTrace;
+
+  Actor parent = CreateTouchableActor("parent");
+  Actor child  = CreateTouchableActor("child");
+  parent.Add(child);
+  application.GetScene().Add(parent);
+
+  TouchTraceFunctor childFunctor(touchTrace, "child", false);
+  TouchTraceFunctor parentFunctor(touchTrace, "parent", true);
+  child.TouchEventSignal().Connect(&application, childFunctor);
+  parent.TouchEventSignal().Connect(&application, parentFunctor);
+  PrepareScene(application);
+
+  PanGestureDetector detector = PanGestureDetector::New();
+  PanTraceFunctor    panFunctor(panTrace);
+  detector.Attach(parent);
+  detector.DetectedSignal().Connect(&application, panFunctor);
+
+  uint32_t time = 100u;
+  TestStartPan(application, Vector2(10.0f, 20.0f), Vector2(30.0f, 20.0f), time);
+  DALI_TEST_EQUALS(1u, panTrace.Count(GestureState::STARTED), TEST_LOCATION);
+
+  child.Unparent();
+  TestMovePan(application, Vector2(200.0f, 20.0f), time);
+  time += TestGetFrameInterval();
+  TestEndPan(application, Vector2(210.0f, 20.0f), time);
+
+  DALI_TEST_CHECK(panTrace.states.size() >= 3u);
+  DALI_TEST_EQUALS(GestureState::STARTED, panTrace.states.front(), TEST_LOCATION);
+  DALI_TEST_CHECK(panTrace.Count(GestureState::CONTINUING) >= 1u);
+  DALI_TEST_EQUALS(1u, panTrace.Count(GestureState::FINISHED), TEST_LOCATION);
+  DALI_TEST_EQUALS(GestureState::FINISHED, panTrace.states.back(), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, panTrace.Count(GestureState::CANCELLED), TEST_LOCATION);
+  END_TEST;
+}
+
 int UtcDaliGeoTouchStreamNewDownInterruptsMappedDevice(void)
 {
   TestApplication application;
@@ -722,6 +1056,71 @@ int UtcDaliGeoTouchStreamSameInitialRouteSharesOneSubset(void)
   DALI_TEST_EQUALS(1u, trace.Count("actor", CallbackKind::TOUCH, PointState::MOTION), TEST_LOCATION);
   DALI_TEST_EQUALS(1u, trace.CountDevice("actor", CallbackKind::TOUCH, PointState::MOTION, 4), TEST_LOCATION);
   DALI_TEST_EQUALS(1u, trace.CountDevice("actor", CallbackKind::TOUCH, PointState::STATIONARY, 7), TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliGeoTouchStreamLaterDownPreservesOwnerAndInitialHit(void)
+{
+  TestApplication application;
+  TouchTrace      trace;
+
+  Actor parent = CreateTouchableActor("parent");
+  Actor child  = CreateTouchableActor("child");
+  parent.Add(child);
+  application.GetScene().Add(parent);
+
+  TouchTraceFunctor childFunctor(trace, "child", false);
+  TouchTraceFunctor parentFunctor(trace, "parent", true);
+  SceneTraceFunctor sceneFunctor(trace, "scene");
+  child.TouchEventSignal().Connect(&application, childFunctor);
+  parent.TouchEventSignal().Connect(&application, parentFunctor);
+  application.GetScene().TouchEventSignal().Connect(&application, sceneFunctor);
+  PrepareScene(application);
+
+  const int32_t    childId        = child.GetProperty<int32_t>(Actor::Property::ID);
+  const RenderTask ownerRenderTask = application.GetScene().GetRenderTaskList().GetTask(0u);
+
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f), 4));
+  const TraceEntry* sceneInitialDown = trace.Find("scene", CallbackKind::SCENE, PointState::DOWN);
+  DALI_TEST_CHECK(sceneInitialDown);
+  DALI_TEST_EQUALS(childId, sceneInitialDown->hitActorIds[0], TEST_LOCATION);
+  trace.Clear();
+
+  // A later device joins the same routing group with a separate DOWN event.
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), 7));
+
+  const TraceEntry* parentDown = trace.Find("parent", CallbackKind::TOUCH, PointState::DOWN);
+  DALI_TEST_CHECK(parentDown);
+  DALI_TEST_EQUALS(1u, parentDown->hitActorIds.size(), TEST_LOCATION);
+  DALI_TEST_EQUALS(childId, parentDown->hitActorIds[0], TEST_LOCATION);
+  DALI_TEST_CHECK(parentDown->renderTask == ownerRenderTask);
+  trace.Clear();
+
+  child.Unparent();
+  DALI_TEST_EQUALS(0u, trace.Count("parent", CallbackKind::TOUCH, PointState::INTERRUPTED), TEST_LOCATION);
+
+  application.ProcessEvent(GenerateTwoTouches(PointState::MOTION,
+                                              Vector2(200.0f, 200.0f),
+                                              4,
+                                              PointState::UP,
+                                              Vector2(210.0f, 210.0f),
+                                              7));
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(220.0f, 220.0f), 4));
+
+  const TraceEntry* parentMotion = trace.Find("parent", CallbackKind::TOUCH, PointState::MOTION);
+  DALI_TEST_CHECK(parentMotion);
+  DALI_TEST_EQUALS(2u, parentMotion->hitActorIds.size(), TEST_LOCATION);
+  DALI_TEST_EQUALS(childId, parentMotion->hitActorIds[0], TEST_LOCATION);
+  DALI_TEST_EQUALS(childId, parentMotion->hitActorIds[1], TEST_LOCATION);
+  DALI_TEST_CHECK(parentMotion->renderTask == ownerRenderTask);
+  DALI_TEST_EQUALS(1u, trace.CountDevice("parent", CallbackKind::TOUCH, PointState::UP, 7), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, trace.CountDevice("parent", CallbackKind::TOUCH, PointState::UP, 4), TEST_LOCATION);
+  const TraceEntry* parentUp = trace.Find("parent", CallbackKind::TOUCH, PointState::UP);
+  const TraceEntry* sceneUp  = trace.Find("scene", CallbackKind::SCENE, PointState::UP);
+  DALI_TEST_CHECK(parentUp);
+  DALI_TEST_CHECK(sceneUp);
+  DALI_TEST_EQUALS(childId, parentUp->hitActorIds[0], TEST_LOCATION);
+  DALI_TEST_EQUALS(childId, sceneUp->hitActorIds[0], TEST_LOCATION);
   END_TEST;
 }
 

@@ -25,7 +25,7 @@
 #include <dali/internal/common/owner-pointer.h>
 #include <dali/public-api/common/dali-vector.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -88,6 +88,6 @@ struct EnableBitMaskOperators<Internal::SceneGraph::NodePropertyFlags>
   static const bool ENABLE = true;
 };
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_SCENE_GRAPH_NODE_DECLARATIONS_H

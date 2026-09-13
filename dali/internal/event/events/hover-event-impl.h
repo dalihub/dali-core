@@ -28,7 +28,7 @@
 #include <dali/public-api/events/hover-event.h>
 #include <dali/public-api/object/base-object.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -200,6 +200,6 @@ inline const Internal::HoverEvent& GetImplementation(const Dali::HoverEvent& hov
   return static_cast<const Internal::HoverEvent&>(object);
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_HOVER_EVENT_H

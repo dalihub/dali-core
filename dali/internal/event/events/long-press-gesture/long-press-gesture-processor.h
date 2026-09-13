@@ -23,7 +23,7 @@
 #include <dali/internal/event/events/long-press-gesture/long-press-gesture-detector-impl.h>
 #include <dali/internal/event/render-tasks/render-task-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -146,6 +146,6 @@ private:
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_LONG_PRESS_GESTURE_EVENT_PROCESSOR_H

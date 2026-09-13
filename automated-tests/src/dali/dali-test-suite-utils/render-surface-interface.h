@@ -22,7 +22,7 @@
 #include <dali/public-api/math/int-pair.h>
 #include <dali/public-api/math/rect.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 using PositionSize = Dali::BoundsInteger;
 using SurfaceSize  = Int32Pair;
@@ -67,4 +67,4 @@ protected:
   virtual ~RenderSurfaceInterface();
 };
 } // namespace Integration
-} // namespace Dali
+} //namespace DALI_NAMESPACE

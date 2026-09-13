@@ -21,7 +21,7 @@
 #include <dali/internal/common/const-string.h>
 #include <dali/internal/event/actors/actor-declarations.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -174,6 +174,6 @@ public:
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif

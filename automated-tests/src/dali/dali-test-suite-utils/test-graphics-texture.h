@@ -2,7 +2,7 @@
 #define DALI_TEST_GRAPHICS_TEXTURE_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@
 #include "test-gl-abstraction.h"
 #include "test-graphics-sampler.h"
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 class TestGraphicsTexture : public Graphics::Texture
 {
@@ -88,6 +88,6 @@ public:
   GLenum                      mPixelDataType;    ///< The data type of the pixel data
 };
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TEST_GRAPHICS_TEXTURE_H

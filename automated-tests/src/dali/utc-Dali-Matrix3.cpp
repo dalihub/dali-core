@@ -54,19 +54,19 @@ Matrix3 m6(
   -2.43f, -13.2f, -200.9f, 18.5f, 1.92f, 1.51f, 0.257f, 13.0f, 13.4f);
 
 Matrix3 i1(
-  -0.05, -0.00, 0.00, -0.00, 0.04, 0.04, 0.00, 0.04, -0.04);
+  -0.05f, -0.00f, 0.00f, -0.00f, 0.04f, 0.04f, 0.00f, 0.04f, -0.04f);
 
 Matrix3 i2(
-  -0.05, 0.00, -0.00, 0.00, 0.04, 0.04, 0.00, 0.04, -0.04);
+  -0.05f, 0.00f, -0.00f, 0.00f, 0.04f, 0.04f, 0.00f, 0.04f, -0.04f);
 
 Matrix3 i3(
-  0.02, -0.05, -0.00, -0.04, -0.01, 0.04, -0.04, -0.01, -0.04);
+  0.02f, -0.05f, -0.00f, -0.04f, -0.01f, 0.04f, -0.04f, -0.01f, -0.04f);
 
 Matrix3 i4(
-  -0.05, 0.03, -0.00, 0.02, 0.03, 0.04, 0.02, 0.03, -0.04);
+  -0.05f, 0.03f, -0.00f, 0.02f, 0.03f, 0.04f, 0.02f, 0.03f, -0.04f);
 
 Matrix3 i5(
-  -0.01, 0.05, -0.00, 0.04, 0.01, 0.04, 0.04, 0.00, -0.04);
+  -0.01f, 0.05f, -0.00f, 0.04f, 0.01f, 0.04f, 0.04f, 0.00f, -0.04f);
 
 Matrix3 t1(
   -18.6f, 0.0f, -1.36e-08f, 1.88e-09f, 13.2f, 13.2f, -6.85e-09f, 13.2f, -13.2f);
@@ -97,7 +97,7 @@ int UtcDaliMatrix3FromMatrix(void)
 
   Matrix3 m2(m0);
 
-  DALI_TEST_EQUALS(m1, m2, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(m1, m2, 0.001f, TEST_LOCATION);
   END_TEST;
 }
 
@@ -150,7 +150,7 @@ int UtcDaliMatrix3OperatorAssign01(void)
   m2 = m0;
   m2 = m2; // Test branch
 
-  DALI_TEST_EQUALS(m1, m2, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(m1, m2, 0.001f, TEST_LOCATION);
   END_TEST;
 }
 
@@ -163,7 +163,7 @@ int UtcDaliMatrix3OperatorAssign02(void)
   Matrix3 m2;
   m2 = m0;
 
-  DALI_TEST_EQUALS(m1, m2, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(m1, m2, 0.001f, TEST_LOCATION);
   END_TEST;
 }
 
@@ -250,7 +250,7 @@ int UtcDaliMatrix3Scale(void)
 
   m1.Scale(3.0f);
 
-  DALI_TEST_EQUALS(m1, m2, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(m1, m2, 0.001f, TEST_LOCATION);
   END_TEST;
 }
 

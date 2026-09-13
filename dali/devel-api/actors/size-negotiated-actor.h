@@ -22,7 +22,7 @@
 #include <dali/devel-api/actors/actor-enumerations-devel.h>
 #include <dali/public-api/common/dali-common.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 class Actor;
 struct Vector2;
@@ -176,6 +176,6 @@ protected: // Size negotiation helpers
   bool RelayoutDependentOnChildrenBase(Dimension::Type dimension = Dimension::ALL_DIMENSIONS);
 };
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_SIZE_NEGOTIATED_ACTOR_H

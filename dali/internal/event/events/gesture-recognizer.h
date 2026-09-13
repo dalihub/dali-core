@@ -27,7 +27,7 @@
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/object/ref-object.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Integration
 {
@@ -158,6 +158,6 @@ using GestureRecognizerPtr = IntrusivePtr<GestureRecognizer>;
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_GESTURE_RECOGNIZER_H

@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/rendering/renderer.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @addtogroup dali_core_common
@@ -48,6 +48,6 @@ DALI_CORE_API bool IsBlendEquationSupported(BlendEquation::Type blendEquation);
 /**
  * @}
  */
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_CAPABILITIES_H

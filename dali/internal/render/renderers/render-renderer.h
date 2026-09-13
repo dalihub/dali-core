@@ -45,7 +45,7 @@
 #include <dali/internal/render/renderers/uniform-buffer-manager.h>
 #include <dali/internal/update/manager/render-instruction-processor.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -923,6 +923,6 @@ private:
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_RENDER_RENDERER_H

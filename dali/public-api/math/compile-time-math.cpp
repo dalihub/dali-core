@@ -21,7 +21,7 @@
 // EXTERNAL INCLUDES
 #include <type_traits>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 // verification for static asserts, these get removed from final binary by the linker
 static_assert(Power<10, 0>::value == 1, "");
@@ -47,4 +47,4 @@ static_assert(Power<10, Log<100, 10>::value>::value == 100, "");
 
 // TODO unfortunately cannot static assert floats so cannot test EPSILON here...
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

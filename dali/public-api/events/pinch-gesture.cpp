@@ -22,7 +22,7 @@
 #include <dali/internal/event/events/pinch-gesture/pinch-gesture-impl.h>
 #include <dali/public-api/common/dali-common.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 PinchGesture::PinchGesture(Internal::PinchGesture* internal)
 : Gesture(internal)
@@ -61,4 +61,4 @@ const Vector2& PinchGesture::GetLocalCenterPoint() const
   return GetImplementation(*this).GetLocalCenterPoint();
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

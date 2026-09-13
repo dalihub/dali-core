@@ -18,6 +18,10 @@
  *
  */
 
+#if defined(_WIN32)
+#define _CRT_SECURE_NO_WARNINGS
+#endif
+
 // EXTERNAL INCLUDES
 #include <cstdarg>
 #include <cstdlib>
@@ -45,9 +49,16 @@ void tet_printf(const char* format, ...);
 #if defined(_MSC_VER)
 static inline int setenv(const char* name, const char* value, int overwrite)
 {
-  if(!overwrite && std::getenv(name) != nullptr)
+  if(!overwrite)
   {
-    return 0;
+    char* envValue = nullptr;
+    _dupenv_s(&envValue, nullptr, name);
+    bool exists = (envValue != nullptr);
+    free(envValue);
+    if(exists)
+    {
+      return 0;
+    }
   }
   return _putenv_s(name, value);
 }

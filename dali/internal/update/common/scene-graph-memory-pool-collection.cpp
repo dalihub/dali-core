@@ -37,7 +37,7 @@
 #include <dali/internal/render/renderers/render-texture.h>
 #include <dali/internal/render/renderers/uniform-buffer-view.h>
 
-namespace Dali::Internal::SceneGraph
+namespace DALI_NAMESPACE::Internal::SceneGraph
 {
 namespace
 {
@@ -363,4 +363,4 @@ std::string MemoryPoolCollection::LogPools() const
   return oss.str();
 }
 
-} // namespace Dali::Internal::SceneGraph
+} //namespace DALI_NAMESPACE::Internal::SceneGraph

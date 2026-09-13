@@ -24,9 +24,9 @@
 #include <dali/internal/update/manager/update-manager.h>
 #include <dali/internal/update/rendering/scene-graph-renderer.h>
 #include <dali/internal/update/rendering/scene-graph-visual-renderer.h>
-#include <dali/public-api/common/extents.h>
+#include <dali/public-api/common/insets.h>
 
-namespace Dali::Internal::SceneGraph
+namespace DALI_NAMESPACE::Internal::SceneGraph
 {
 class TextureSet;
 
@@ -334,11 +334,11 @@ inline void SetInstanceCountMessage(EventThreadServices& eventThreadServices, co
   new(slot) LocalType(&renderer, &SceneGraph::Renderer::SetInstanceCount, instanceCount);
 }
 
-inline void SetUpdateAreaExtentsMessage(EventThreadServices& eventThreadServices, const Renderer& renderer, const Extents& updateAreaExtents)
+inline void SetUpdateAreaMarginMessage(EventThreadServices& eventThreadServices, const Renderer& renderer, const Insets& updateAreaMargin)
 {
-  using LocalType = MessageValue1<SceneGraph::Renderer, Extents>;
+  using LocalType = MessageValue1<SceneGraph::Renderer, Insets>;
   uint32_t* slot  = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
-  new(slot) LocalType(&renderer, &SceneGraph::Renderer::SetUpdateAreaExtents, updateAreaExtents);
+  new(slot) LocalType(&renderer, &SceneGraph::Renderer::SetUpdateAreaMargin, updateAreaMargin);
 }
 
 inline void EnableSharedUniformBlockMessage(EventThreadServices& eventThreadServices, const Renderer& renderer, bool enabled)
@@ -378,6 +378,6 @@ inline void SetDecoratedVisualBorderlinePropertiesMessage(EventThreadServices& e
   new(slot) LocalType(&renderer, &Renderer::SetDecoratedVisualBorderlineProperties, decoratedVisualBorderlineProperties);
 }
 
-} // namespace Dali::Internal::SceneGraph
+} //namespace DALI_NAMESPACE::Internal::SceneGraph
 
 #endif // DALI_INTERNAL_SCENE_GRAPH_RENDERER_MESSAGES_H

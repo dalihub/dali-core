@@ -22,7 +22,7 @@
 #include <dali/integration-api/rendering/decorated-visual-renderer.h> // Dali::DecoratedVisualRenderer
 #include <dali/internal/event/rendering/visual-renderer-impl.h>       // Dali::Internal::VisualRenderer
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -180,6 +180,6 @@ inline const Internal::DecoratedVisualRenderer& GetImplementation(const Dali::De
   return static_cast<const Internal::DecoratedVisualRenderer&>(object);
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_DECORATED_VISUAL_RENDERER_H

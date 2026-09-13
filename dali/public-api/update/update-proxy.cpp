@@ -22,7 +22,7 @@
 #include <dali/internal/common/const-string.h>
 #include <dali/internal/update/manager/update-proxy-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 bool UpdateProxy::GetPosition(uint32_t id, Vector3& position) const
 {
@@ -171,4 +171,4 @@ UpdateProxy::UpdateProxy(Internal::UpdateProxy& impl)
 
 UpdateProxy::~UpdateProxy() = default;
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

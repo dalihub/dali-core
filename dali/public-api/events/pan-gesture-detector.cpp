@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/event/events/pan-gesture/pan-gesture-detector-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 const Radian PanGestureDetector::DIRECTION_LEFT(-Math::PI);
 const Radian PanGestureDetector::DIRECTION_RIGHT(0.0f);
@@ -135,4 +135,4 @@ void PanGestureDetector::SetPanGestureProperties(const Dali::PanGesture& pan)
   Internal::PanGestureDetector::SetPanGestureProperties(pan);
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

@@ -47,7 +47,7 @@ uint32_t GetGLDataTypeSize(GLenum type)
   }
 }
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 TestGlAbstraction::TestGlAbstraction()
 : mBufferTrace(TRACE, std::string("gl")),
@@ -245,7 +245,7 @@ void TestGlAbstraction::SetActiveUniforms(const std::vector<ActiveUniform>& unif
   }
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 bool BlendEnabled(const Dali::TraceCallStack& callStack)
 {

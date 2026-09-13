@@ -65,7 +65,7 @@ int UtcDaliStringImplMove(void)
   {
     tet_printf("Test 3: Large string move...\n");
     std::string largeContent(1000, 'X');
-    String      daliStr(StringView(largeContent.data(), largeContent.size()));
+    String      daliStr(StringView(largeContent.data(), static_cast<uint32_t>(largeContent.size())));
 
     std::string moved = ToStdString(std::move(daliStr));
 
@@ -89,7 +89,7 @@ int UtcDaliStringImplMove(void)
   {
     tet_printf("Test 5: String with null characters...\n");
     std::string content("Hello\0World", 11);
-    String      daliStr(StringView(content.data(), content.size()));
+    String      daliStr(StringView(content.data(), static_cast<uint32_t>(content.size())));
 
     std::string moved = ToStdString(std::move(daliStr));
 
@@ -236,7 +236,7 @@ int UtcDaliStringViewConversions(void)
   {
     tet_printf("Test 9: ToStdStringView with String containing null characters...\n");
     std::string      content("Hello\0World", 11);
-    String           daliStr(StringView(content.data(), content.size()));
+    String           daliStr(StringView(content.data(), static_cast<uint32_t>(content.size())));
     std::string_view stdView = ToStdStringView(daliStr);
 
     DALI_TEST_CHECK(stdView.size() == 11);
@@ -332,7 +332,7 @@ int UtcDaliStringImplDirect(void)
   {
     tet_printf("Test 4: StringImpl with large string...\n");
     std::string          large(2000, 'Y');
-    String               daliStr(StringView(large.data(), large.size()));
+    String               daliStr(StringView(large.data(), static_cast<uint32_t>(large.size())));
     Internal::StringImpl impl(std::move(daliStr));
 
     std::string extracted = impl.Extract();
@@ -381,7 +381,7 @@ int UtcDaliStringImplConstAccessors(void)
   {
     tet_printf("Test 3: Const GetString with large string...\n");
     std::string          large(1500, 'Z');
-    String               daliStr(StringView(large.data(), large.size()));
+    String               daliStr(StringView(large.data(), static_cast<uint32_t>(large.size())));
     Internal::StringImpl impl(std::move(daliStr));
 
     // Create a const reference to test the const overload
@@ -397,7 +397,7 @@ int UtcDaliStringImplConstAccessors(void)
   {
     tet_printf("Test 4: Const GetString with null characters...\n");
     std::string          content("Null\0Embedded", 13);
-    String               daliStr(StringView(content.data(), content.size()));
+    String               daliStr(StringView(content.data(), static_cast<uint32_t>(content.size())));
     Internal::StringImpl impl(std::move(daliStr));
 
     // Create a const reference to test the const overload

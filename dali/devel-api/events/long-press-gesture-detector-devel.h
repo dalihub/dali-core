@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/events/long-press-gesture-detector.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 class LongPressGestureDetector;
 
@@ -37,6 +37,6 @@ DALI_CORE_API uint32_t GetMinimumHoldingTime(LongPressGestureDetector longPressG
 
 } // namespace DevelLongPressGestureDetector
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_LONG_PRESS_GESTURE_DETECTOR_DEVEL_H

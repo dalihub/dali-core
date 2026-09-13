@@ -25,7 +25,7 @@
 #include <dali/public-api/images/pixel.h>
 #include <dali/public-api/object/base-handle.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @addtogroup dali_core_images
@@ -195,6 +195,6 @@ public:
 /**
  * @}
  */
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_PIXEL_DATA_H

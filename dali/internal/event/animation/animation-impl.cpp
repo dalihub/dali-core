@@ -47,7 +47,7 @@ using Dali::Internal::SceneGraph::AnimatorBase;
 using Dali::Internal::SceneGraph::Shader;
 using Dali::Internal::SceneGraph::UpdateManager;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -1504,4 +1504,4 @@ void Animation::SetObjectAnimatablePropertyAnimationAsConnector(AnimatorConnecto
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

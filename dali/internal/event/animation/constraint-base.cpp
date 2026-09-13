@@ -36,7 +36,7 @@
 
 using Dali::Internal::SceneGraph::AnimatableProperty;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -474,4 +474,4 @@ PropertyInputImpl* ConstraintBase::AddInputProperty(Source& source, SceneGraph::
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

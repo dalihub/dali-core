@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/event/events/key-event-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Integration
 {
@@ -119,4 +119,4 @@ KeyEvent::~KeyEvent() = default;
 
 } // namespace Integration
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

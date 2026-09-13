@@ -27,7 +27,7 @@
 #include <dali/public-api/common/dali-utility.h>
 #include <dali/public-api/math/math-utils.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Integration
 {
@@ -511,6 +511,6 @@ private:
 };
 
 } // namespace Integration
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTEGRATION_API_OPEN_HASH_MAP_H

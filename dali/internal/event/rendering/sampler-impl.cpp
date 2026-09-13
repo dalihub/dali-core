@@ -23,7 +23,7 @@
 #include <dali/internal/render/renderers/render-sampler.h>
 #include <dali/internal/update/manager/update-manager.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -85,4 +85,4 @@ Sampler::~Sampler()
 }
 
 } // namespace Internal
-} // namespace Dali
+} //namespace DALI_NAMESPACE

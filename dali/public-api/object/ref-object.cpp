@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 RefObject::RefObject()
 : mCount(0)
@@ -74,4 +74,4 @@ void RefObject::OnDestroy()
 {
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

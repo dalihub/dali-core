@@ -16,7 +16,7 @@
 
 #include "test-graphics-command-buffer.h"
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 
 std::ostream& operator<<(std::ostream& os, Graphics::BlendFactor op)
@@ -371,4 +371,4 @@ std::vector<const Command*> TestGraphicsCommandBuffer::GetChildCommandsByType(Co
   return mCommandStack;
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

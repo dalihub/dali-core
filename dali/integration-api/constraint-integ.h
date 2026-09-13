@@ -2,7 +2,7 @@
 #define DALI_CONSTRAINT_INTEG_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/object/handle.h>
 
-namespace Dali::Integration
+namespace DALI_NAMESPACE::Integration
 {
 /**
  * @brief Set tag number for given constraint.
@@ -66,6 +66,6 @@ DALI_CORE_API void HandleRemoveConstraints(Dali::Handle& handle, uint32_t tag);
  */
 DALI_CORE_API void HandleRemoveConstraints(Dali::Handle& handle, uint32_t tagBegin, uint32_t tagEnd);
 
-} // namespace Dali::Integration
+} //namespace DALI_NAMESPACE::Integration
 
 #endif // DALI_CONSTRAINT_INTEG_H

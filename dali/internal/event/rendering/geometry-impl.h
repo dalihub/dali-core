@@ -31,7 +31,7 @@
 #include <dali/internal/event/rendering/vertex-buffer-impl.h> // Dali::Internal::VertexBuffer
 #include <dali/internal/render/renderers/render-geometry.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -147,6 +147,6 @@ inline const Internal::Geometry& GetImplementation(const Dali::Geometry& handle)
   return static_cast<const Internal::Geometry&>(object);
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_GEOMETRY_H

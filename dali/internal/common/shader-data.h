@@ -28,7 +28,7 @@
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/rendering/shader.h> // ShaderHints
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -287,6 +287,6 @@ private:                                            // Data
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_SHADER_DATA_H

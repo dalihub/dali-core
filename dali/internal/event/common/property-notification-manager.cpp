@@ -22,7 +22,7 @@
 #include <dali/internal/common/message.h>
 #include <dali/internal/event/common/property-notification-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -69,4 +69,4 @@ PropertyNotificationManager::PropertyNotificationManager() = default;
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

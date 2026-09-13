@@ -25,7 +25,7 @@
 #include <dali/public-api/events/touch-event.h>
 #include <dali/public-api/object/handle.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @addtogroup dali_core_events
@@ -197,6 +197,6 @@ protected:
 /**
  * @}
  */
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_GESTURE_DETECTOR_H

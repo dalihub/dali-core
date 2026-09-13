@@ -32,7 +32,7 @@
 
 #ifdef DALI_PRINT_UPDATE_INFO
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -118,6 +118,6 @@ void PrintNodeTree(const Node& node, std::string indentation)
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif

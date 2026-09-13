@@ -54,7 +54,7 @@
 using Dali::Internal::GestureEventProcessor;
 using Dali::Internal::ThreadLocalStorage;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Integration
 {
@@ -126,4 +126,4 @@ std::string LogMemoryPools()
 
 } // namespace Integration
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

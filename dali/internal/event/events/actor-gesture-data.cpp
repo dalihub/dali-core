@@ -21,7 +21,7 @@
 // EXTERNAL INCLUDES
 #include <algorithm> // for std::remove
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -120,4 +120,4 @@ GestureDetectorContainer*& ActorGestureData::GetContainerPtr(GestureType::Value 
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

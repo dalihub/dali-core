@@ -26,7 +26,7 @@
 #include <dali/internal/event/animation/progress-value.h>
 #include <dali/public-api/animation/animation.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -164,6 +164,6 @@ struct KeyFrameChannel
 };
 
 } // namespace Internal
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_KEY_FRAME_CHANNEL_H

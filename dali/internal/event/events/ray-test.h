@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RAY_TEST_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 // CLASS HEADER
 #include <dali/internal/event/actors/actor-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 struct Vector2;
 struct Vector4;
@@ -82,6 +82,6 @@ bool ActorBoundingBoxTest(const Internal::Actor& actor, const Vector4& rayOrigin
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_RAY_TEST_H

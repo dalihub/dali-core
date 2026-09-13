@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ const uint32_t NUM_BYTES_IN_MATRIX3(9 * sizeof(float));
 
 } // namespace
 
-namespace Dali::Internal
+namespace DALI_NAMESPACE::Internal
 {
 using Internal::PerformanceMonitor;
 
@@ -609,4 +609,4 @@ void MultiplyAssign(Dali::Matrix3& result, const Dali::Matrix3& rhs)
 }
 
 } // namespace MatrixUtils
-} // namespace Dali::Internal
+} //namespace DALI_NAMESPACE::Internal

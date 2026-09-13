@@ -1149,3 +1149,43 @@ int UtcDaliFrameBufferAttachmentAutoRequiresDepthStencil06(void)
 
   END_TEST;
 }
+
+int UtcDaliFrameBufferDepthStencilIgnoresScenePolicy(void)
+{
+  TestApplication application;
+  tet_infoline("Test that a framebuffer's own attachments drive the depth/stencil state, not the scene policy");
+
+  Dali::Integration::Scene scene = application.GetScene();
+
+  // Take the depth and stencil buffers away from the scene; the framebuffer keeps its own.
+  scene.SetDepthBufferEnabled(false);
+  scene.SetStencilBufferEnabled(false);
+  application.SendNotification();
+  application.Render();
+
+  FrameBuffer framebuffer = FrameBuffer::New(64u, 64u, FrameBuffer::Attachment::DEPTH_STENCIL);
+  RenderTask  task        = CreateRenderTask(application, framebuffer);
+
+  Renderer renderer = task.GetSourceActor().GetRendererAt(0u);
+  renderer.SetProperty(Renderer::Property::DEPTH_TEST_MODE, DepthTestMode::ON);
+  renderer.SetProperty(Renderer::Property::RENDER_MODE, RenderMode::COLOR_STENCIL);
+
+  TestGlAbstraction& glAbstraction        = application.GetGlAbstraction();
+  TraceCallStack&    glEnableDisableStack = glAbstraction.GetEnableDisableTrace();
+  glEnableDisableStack.Enable(true);
+  glEnableDisableStack.Reset();
+
+  application.SendNotification();
+  application.Render();
+
+  std::stringstream depthTest;
+  depthTest << std::hex << GL_DEPTH_TEST;
+  std::stringstream stencilTest;
+  stencilTest << std::hex << GL_STENCIL_TEST;
+
+  tet_infoline("The framebuffer has both attachments, so both tests are set up despite the scene having neither");
+  DALI_TEST_CHECK(glEnableDisableStack.FindMethodAndParams("Enable", depthTest.str()));
+  DALI_TEST_CHECK(glEnableDisableStack.FindMethodAndParams("Enable", stencilTest.str()));
+
+  END_TEST;
+}

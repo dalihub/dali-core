@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/actors/custom-actor.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace DevelCustomActor
 {
@@ -36,6 +36,6 @@ DALI_CORE_API const Dali::TypeInfo GetTypeInfo(CustomActor actor);
 
 } // namespace DevelCustomActor
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_CUSTOM_ACTOR_DEVEL_H

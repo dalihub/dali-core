@@ -28,7 +28,7 @@
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/object/invoke-method.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @addtogroup dali_core_object
@@ -289,6 +289,6 @@ public: // Not intended for application developers
 /**
  * @}
  */
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TYPE_INFO_H

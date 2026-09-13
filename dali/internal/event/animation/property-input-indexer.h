@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/event/common/property-input-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -154,6 +154,6 @@ public:
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_PROPERTY_INPUT_INDEXER_H

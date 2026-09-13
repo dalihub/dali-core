@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_DRAWABLE_ACTOR_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/public-api/rendering/renderer.h>
 
-namespace Dali::Internal
+namespace DALI_NAMESPACE::Internal
 {
 namespace SceneGraph
 {
@@ -54,6 +54,6 @@ private:
   Dali::Renderer mRenderer; //< Drawable renderer with callback attached
 };
 
-} // namespace Dali::Internal
+} //namespace DALI_NAMESPACE::Internal
 
 #endif // DALI_INTERNAL_DRAWABLE_ACTOR_H

@@ -22,7 +22,7 @@
 #include <dali/integration-api/addon-manager.h>
 #include <vector>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace AddOns
 {
@@ -252,13 +252,13 @@ inline void AddOnConstructorInternal()
 }
 
 } // namespace AddOns
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 /**
  * Macro must be used in order to auto-register AddOn with the AddOnManager.
  */
 #define REGISTER_ADDON_CLASS(ADDON_CLASS_WITH_FULL_NAMESPACE) \
-  namespace Dali                                              \
+  namespace DALI_NAMESPACE                                    \
   {                                                           \
   namespace AddOns                                            \
   {                                                           \

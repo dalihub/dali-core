@@ -19,11 +19,12 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/dali-namespace.h>
 #include <array>
 #include <atomic>
 #include <cstddef>
 
-namespace Dali::Internal
+namespace DALI_NAMESPACE::Internal
 {
 namespace
 {
@@ -163,6 +164,6 @@ private:
   alignas(CACHE_LINE_SIZE) std::atomic<std::size_t> mReadIndex{0};  ///< consumer-owned
 };
 
-} // namespace Dali::Internal
+} //namespace DALI_NAMESPACE::Internal
 
 #endif // DALI_LOCKLESS_POINTER_RING_H

@@ -23,7 +23,7 @@
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/render/renderers/render-sampler.h>
 
-namespace Dali::Internal::Render
+namespace DALI_NAMESPACE::Internal::Render
 {
 inline void SetFilterModeMessage(EventThreadServices& eventThreadServices, Render::Sampler& sampler, Dali::FilterMode::Type minFilterMode, Dali::FilterMode::Type magFilterMode)
 {
@@ -46,6 +46,6 @@ inline void SetWrapModeMessage(EventThreadServices& eventThreadServices, Render:
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new(slot) LocalType(&sampler, &Render::Sampler::SetWrapMode, rWrapMode, sWrapMode, tWrapMode);
 }
-} // namespace Dali::Internal::Render
+} //namespace DALI_NAMESPACE::Internal::Render
 
 #endif //  DALI_INTERNAL_RENDER_SAMPLER_MESSAGES_H

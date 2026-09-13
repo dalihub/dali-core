@@ -28,7 +28,7 @@ using Dali::Integration::ToDaliString;
 using Dali::Integration::ToDaliStringView;
 using Dali::Integration::ToStdString;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 TypeInfo::TypeInfo() = default;
 
@@ -124,4 +124,4 @@ TypeInfo::TypeInfo(Internal::TypeInfo* internal)
 {
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

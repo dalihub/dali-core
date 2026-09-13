@@ -40,7 +40,7 @@
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/signals/callback.h>
 
-namespace Dali::Internal
+namespace DALI_NAMESPACE::Internal
 {
 namespace
 {
@@ -276,8 +276,8 @@ void ParsePrimaryTouchPoint(
 
     if(currentPoint.GetState() == PointState::STARTED && hitTestResults.actor)
     {
-      // A geometry stream always follows its initial hit, so the capturing and own-touch actors are
-      // unconditionally the actor that started it.
+      // A geometry stream starts from its initial hit. These observers are rebound if a consumer
+      // later becomes the stable owner.
       Actor* hitActor = &GetImplementation(hitTestResults.actor);
       capturingTouchActorObserver.SetActor(hitActor);
       ownTouchActorObserver.SetActor(hitActor);
@@ -296,6 +296,30 @@ void ParsePrimaryTouchPoint(
 
 struct GeometryTouchEventProcessor::Impl
 {
+  static Actor* GetEstablishedOwner(GeometryTouchEventProcessor& processor)
+  {
+    if(processor.mStreamState.phase != GeometryTouchStreamPhase::OWNED || !processor.mLastRenderTask)
+    {
+      return nullptr;
+    }
+
+    Actor* owner = processor.mLastConsumedActor.GetActor();
+    if(!owner)
+    {
+      return nullptr;
+    }
+
+    const GeometryTouchRecipient* recipient = FindRecipient(processor.mStreamState, owner);
+    return recipient && recipient->state == GeometryTouchRecipientState::ACTIVE ? owner : nullptr;
+  }
+
+  static void BindRouteToOwner(GeometryTouchEventProcessor& processor, Actor* owner)
+  {
+    processor.mLastPrimaryHitActor.SetActor(owner);
+    processor.mCapturingTouchActor.SetActor(owner);
+    processor.mOwnTouchActor.SetActor(owner);
+  }
+
   static Dali::Actor TerminateRecipient(GeometryTouchEventProcessor& processor,
                                         Actor*                       actor,
                                         const TouchEventPtr&         sourceEvent,
@@ -367,6 +391,15 @@ struct GeometryTouchEventProcessor::Impl
     BuildRootToTargetPath(Dali::Actor(newOwner), processor.mStreamState.ownerPathRootToOwner);
     processor.mLastConsumedActor.SetActor(newOwner);
     processor.mStreamState.phase = GeometryTouchStreamPhase::OWNED;
+
+    // A consumer selected after the initial event can take over an already established route
+    // before termination callbacks run. The first event binds the route after its render task
+    // has been stored.
+    if(!localVars.streamEnding && GetEstablishedOwner(processor))
+    {
+      BindRouteToOwner(processor, newOwner);
+    }
+
     TerminateAllActive(processor, localVars.touchEventImpl, localVars.currentRenderTask.Get(), newOwner);
 
     if(!localVars.streamEnding && processor.mStreamState.phase == GeometryTouchStreamPhase::OWNED)
@@ -656,8 +689,6 @@ struct GeometryTouchEventProcessor::Impl
       // The primaryHitActor may have been removed from the scene so ensure it is still on the scene before setting members.
       if(localVars.primaryHitActor && GetImplementation(localVars.primaryHitActor).OnScene())
       {
-        processor.mLastPrimaryHitActor.SetActor(&GetImplementation(localVars.primaryHitActor));
-
         // Only observe the consumed actor if we have a primaryHitActor (check if it is still on the scene).
         if(localVars.consumedActor && GetImplementation(localVars.consumedActor).OnScene())
         {
@@ -669,6 +700,23 @@ struct GeometryTouchEventProcessor::Impl
         }
 
         processor.mLastRenderTask = localVars.currentRenderTask;
+
+        if(Actor* owner = GetEstablishedOwner(processor))
+        {
+          // Ownership replaces the primary hit as the stable route. The initial hit remains in
+          // mStreamState solely as the public hit-actor identity for recipient events.
+          BindRouteToOwner(processor, owner);
+        }
+        else
+        {
+          processor.mLastPrimaryHitActor.SetActor(&GetImplementation(localVars.primaryHitActor));
+        }
+      }
+      else if(Actor* owner = GetEstablishedOwner(processor))
+      {
+        // The route was established by an earlier event, so a disappearing primary cannot replace
+        // its render task or terminate it. Continue routing through the owner.
+        BindRouteToOwner(processor, owner);
       }
       else
       {
@@ -758,15 +806,25 @@ bool GeometryTouchEventProcessor::ProcessTouchEvent(const Integration::TouchEven
       firstPointParsed = true;
       ParsePrimaryTouchPoint(hitTestResults, mCapturingTouchActor, mOwnTouchActor, mLastRenderTask, currentPoint, mScene, mStreamState.candidatesRootToFront, initialHit);
 
-      if(currentPoint.GetState() == PointState::DOWN && hitTestResults.actor)
+      // The router's pending initial hit starts this processor. A processor whose recipients were
+      // all terminated can also be cleared and restarted within the same router stream. Otherwise,
+      // a later device joining with another DOWN must preserve the established owner and initial hit.
+      const bool initializeStream = initialHit || (mStreamState.initialHitActor.Get() == nullptr);
+      if(initializeStream && currentPoint.GetState() == PointState::DOWN && hitTestResults.actor)
       {
         mStreamState.phase           = GeometryTouchStreamPhase::UNOWNED;
         mStreamState.initialHitActor = ActorPtr(&GetImplementation(hitTestResults.actor));
         BuildRootToTargetPath(hitTestResults.actor, mStreamState.initialHitPathRootToTarget);
       }
 
-      // Only set the currentRenderTask for the primary hit actor.
+      // Start with the task of the primary hit actor. An established owner route overrides it below.
       localVars.currentRenderTask = hitTestResults.renderTask;
+      if(Impl::GetEstablishedOwner(*this))
+      {
+        // Once ownership is established, the stream stays in the render task that selected the
+        // owner even if a later hit test finds another actor in another render task.
+        localVars.currentRenderTask = mLastRenderTask;
+      }
       localVars.touchEventImpl->SetRenderTask(Dali::RenderTask(localVars.currentRenderTask.Get()));
     }
     else
@@ -856,8 +914,19 @@ bool GeometryTouchEventProcessor::IsFinished() const
 
 void GeometryTouchEventProcessor::OnObservedActorDisconnected(Actor* actor)
 {
-  if(actor == mLastConsumedActor.GetActor() || actor == mLastPrimaryHitActor.GetActor())
+  Actor* consumedActor    = mLastConsumedActor.GetActor();
+  Actor* primaryHitActor  = mLastPrimaryHitActor.GetActor();
+  Actor* establishedOwner = Impl::GetEstablishedOwner(*this);
+
+  if(actor == consumedActor || actor == primaryHitActor)
   {
+    // Once an actor owns the stream, removing a different primary hit actor must not
+    // terminate the owner's stream. The owner will receive the physical terminal event.
+    if(establishedOwner && actor == primaryHitActor && actor != establishedOwner)
+    {
+      return;
+    }
+
     if(mProcessingTouchEvent)
     {
       mObservedActorDisconnected = true;
@@ -890,4 +959,4 @@ void GeometryTouchEventProcessor::Clear(bool keepLastPrimaryObserver)
   mObservedActorDisconnected = false;
 }
 
-} // namespace Dali::Internal
+} //namespace DALI_NAMESPACE::Internal

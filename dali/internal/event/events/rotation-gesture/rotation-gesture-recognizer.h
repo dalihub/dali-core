@@ -25,7 +25,7 @@
 #include <dali/internal/event/events/gesture-recognizer.h>
 #include <dali/internal/event/events/rotation-gesture/rotation-gesture-event.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Integration
 {
@@ -119,6 +119,6 @@ private:
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_EVENT_ROTATION_GESTURE_RECOGNIZER_H

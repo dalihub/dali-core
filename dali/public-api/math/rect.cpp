@@ -18,8 +18,8 @@
 // CLASS HEADER
 #include <dali/public-api/math/rect.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 // Ensure Rect is maintained as a trivially copyable type
 static_assert(std::is_trivially_copyable<Bounds>::value);
-} // namespace Dali
+} //namespace DALI_NAMESPACE

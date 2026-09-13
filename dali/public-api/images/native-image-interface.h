@@ -28,7 +28,7 @@
 #include <dali/public-api/object/any.h>
 #include <dali/public-api/object/ref-object.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 #ifdef NO_ERROR
 #undef NO_ERROR
@@ -225,6 +225,6 @@ using NativeImageInterfacePtr = Dali::IntrusivePtr<NativeImageInterface>;
 /**
  * @}
  */
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_NATIVE_IMAGE_INTERFACE_H

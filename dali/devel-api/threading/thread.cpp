@@ -23,7 +23,7 @@
 #include <cstddef>
 #include <thread>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 struct Thread::ThreadImpl
 {
@@ -68,4 +68,4 @@ void Thread::InternalThreadEntryFunc(Thread& aThis)
   aThis.Run();
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

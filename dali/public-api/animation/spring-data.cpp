@@ -34,7 +34,7 @@ static constexpr float  MIN_MASS      = 0.1f;
 static constexpr double EPSILON       = 0.001;
 } // namespace
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 
 struct SpringData::Impl
@@ -166,4 +166,4 @@ float SpringData::GetDuration() const
   return static_cast<float>(time);
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

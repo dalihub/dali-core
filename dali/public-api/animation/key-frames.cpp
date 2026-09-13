@@ -24,7 +24,7 @@
 #include <dali/public-api/math/degree.h>
 #include <dali/public-api/math/radian.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 KeyFrames KeyFrames::New()
 {
@@ -64,4 +64,4 @@ KeyFrames::KeyFrames(Internal::KeyFrames* internal)
 {
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

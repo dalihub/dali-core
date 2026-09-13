@@ -363,7 +363,7 @@ int UtcDaliConstraintNewFunctorMemberN(void)
       &UtcDaliConstraintNewFunctorMember::Functor::Position);
     DALI_TEST_CHECK(false); // Should not reach here
   }
-  catch(Dali::DaliException& e)
+  catch(const Dali::DaliException&)
   {
     DALI_TEST_CHECK(true); // Should assert!
   }

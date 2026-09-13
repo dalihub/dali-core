@@ -843,3 +843,51 @@ int UtcDaliPanGestureRecognizerUpdateParamsMinDistance(void)
 
   END_TEST;
 }
+
+int UtcDaliInputOptionsGestureRecognitionOptions(void)
+{
+  TestApplication application;
+
+  DALI_TEST_EQUALS(Dali::Integration::GetPanGestureMinimumDistance(), Dali::Integration::DEFAULT_PAN_GESTURE_MINIMUM_DISTANCE, TEST_LOCATION);
+  DALI_TEST_EQUALS(Dali::Integration::GetPanGestureMinimumPanEvents(), Dali::Integration::DEFAULT_PAN_GESTURE_MINIMUM_PAN_EVENTS, TEST_LOCATION);
+  DALI_TEST_EQUALS(Dali::Integration::GetPinchGestureMinimumDistance(), Dali::Integration::DEFAULT_PINCH_GESTURE_MINIMUM_DISTANCE, TEST_LOCATION);
+  DALI_TEST_EQUALS(Dali::Integration::GetPinchGestureMinimumTouchEvents(), Dali::Integration::DEFAULT_PINCH_GESTURE_MINIMUM_TOUCH_EVENTS, TEST_LOCATION);
+  DALI_TEST_EQUALS(Dali::Integration::GetPinchGestureMinimumTouchEventsAfterStart(), Dali::Integration::DEFAULT_PINCH_GESTURE_MINIMUM_TOUCH_EVENTS_AFTER_START, TEST_LOCATION);
+  DALI_TEST_EQUALS(Dali::Integration::GetRotationGestureMinimumTouchEvents(), Dali::Integration::DEFAULT_ROTATION_GESTURE_MINIMUM_TOUCH_EVENTS, TEST_LOCATION);
+  DALI_TEST_EQUALS(Dali::Integration::GetRotationGestureMinimumTouchEventsAfterStart(), Dali::Integration::DEFAULT_ROTATION_GESTURE_MINIMUM_TOUCH_EVENTS_AFTER_START, TEST_LOCATION);
+
+  Dali::Integration::SetPanGestureMinimumDistance(24);
+  Dali::Integration::SetPanGestureMinimumPanEvents(6);
+  Dali::Integration::SetPinchGestureMinimumDistance(12.0f);
+  Dali::Integration::SetPinchGestureMinimumTouchEvents(5u);
+  Dali::Integration::SetPinchGestureMinimumTouchEventsAfterStart(6u);
+  Dali::Integration::SetRotationGestureMinimumTouchEvents(7u);
+  Dali::Integration::SetRotationGestureMinimumTouchEventsAfterStart(8u);
+
+  DALI_TEST_EQUALS(Dali::Integration::GetPanGestureMinimumDistance(), 24, TEST_LOCATION);
+  DALI_TEST_EQUALS(Dali::Integration::GetPanGestureMinimumPanEvents(), 6, TEST_LOCATION);
+  DALI_TEST_EQUALS(Dali::Integration::GetPinchGestureMinimumDistance(), 12.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Dali::Integration::GetPinchGestureMinimumTouchEvents(), 5u, TEST_LOCATION);
+  DALI_TEST_EQUALS(Dali::Integration::GetPinchGestureMinimumTouchEventsAfterStart(), 6u, TEST_LOCATION);
+  DALI_TEST_EQUALS(Dali::Integration::GetRotationGestureMinimumTouchEvents(), 7u, TEST_LOCATION);
+  DALI_TEST_EQUALS(Dali::Integration::GetRotationGestureMinimumTouchEventsAfterStart(), 8u, TEST_LOCATION);
+
+  Dali::Integration::SetPanGestureMinimumDistance(-1);
+  Dali::Integration::SetPanGestureMinimumPanEvents(0);
+  Dali::Integration::SetPinchGestureMinimumTouchEvents(1u);
+  Dali::Integration::SetPinchGestureMinimumTouchEventsAfterStart(1u);
+  Dali::Integration::SetRotationGestureMinimumTouchEvents(1u);
+  Dali::Integration::SetRotationGestureMinimumTouchEventsAfterStart(1u);
+
+  DALI_TEST_EQUALS(Dali::Integration::GetPanGestureMinimumDistance(), 24, TEST_LOCATION);
+  DALI_TEST_EQUALS(Dali::Integration::GetPanGestureMinimumPanEvents(), 6, TEST_LOCATION);
+  DALI_TEST_EQUALS(Dali::Integration::GetPinchGestureMinimumTouchEvents(), 5u, TEST_LOCATION);
+  DALI_TEST_EQUALS(Dali::Integration::GetPinchGestureMinimumTouchEventsAfterStart(), 6u, TEST_LOCATION);
+  DALI_TEST_EQUALS(Dali::Integration::GetRotationGestureMinimumTouchEvents(), 7u, TEST_LOCATION);
+  DALI_TEST_EQUALS(Dali::Integration::GetRotationGestureMinimumTouchEventsAfterStart(), 8u, TEST_LOCATION);
+
+  Dali::Integration::SetPinchGestureMinimumDistance(-1.0f);
+  DALI_TEST_EQUALS(Dali::Integration::GetPinchGestureMinimumDistance(), Dali::Integration::DEFAULT_PINCH_GESTURE_MINIMUM_DISTANCE, TEST_LOCATION);
+
+  END_TEST;
+}

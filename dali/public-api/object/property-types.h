@@ -33,7 +33,7 @@
 #include <dali/public-api/math/vector4.h>
 #include <dali/public-api/object/property.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @addtogroup dali_core_object
@@ -153,6 +153,6 @@ inline Property::Type Get<Insets>()
 /**
  * @}
  */
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_PROPERTY_TYPES_H

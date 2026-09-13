@@ -38,7 +38,7 @@
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector4.h>
 
-namespace Dali::Internal::HitTestAlgorithm
+namespace DALI_NAMESPACE::Internal::HitTestAlgorithm
 {
 namespace
 {
@@ -345,11 +345,11 @@ bool IsOverlayRoot(const Actor& actor, const bool isParentOverlay)
   return false;
 }
 
-bool IsHitClipped(const Actor&                 actor,
-                  const Dali::Layer::Behavior  layerBehavior,
-                  const Ray&                   ray,
-                  const float&                 projectedNearClippingDistance,
-                  const float&                 projectedFarClippingDistance)
+bool IsHitClipped(const Actor&                actor,
+                  const Dali::Layer::Behavior layerBehavior,
+                  const Ray&                  ray,
+                  const float&                projectedNearClippingDistance,
+                  const float&                projectedFarClippingDistance)
 {
   bool isClippingRequired = (layerBehavior != Dali::Layer::LAYER_3D) && (actor.GetClippingMode() != ClippingMode::DISABLED);
   if(isClippingRequired)
@@ -893,4 +893,4 @@ bool HitTest(const Vector2& sceneSize, RenderTaskList& renderTaskList, LayerList
   return HitTest(sceneSize, renderTaskList, layerList, screenCoordinates, results, actorTouchableCheck, propagationType);
 }
 
-} // namespace Dali::Internal::HitTestAlgorithm
+} //namespace DALI_NAMESPACE::Internal::HitTestAlgorithm

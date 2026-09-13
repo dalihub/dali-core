@@ -30,7 +30,7 @@
 using Dali::Integration::ToDaliString;
 using Dali::Integration::ToStdStringView;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 Handle::Handle(Dali::Internal::Object* handle)
 : BaseHandle(handle)
@@ -270,4 +270,4 @@ Handle New()
 
 } // namespace WeightObject
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

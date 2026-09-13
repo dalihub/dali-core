@@ -128,15 +128,15 @@ int UtcDaliMathUtilsClampP(void)
 
   float value = -10.0f, min = -2.0f, max = 4.0f;
   ClampInPlace(value, min, max);
-  DALI_TEST_EQUALS(value, min, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(value, min, 0.001f, TEST_LOCATION);
 
   value = 10.0f;
   ClampInPlace(value, min, max);
-  DALI_TEST_EQUALS(value, max, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(value, max, 0.001f, TEST_LOCATION);
 
   value = 3.0f;
   ClampInPlace(value, min, max);
-  DALI_TEST_EQUALS(value, 3.0f, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(value, 3.0f, 0.001f, TEST_LOCATION);
   END_TEST;
 }
 
@@ -146,15 +146,15 @@ int UtcDaliMathUtilsClampInPlaceP(void)
 
   float value = -10.0f, min = -2.0f, max = 4.0f;
   ClampInPlace(value, min, max);
-  DALI_TEST_EQUALS(value, min, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(value, min, 0.001f, TEST_LOCATION);
 
   value = 10.0f;
   ClampInPlace(value, min, max);
-  DALI_TEST_EQUALS(value, max, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(value, max, 0.001f, TEST_LOCATION);
 
   value = 3.0f;
   ClampInPlace(value, min, max);
-  DALI_TEST_EQUALS(value, 3.0f, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(value, 3.0f, 0.001f, TEST_LOCATION);
   END_TEST;
 }
 
@@ -163,11 +163,11 @@ int UtcDaliMathUtilsLerpP(void)
   Dali::TestApplication testApp;
 
   float offset = 0.0f, low = -2.0f, high = 4.0f;
-  DALI_TEST_EQUALS(Lerp(offset, low, high), low, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(Lerp(offset, low, high), low, 0.001f, TEST_LOCATION);
   offset = 1.0f;
-  DALI_TEST_EQUALS(Lerp(offset, low, high), high, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(Lerp(offset, low, high), high, 0.001f, TEST_LOCATION);
   offset = 0.5f;
-  DALI_TEST_EQUALS(Lerp(offset, low, high), 1.0f, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(Lerp(offset, low, high), 1.0f, 0.001f, TEST_LOCATION);
 
   END_TEST;
 }
@@ -311,9 +311,9 @@ int UtcDaliMathUtilsRoundP(void)
 {
   Dali::TestApplication testApp;
 
-  DALI_TEST_EQUALS(Round(1.00001, 4), 1.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Round(1.00001f, 4), 1.0f, TEST_LOCATION);
   DALI_TEST_EQUALS(Round(0.99999f, 4), 1.0f, TEST_LOCATION);
-  DALI_TEST_EQUALS(Round(-1.00001, 4), -1.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Round(-1.00001f, 4), -1.0f, TEST_LOCATION);
   DALI_TEST_EQUALS(Round(-0.99999f, 4), -1.0f, TEST_LOCATION);
   END_TEST;
 }

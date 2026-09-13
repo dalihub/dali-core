@@ -24,7 +24,7 @@
 // EXTERNAL HEADERS
 #include <algorithm>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -82,4 +82,4 @@ void CollectedUniformMap::AddMappings(const UniformMap& uniformMap)
 
 } // namespace SceneGraph
 } // namespace Internal
-} // namespace Dali
+} //namespace DALI_NAMESPACE

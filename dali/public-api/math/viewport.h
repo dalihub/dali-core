@@ -24,7 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/math/rect.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @addtogroup dali_core_math
@@ -40,6 +40,6 @@ using Viewport = Rect<int32_t>;
 /**
  * @}
  */
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_VIEWPORT_H

@@ -22,7 +22,7 @@
 #include <dali/devel-api/signals/render-callback.h>
 #include <dali/public-api/actors/actor.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -96,6 +96,6 @@ private:
   explicit DALI_INTERNAL DrawableActor(Internal::DrawableActor* internal);
   /// @endcond
 };
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_DRAWABLE_ACTOR_H

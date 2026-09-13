@@ -40,7 +40,7 @@
 #include <dali/public-api/math/quaternion.h>
 #include <dali/public-api/math/vector3.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -1201,8 +1201,8 @@ public: // Default properties
   PROPERTY_WRAPPER(mWorldMatrix, TransformManagerBooleanIgnoredInput, false, mIgnored);
   PROPERTY_WRAPPER(mIgnored, TransformManagerBooleanIgnoredInput, true, mWorldIgnored);
 
-  AnimatableProperty<bool>    mVisible;        ///< Visibility can be inherited from the Node hierachy
-  AnimatableProperty<bool>    mCulled;         ///< True if the node is culled. This is not animatable. It is just double-buffered.
+  AnimatableProperty<bool>    mVisible;              ///< Visibility can be inherited from the Node hierachy
+  AnimatableProperty<bool>    mCulled;               ///< True if the node is culled. This is not animatable. It is just double-buffered.
   AnimatableProperty<Vector4> mColorMultiplier;      ///< Component-wise color multiplier
   InheritedColor              mWorldColorMultiplier; ///< Full inherited color multiplier
   Vector4                     mUpdateAreaHint;       ///< Update area hint is provided for damaged area calculation. (x, y, width, height)
@@ -1423,6 +1423,6 @@ inline void OwnerContainer<Dali::Internal::SceneGraph::Node*>::Delete(Dali::Inte
 {
   Dali::Internal::SceneGraph::Node::Delete(pointer);
 }
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_SCENE_GRAPH_NODE_H

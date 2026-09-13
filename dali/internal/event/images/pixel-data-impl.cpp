@@ -24,7 +24,7 @@
 Debug::Filter* gPixelDataLogFilter = Debug::Filter::New(Debug::NoLogging, false, "DALI_LOG_PIXEL_DATA_SIZE");
 #endif
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -130,4 +130,4 @@ uint32_t PixelData::GetStrideBytes() const
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

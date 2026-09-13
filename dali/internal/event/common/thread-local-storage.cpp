@@ -47,7 +47,7 @@ Debug::Filter* gSingletonServiceLogFilter = Debug::Filter::New(Debug::NoLogging,
 
 #endif
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -275,4 +275,4 @@ BaseHandle ThreadLocalStorage::GetSingleton(const std::type_info& info) const
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

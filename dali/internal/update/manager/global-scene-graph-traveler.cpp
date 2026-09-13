@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
 #include <dali/internal/update/manager/update-manager.h>
 #include <dali/internal/update/nodes/node.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -38,4 +38,4 @@ SceneGraph::Node* GlobalSceneGraphTraveler::FindNode(uint32_t id)
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

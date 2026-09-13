@@ -21,7 +21,7 @@
 #include <dali/internal/update/common/property-batch.h>
 #include <mutex>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -52,7 +52,10 @@ struct ThreadLocalBatchFreeList
    * @brief Default constructor.
    */
   ThreadLocalBatchFreeList()
-  : head(0), peakActive(0), poolExhaustions(0), poolOverflows(0)
+  : head(0),
+    peakActive(0),
+    poolExhaustions(0),
+    poolOverflows(0)
   {
     // Initialize pool to nullptr for safety
     for(size_t i = 0; i < POOL_SIZE; ++i)
@@ -251,6 +254,6 @@ void UnlinkFromDirtyList(Object* object);
 void FlushAllPropertyBatches();
 
 } // namespace Internal
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_UPDATE_COMMON_PROPERTY_BATCH_FREE_LIST_H

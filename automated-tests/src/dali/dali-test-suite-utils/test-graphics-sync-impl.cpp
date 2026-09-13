@@ -17,7 +17,7 @@
 
 #include "test-graphics-sync-impl.h"
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 TestSyncObject::TestSyncObject(Dali::TraceCallStack& trace)
 
@@ -151,4 +151,4 @@ int32_t TestGraphicsSyncImplementation::GetNumberOfSyncObjects()
   return static_cast<int32_t>(mSyncObjects.size());
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

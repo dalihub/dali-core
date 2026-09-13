@@ -23,7 +23,7 @@
 #include <dali/integration-api/events/event.h>
 #include <dali/integration-api/events/point.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Integration
 {
@@ -106,6 +106,6 @@ public:
 
 } // namespace Integration
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTEGRATION_MULTI_POINT_EVENT_H

@@ -23,7 +23,7 @@
 #include <dali/internal/event/actors/camera-actor-impl.h>
 #include <dali/internal/event/render-tasks/render-task-list-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Integration
 {
@@ -44,4 +44,4 @@ Dali::RenderTask CreateTask(Dali::RenderTaskList& taskList, Dali::Actor& sourceA
 
 } // namespace Integration
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

@@ -23,7 +23,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @addtogroup dali_core_common
@@ -510,6 +510,6 @@ inline bool operator<(IntrusivePtr<T> const& lhs, decltype(nullptr) rhs)
 /**
  * @}
  */
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTRUSIVE_PTR_H

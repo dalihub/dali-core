@@ -25,7 +25,7 @@
 #include "graphics-framebuffer.h"
 #include "graphics-types.h"
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Graphics
 {
@@ -144,6 +144,6 @@ struct FramebufferCreateInfo
 };
 
 } // namespace Graphics
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_GRAPHICS_FRAMEBUFFER_CREATE_INFO_H

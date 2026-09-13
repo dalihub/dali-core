@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/update/nodes/node-declarations.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -61,6 +61,6 @@ void UpdateLayerTree(Layer& layer);
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_SCENE_GRAPH_UPDATE_ALGORITHMS_H

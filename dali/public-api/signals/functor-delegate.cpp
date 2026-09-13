@@ -21,7 +21,7 @@
 // EXTERNAL INCLUDES
 #include <type_traits>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace
 {
@@ -58,4 +58,4 @@ FunctorDelegate::FunctorDelegate(void* objectPtr, Dispatcher dispatcher, Destruc
 {
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

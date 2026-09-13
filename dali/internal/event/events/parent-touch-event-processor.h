@@ -23,7 +23,7 @@
 #include <dali/internal/event/render-tasks/render-task-impl.h>
 #include <dali/public-api/events/point-state.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Integration
 {
@@ -68,6 +68,6 @@ private:
 };
 
 } // namespace Internal
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_PARENT_TOUCH_EVENT_PROCESSOR_H

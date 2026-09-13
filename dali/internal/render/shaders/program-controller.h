@@ -25,7 +25,7 @@
 #include <dali/internal/render/shaders/program-cache.h>
 #include <dali/internal/render/shaders/program.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -173,6 +173,6 @@ private: // Data
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_PROGRAM_CONTROLLER_H

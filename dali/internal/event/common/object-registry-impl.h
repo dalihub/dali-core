@@ -23,7 +23,7 @@
 #include <dali/public-api/object/object-registry.h>
 #include <dali/public-api/object/ref-object.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 struct Vector2;
 
@@ -136,6 +136,6 @@ inline const Internal::ObjectRegistry& GetImplementation(const Dali::ObjectRegis
   return static_cast<const Internal::ObjectRegistry&>(handle);
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_OBJECT_REGISTRY_H

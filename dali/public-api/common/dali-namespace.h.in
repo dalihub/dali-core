@@ -1,0 +1,106 @@
+#ifndef DALI_NAMESPACE_H
+#define DALI_NAMESPACE_H
+
+/*
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
+/*
+ * This file is generated from dali-namespace.h.in by CMake.
+ * DO NOT EDIT the generated dali-namespace.h; edit the .in template instead.
+ *
+ * The value below is baked in when DALi is built, so that an application always
+ * agrees with the library it links against. It must NOT be overridden with -D
+ * on the application's command line: doing so makes the headers declare symbols
+ * that do not exist in the installed library, and the link will fail.
+ */
+#define DALI_TIZEN_NAMESPACE @DALI_TIZEN_NAMESPACE_VALUE@
+
+/**
+ * @brief DALI_NAMESPACE is the name of the namespace enclosing the whole of DALi.
+ *
+ * It is used in place of a namespace name at every namespace definition in DALi,
+ * for example:
+ * @code
+ * namespace DALI_NAMESPACE
+ * {
+ * } // namespace Dali
+ *
+ * namespace DALI_NAMESPACE::Ui::Internal
+ * {
+ * } // namespace Dali::Ui::Internal
+ * @endcode
+ *
+ * When DALi is built for Tizen it expands to Tizen::Dali, so that DALi is
+ * published under the Tizen top level namespace. Otherwise it expands to Dali.
+ *
+ * Both spellings are usable from application code in either configuration,
+ * because whichever of the two namespaces is not the real one is declared as an
+ * alias of it below. Dali::Actor, Tizen::Dali::Actor and, after
+ * "using namespace Dali;", plain Actor all name the same type.
+ *
+ * The one thing an alias cannot do is be reopened. Code that forward declares a
+ * DALi type without including its header must use DALI_NAMESPACE rather than a
+ * literal namespace name, as the literal name is an alias in one of the two
+ * configurations:
+ * @code
+ * namespace DALI_NAMESPACE { class Actor; }
+ * @endcode
+ */
+#if DALI_TIZEN_NAMESPACE
+
+#define DALI_NAMESPACE Tizen::Dali
+
+namespace Tizen
+{
+namespace Dali
+{
+}
+} // namespace Tizen
+
+/**
+ * @brief Allows DALi to be reached as Dali:: as well as Tizen::Dali::.
+ */
+namespace Dali = Tizen::Dali;
+
+#else
+
+#define DALI_NAMESPACE Dali
+
+namespace Dali
+{
+}
+
+/*
+ * Doxygen reports this as a recursive namespace alias, because the alias is
+ * named after the last component of its own target, and a warning fails the
+ * documentation build. The documentation refers to this configuration's types
+ * as Dali:: anyway, so hide the alias from it.
+ */
+#ifndef DALI_DOXYGEN
+namespace Tizen
+{
+/**
+ * @brief Allows DALi to be reached as Tizen::Dali:: as well as Dali::, so that
+ * application code written against the Tizen API also builds for other targets.
+ */
+namespace Dali = ::Dali;
+} // namespace Tizen
+#endif
+
+#endif // DALI_TIZEN_NAMESPACE
+
+#endif // DALI_NAMESPACE_H

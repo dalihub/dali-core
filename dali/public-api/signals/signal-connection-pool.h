@@ -26,7 +26,7 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/signals/signal-slot-connections.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 class ConnectionTrackerInterface;
 
@@ -232,6 +232,6 @@ private:
 /**
  * @}
  */
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_SIGNAL_CONNECTION_POOL_H

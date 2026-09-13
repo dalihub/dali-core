@@ -30,7 +30,7 @@
 #include <dali/internal/common/owner-key-container.h>
 #include <dali/internal/render/common/render-item.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -274,6 +274,6 @@ private:
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_SCENE_GRAPH_RENDER_LIST_H

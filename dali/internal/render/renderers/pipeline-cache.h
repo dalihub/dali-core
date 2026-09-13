@@ -28,7 +28,7 @@
 #include <dali/internal/render/renderers/render-geometry.h>             ///< For Geometry::LifecycleObserver
 #include <dali/internal/render/shaders/program.h>                       ///< For Program::LifecycleObserver
 
-namespace Dali::Internal
+namespace DALI_NAMESPACE::Internal
 {
 namespace Render
 {
@@ -348,6 +348,6 @@ private:
 };
 
 } // namespace Render
-} // namespace Dali::Internal
+} //namespace DALI_NAMESPACE::Internal
 
 #endif // DALI_INTERNAL_RENDER_PIPELINE_CACHE_H

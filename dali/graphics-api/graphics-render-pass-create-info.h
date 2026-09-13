@@ -2,7 +2,7 @@
 #define DALI_GRAPHICS_RENDERPASS_CREATE_INFO_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
 #include "graphics-render-pass.h"
 #include "graphics-types.h"
 
-namespace Dali::Graphics
+namespace DALI_NAMESPACE::Graphics
 {
 class RenderTarget;
 /**
@@ -96,6 +96,6 @@ struct RenderPassCreateInfo
   const AllocationCallbacks*                allocationCallbacks{nullptr};
 };
 
-} // namespace Dali::Graphics
+} //namespace DALI_NAMESPACE::Graphics
 
 #endif // DALI_GRAPHICS_FRAMEBUFFER_FACTORY_H

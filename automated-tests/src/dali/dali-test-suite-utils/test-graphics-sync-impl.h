@@ -31,7 +31,7 @@
 
 #include "test-trace-call-stack.h"
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 class TestGraphicsSyncImplementation;
 
@@ -121,6 +121,6 @@ private:
   TraceCallStack                       mTrace{true, "gl"}; ///< the trace call stack for testing
 };
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // TEST_GL_SYNC_ABSTRACTION_H

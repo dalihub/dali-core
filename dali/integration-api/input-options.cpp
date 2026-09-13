@@ -6,7 +6,7 @@
 using Dali::Internal::GestureEventProcessor;
 using Dali::Internal::ThreadLocalStorage;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Integration
 {
@@ -106,10 +106,22 @@ void SetPanGestureMinimumDistance(int value)
   eventProcessor.SetPanGestureMinimumDistance(value);
 }
 
+int GetPanGestureMinimumDistance()
+{
+  GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
+  return eventProcessor.GetPanGestureProcessor().GetMinimumDistance();
+}
+
 void SetPanGestureMinimumPanEvents(int value)
 {
   GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
   eventProcessor.SetPanGestureMinimumPanEvents(value);
+}
+
+int GetPanGestureMinimumPanEvents()
+{
+  GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
+  return eventProcessor.GetPanGestureProcessor().GetMinimumPanEvents();
 }
 
 void SetPinchGestureMinimumDistance(float value)
@@ -118,10 +130,22 @@ void SetPinchGestureMinimumDistance(float value)
   eventProcessor.SetPinchGestureMinimumDistance(value);
 }
 
+float GetPinchGestureMinimumDistance()
+{
+  GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
+  return eventProcessor.GetPinchGestureProcessor().GetMinimumPinchDistance();
+}
+
 void SetPinchGestureMinimumTouchEvents(uint32_t value)
 {
   GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
   eventProcessor.SetPinchGestureMinimumTouchEvents(value);
+}
+
+uint32_t GetPinchGestureMinimumTouchEvents()
+{
+  GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
+  return eventProcessor.GetPinchGestureProcessor().GetMinimumTouchEvents();
 }
 
 void SetPinchGestureMinimumTouchEventsAfterStart(uint32_t value)
@@ -130,16 +154,34 @@ void SetPinchGestureMinimumTouchEventsAfterStart(uint32_t value)
   eventProcessor.SetPinchGestureMinimumTouchEventsAfterStart(value);
 }
 
+uint32_t GetPinchGestureMinimumTouchEventsAfterStart()
+{
+  GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
+  return eventProcessor.GetPinchGestureProcessor().GetMinimumTouchEventsAfterStart();
+}
+
 void SetRotationGestureMinimumTouchEvents(uint32_t value)
 {
   GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
   eventProcessor.SetRotationGestureMinimumTouchEvents(value);
 }
 
+uint32_t GetRotationGestureMinimumTouchEvents()
+{
+  GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
+  return eventProcessor.GetRotationGestureProcessor().GetMinimumTouchEvents();
+}
+
 void SetRotationGestureMinimumTouchEventsAfterStart(uint32_t value)
 {
   GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
   eventProcessor.SetRotationGestureMinimumTouchEventsAfterStart(value);
+}
+
+uint32_t GetRotationGestureMinimumTouchEventsAfterStart()
+{
+  GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
+  return eventProcessor.GetRotationGestureProcessor().GetMinimumTouchEventsAfterStart();
 }
 
 void SetLongPressGestureMinimumHoldingTime(uint32_t time)
@@ -192,4 +234,4 @@ float GetTapGestureMaximumMotionDistance()
 
 } // namespace Integration
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

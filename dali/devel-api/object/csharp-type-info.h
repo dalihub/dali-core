@@ -22,7 +22,7 @@
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/object/property-value.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace CSharpTypeInfo
 {
@@ -55,6 +55,6 @@ using SetPropertyFunction = void (*)(BaseObject*, const char* const, Property::V
 using GetPropertyFunction = Property::Value* (*)(BaseObject*, const char* const);
 } // namespace CSharpTypeInfo
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_CSHARP_TYPE_INFO_H

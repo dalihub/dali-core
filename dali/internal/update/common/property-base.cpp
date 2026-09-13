@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/update/common/resetter-manager.h> ///< For RequestPropertyBaseResetToBaseValue
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -57,4 +57,4 @@ void PropertyBase::RequestResetToBaseValue()
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

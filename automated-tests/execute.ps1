@@ -242,6 +242,22 @@ foreach($Test in $Tests)
     $Stderr
   ) | Set-Content -LiteralPath $CombinedPath -Encoding UTF8
 
+
+  # Also stream test output to console (stdout/stderr) for Jenkins log visibility
+  if(-not $Quiet)
+  {
+    if($Stdout)
+    {
+      Write-Host "  --- stdout ---"
+      Write-Host $Stdout
+    }
+    if($Stderr)
+    {
+      Write-Host "  --- stderr ---" -ForegroundColor Yellow
+      Write-Host $Stderr -ForegroundColor Yellow
+    }
+  }
+
   $ExitCode = if($TimedOut) { 4 } else { $Process.ExitCode }
   $Passed = $ExitCode -eq 0
   $Message = if($TimedOut)

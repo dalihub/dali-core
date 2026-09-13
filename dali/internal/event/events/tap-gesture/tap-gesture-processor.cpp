@@ -37,7 +37,7 @@
 #include <dali/public-api/events/tap-gesture.h>
 #include <dali/public-api/math/vector2.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -380,4 +380,4 @@ void TapGestureProcessor::EmitGestureSignal(Actor* actor, const GestureDetectorC
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

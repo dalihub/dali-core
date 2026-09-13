@@ -28,7 +28,7 @@
 #include <dali/public-api/math/vector3.h>
 #include <dali/public-api/object/property-value.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal DALI_INTERNAL
 {
@@ -352,6 +352,6 @@ private:
   /// @endcond
 };
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_UPDATE_PROXY_H

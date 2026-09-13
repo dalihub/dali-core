@@ -18,7 +18,7 @@
 // CLASS HEADER
 #include <dali/devel-api/object/property-array-devel.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 
 Property::Array CreatePropertyArray(std::initializer_list<Property::Value> values)
@@ -31,4 +31,4 @@ Property::Array CreatePropertyArray(std::initializer_list<Property::Value> value
   return array;
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

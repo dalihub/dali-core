@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/event/common/thread-local-storage.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 SingletonService::SingletonService() = default;
 
@@ -52,4 +52,4 @@ SingletonService::SingletonService(Internal::ThreadLocalStorage* tls)
 {
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

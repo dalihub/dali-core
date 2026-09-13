@@ -17,7 +17,7 @@
 #include <dali/devel-api/rendering/texture-devel.h>
 #include <dali/internal/event/rendering/texture-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace DevelTexture
 {
@@ -62,4 +62,4 @@ bool UploadSubPixelData(Texture   texture,
 }
 
 } // namespace DevelTexture
-} // namespace Dali
+} //namespace DALI_NAMESPACE

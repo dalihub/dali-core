@@ -16,7 +16,7 @@
 
 #include "addon-binder.h"
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace AddOn
 {
@@ -24,4 +24,4 @@ Dali::Integration::AddOnManager* AddOnBinder::mAddOnManager = nullptr;
 
 } // namespace AddOn
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

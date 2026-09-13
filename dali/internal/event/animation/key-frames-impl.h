@@ -28,7 +28,7 @@
 #include <dali/public-api/animation/key-frames.h>
 #include <dali/public-api/object/base-object.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -268,6 +268,6 @@ inline const Internal::KeyFrames& GetImplementation(const Dali::KeyFrames& keyFr
   return static_cast<const Internal::KeyFrames&>(object);
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_KEY_FRAMES_H

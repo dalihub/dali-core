@@ -33,7 +33,7 @@
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/object/property.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -481,6 +481,6 @@ inline const Internal::TypeInfo& GetImplementation(const Dali::TypeInfo& typeInf
   return static_cast<const Internal::TypeInfo&>(handle);
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_TYPE_INFO_H

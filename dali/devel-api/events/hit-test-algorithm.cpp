@@ -24,7 +24,7 @@
 #include <dali/internal/event/events/hit-test-algorithm-impl.h>
 #include <dali/internal/event/render-tasks/render-task-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace HitTestAlgorithm
 {
@@ -70,4 +70,4 @@ bool BuildPickingRay(RenderTask renderTask, const Vector2& screenCoordinates, Ve
 
 } // namespace HitTestAlgorithm
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

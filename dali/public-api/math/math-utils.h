@@ -26,7 +26,7 @@
 #include <dali/public-api/common/constants.h>
 #include <dali/public-api/common/dali-common.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -311,7 +311,7 @@ constexpr float Round(float value, int32_t pos)
 {
   const int64_t exponent = static_cast<int64_t>(pos);
   float         temp     = value * Internal::MathUtils::PowerOfTen(exponent);
-  temp                    = Internal::MathUtils::Floor(temp + 0.5f);
+  temp                   = Internal::MathUtils::Floor(temp + 0.5f);
   temp *= Internal::MathUtils::PowerOfTen(-exponent);
   return temp;
 }
@@ -441,6 +441,6 @@ constexpr int32_t Sign(T value)
 /**
  * @}
  */
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_MATH_UTILS_H

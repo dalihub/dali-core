@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@
 #include <dali/internal/render/renderers/render-uniform-block.h>
 #include <dali/internal/update/manager/update-manager.h> ///< for AddUniformBlockMessage
 
-namespace Dali::Internal
+namespace DALI_NAMESPACE::Internal
 {
 UniformBlockPtr UniformBlock::New(std::string&& name)
 {
@@ -104,4 +104,4 @@ UniformBlock::~UniformBlock()
   }
 }
 
-}; // namespace Dali::Internal
+}; //namespace DALI_NAMESPACE::Internal

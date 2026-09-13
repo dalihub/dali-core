@@ -25,7 +25,7 @@
 #include <dali/internal/update/common/property-owner.h>
 #include <dali/internal/update/gestures/gesture-properties.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 class PanGesture;
 
@@ -569,6 +569,6 @@ private:
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_SCENE_GRAPH_PAN_GESTURE_H

@@ -265,7 +265,7 @@ void Dali::Internal::Texture::TextureMemoryInfo::Destroy(bool printLog)
 }
 #endif
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -674,4 +674,4 @@ bool Texture::ApplyNativeFragmentShader(std::string& shader, int mask)
 }
 
 } // namespace Internal
-} // namespace Dali
+} //namespace DALI_NAMESPACE

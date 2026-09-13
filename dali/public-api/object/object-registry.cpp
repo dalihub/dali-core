@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/event/common/object-registry-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 ObjectRegistry::ObjectRegistry() = default;
 
@@ -50,4 +50,4 @@ ObjectRegistry::ObjectRegistry(Internal::ObjectRegistry* internal)
 {
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

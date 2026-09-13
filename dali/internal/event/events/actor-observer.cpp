@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/events/actor-observer.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -147,4 +147,4 @@ void ActorObserver::ObjectDestroyed(Object& object)
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

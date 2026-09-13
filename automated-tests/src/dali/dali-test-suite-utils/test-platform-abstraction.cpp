@@ -21,7 +21,7 @@
 
 #include "dali-test-suite-utils.h"
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 TestPlatformAbstraction::TestPlatformAbstraction()
 : mTimerId(0),
@@ -96,4 +96,4 @@ void TestPlatformAbstraction::CancelTimer(uint32_t timerId)
                            mTimerPairsWaiting.end());
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

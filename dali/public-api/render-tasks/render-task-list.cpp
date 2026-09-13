@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/event/render-tasks/render-task-list-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 RenderTaskList::RenderTaskList() = default;
 
@@ -73,4 +73,4 @@ RenderTaskList::RenderTaskList(Internal::RenderTaskList* internal)
 {
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

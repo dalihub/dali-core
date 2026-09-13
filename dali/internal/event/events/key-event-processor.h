@@ -18,9 +18,10 @@
  *
  */
 
+#include <dali/public-api/common/dali-namespace.h>
 #include <vector>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Integration
 {
@@ -71,6 +72,6 @@ private:
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_KEY_EVENT_PROCESSOR_H

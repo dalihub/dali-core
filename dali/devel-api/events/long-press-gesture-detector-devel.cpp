@@ -24,7 +24,7 @@
 #include <dali/devel-api/events/long-press-gesture-detector-devel.h>
 #include <dali/internal/event/events/long-press-gesture/long-press-gesture-detector-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace DevelLongPressGestureDetector
 {
@@ -35,4 +35,4 @@ uint32_t GetMinimumHoldingTime(LongPressGestureDetector longPressGestureDetector
 
 } // namespace DevelLongPressGestureDetector
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

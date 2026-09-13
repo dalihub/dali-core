@@ -38,7 +38,7 @@ using std::vector;
 
 using Dali::Integration::RenderController;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -586,4 +586,4 @@ std::size_t MessageQueue::GetCapacity() const
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

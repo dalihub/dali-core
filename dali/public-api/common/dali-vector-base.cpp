@@ -31,7 +31,7 @@
 #include <cstring> // for memcpy & memmove
 #include <utility> // std::swap
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace
 {
@@ -282,7 +282,7 @@ void VectorBase::CopyMemory(uint8_t* destination, const uint8_t* source, SizeTyp
   }
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #if defined(DALI_VECTOR_BASE_CPP_RESTORE_COPY_MEMORY_MACRO)
 #pragma pop_macro("CopyMemory")

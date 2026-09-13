@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/event/animation/linear-constrainer-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 LinearConstrainer LinearConstrainer::New()
 {
@@ -61,4 +61,4 @@ void LinearConstrainer::Remove(Dali::Handle& target)
   GetImplementation(*this).Remove(target);
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

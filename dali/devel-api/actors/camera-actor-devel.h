@@ -2,7 +2,7 @@
 #define DALI_CAMERA_ACTOR_DEVEL_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
 
 #include <dali/public-api/actors/camera-actor.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace DevelCameraActor
 {
@@ -85,6 +85,6 @@ enum
 DALI_CORE_API void RotateProjection(Dali::CameraActor camera, int32_t rotationAngle);
 
 } // namespace DevelCameraActor
-} // Namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_CAMERA_ACTOR_DEVEL_H

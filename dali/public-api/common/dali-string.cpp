@@ -47,7 +47,7 @@ inline const std::string& GetString(const void* storage)
 
 } // unnamed namespace
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 
 String::String()
@@ -245,4 +245,4 @@ bool StringEqual::operator()(const String& a, const String& b) const
   return a == b;
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

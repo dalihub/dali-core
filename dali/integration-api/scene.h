@@ -31,7 +31,7 @@
 #include <dali/public-api/math/vector4.h>
 #include <dali/public-api/object/handle.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 class Actor;
 class KeyEvent;
@@ -57,7 +57,6 @@ enum class ScenePolicyFlagBits : ScenePolicyFlags
   DEPTH_BUFFER_ENABLED   = 1 << 0, ///< Whether the depth buffer is available or not.
   STENCIL_BUFFER_ENABLED = 1 << 1, ///< Whether the stencil buffer is available or not.
   PARTIAL_UPDATE_ENABLED = 1 << 2, ///< Whether partial update is available or not.
-  MULTI_SAMPLING_ENABLED = 1 << 3, ///< Whether multi-sampling anti-aliasing is available or not.
 };
 
 template<>
@@ -472,10 +471,6 @@ public:
 
   bool IsStencilBufferEnabled() const;
 
-  void SetMultiSampledAntiAliasingEnabled(bool enabled);
-
-  bool IsMultiSampledAntiAliasingEnabled() const;
-
   /**
    * @brief Sets whether the scene will update partial area or full area.
    *
@@ -494,16 +489,23 @@ public:
   bool IsPartialUpdateEnabled() const;
 
   /**
-   * @brief Sets whether the processes using geometry event propagation touch and hover events.
+   * @brief Sets whether geometry hit testing is used for touch and hover events.
    *
-   * @param[in] enabled True if the processes using geometry event propagation touch and hover events.
+   * Geometry touch events are propagated through the geometry hit results. Geometry hover events visit
+   * hoverable geometry hit candidates from front to back until one consumes the current input. Candidates
+   * that return false remain active hover targets, and may include unrelated siblings. Actual parents are
+   * visited only when present later in the geometry hit list; there is no separate parent bubbling pass.
+   * Every active GEOMETRY hover target receives STARTED and LEAVE lifecycle events independently of
+   * Actor::SetLeaveRequired().
+   *
+   * @param[in] enabled True to use geometry hit testing for touch and hover events.
    */
   void SetGeometryHittestEnabled(bool enabled);
 
   /**
-   * @brief Queries whether the scene using geometry event propagation touch and hover events.
+   * @brief Queries whether the scene uses geometry hit testing for touch and hover events.
    *
-   * @return True if the scene using geometry event propagation touch and hover events.
+   * @return True if the scene uses geometry hit testing for touch and hover events.
    */
   bool IsGeometryHittestEnabled();
 
@@ -657,6 +659,6 @@ public: // Not intended for application developers
 
 } // namespace Integration
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_SCENE_H

@@ -31,7 +31,7 @@ Dali::Internal::SceneGraph::MemoryPoolCollection*                               
 static constexpr Dali::Internal::SceneGraph::MemoryPoolCollection::MemoryPoolType gMemoryPoolType       = Dali::Internal::SceneGraph::MemoryPoolCollection::MemoryPoolType::TEXTURE_SET;
 } // namespace
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -177,4 +177,4 @@ void TextureSet::SetRenderManagerDispatcher(RenderManagerDispatcher* renderManag
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

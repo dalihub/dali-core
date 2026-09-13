@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_UNIFORM_BUFFER_MANAGER_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,12 +22,12 @@
 #include <dali/devel-api/common/map-wrapper.h>
 #include <dali/graphics-api/graphics-controller.h>
 
-namespace Dali::Internal::SceneGraph
+namespace DALI_NAMESPACE::Internal::SceneGraph
 {
 class Scene;
 }
 
-namespace Dali::Internal::Render
+namespace DALI_NAMESPACE::Internal::Render
 {
 class UniformBufferV2;
 class UniformBufferView;
@@ -179,6 +179,6 @@ private:
   bool                                 mCurrentSceneOffscreen{false};
 };
 
-} // namespace Dali::Internal::Render
+} //namespace DALI_NAMESPACE::Internal::Render
 
 #endif // DALI_INTERNAL_UNIFORM_BUFFER_MANAGER_H

@@ -23,7 +23,7 @@
 
 using Dali::Integration::ToDaliString;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 
 Property::Map CreatePropertyMap(std::initializer_list<KeyValuePair> values)
@@ -49,4 +49,4 @@ Property::Map CreatePropertyMap(std::initializer_list<KeyValuePair> values)
   return map;
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

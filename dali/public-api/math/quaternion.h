@@ -25,7 +25,7 @@
 #include <dali/public-api/math/radian.h>
 #include <dali/public-api/math/vector4.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @addtogroup dali_core_math
@@ -488,6 +488,6 @@ struct TypeTraits<Quaternion> : public BasicTypes<Quaternion>
 /**
  * @}
  */
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_QUATERNION_H

@@ -18,9 +18,10 @@
  *
  */
 
+#include <dali/public-api/common/dali-namespace.h>
 #include <dali/public-api/events/point-state.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 class TouchEvent;
 
@@ -60,6 +61,6 @@ public:
 };
 
 } // namespace Internal
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_TOUCH_RECIPIENT_DISPATCHER_H
