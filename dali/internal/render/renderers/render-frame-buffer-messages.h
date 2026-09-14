@@ -22,7 +22,7 @@
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/render/renderers/render-frame-buffer.h>
 
-namespace Dali::Internal::Render
+namespace DALI_NAMESPACE::Internal::Render
 {
 inline void KeepRenderResultMessage(EventThreadServices& eventThreadServices, Render::FrameBuffer& frameBuffer)
 {
@@ -89,6 +89,6 @@ inline void SetMultiSamplingLevelMessage(EventThreadServices& eventThreadService
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new(slot) LocalType(&frameBuffer, &Render::FrameBuffer::SetMultiSamplingLevel, multiSamplingLevel);
 }
-} // namespace Dali::Internal::Render
+} //namespace DALI_NAMESPACE::Internal::Render
 
 #endif // DALI_INTERNAL_RENDER_FRAME_BUFFER_MESSAGES_H

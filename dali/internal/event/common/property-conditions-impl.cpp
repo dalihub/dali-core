@@ -18,7 +18,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/event/common/property-conditions-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -31,4 +31,4 @@ PropertyCondition::~PropertyCondition() = default;
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

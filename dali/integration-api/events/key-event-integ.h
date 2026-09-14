@@ -25,7 +25,7 @@
 #include <dali/integration-api/events/event.h>
 #include <dali/public-api/events/key-event.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Integration
 {
@@ -181,6 +181,6 @@ struct DALI_CORE_API KeyEvent : public Event
 
 } // namespace Integration
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTEGRATION_KEY_EVENT_H

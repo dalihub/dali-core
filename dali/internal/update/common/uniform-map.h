@@ -29,7 +29,7 @@
 
 #include <dali/internal/common/const-string.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -171,6 +171,6 @@ public: // inline functions using mImpl
 
 } // namespace SceneGraph
 } // namespace Internal
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_SCENE_GRAPH_UNIFORM_MAP_H

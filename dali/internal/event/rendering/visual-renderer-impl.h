@@ -22,7 +22,7 @@
 #include <dali/integration-api/rendering/visual-renderer.h> // Dali::VisualRenderer
 #include <dali/internal/event/rendering/renderer-impl.h>    // Dali::Internal::Renderer
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -174,6 +174,6 @@ inline const Internal::VisualRenderer& GetImplementation(const Dali::VisualRende
   return static_cast<const Internal::VisualRenderer&>(object);
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_VISUAL_RENDERER_H

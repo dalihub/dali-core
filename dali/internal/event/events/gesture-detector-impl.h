@@ -33,7 +33,7 @@
 #include <dali/public-api/events/gesture.h>
 #include <dali/public-api/signals/slot-delegate.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Integration
 {
@@ -271,6 +271,6 @@ inline const Internal::GestureDetector& GetImplementation(const Dali::GestureDet
   return static_cast<const Internal::GestureDetector&>(handle);
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_GESTURE_DETECTOR_H

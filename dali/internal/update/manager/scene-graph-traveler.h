@@ -28,7 +28,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/update/manager/scene-graph-traveler-interface.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -122,6 +122,6 @@ private:
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_UPDATE_PROXY_SCENE_GRAPH_TRAVELER_H

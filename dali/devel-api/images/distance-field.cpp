@@ -31,7 +31,7 @@
 #include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/math/vector2.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace
 {
@@ -252,4 +252,4 @@ void GenerateDistanceFieldMap(const uint8_t* const imagePixels, const Size& imag
   }
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

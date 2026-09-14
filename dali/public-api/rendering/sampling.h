@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @addtogroup dali_core_rendering_effects
@@ -124,6 +124,6 @@ enum Type
 /**
  * @}
  */
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_SAMPLING_H

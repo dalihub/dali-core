@@ -17,7 +17,7 @@
 #include <dali/internal/event/rendering/renderer-impl.h>
 #include <dali/internal/update/manager/update-manager.h>
 
-namespace Dali::Internal
+namespace DALI_NAMESPACE::Internal
 {
 RendererContainer::RendererContainer(EventThreadServices& eventThreadServices, bool isCache)
 : EventThreadServicesHolder(eventThreadServices),
@@ -136,4 +136,4 @@ void RendererContainer::SetBlending(Dali::BlendEquation::Type blendEquation)
   }
 }
 
-} // namespace Dali::Internal
+} //namespace DALI_NAMESPACE::Internal

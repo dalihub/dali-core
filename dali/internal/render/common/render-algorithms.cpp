@@ -33,7 +33,7 @@ using Dali::Internal::SceneGraph::RenderItem;
 using Dali::Internal::SceneGraph::RenderList;
 using Dali::Internal::SceneGraph::RenderListContainer;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -730,7 +730,7 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
         // Ignore an item's world color when rendering offscreen cache
         // to ensure we avoid repetitive calculations from different instructions.
         const bool     drawOffscreenRenderingCache = (item.mNode->GetCacheRendererCount() > 0u) && (instruction.mFrameBuffer != nullptr);
-        const Vector4& worldColorMultiplier                  = drawOffscreenRenderingCache ? Vector4::ONE : nodeInfo.worldColorMultiplier;
+        const Vector4& worldColorMultiplier        = drawOffscreenRenderingCache ? Vector4::ONE : nodeInfo.worldColorMultiplier;
 
         auto const MAX_QUEUE = item.mRenderer->IsDrawCommandsExist() ? DevelRenderer::RENDER_QUEUE_MAX : 1;
         for(auto queue = 0u; queue < MAX_QUEUE; ++queue)
@@ -811,4 +811,4 @@ void RenderAlgorithms::ProcessRenderInstruction(const RenderInstruction&        
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

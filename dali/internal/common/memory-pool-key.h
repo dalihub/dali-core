@@ -20,8 +20,9 @@
  */
 
 #include <dali/internal/common/fixed-size-memory-pool.h>
+#include <dali/public-api/common/dali-namespace.h>
 
-namespace Dali::Internal
+namespace DALI_NAMESPACE::Internal
 {
 /**
  * MemoryPoolKey is a 32bit replacement for pointers to objects stored
@@ -192,6 +193,6 @@ private:
   KeyType key{INVALID}; ///< The actual key.
 };
 
-} // namespace Dali::Internal
+} //namespace DALI_NAMESPACE::Internal
 
 #endif // DALI_INTERNAL_MEMORY_POOL_KEY_H

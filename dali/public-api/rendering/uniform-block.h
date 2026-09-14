@@ -21,7 +21,7 @@
 #include <dali/public-api/object/handle.h>
 #include <dali/public-api/rendering/shader.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @addtogroup dali_core_rendering_effects
@@ -168,6 +168,6 @@ public:
 /**
  * @}
  */
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_RENDERING_UNIFORM_BLOCK_H

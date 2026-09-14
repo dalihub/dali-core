@@ -18,7 +18,10 @@
  *
  */
 
-namespace Dali
+// INTERNAL INCLUDES
+#include <dali/public-api/common/dali-namespace.h>
+
+namespace DALI_NAMESPACE
 {
 /**
  * @addtogroup dali_core_events
@@ -47,6 +50,6 @@ enum Type
 /**
  * @}
  */
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // __DALI_MOUSE_BUTTON_H__

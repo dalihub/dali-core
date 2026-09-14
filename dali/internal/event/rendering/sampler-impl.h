@@ -28,7 +28,7 @@
 #include <dali/public-api/rendering/sampler.h>           // Dali::Sampler
 #include <dali/public-api/rendering/sampling.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -109,6 +109,6 @@ inline const Internal::Sampler& GetImplementation(const Dali::Sampler& handle)
   return static_cast<const Internal::Sampler&>(object);
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_SAMPLER_H

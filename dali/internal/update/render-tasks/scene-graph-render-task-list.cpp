@@ -29,7 +29,7 @@ Dali::Internal::SceneGraph::MemoryPoolCollection*                               
 static constexpr Dali::Internal::SceneGraph::MemoryPoolCollection::MemoryPoolType gMemoryPoolType       = Dali::Internal::SceneGraph::MemoryPoolCollection::MemoryPoolType::RENDER_TASK_LIST;
 } // unnamed namespace
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -170,4 +170,4 @@ CompleteNotificationInterface* RenderTaskList::GetCompleteNotificationInterface(
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

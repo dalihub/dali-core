@@ -27,7 +27,7 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/dali-vector.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @brief Create a hash code for a string
@@ -91,6 +91,6 @@ DALI_CORE_API std::size_t CalculateHash(const std::vector<std::uint8_t>& toHash)
  */
 DALI_CORE_API std::size_t CalculateHash(const Dali::Vector<std::uint8_t>& toHash);
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_HASH

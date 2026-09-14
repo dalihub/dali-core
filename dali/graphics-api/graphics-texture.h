@@ -2,7 +2,7 @@
 #define DALI_GRAPHICS_TEXTURE_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,10 @@
  *
  */
 
-namespace Dali
+// INTERNAL INCLUDES
+#include <dali/public-api/common/dali-namespace.h>
+
+namespace DALI_NAMESPACE
 {
 namespace Graphics
 {
@@ -44,6 +47,6 @@ protected:
 };
 
 } // namespace Graphics
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif

@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDER_ITEM_KEY_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 #include <dali/internal/common/memory-pool-key.h>
 #include <dali/internal/common/type-abstraction-enums.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal::SceneGraph
 {
@@ -40,6 +40,6 @@ struct TypeTraits<Internal::SceneGraph::RenderItemKey> : public BasicTypes<Inter
   };
 };
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif //  DALI_INTERNAL_SCENE_GRAPH_RENDER_ITEM_KEY_H

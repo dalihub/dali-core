@@ -46,7 +46,7 @@ void __attribute__((destructor)) ShutDown(void)
 #endif
 } // Unnamed namespace
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -448,4 +448,4 @@ Vector4 Node::CalculateNodeUpdateArea(bool isLayer3d, const Matrix& nodeWorldMat
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

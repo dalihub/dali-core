@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/event/events/long-press-gesture/long-press-gesture-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 LongPressGesture::LongPressGesture(Internal::LongPressGesture* internal)
 : Gesture(internal)
@@ -55,4 +55,4 @@ const Vector2& LongPressGesture::GetLocalPoint() const
   return GetImplementation(*this).GetLocalPoint();
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

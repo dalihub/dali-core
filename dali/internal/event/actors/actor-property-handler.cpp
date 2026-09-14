@@ -37,7 +37,7 @@ using Dali::Internal::SceneGraph::AnimatableProperty;
 using Dali::Internal::SceneGraph::Node;
 using Dali::Internal::SceneGraph::PropertyBase;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -1041,11 +1041,11 @@ const PropertyBase* Actor::PropertyHandler::GetSceneObjectAnimatableProperty(Pro
       property = &node.mVisible;
       break;
     }
-    case Dali::Actor::Property::COLOR_MULTIPLIER: // FALLTHROUGH
-    case Dali::Actor::Property::COLOR_MULTIPLIER_RED:        // FALLTHROUGH
-    case Dali::Actor::Property::COLOR_MULTIPLIER_GREEN:      // FALLTHROUGH
-    case Dali::Actor::Property::COLOR_MULTIPLIER_BLUE:       // FALLTHROUGH
-    case Dali::Actor::Property::COLOR_MULTIPLIER_ALPHA:      // FALLTHROUGH
+    case Dali::Actor::Property::COLOR_MULTIPLIER:       // FALLTHROUGH
+    case Dali::Actor::Property::COLOR_MULTIPLIER_RED:   // FALLTHROUGH
+    case Dali::Actor::Property::COLOR_MULTIPLIER_GREEN: // FALLTHROUGH
+    case Dali::Actor::Property::COLOR_MULTIPLIER_BLUE:  // FALLTHROUGH
+    case Dali::Actor::Property::COLOR_MULTIPLIER_ALPHA: // FALLTHROUGH
     case Dali::Actor::Property::OPACITY:
     {
       property = &node.mColorMultiplier;
@@ -1856,4 +1856,4 @@ bool Actor::PropertyHandler::GetCurrentPropertyValue(const Internal::Actor& acto
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

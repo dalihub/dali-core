@@ -25,7 +25,7 @@
 #include "graphics-render-target.h"
 #include "graphics-types.h"
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Integration
 {
@@ -133,5 +133,5 @@ struct RenderTargetCreateInfo
 };
 
 } // namespace Graphics
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 #endif // DALI_GRAPHICS_RENDER_TARGET_CREATE_INFO

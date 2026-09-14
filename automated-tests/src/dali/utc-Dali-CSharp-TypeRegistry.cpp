@@ -199,6 +199,7 @@ int UtcDaliCSharpPropertyRegistrationFunctions(void)
   }
   catch(DaliException& e)
   {
+    (void)e;
     tet_result(TET_FAIL);
   }
 

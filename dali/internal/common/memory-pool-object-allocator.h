@@ -26,7 +26,7 @@
 #include <dali/internal/common/dummy-memory-pool.h>
 #include <dali/internal/common/fixed-size-memory-pool.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -227,6 +227,6 @@ private:
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_MEMORY_POOL_OBJECT_ALLOCATOR_H

@@ -24,7 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/math/math-utils.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 Insets::Insets()
 : start(0.0f),
@@ -73,4 +73,4 @@ bool Insets::operator!=(const Insets& rhs) const
   return !(*this == rhs);
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

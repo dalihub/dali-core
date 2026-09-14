@@ -534,7 +534,7 @@ int UtcDaliOrderedSetReorderCacheMap(void)
     {
       shuffleList.emplace_back((*iter)->mId, (*iter));
     }
-    std::shuffle(shuffleList.begin(), shuffleList.end(), std::default_random_engine(std::chrono::system_clock::now().time_since_epoch().count()));
+    std::shuffle(shuffleList.begin(), shuffleList.end(), std::default_random_engine(static_cast<unsigned int>(std::chrono::system_clock::now().time_since_epoch().count())));
 
     // Change the value of container as shuffled order. After then, call ReorderCacheMap().
     int shuffleIndex = 0;

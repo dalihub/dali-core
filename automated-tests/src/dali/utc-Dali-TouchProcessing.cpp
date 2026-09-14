@@ -1179,7 +1179,7 @@ int UtcDaliTouchEventMultipleRenderTasks(void)
   scene.Add(actor);
 
   // Create render task
-  Viewport   viewport(sceneSize.width * 0.5f, sceneSize.height * 0.5f, sceneSize.width * 0.5f, sceneSize.height * 0.5f);
+  Viewport   viewport(static_cast<int>(sceneSize.width * 0.5f), static_cast<int>(sceneSize.height * 0.5f), static_cast<int>(sceneSize.width * 0.5f), static_cast<int>(sceneSize.height * 0.5f));
   RenderTask renderTask(application.GetScene().GetRenderTaskList().CreateTask());
   renderTask.SetViewport(viewport);
   renderTask.SetInputEnabled(true);
@@ -1228,7 +1228,7 @@ int UtcDaliTouchEventMultipleRenderTasksWithChildLayer(void)
   actor.Add(layer);
 
   // Create render task
-  Viewport   viewport(sceneSize.width * 0.5f, sceneSize.height * 0.5f, sceneSize.width * 0.5f, sceneSize.height * 0.5f);
+  Viewport   viewport(static_cast<int>(sceneSize.width * 0.5f), static_cast<int>(sceneSize.height * 0.5f), static_cast<int>(sceneSize.width * 0.5f), static_cast<int>(sceneSize.height * 0.5f));
   RenderTask renderTask(application.GetScene().GetRenderTaskList().CreateTask());
   renderTask.SetViewport(viewport);
   renderTask.SetInputEnabled(true);
@@ -1269,7 +1269,7 @@ int UtcDaliTouchEventOffscreenRenderTasks(void)
   Vector2                  sceneSize(scene.GetSize());
 
   // FrameBufferImage for offscreen RenderTask
-  FrameBuffer frameBuffer = FrameBuffer::New(sceneSize.width, sceneSize.height);
+  FrameBuffer frameBuffer = FrameBuffer::New(static_cast<uint32_t>(sceneSize.width), static_cast<uint32_t>(sceneSize.height));
 
   // Create a renderable actor to display the FrameBufferImage
   Actor renderableActor = CreateRenderableActor(frameBuffer.GetColorTexture());
@@ -2415,7 +2415,7 @@ int UtcDaliTouchAreaOffset(void)
   data.Reset();
 
   // set a bigger touch area
-  actor.SetProperty(Actor::Property::TOUCH_HIT_AREA_MARGIN, Extents(70, 70, 70, 70)); // left, right, top, bottom
+  actor.SetProperty(Actor::Property::TOUCH_HIT_AREA_MARGIN, Insets(70.0f, 70.0f, 70.0f, 70.0f)); // left, right, top, bottom
 
   // Render and notify
   application.SendNotification();
@@ -2430,7 +2430,7 @@ int UtcDaliTouchAreaOffset(void)
   data.Reset();
 
   // set a offset touch area
-  actor.SetProperty(Actor::Property::TOUCH_HIT_AREA_MARGIN, Extents(-50, 100, 0, -50)); // left, right, top, bottom
+  actor.SetProperty(Actor::Property::TOUCH_HIT_AREA_MARGIN, Insets(-50.0f, 100.0f, 0.0f, -50.0f)); // left, right, top, bottom
 
   // Render and notify
   application.SendNotification();
@@ -2445,7 +2445,7 @@ int UtcDaliTouchAreaOffset(void)
   data.Reset();
 
   // set a smaller touch area
-  actor.SetProperty(Actor::Property::TOUCH_HIT_AREA_MARGIN, Extents(-50, 0, -50, 0)); // left, right, top, bottom
+  actor.SetProperty(Actor::Property::TOUCH_HIT_AREA_MARGIN, Insets(-50.0f, 0.0f, -50.0f, 0.0f)); // left, right, top, bottom
 
   // Render and notify
   application.SendNotification();

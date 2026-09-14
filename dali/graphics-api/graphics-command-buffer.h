@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include "graphics-types.h"
 
-namespace Dali::Graphics
+namespace DALI_NAMESPACE::Graphics
 {
 class Buffer;
 class Pipeline;
@@ -500,13 +500,13 @@ public:
    * @param[in] dstAlphaBlendFactor Destination alpha blend factor
    * @param[in] alphaBlendOp Alpha blend operation
    */
-  virtual void SetColorBlendEquation(uint32_t attachment,
+  virtual void SetColorBlendEquation(uint32_t    attachment,
                                      BlendFactor srcColorBlendFactor,
                                      BlendFactor dstColorBlendFactor,
-                                     BlendOp colorBlendOp,
+                                     BlendOp     colorBlendOp,
                                      BlendFactor srcAlphaBlendFactor,
                                      BlendFactor dstAlphaBlendFactor,
-                                     BlendOp alphaBlendOp) = 0;
+                                     BlendOp     alphaBlendOp) = 0;
 
   /**
    * @brief Sets advanced color blend equation
@@ -520,12 +520,12 @@ public:
   virtual void SetColorBlendAdvanced(uint32_t attachment,
                                      bool     srcPremultiplied,
                                      bool     dstPremultiplied,
-                                     BlendOp      blendOp) = 0;
+                                     BlendOp  blendOp) = 0;
 
 protected:
   CommandBuffer(CommandBuffer&&)            = default;
   CommandBuffer& operator=(CommandBuffer&&) = default;
 };
-} // namespace Dali::Graphics
+} //namespace DALI_NAMESPACE::Graphics
 
 #endif

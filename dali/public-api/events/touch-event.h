@@ -31,7 +31,7 @@
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/render-tasks/render-task.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal DALI_INTERNAL
 {
@@ -361,6 +361,6 @@ public: // Not intended for application developers
 /**
  * @}
  */
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOUCH_EVENT_H

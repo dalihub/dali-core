@@ -24,7 +24,7 @@
 #include <dali/public-api/images/pixel-data.h>
 #include <dali/public-api/object/base-object.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -203,6 +203,6 @@ inline const Internal::PixelData& GetImplementation(const Dali::PixelData& handl
   return static_cast<const Internal::PixelData&>(object);
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // __DALI_INTERNAL_PIXEL_DATA_H__

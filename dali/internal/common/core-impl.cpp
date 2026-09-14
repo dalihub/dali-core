@@ -74,7 +74,7 @@ Debug::Filter* gCoreFilter = Debug::Filter::New(Debug::Concise, false, "LOG_CORE
 #endif
 } // namespace
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -1019,4 +1019,4 @@ uint32_t* Core::ReserveMessageSlot(uint32_t size, bool updateScene)
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

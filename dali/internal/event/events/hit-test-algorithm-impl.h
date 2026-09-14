@@ -24,7 +24,7 @@
 #include <dali/internal/event/render-tasks/render-task-impl.h>
 #include <dali/public-api/actors/actor.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -204,6 +204,6 @@ bool HitTest(const Vector2& sceneSize, RenderTaskList& renderTaskList, LayerList
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_HIT_TEST_ALGORITHM_H

@@ -26,7 +26,7 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/dali-vector.h>
 
-namespace Dali::Internal
+namespace DALI_NAMESPACE::Internal
 {
 /**
  * OwnerKeyContainer is a vector which is responsible for killing memory-pool allocated objects.
@@ -255,6 +255,6 @@ private:
   }
 };
 
-} // namespace Dali::Internal
+} //namespace DALI_NAMESPACE::Internal
 
 #endif // DALI_INTERNAL_OWNER_KEY_CONTAINER_H

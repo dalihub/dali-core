@@ -24,7 +24,7 @@
 
 using Dali::Integration::ToDaliString;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 Shader Shader::New(Dali::StringView vertexShader,
                    Dali::StringView fragmentShader,
@@ -83,4 +83,4 @@ Dali::String Shader::GetFragmentShaderPrefix()
   return ToDaliString(Dali::Internal::Shader::GetFragmentShaderPrefix());
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

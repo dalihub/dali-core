@@ -50,7 +50,7 @@ constexpr float GetEpsilon(const float targetScale)
 }
 } // namespace
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -127,7 +127,7 @@ bool RayTest::SphereTest(const Internal::Actor& actor, const Vector4& rayOrigin,
   const Vector3& translation        = node.GetWorldPosition();
   const Vector3& size               = node.GetSize();
   const Vector3& scale              = node.GetWorldScale();
-  const Extents& touchHitAreaMargin = actor.GetTouchHitAreaMargin();
+  const Insets&  touchHitAreaMargin = actor.GetTouchHitAreaMargin();
 
   // Transforms the ray to the local reference system. As the test is against a sphere, only the translation and scale are needed.
   const Vector3 rayOriginLocal(rayOrigin.x - translation.x - (touchHitAreaMargin.end - touchHitAreaMargin.start) * 0.5f, rayOrigin.y - translation.y - (touchHitAreaMargin.bottom - touchHitAreaMargin.top) * 0.5f, rayOrigin.z - translation.z);
@@ -175,7 +175,7 @@ bool RayTest::ActorTest(const Internal::Actor& actor, const Vector4& rayOrigin, 
       distance = a / b;
 
       const Vector2& size               = Vector2(node.GetSize());
-      const Extents& touchHitAreaMargin = actor.GetTouchHitAreaMargin();
+      const Insets&  touchHitAreaMargin = actor.GetTouchHitAreaMargin();
       hitPointLocal.x                   = rayOriginLocal.x + rayDirLocal.x * distance + size.x * 0.5f;
       hitPointLocal.y                   = rayOriginLocal.y + rayDirLocal.y * distance + size.y * 0.5f;
 
@@ -270,4 +270,4 @@ bool RayTest::ActorBoundingBoxTest(const Internal::Actor& actor, const Vector4& 
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

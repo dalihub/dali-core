@@ -45,7 +45,7 @@ const uint32_t ROW2_OFFSET(8);
 const uint32_t ROW3_OFFSET(12);
 } // namespace
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 using Internal::PerformanceMonitor;
 
@@ -632,4 +632,4 @@ void Matrix::GetTransformComponents(Vector3&    position,
   }
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

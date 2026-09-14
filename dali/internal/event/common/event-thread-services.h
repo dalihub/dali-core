@@ -19,10 +19,11 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/dali-namespace.h>
 #include <cstddef>
 #include <cstdint>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 class BaseObject;
 
@@ -121,6 +122,6 @@ public:
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_EVENT_THREAD_SERVICES_H

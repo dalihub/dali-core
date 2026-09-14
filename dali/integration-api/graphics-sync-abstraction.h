@@ -20,7 +20,7 @@
 
 #include <dali/public-api/common/dali-common.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Integration
 {
@@ -98,6 +98,6 @@ public:
 };
 
 } // namespace Integration
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTEGRATION_GRAPHICS_SYNC_ABSTRACTION_H

@@ -26,7 +26,7 @@
 #include <dali/integration-api/open-hash-map.h>
 #include <dali/public-api/common/dali-common.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Integration
 {
@@ -344,7 +344,8 @@ private:
 
   void ReleaseCacheMap()
   {
-    mMap.ForEach([](const T* const&, Iterator*& iterator) { delete iterator; });
+    mMap.ForEach([](const T* const&, Iterator*& iterator)
+    { delete iterator; });
     mMap.Release();
   }
 
@@ -353,6 +354,6 @@ private:
   ListContainer mList{}; ///< Ordered by PushBack API called. Actual ownership will be stored here.
 };
 } // namespace Integration
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTEGRATION_ORDERED_SET_H

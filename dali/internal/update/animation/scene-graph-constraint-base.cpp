@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -100,4 +100,4 @@ uint32_t ConstraintBase::GetTotalInstanceCount()
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

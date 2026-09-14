@@ -24,7 +24,7 @@
 #include <dali/internal/event/rendering/texture-impl.h>      // Dali::Internal::Texture
 #include <dali/public-api/common/type-traits.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace
 {
@@ -96,4 +96,4 @@ Texture FrameBuffer::GetColorTexture()
   return Dali::Texture(texturePtr);
 }
 
-} //namespace Dali
+} //namespace DALI_NAMESPACE

@@ -22,7 +22,7 @@
 #include <dali/integration-api/string-utils.h>
 #include <dali/internal/event/rendering/texture-impl.h>
 
-namespace Dali::Integration
+namespace DALI_NAMESPACE::Integration
 {
 Dali::Texture NewTextureWithResourceId(Dali::TextureType::Type type, uint32_t resourceId)
 {
@@ -64,4 +64,4 @@ bool TextureUploadWithContent(Dali::Texture texture, Dali::PixelData pixelData, 
   }
 }
 
-} // namespace Dali::Integration
+} //namespace DALI_NAMESPACE::Integration

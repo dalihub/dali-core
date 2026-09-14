@@ -26,7 +26,7 @@
 #include <optional>
 #include <string>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 #ifdef DEBUG_ENABLED
 
@@ -65,7 +65,7 @@ namespace Log
 namespace
 {
 constexpr const char* DISABLE_LOG_ENVIRONMENT_VARIABLE = "DALI_LOG_DISABLE";
-void FormatPrintToStandardOutput(DebugPriority priority, const char* format, va_list args)
+void                  FormatPrintToStandardOutput(DebugPriority priority, const char* format, va_list args)
 {
   static const bool logDisabled = IsLogDisabled();
 
@@ -445,4 +445,4 @@ ScopeTracer::~ScopeTracer()
 
 } // namespace Integration
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

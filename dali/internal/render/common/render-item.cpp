@@ -31,7 +31,7 @@ Dali::Internal::SceneGraph::MemoryPoolCollection*                               
 static constexpr Dali::Internal::SceneGraph::MemoryPoolCollection::MemoryPoolType gMemoryPoolType       = Dali::Internal::SceneGraph::MemoryPoolCollection::MemoryPoolType::RENDER_ITEM;
 } // namespace
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -243,4 +243,4 @@ bool RenderItem::UsesStencilBuffer() const
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

@@ -22,7 +22,7 @@
 #include <dali/internal/event/actors/custom-actor-internal.h>
 #include <dali/public-api/actors/custom-actor-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 void SizeNegotiatedActor::RelayoutRequest()
 {
@@ -93,4 +93,4 @@ bool SizeNegotiatedActor::RelayoutDependentOnChildrenBase(Dimension::Type dimens
   return false;
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

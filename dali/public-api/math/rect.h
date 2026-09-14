@@ -22,7 +22,7 @@
 #include <dali/public-api/common/dali-utility.h> ///< Dali::Min , Dali::Max
 #include <dali/public-api/math/math-utils.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @addtogroup dali_core_math
@@ -74,10 +74,10 @@ struct Rect
    * @param[in] vec4 Vector4 to convert from
    */
   Rect(const Vector4& vec4)
-  : x(vec4.x),
-    y(vec4.y),
-    width(vec4.z),
-    height(vec4.w)
+  : x(static_cast<T>(vec4.x)),
+    y(static_cast<T>(vec4.y)),
+    width(static_cast<T>(vec4.z)),
+    height(static_cast<T>(vec4.w))
   {
   }
 
@@ -401,6 +401,6 @@ inline bool Rect<float>::IsEmpty() const
 /**
  * @}
  */
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_RECT_H

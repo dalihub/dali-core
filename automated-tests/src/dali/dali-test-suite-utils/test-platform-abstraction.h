@@ -32,7 +32,7 @@
 
 #include "test-trace-call-stack.h"
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * Concrete implementation of the platform abstraction class.
@@ -93,6 +93,6 @@ private:
   std::vector<std::pair<uint32_t, std::unique_ptr<CallbackBase>>> mTimerPairsWaiting;
 };
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif /* DALI_TEST_PLATFORM_ABSTRACTION_H */

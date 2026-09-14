@@ -17,7 +17,7 @@
 
 #include "addon-manager.h"
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Integration
 {
@@ -35,4 +35,4 @@ AddOnManager* AddOnManager::Get()
   return mSingleton;
 }
 } // namespace Integration
-} // namespace Dali
+} //namespace DALI_NAMESPACE

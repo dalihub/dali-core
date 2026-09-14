@@ -2,7 +2,7 @@
 #define DALI_FRAME_BUFFER_DEVEL_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/rendering/frame-buffer.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace DevelFrameBuffer
 {
@@ -153,6 +153,6 @@ DALI_CORE_API FrameBuffer::Attachment::Mask GetMask(FrameBuffer frameBuffer);
 
 } // namespace DevelFrameBuffer
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_FRAME_BUFFER_DEVEL_H

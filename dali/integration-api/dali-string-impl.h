@@ -22,7 +22,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-string.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -93,4 +93,4 @@ private:
 };
 
 } // namespace Internal
-} // namespace Dali
+} //namespace DALI_NAMESPACE

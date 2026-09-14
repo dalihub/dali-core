@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/event/rendering/shader-impl.h>
 
-namespace Dali::Integration
+namespace DALI_NAMESPACE::Integration
 {
 Dali::Shader ShaderNewWithUniformBlock(Dali::StringView vertexShader, Dali::StringView fragmentShader, Shader::Hint::Value hints, Dali::StringView shaderName, std::vector<Dali::UniformBlock> uniformBlocks, bool strongConnection)
 {
@@ -39,4 +39,4 @@ std::string GenerateTaggedShaderPrefix(const std::string& shaderPrefix)
 {
   return Dali::Internal::Shader::GenerateTaggedShaderPrefix(shaderPrefix);
 }
-} // namespace Dali::Integration
+} //namespace DALI_NAMESPACE::Integration

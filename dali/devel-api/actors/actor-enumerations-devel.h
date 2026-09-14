@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @brief Enumeration for layout Dimensions.
@@ -123,6 +123,6 @@ enum Type
 
 } // namespace VerticalAlignment
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_ACTOR_ENUMERATIONS_DEVEL_H

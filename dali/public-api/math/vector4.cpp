@@ -28,7 +28,7 @@
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector3.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 using Internal::PerformanceMonitor;
 
@@ -211,4 +211,4 @@ Vector4 Clamp(const Vector4& v, const float& min, const float& max)
   return result;
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

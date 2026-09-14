@@ -29,7 +29,7 @@
 #include <dali/public-api/rendering/shader.h>            // Dali::Shader
 #include <dali/public-api/rendering/uniform-block.h>     // Dali::UniformBlock
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -224,6 +224,6 @@ inline const Internal::Shader& GetImplementation(const Dali::Shader& handle)
   return static_cast<const Internal::Shader&>(object);
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_SHADER_H

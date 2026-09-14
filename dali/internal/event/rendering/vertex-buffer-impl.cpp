@@ -23,7 +23,7 @@
 #include <dali/internal/update/manager/update-manager.h>
 #include <dali/public-api/rendering/vertex-buffer.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -387,4 +387,4 @@ uint32_t GetPropertyImplementationSize(Property::Type& propertyType)
 }
 
 } // namespace Internal
-} // namespace Dali
+} //namespace DALI_NAMESPACE

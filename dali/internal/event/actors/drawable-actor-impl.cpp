@@ -19,7 +19,7 @@
 #include <dali/internal/event/rendering/renderer-impl.h>
 #include <dali/internal/update/nodes/node.h>
 
-namespace Dali::Internal
+namespace DALI_NAMESPACE::Internal
 {
 DrawableActorPtr DrawableActor::New(RenderCallback* renderCallback)
 {
@@ -39,4 +39,4 @@ DrawableActor::DrawableActor(const Internal::SceneGraph::Node& node, RenderCallb
   AddRenderer(*rendererImpl.Get());
 }
 
-} // namespace Dali::Internal
+} //namespace DALI_NAMESPACE::Internal

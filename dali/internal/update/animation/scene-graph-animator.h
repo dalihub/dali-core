@@ -37,7 +37,7 @@
 #include <dali/public-api/math/quaternion.h>
 #include <dali/public-api/math/radian.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -1181,6 +1181,6 @@ struct PathRotationFunctor
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_SCENE_GRAPH_ANIMATOR_H

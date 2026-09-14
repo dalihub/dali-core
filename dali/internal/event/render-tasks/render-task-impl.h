@@ -28,7 +28,7 @@
 #include <dali/internal/event/events/actor-observer.h>
 #include <dali/internal/event/rendering/frame-buffer-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -521,6 +521,6 @@ inline const Internal::RenderTask& GetImplementation(const Dali::RenderTask& tas
   return static_cast<const Internal::RenderTask&>(handle);
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_RENDER_TASK_H

@@ -24,7 +24,7 @@
 #include <dali/devel-api/object/type-info.h>
 #include <dali/public-api/common/dali-common.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Integration
 {
@@ -49,6 +49,45 @@ constexpr uint32_t DEFAULT_TAP_GESTURE_MAXIMUM_HOLDING_TIME = 330u;
  * @todo Set this according to DPI
  */
 constexpr float DEFAULT_TAP_GESTURE_MAXIMUM_MOTION_DISTANCE = 20.0f;
+
+/**
+ * @brief The default minimum distance required to start a pan gesture (pixel)
+ */
+constexpr int DEFAULT_PAN_GESTURE_MINIMUM_DISTANCE = 15;
+
+/**
+ * @brief The default minimum number of touch events required to start a pan gesture
+ *
+ * The initial touch-down event is included in this count.
+ */
+constexpr int DEFAULT_PAN_GESTURE_MINIMUM_PAN_EVENTS = 3;
+
+/**
+ * @brief The default minimum distance required to start a pinch gesture
+ *
+ * A negative value means that the distance is calculated automatically from the scene DPI.
+ */
+constexpr float DEFAULT_PINCH_GESTURE_MINIMUM_DISTANCE = -1.0f;
+
+/**
+ * @brief The default minimum number of touch events required before a pinch can be started
+ */
+constexpr uint32_t DEFAULT_PINCH_GESTURE_MINIMUM_TOUCH_EVENTS = 4u;
+
+/**
+ * @brief The default minimum number of touch events required after a pinch has started
+ */
+constexpr uint32_t DEFAULT_PINCH_GESTURE_MINIMUM_TOUCH_EVENTS_AFTER_START = 4u;
+
+/**
+ * @brief The default minimum number of touch events required before a rotation can be started
+ */
+constexpr uint32_t DEFAULT_ROTATION_GESTURE_MINIMUM_TOUCH_EVENTS = 4u;
+
+/**
+ * @brief The default minimum number of touch events required after a rotation has started
+ */
+constexpr uint32_t DEFAULT_ROTATION_GESTURE_MINIMUM_TOUCH_EVENTS_AFTER_START = 4u;
 
 /**
  * @brief Called by adaptor to set the pan gesture prediction mode from
@@ -172,11 +211,25 @@ DALI_CORE_API void SetPanGestureMultitapSmoothingRange(int value);
 DALI_CORE_API void SetPanGestureMinimumDistance(int value);
 
 /**
+ * @brief Retrieves the minimum distance required to start a pan gesture
+ *
+ * @return The distance in pixels
+ */
+DALI_CORE_API int GetPanGestureMinimumDistance();
+
+/**
  * @brief Sets the minimum number of touch events to start a pan
  *
  * @param[in] value Number of pan events
  */
 DALI_CORE_API void SetPanGestureMinimumPanEvents(int value);
+
+/**
+ * @brief Retrieves the minimum number of touch events required to start a pan gesture
+ *
+ * @return The number of touch events, including the initial touch-down event
+ */
+DALI_CORE_API int GetPanGestureMinimumPanEvents();
 
 /**
  * @brief Sets the minimum distance required to start a pinch gesture
@@ -186,11 +239,25 @@ DALI_CORE_API void SetPanGestureMinimumPanEvents(int value);
 DALI_CORE_API void SetPinchGestureMinimumDistance(float value);
 
 /**
+ * @brief Retrieves the minimum distance required to start a pinch gesture
+ *
+ * @return The distance in pixels, or a negative value when it is calculated automatically from the scene DPI
+ */
+DALI_CORE_API float GetPinchGestureMinimumDistance();
+
+/**
  * @brief Sets the minimum touch events required before a pinch can be started
  *
  * @param[in] value The number of touch events
  */
 DALI_CORE_API void SetPinchGestureMinimumTouchEvents(uint32_t value);
+
+/**
+ * @brief Retrieves the minimum touch events required before a pinch can be started
+ *
+ * @return The number of touch events
+ */
+DALI_CORE_API uint32_t GetPinchGestureMinimumTouchEvents();
 
 /**
  * @brief Sets the minimum touch events required after a pinch started
@@ -200,6 +267,13 @@ DALI_CORE_API void SetPinchGestureMinimumTouchEvents(uint32_t value);
 DALI_CORE_API void SetPinchGestureMinimumTouchEventsAfterStart(uint32_t value);
 
 /**
+ * @brief Retrieves the minimum touch events required after a pinch has started
+ *
+ * @return The number of touch events
+ */
+DALI_CORE_API uint32_t GetPinchGestureMinimumTouchEventsAfterStart();
+
+/**
  * @brief Sets the minimum touch events required before a rotation can be started
  *
  * @param[in] value The number of touch events
@@ -207,11 +281,25 @@ DALI_CORE_API void SetPinchGestureMinimumTouchEventsAfterStart(uint32_t value);
 DALI_CORE_API void SetRotationGestureMinimumTouchEvents(uint32_t value);
 
 /**
+ * @brief Retrieves the minimum touch events required before a rotation can be started
+ *
+ * @return The number of touch events
+ */
+DALI_CORE_API uint32_t GetRotationGestureMinimumTouchEvents();
+
+/**
  * @brief Sets the minimum touch events required after a rotation started
  *
  * @param[in] value The number of touch events
  */
 DALI_CORE_API void SetRotationGestureMinimumTouchEventsAfterStart(uint32_t value);
+
+/**
+ * @brief Retrieves the minimum touch events required after a rotation has started
+ *
+ * @return The number of touch events
+ */
+DALI_CORE_API uint32_t GetRotationGestureMinimumTouchEventsAfterStart();
 
 /**
  * @brief Sets the minimum holding time required to be recognized as a long press gesture (millisecond)
@@ -299,6 +387,6 @@ DALI_CORE_API float GetTapGestureMaximumMotionDistance();
 
 } // namespace Integration
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTEGRATION_INPUT_OPTIONS_H

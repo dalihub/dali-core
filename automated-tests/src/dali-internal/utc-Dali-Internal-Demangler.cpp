@@ -19,6 +19,12 @@
 #include <dali/internal/event/common/demangler.h>
 #include <typeinfo>
 
+// The namespace enclosing DALi depends on how it was built, so the expected
+// demangled name is derived from DALI_NAMESPACE rather than hard coded.
+#define UTC_STRINGIFY_(x) #x
+#define UTC_STRINGIFY(x) UTC_STRINGIFY_(x)
+#define UTC_DALI_NAMESPACE_NAME UTC_STRINGIFY(DALI_NAMESPACE)
+
 using namespace Dali;
 using namespace Dali::Internal;
 
@@ -88,7 +94,7 @@ int UtcDaliInternalDemangleTypeInfoNameNamespaced(void)
 
   // Test with a namespaced type (Dali::Actor)
   std::string actorResult = DemangleTypeInfoName(typeid(Dali::Actor).name());
-  DALI_TEST_EQUALS(actorResult, "Dali::Actor", TEST_LOCATION);
+  DALI_TEST_EQUALS(actorResult, UTC_DALI_NAMESPACE_NAME "::Actor", TEST_LOCATION);
 
   // Test with a nested type
   std::string vectorResult = DemangleTypeInfoName(typeid(std::vector<int>).name());

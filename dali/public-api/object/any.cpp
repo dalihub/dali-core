@@ -24,7 +24,7 @@
 // INTERNAL HEADERS
 #include <dali/internal/event/common/demangler.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 Any::Any()
 : mContainer(nullptr)
@@ -128,4 +128,4 @@ void Any::AssertAlways(const char* assertMessage)
   throw Dali::DaliException(assertMessage, "");
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

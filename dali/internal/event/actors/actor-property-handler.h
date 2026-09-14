@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/event/actors/actor-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -74,6 +74,6 @@ struct Actor::PropertyHandler
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_ACTOR_PROPERTY_HANDLER_H

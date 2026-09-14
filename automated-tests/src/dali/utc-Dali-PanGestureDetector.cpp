@@ -1749,31 +1749,31 @@ int UtcDaliPanGestureAngleOutOfRange(void)
   //
 
   detector.AddAngle(Degree(180.0f));
-  DALI_TEST_EQUALS(detector.GetAngle(0).first, Radian(Degree(-180.0f)), 0.000001, TEST_LOCATION);
+  DALI_TEST_EQUALS(detector.GetAngle(0).first, Radian(Degree(-180.0f)), 0.000001f, TEST_LOCATION);
   detector.ClearAngles();
 
   detector.AddAngle(Degree(190.0f));
-  DALI_TEST_EQUALS(detector.GetAngle(0).first, Radian(Degree(-170.0f)), 0.000001, TEST_LOCATION);
+  DALI_TEST_EQUALS(detector.GetAngle(0).first, Radian(Degree(-170.0f)), 0.000001f, TEST_LOCATION);
   detector.ClearAngles();
 
   detector.AddAngle(Degree(-190.0f));
-  DALI_TEST_EQUALS(detector.GetAngle(0).first, Radian(Degree(170.0f)), 0.000001, TEST_LOCATION);
+  DALI_TEST_EQUALS(detector.GetAngle(0).first, Radian(Degree(170.0f)), 0.000001f, TEST_LOCATION);
   detector.ClearAngles();
 
   detector.AddAngle(Degree(350.0f));
-  DALI_TEST_EQUALS(detector.GetAngle(0).first, Radian(Degree(-10.0f)), 0.000001, TEST_LOCATION);
+  DALI_TEST_EQUALS(detector.GetAngle(0).first, Radian(Degree(-10.0f)), 0.000001f, TEST_LOCATION);
   detector.ClearAngles();
 
   detector.AddAngle(Degree(-350.0f));
-  DALI_TEST_EQUALS(detector.GetAngle(0).first, Radian(Degree(10.0f)), 0.000001, TEST_LOCATION);
+  DALI_TEST_EQUALS(detector.GetAngle(0).first, Radian(Degree(10.0f)), 0.000001f, TEST_LOCATION);
   detector.ClearAngles();
 
   detector.AddAngle(Degree(370.0f));
-  DALI_TEST_EQUALS(detector.GetAngle(0).first, Radian(Degree(10.0f)), 0.000001, TEST_LOCATION);
+  DALI_TEST_EQUALS(detector.GetAngle(0).first, Radian(Degree(10.0f)), 0.000001f, TEST_LOCATION);
   detector.ClearAngles();
 
   detector.AddAngle(Degree(-370.0f));
-  DALI_TEST_EQUALS(detector.GetAngle(0).first, Radian(Degree(-10.0f)), 0.000001, TEST_LOCATION);
+  DALI_TEST_EQUALS(detector.GetAngle(0).first, Radian(Degree(-10.0f)), 0.000001f, TEST_LOCATION);
   detector.ClearAngles();
 
   //
@@ -1781,19 +1781,19 @@ int UtcDaliPanGestureAngleOutOfRange(void)
   //
 
   detector.AddAngle(PanGestureDetector::DIRECTION_RIGHT, Degree(0.0f));
-  DALI_TEST_EQUALS(detector.GetAngle(0).second, Radian(Degree(0.0f)), 0.000001, TEST_LOCATION);
+  DALI_TEST_EQUALS(detector.GetAngle(0).second, Radian(Degree(0.0f)), 0.000001f, TEST_LOCATION);
   detector.ClearAngles();
 
   detector.AddAngle(PanGestureDetector::DIRECTION_RIGHT, Degree(-10.0f));
-  DALI_TEST_EQUALS(detector.GetAngle(0).second, Radian(Degree(10.0f)), 0.000001, TEST_LOCATION);
+  DALI_TEST_EQUALS(detector.GetAngle(0).second, Radian(Degree(10.0f)), 0.000001f, TEST_LOCATION);
   detector.ClearAngles();
 
   detector.AddAngle(PanGestureDetector::DIRECTION_RIGHT, Degree(-181.0f));
-  DALI_TEST_EQUALS(detector.GetAngle(0).second, Radian(Degree(180.0f)), 0.000001, TEST_LOCATION);
+  DALI_TEST_EQUALS(detector.GetAngle(0).second, Radian(Degree(180.0f)), 0.000001f, TEST_LOCATION);
   detector.ClearAngles();
 
   detector.AddAngle(PanGestureDetector::DIRECTION_RIGHT, Degree(181.0f));
-  DALI_TEST_EQUALS(detector.GetAngle(0).second, Radian(Degree(180.0f)), 0.000001, TEST_LOCATION);
+  DALI_TEST_EQUALS(detector.GetAngle(0).second, Radian(Degree(180.0f)), 0.000001f, TEST_LOCATION);
   detector.ClearAngles();
   END_TEST;
 }
@@ -2791,7 +2791,7 @@ int UtcDaliPanGestureSetPropertiesAlreadyPanning(void)
   application.Render();
 
   DALI_TEST_EQUALS(constraintData.called, true, TEST_LOCATION);
-  DALI_TEST_EQUALS(constraintData.screenPosition, currentPosition, 0.1, TEST_LOCATION);
+  DALI_TEST_EQUALS(constraintData.screenPosition, currentPosition, 0.1f, TEST_LOCATION);
   DALI_TEST_EQUALS(constraintData.localPosition, currentPosition, 0.1f, TEST_LOCATION);
   constraintData.Reset();
   END_TEST;

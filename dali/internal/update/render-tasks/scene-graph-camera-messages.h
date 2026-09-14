@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_CAMERA_MESSAGES_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@
 #include <dali/internal/update/manager/update-manager.h>
 #include <dali/internal/update/render-tasks/scene-graph-camera.h>
 
-namespace Dali::Internal
+namespace DALI_NAMESPACE::Internal
 {
 // value types used by messages
 template<>
@@ -203,6 +203,6 @@ inline void RotateProjectionMessage(EventThreadServices& eventThreadServices, co
 }
 
 } // namespace SceneGraph
-} // namespace Dali::Internal
+} //namespace DALI_NAMESPACE::Internal
 
 #endif //DALI_INTERNAL_SCENE_GRAPH_CAMERA_MESSAGES_H

@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/object/handle.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace DevelHandle
 {
@@ -37,6 +37,6 @@ DALI_CORE_API void SetTypeInfo(Handle& handle, const TypeInfo& typeInfo);
 
 } // namespace DevelHandle
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_HANDLE_DEVEL_H

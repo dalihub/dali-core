@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/devel-api/scripting/scripting.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * Macros for creating value, typically enumerations, to string tables.
@@ -61,6 +61,6 @@ namespace Dali
  */
 #define DALI_ENUM_CLASS_TO_STRING_WITH_SCOPE(className, enumName) {#enumName, static_cast<int32_t>(className::enumName)},
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_ENUM_HELPER_H

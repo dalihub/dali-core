@@ -33,7 +33,7 @@
 #include <dali/internal/update/manager/scene-graph-traveler.h>
 #include <dali/internal/update/manager/update-proxy-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 class FrameCallbackInterface;
 
@@ -131,6 +131,6 @@ private:
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_SCENE_GRAPH_FRAME_CALLBACK_PROCESSOR_H

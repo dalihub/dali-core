@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/event/events/key-event-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 KeyEvent KeyEvent::New()
 {
@@ -200,4 +200,4 @@ KeyEvent::KeyEvent(Internal::KeyEvent* internal)
 {
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

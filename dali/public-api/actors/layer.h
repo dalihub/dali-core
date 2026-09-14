@@ -26,7 +26,7 @@
 #include <dali/public-api/math/vector3.h>
 #include <dali/public-api/object/ref-object.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @addtogroup dali_core_actors
@@ -402,6 +402,6 @@ public: // Not intended for application developers
 /**
  * @}
  */
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_LAYER_H

@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_UNIFORM_BUFFER_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@
 // EXTERNAL INCLUDES
 #include <memory>
 
-namespace Dali::Internal::Render
+namespace DALI_NAMESPACE::Internal::Render
 {
 /**
  * Class UniformBuffer
@@ -117,5 +117,5 @@ private:
   uint32_t               mCurrentGraphicsBufferIndex{0u};
   bool                   mEmulated{false};
 };
-} // namespace Dali::Internal::Render
+} //namespace DALI_NAMESPACE::Internal::Render
 #endif //DALI_INTERNAL_UNIFORM_BUFFER_H

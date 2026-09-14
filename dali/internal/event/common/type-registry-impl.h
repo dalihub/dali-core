@@ -28,7 +28,7 @@
 #include <dali/public-api/object/base-object.h>
 #include <vector>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -359,6 +359,6 @@ inline const Internal::TypeRegistry& GetImplementation(const Dali::TypeRegistry&
   return static_cast<const Internal::TypeRegistry&>(handle);
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_TYPE_REGISTRY_H

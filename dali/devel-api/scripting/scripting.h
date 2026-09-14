@@ -25,7 +25,7 @@
 #include <dali/public-api/object/property-map.h>
 #include <dali/public-api/object/property-value.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 class Actor;
 
@@ -289,6 +289,6 @@ DALI_CORE_API void NewAnimation(const Property::Map& map, Dali::AnimationData& o
 
 } // namespace Scripting
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_SCRIPTING_H

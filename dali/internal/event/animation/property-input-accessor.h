@@ -22,7 +22,7 @@
 #include <dali/internal/event/common/property-input-impl.h>
 #include <dali/public-api/object/property-types.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -217,6 +217,6 @@ public:
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_PROPERTY_INPUT_ACCESSOR_H

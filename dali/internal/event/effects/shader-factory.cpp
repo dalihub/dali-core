@@ -34,7 +34,7 @@ namespace
 constexpr uint32_t MAXIMUM_STRING_SHADER_DATA_CACHE_CLEAN_THRESHOLD = 128u;
 } // namespace
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -152,4 +152,4 @@ void ShaderFactory::ResetStringShaderData()
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

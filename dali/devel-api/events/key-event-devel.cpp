@@ -19,7 +19,7 @@
 #include <dali/devel-api/events/key-event-devel.h>
 #include <dali/internal/event/events/key-event-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace DevelKeyEvent
 {
@@ -52,4 +52,4 @@ void SetInterceptProcessed(KeyEvent keyEvent, bool interceptProcessed)
 
 } // namespace DevelKeyEvent
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

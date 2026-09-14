@@ -20,7 +20,7 @@
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/object/any.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 
 /**
@@ -60,6 +60,6 @@ using InvokeArguments = Dali::Vector<Dali::Any>;
  */
 using InvokeResult = Dali::Any;
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INVOKE_METHOD_H

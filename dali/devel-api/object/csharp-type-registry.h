@@ -26,7 +26,7 @@
 #include <dali/devel-api/object/csharp-type-info.h>
 #include <dali/devel-api/object/type-registry.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * Custom static functions for registering C# custom controls and properties
@@ -66,6 +66,6 @@ DALI_CORE_API bool RegisterProperty(const std::string&                  objectNa
                                     CSharpTypeInfo::GetPropertyFunction getFunc);
 } // namespace CSharpTypeRegistry
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_CSHARP_TYPE_REGISTRY_H

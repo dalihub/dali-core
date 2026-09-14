@@ -30,7 +30,7 @@
 #include <dali/internal/event/events/actor-observer.h>
 #include <dali/internal/event/render-tasks/render-task-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -267,6 +267,6 @@ inline const Internal::RenderTaskList& GetImplementation(const Dali::RenderTaskL
   return static_cast<const Internal::RenderTaskList&>(handle);
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_RENDER_TASK_LIST_H

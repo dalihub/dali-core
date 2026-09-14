@@ -28,7 +28,7 @@
 #include <unordered_set>
 #include <vector>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Integration
 {
@@ -99,6 +99,6 @@ private:
 };
 
 } // namespace Internal
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_GEOMETRY_TOUCH_STREAM_ROUTER_H

@@ -51,7 +51,7 @@
 /* OpenGL ES 3.0 */
 struct __GLsync;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * These types are equivalent to those in the GLES2 API.
@@ -438,6 +438,6 @@ public:
 
 } // namespace Integration
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTEGRATION_GL_ABSTRACTION_H

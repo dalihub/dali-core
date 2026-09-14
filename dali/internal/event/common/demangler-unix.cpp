@@ -22,6 +22,7 @@
 
 // FILE HEADER
 #include <dali/internal/event/common/demangler.h>
+#include <dali/public-api/common/dali-namespace.h>
 
 namespace
 {
@@ -86,7 +87,7 @@ std::string_view ExtractDemangleNestedName(std::string_view mangledName)
 
 } // namespace
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -124,4 +125,4 @@ std::string DemangleTypeInfoName(const char* typeIdName)
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

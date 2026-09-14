@@ -27,7 +27,7 @@
 #include <dali/public-api/object/handle.h>
 #include <stdio.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 PropertyNotification::PropertyNotification() = default;
 
@@ -91,4 +91,4 @@ PropertyNotifySignalType& PropertyNotification::NotifySignal()
   return GetImplementation(*this).NotifySignal();
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

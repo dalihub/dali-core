@@ -24,7 +24,7 @@
 #include <dali/internal/update/common/property-resetter.h>
 #include <dali/internal/update/manager/update-manager.h>
 
-namespace Dali::Internal
+namespace DALI_NAMESPACE::Internal
 {
 
 /**
@@ -207,6 +207,6 @@ void SetWComponentMessage(EventThreadServices&                       eventThread
                       newValue);
 }
 
-} // namespace Dali::Internal
+} //namespace DALI_NAMESPACE::Internal
 
 #endif // DALI_INTERNAL_COMMON_ANIMATABLE_PROPERTY_MESSAGES_H

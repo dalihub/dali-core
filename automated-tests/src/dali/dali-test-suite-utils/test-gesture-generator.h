@@ -2,7 +2,7 @@
 #define DALI_TEST_GESTURE_GENERATOR_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
 
 #include "test-application.h"
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * These functions use touch events to trigger a gesture, assuming the default gesture parameters are used
@@ -143,6 +143,6 @@ void TestContinueRotation(TestApplication& application, Vector2 a1, Vector2 b1, 
  */
 void TestEndRotation(TestApplication& application, Vector2 a1, Vector2 b1, Vector2 a2, Vector2 b2, uint32_t time);
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TEST_GESTURE_GENERATOR_H

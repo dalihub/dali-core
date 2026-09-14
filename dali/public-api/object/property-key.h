@@ -27,7 +27,7 @@
 #include <dali/public-api/common/dali-string.h>
 #include <dali/public-api/object/property.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @addtogroup dali_core_object
@@ -161,6 +161,6 @@ struct DALI_CORE_API Property::Key
 /**
  * @}
  */
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_PROPERTY_KEY_H

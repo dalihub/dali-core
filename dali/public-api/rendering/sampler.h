@@ -22,7 +22,7 @@
 #include <dali/public-api/object/handle.h> // Dali::Handle
 #include <dali/public-api/rendering/sampling.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @addtogroup dali_core_rendering_effects
@@ -150,6 +150,6 @@ public:
 /**
  * @}
  */
-} //namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_SAMPLER_H

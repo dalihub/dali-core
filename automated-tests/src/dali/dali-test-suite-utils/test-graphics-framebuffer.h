@@ -23,7 +23,7 @@
 #include "test-gl-abstraction.h"
 #include "test-trace-call-stack.h"
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 class TestGraphicsFramebuffer : public Graphics::Framebuffer
 {
@@ -56,6 +56,6 @@ public:
   GLenum mAttachedInternalFormat;
 };
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif //TEST_GRAPHICS_FRAMEBUFFER_H

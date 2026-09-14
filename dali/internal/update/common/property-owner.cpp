@@ -27,7 +27,7 @@
 #include <dali/internal/update/common/property-owner-flag-manager.h>
 #include <dali/public-api/common/dali-common.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -262,4 +262,4 @@ const UniformMap& PropertyOwner::GetUniformMap() const
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

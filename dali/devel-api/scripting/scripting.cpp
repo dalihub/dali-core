@@ -29,7 +29,7 @@
 using Dali::Integration::ToStdString;
 using Dali::Integration::ToStdStringView;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Scripting
 {
@@ -326,4 +326,4 @@ void NewAnimation(const Property::Map& map, Dali::AnimationData& outputAnimation
 
 } // namespace Scripting
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

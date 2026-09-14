@@ -19,7 +19,7 @@
 
 #include <dali/integration-api/addon-manager.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace AddOn
 {
@@ -184,6 +184,6 @@ protected:
   std::function<FUNCTYPE> FUNCNAME{ConvertFunction<FUNCTYPE>(std::string(#FUNCNAME))};
 
 } // namespace AddOn
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_ADDON_BINDER_H

@@ -16,10 +16,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/common/dali-utility.h>
+#include <dali/public-api/common/dali-vector.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * Class to provide a circular growable queue on top of Dali::Vector
@@ -239,6 +239,6 @@ private:
   uint32_t mNumberOfElements{0u}; ///< Number of valid elements in the queue
 };
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif //  DALI_CIRCULAR_QUEUE_H

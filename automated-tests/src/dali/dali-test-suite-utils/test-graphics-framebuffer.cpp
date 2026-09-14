@@ -73,7 +73,7 @@ struct DEPTH_STENCIL_ATTACHMENT_TYPE
 } // namespace
 //namespace
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 TestGraphicsFramebuffer::TestGraphicsFramebuffer(
   TraceCallStack&                        callStack,
@@ -122,7 +122,7 @@ void TestGraphicsFramebuffer::Initialize()
   {
     AttachTexture(attachment.texture, COLOR_ATTACHMENTS[attachment.attachmentId], attachment.layerId, attachment.levelId);
   }
-  mGl.DrawBuffers(mCreateInfo.colorAttachments.size(), COLOR_ATTACHMENTS);
+  mGl.DrawBuffers(static_cast<Dali::GLsizei>(mCreateInfo.colorAttachments.size()), COLOR_ATTACHMENTS);
 
   if(mCreateInfo.depthStencilAttachment.stencilTexture)
   {
@@ -252,4 +252,4 @@ void TestGraphicsFramebuffer::PrepareRenderBuffer()
   }
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

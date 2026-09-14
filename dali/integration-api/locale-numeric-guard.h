@@ -19,11 +19,12 @@
 #define DALI_INTEGRATION_API_LOCALE_NUMERIC_GUARD_H
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/dali-namespace.h>
 #include <clocale> ///< for setlocale
 #include <cstdlib> ///< for free
 #include <cstring> ///< for strdup
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 
 /**
@@ -54,7 +55,11 @@ public:
     mPreviousLocale = setlocale(LC_NUMERIC, nullptr);
     if(mPreviousLocale)
     {
-      mPreviousLocale = strdup(mPreviousLocale);
+#if defined(_MSC_VER)
+    mPreviousLocale = _strdup(mPreviousLocale);
+#else
+    mPreviousLocale = strdup(mPreviousLocale);
+#endif
     }
     // Set LC_NUMERIC to "C" for locale-independent numeric formatting
     setlocale(LC_NUMERIC, "C");
@@ -80,6 +85,6 @@ private:
   char* mPreviousLocale;
 };
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTEGRATION_API_LOCALE_NUMERIC_GUARD_H

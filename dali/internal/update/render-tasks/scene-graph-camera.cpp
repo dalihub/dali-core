@@ -42,7 +42,7 @@ const uint32_t COPY_PREVIOUS_MATRIX = 1u; // Copy view or projection matrix from
 // For reflection and clipping plane
 } // namespace
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -933,4 +933,4 @@ uint32_t Camera::UpdateProjection()
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

@@ -27,7 +27,7 @@
 #include <dali/integration-api/string-utils.h>
 #include <dali/internal/event/common/object-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 BaseHandle::BaseHandle(Dali::BaseObject* handle)
 : mObjectHandle(handle)
@@ -106,4 +106,4 @@ bool BaseHandle::DoConnectSignal(ConnectionTrackerInterface* connectionTracker, 
   return GetImplementation(*this).DoConnectSignal(connectionTracker, signalName, functorDelegate);
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

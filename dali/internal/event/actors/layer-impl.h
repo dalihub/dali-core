@@ -24,7 +24,7 @@
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/math/rect.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -263,6 +263,6 @@ inline const Internal::Layer& GetImplementation(const Dali::Layer& layer)
   return static_cast<const Internal::Layer&>(handle);
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_LAYER_H

@@ -22,7 +22,7 @@
 #include <dali/devel-api/object/type-registry.h>
 #include <dali/internal/event/actors/custom-actor-internal.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace
 {
@@ -91,4 +91,4 @@ CustomActor::CustomActor(Internal::CustomActor* internal)
   }
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

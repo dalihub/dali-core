@@ -2,7 +2,7 @@
 #define DALI_GRAPHICS_API_BUFFER_CREATE_INFO
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@
 #include "graphics-buffer.h"
 #include "graphics-types.h"
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Graphics
 {
@@ -116,6 +116,6 @@ struct BufferCreateInfo
 };
 
 } // namespace Graphics
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif

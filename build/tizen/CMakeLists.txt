@@ -38,6 +38,7 @@ OPTION(ENABLE_PKG_CONFIGURE  "Use pkgconfig" ON)
 OPTION(ENABLE_LINK_TEST      "Enable the link test" ON)
 OPTION(ENABLE_LOW_SPEC_MEMORY_MANAGEMENT "Enable Memory management for low spec devices" OFF)
 OPTION(ENABLE_GPU_MEMORY_PROFILE "Enable GPU memory profiling" OFF)
+OPTION(ENABLE_TIZEN_NAMESPACE "Publish DALi under the Tizen top level namespace" OFF)
 
 IF( WIN32 ) # WIN32 includes x64 as well according to the cmake doc.
   IF(STATIC)
@@ -225,6 +226,26 @@ ELSEIF( UNIX )
   INCLUDE( ${ROOT_SRC_DIR}/dali/internal/file-unix.list )
 ENDIF()
 INCLUDE( ${ROOT_SRC_DIR}/doc/file.list )
+
+# Generate the header that names the top level namespace. When
+# ENABLE_TIZEN_NAMESPACE is on, DALi is published as Tizen::Dali. The value is
+# baked into the installed header so that an application cannot disagree with
+# the library it links against.
+#
+# The header is generated next to its template in the source tree, not in the
+# build directory, so that editors and other source based tooling resolve it
+# without knowing the build layout. It is generated, so it is in .gitignore.
+# Two build trees configured with different values share this one file: the
+# last CMake configure wins, so reconfigure before building the other one.
+IF( ENABLE_TIZEN_NAMESPACE )
+  SET( DALI_TIZEN_NAMESPACE_VALUE 1 )
+ELSE()
+  SET( DALI_TIZEN_NAMESPACE_VALUE 0 )
+ENDIF()
+CONFIGURE_FILE(
+  ${public_api_namespace_header_template}
+  ${public_api_namespace_header}
+  @ONLY )
 
 OPTION(ENABLE_INVOKE_METHOD_WRAPPERS "Generate InvokeMethod wrappers for exported public API handle methods" ON)
 
@@ -478,6 +499,7 @@ MESSAGE( STATUS "Backtrace:             " ${ENABLE_BACKTRACE} )
 MESSAGE( STATUS "Scoped Lock backtrace: " ${ENABLE_LOCK_BACKTRACE} )
 MESSAGE( STATUS "Coverage:              " ${ENABLE_COVERAGE} )
 MESSAGE( STATUS "Trace:                 " ${ENABLE_TRACE} )
+MESSAGE( STATUS "Tizen namespace:       " ${ENABLE_TIZEN_NAMESPACE} )
 MESSAGE( STATUS "Use pkg configure:     " ${ENABLE_PKG_CONFIGURE} )
 MESSAGE( STATUS "Enable link test:      " ${ENABLE_LINK_TEST} )
 MESSAGE( STATUS "Memory Management:     " ${ENABLE_LOW_SPEC_MEMORY_MANAGEMENT} )

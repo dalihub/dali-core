@@ -27,7 +27,7 @@
 using Dali::Integration::ToDaliString;
 using Dali::Integration::ToStdString;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 class TestNativeImage;
 typedef IntrusivePtr<TestNativeImage> TestNativeImagePointer;
@@ -168,6 +168,6 @@ public:
   mutable TraceCallStack mCallStack;
 };
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // TEST_NATIVE_IMAGE_H

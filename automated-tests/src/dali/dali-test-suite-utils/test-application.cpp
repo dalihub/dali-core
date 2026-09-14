@@ -18,7 +18,7 @@
 #include "test-application.h"
 #include "dali-test-suite-utils.h"
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 const BoundsInteger TestApplication::DEFAULT_SURFACE_RECT = BoundsInteger(0, 0, TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT);
 
@@ -363,4 +363,4 @@ void TestApplication::RemoveScene(Dali::Integration::Scene scene)
   mScenes.erase(std::remove(mScenes.begin(), mScenes.end(), scene), mScenes.end());
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

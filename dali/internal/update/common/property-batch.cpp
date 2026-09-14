@@ -21,7 +21,7 @@
 #include <dali/internal/event/common/object-impl.h>
 #include <dali/internal/update/common/property-batch-free-list.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -301,4 +301,4 @@ void FlushAllPropertyBatches()
 }
 
 } // namespace Internal
-} // namespace Dali
+} //namespace DALI_NAMESPACE

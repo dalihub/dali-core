@@ -23,7 +23,7 @@
 #include <dali/devel-api/common/vector-wrapper.h>
 #include <cstddef>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -85,6 +85,6 @@ private:
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_SCENE_GRAPH_RENDER_INSTRUCTION_CONTAINER_H

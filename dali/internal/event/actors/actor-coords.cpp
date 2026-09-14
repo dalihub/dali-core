@@ -22,7 +22,7 @@
 #include <dali/internal/update/nodes/node.h>
 #include <dali/public-api/common/dali-utility.h>
 
-namespace Dali::Internal
+namespace DALI_NAMESPACE::Internal
 {
 namespace
 {
@@ -854,8 +854,8 @@ Vector4 CalculateActorWorldColorMultiplier(const Actor& actor)
     }
     else if(inheritanceModeList[i] == USE_OWN_MULTIPLY_PARENT_ALPHA)
     {
-      Vector4 ownColor = descentList[i].GetProperty<Vector4>(Dali::Actor::Property::COLOR_MULTIPLIER);
-      worldColorMultiplier       = Vector4(ownColor.r, ownColor.g, ownColor.b, ownColor.a * worldColorMultiplier.a);
+      Vector4 ownColor     = descentList[i].GetProperty<Vector4>(Dali::Actor::Property::COLOR_MULTIPLIER);
+      worldColorMultiplier = Vector4(ownColor.r, ownColor.g, ownColor.b, ownColor.a * worldColorMultiplier.a);
     }
     else if(inheritanceModeList[i] == USE_OWN_MULTIPLY_PARENT_COLOR)
     {
@@ -909,4 +909,4 @@ Quaternion CalculateActorLookAtOrientation(const Actor& actor, Vector3 target, V
   return ret;
 }
 
-} // namespace Dali::Internal
+} //namespace DALI_NAMESPACE::Internal

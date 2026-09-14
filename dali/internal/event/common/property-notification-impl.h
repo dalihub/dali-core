@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_PROPERTY_NOTIFICATION_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@
 #include <dali/public-api/object/property-notification.h>
 #include <dali/public-api/object/ref-object.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 class PropertyCondition;
 
@@ -214,6 +214,6 @@ inline const Internal::PropertyNotification& GetImplementation(const Dali::Prope
   return static_cast<const Internal::PropertyNotification&>(handle);
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_PROPERTY_NOTIFICATION_H

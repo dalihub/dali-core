@@ -36,7 +36,7 @@
 #include <string>
 #endif
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -260,6 +260,6 @@ inline const Internal::Texture& GetImplementation(const Dali::Texture& handle)
   return static_cast<const Internal::Texture&>(object);
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_TEXTURE_H

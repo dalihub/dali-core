@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/event/events/wheel-event-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 WheelEvent WheelEvent::New(Type type, int32_t direction, uint32_t modifiers, Vector2 point, int32_t delta, uint32_t timeStamp)
 {
@@ -95,4 +95,4 @@ WheelEvent::WheelEvent(Internal::WheelEvent* internal)
 {
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

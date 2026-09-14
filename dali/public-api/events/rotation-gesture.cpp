@@ -22,7 +22,7 @@
 #include <dali/internal/event/events/rotation-gesture/rotation-gesture-impl.h>
 #include <dali/public-api/common/dali-common.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 RotationGesture::RotationGesture(Internal::RotationGesture* internal)
 : Gesture(internal)
@@ -56,4 +56,4 @@ const Vector2& RotationGesture::GetLocalCenterPoint() const
   return GetImplementation(*this).GetLocalCenterPoint();
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

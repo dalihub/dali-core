@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
 #include "test-graphics-program.h"
 #include "test-graphics-reflection.h"
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 TestGraphicsBuffer::TestGraphicsBuffer(const Graphics::BufferCreateInfo& createInfo, TestGraphicsController& controller, TestGlAbstraction& glAbstraction, TraceCallStack& callStack)
 : mCallStack(callStack),
@@ -182,4 +182,4 @@ void TestGraphicsBuffer::BindAsUniformBuffer(const TestGraphicsProgram* program,
   }
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

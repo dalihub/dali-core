@@ -20,7 +20,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/event/common/thread-local-storage.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -45,4 +45,4 @@ bool EventThreadServices::IsEventThread()
 }
 
 } // namespace Internal
-} // namespace Dali
+} //namespace DALI_NAMESPACE

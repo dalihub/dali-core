@@ -29,7 +29,7 @@
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/rendering/frame-buffer.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 using Mask = Dali::FrameBuffer::Attachment::Mask;
 
@@ -220,6 +220,6 @@ inline const Internal::FrameBuffer& GetImplementation(const Dali::FrameBuffer& h
   return static_cast<const Internal::FrameBuffer&>(object);
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_FRAME_BUFFER_H

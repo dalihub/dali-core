@@ -2,7 +2,7 @@
 #define DALI_PIXEL_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @addtogroup dali_core_images
@@ -188,6 +188,6 @@ DALI_CORE_API void GetAlphaOffsetAndMask(Format pixelFormat, int& byteOffset, in
 /**
  * @}
  */
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_PIXEL_H

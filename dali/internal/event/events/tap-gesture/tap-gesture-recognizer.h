@@ -28,7 +28,7 @@
 #include <dali/internal/event/events/gesture-recognizer.h>
 #include <dali/internal/event/events/tap-gesture/tap-gesture-event.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Integration
 {
@@ -192,6 +192,6 @@ private:
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_EVENT_EVENTS_TAP_GESTURE_RECOGNIZER_H

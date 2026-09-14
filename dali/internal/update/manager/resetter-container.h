@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_UPDATE_RESETTER_CONTAINER_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,10 @@
  * limitations under the License.
  */
 
-namespace Dali::Internal::SceneGraph
+// INTERNAL INCLUDES
+#include <dali/public-api/common/dali-namespace.h>
+
+namespace DALI_NAMESPACE::Internal::SceneGraph
 {
 /**
  * Template class to manage node/property resetters
@@ -176,6 +179,6 @@ private:
   ContainerType mContainer; ///< The list of resetters
 };
 
-} // namespace Dali::Internal::SceneGraph
+} //namespace DALI_NAMESPACE::Internal::SceneGraph
 
 #endif // DALI_INTERNAL_UPDATE_RESETTER_CONTAINER_H

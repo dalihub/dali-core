@@ -28,7 +28,7 @@
 #include <dali/public-api/rendering/renderer.h>
 #include <dali/public-api/update/update-proxy.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 struct Vector2;
 class FrameCallbackInterface;
@@ -299,6 +299,6 @@ inline const Internal::ThreadLocalStorage& GetImplementation(const Dali::Singlet
   return static_cast<const Internal::ThreadLocalStorage&>(handle);
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_THREAD_LOCAL_STORAGE_H

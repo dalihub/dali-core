@@ -380,7 +380,7 @@ Dali::BlendEquation::Type RetrieveBlendEquation(unsigned int options, int mask, 
 
 } // unnamed namespace
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -532,4 +532,4 @@ bool BlendingOptions::IsAdvancedBlendEquation(Dali::BlendEquation::Type equation
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

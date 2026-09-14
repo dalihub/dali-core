@@ -26,7 +26,7 @@
 #include <dali/public-api/events/wheel-event.h>
 #include <dali/public-api/math/vector2.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Integration
 {
@@ -118,6 +118,6 @@ struct DALI_CORE_API WheelEvent : public Event
 
 } // namespace Integration
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTEGRATION_WHEEL_EVENT_H

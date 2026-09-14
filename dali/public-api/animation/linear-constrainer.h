@@ -25,7 +25,7 @@
 #include <dali/public-api/object/handle.h>
 #include <dali/public-api/object/property-index-ranges.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @addtogroup dali_core_animation
@@ -178,6 +178,6 @@ public: // Not intended for application developers
 /**
  * @}
  */
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_LINEAR_CONSTRAINER_H

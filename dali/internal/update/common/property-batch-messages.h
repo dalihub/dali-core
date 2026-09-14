@@ -26,7 +26,7 @@
 #include <dali/internal/update/common/property-resetter.h>
 #include <dali/internal/update/manager/update-manager.h>
 
-namespace Dali::Internal
+namespace DALI_NAMESPACE::Internal
 {
 
 /**
@@ -55,7 +55,9 @@ public:
   PropertyBatchMessage(SceneGraph::UpdateManager&       updateManager,
                        const SceneGraph::PropertyOwner& owner,
                        const PropertyBatch&             batch)
-  : mUpdateManager(updateManager), mOwner(owner), mCount(batch.Count())
+  : mUpdateManager(updateManager),
+    mOwner(owner),
+    mCount(batch.Count())
   {
     // Heap allocation for the entries array.
     // Worth revisiting with an inline buffer if Phase 4 profiling shows it matters.
@@ -261,6 +263,6 @@ inline void FlushPropertyBatchMessage(EventThreadServices&             services,
   new(slot) LocalType(services.GetUpdateManager(), owner, batch);
 }
 
-} // namespace Dali::Internal
+} //namespace DALI_NAMESPACE::Internal
 
 #endif // DALI_INTERNAL_COMMON_PROPERTY_BATCH_MESSAGES_H

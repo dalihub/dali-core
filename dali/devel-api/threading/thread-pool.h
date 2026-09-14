@@ -32,7 +32,7 @@
 #include <queue>
 #include <thread>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 using Task = std::function<void(uint32_t)>;
 
@@ -200,6 +200,6 @@ private:
   std::unique_ptr<Impl> mImpl;
 };
 
-} //namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_THREAD_POOL_H

@@ -25,7 +25,7 @@
 
 #include <cstdio>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 TouchEvent TouchEvent::New(uint32_t time)
 {
@@ -157,4 +157,4 @@ TouchEvent::TouchEvent(Internal::TouchEvent* internal)
 {
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

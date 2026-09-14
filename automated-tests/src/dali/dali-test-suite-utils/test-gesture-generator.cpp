@@ -57,7 +57,7 @@ Dali::Integration::TouchEvent GenerateDoubleTouch(PointState::Type stateA, const
 }
 } // namespace
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 uint32_t TestGetFrameInterval()
 {
@@ -217,4 +217,4 @@ void TestEndRotation(TestApplication& application, Vector2 a1, Vector2 b1, Vecto
   application.ProcessEvent(GenerateDoubleTouch(PointState::UP, a2, PointState::UP, b2, time + 50));
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

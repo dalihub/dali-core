@@ -48,7 +48,7 @@ const uint32_t NUM_BYTES_IN_ROW    = 3 * sizeof(float);
 const uint32_t NUM_BYTES_IN_MATRIX = 9 * sizeof(float);
 } // namespace
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 const Matrix3 Matrix3::IDENTITY(1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f);
 
@@ -291,4 +291,4 @@ bool Matrix3::operator!=(const Matrix3& rhs) const
   return !(*this == rhs);
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

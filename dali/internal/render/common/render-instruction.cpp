@@ -24,7 +24,7 @@
 #include <dali/public-api/common/constants.h> // for Color::BLACK
 #include <dali/public-api/common/dali-utility.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -153,4 +153,4 @@ std::size_t RenderInstruction::GetCapacity()
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

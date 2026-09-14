@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/rendering/renderer.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 class RenderCallback;
 
@@ -180,10 +180,11 @@ enum Type
 
   /**
    * @brief Increase the range of update area by pixel value.
-   * @note Extents the area - the position and the size - used for the attached actor's damaged area calculation.
+   * @note Extends the area - the position and the size - used for the attached actor's damaged area calculation.
    * This value be appended after calculate all update area, like visual offset.
+   * Start and end are the left and right edges; they are not swapped for a right-to-left layout direction.
    * @see Dali::Actor::Property::UPDATE_AREA_HINT
-   * @details name "updateAreaMargin", type EXTENTS
+   * @details name "updateAreaMargin", type INSETS
    * @SINCE_2_4.11
    */
   UPDATE_AREA_MARGIN = OPACITY + 4,
@@ -212,6 +213,6 @@ DALI_CORE_API bool IsAdvancedBlendEquationApplied(const Renderer& renderer);
 
 } // namespace DevelRenderer
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_RENDERER_DEVEL_H

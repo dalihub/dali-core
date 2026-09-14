@@ -33,7 +33,7 @@
 
 #include <dali/internal/render/shaders/render-shader.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Graphics
 {
@@ -284,6 +284,6 @@ private:                                                                        
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_PROGRAM_H

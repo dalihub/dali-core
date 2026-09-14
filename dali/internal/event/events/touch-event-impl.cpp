@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/actors/actor.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -175,4 +175,4 @@ void TouchEvent::SetTime(uint32_t time)
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

@@ -35,7 +35,7 @@
 #include <dali/internal/event/rendering/renderer-impl.h>
 #include <dali/internal/event/size-negotiation/relayout-controller-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 Actor::Actor() = default;
 
@@ -617,12 +617,12 @@ bool Actor::GetLeaveRequired() const
   return GetImplementation(*this).GetLeaveRequired();
 }
 
-void Actor::SetTouchHitAreaMargin(const Extents& margin)
+void Actor::SetTouchHitAreaMargin(const Insets& margin)
 {
   GetImplementation(*this).SetProperty(Actor::Property::TOUCH_HIT_AREA_MARGIN, margin);
 }
 
-Extents Actor::GetTouchHitAreaMargin() const
+Insets Actor::GetTouchHitAreaMargin() const
 {
   return GetImplementation(*this).GetTouchHitAreaMargin();
 }
@@ -1023,4 +1023,4 @@ Actor::Actor(Internal::Actor* internal)
 {
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

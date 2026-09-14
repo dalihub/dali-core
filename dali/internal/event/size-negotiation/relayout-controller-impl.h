@@ -31,7 +31,7 @@
 #include <dali/internal/event/size-negotiation/memory-pool-relayout-container.h>
 #include <dali/public-api/object/base-object.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Integration
 {
@@ -222,6 +222,6 @@ private:
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_RELAYOUT_CONTROLLER_IMPL_H

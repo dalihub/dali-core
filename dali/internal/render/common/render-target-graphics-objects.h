@@ -25,7 +25,7 @@
 #include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/graphics-api/graphics-controller.h> ///< for Graphics relative structs.
 
-namespace Dali::Internal::SceneGraph
+namespace DALI_NAMESPACE::Internal::SceneGraph
 {
 
 /**
@@ -230,6 +230,6 @@ private:
 
   bool mObserverNotifying{false}; ///< Safety guard flag to ensure that the LifecycleObserver not be added or deleted while observing.
 };
-} // namespace Dali::Internal::SceneGraph
+} //namespace DALI_NAMESPACE::Internal::SceneGraph
 
 #endif // DALI_INTERNAL_RENDER_TARGET_GRAPHICS_OBJECTS_H

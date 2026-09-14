@@ -75,7 +75,7 @@ Dali::Internal::ActorSizer::ActorDimensionStack& GetRecursionStack()
 }
 } // namespace
 
-namespace Dali::Internal
+namespace DALI_NAMESPACE::Internal
 {
 ActorSizer::ActorSizer(Internal::Actor& owner)
 : mOwner(owner),
@@ -934,4 +934,4 @@ float ActorSizer::CalculateSize(Dimension::Type dimension, const Vector2& maximu
   return 0.0f; // Default
 }
 
-} // namespace Dali::Internal
+} //namespace DALI_NAMESPACE::Internal

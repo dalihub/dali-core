@@ -22,7 +22,7 @@
 #include <dali/public-api/math/radian.h>
 #include <dali/public-api/math/vector3.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @addtogroup dali_core_math
@@ -92,6 +92,6 @@ inline bool operator==(const Dali::AngleAxis& lhs, const Dali::AngleAxis& rhs)
 /**
  * @}
  */
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_ANGLE_AXIS_H

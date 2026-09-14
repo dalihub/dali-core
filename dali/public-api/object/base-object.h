@@ -28,7 +28,7 @@
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/signals/functor-delegate.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @addtogroup dali_core_object
@@ -172,6 +172,6 @@ inline const BaseObject& GetImplementation(const Dali::BaseHandle& handle)
 /**
  * @}
  */
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // __DALI_BASE_OBJECT_H__

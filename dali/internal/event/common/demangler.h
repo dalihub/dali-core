@@ -19,9 +19,10 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/dali-namespace.h>
 #include <string>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -57,6 +58,6 @@ std::string DemangleTypeInfoName(const char* typeIdName);
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_DEMANGLER_H

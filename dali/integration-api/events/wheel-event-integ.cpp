@@ -18,7 +18,7 @@
 // CLASS HEADER
 #include <dali/integration-api/events/wheel-event-integ.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Integration
 {
@@ -70,4 +70,4 @@ WheelEvent::~WheelEvent() = default;
 
 } // namespace Integration
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

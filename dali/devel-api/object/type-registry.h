@@ -28,7 +28,7 @@
 #include <dali/public-api/common/dali-string.h>
 #include <dali/public-api/object/base-handle.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @addtogroup dali_core_object
@@ -522,6 +522,6 @@ public:
 /**
  * @}
  */
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // header

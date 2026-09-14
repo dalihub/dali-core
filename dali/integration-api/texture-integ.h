@@ -24,7 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/rendering/texture.h>
 
-namespace Dali::Integration
+namespace DALI_NAMESPACE::Integration
 {
 /**
  * @brief Create new Dali::Texture with resourceId that Graphics::Controller can use.
@@ -149,6 +149,6 @@ enum Type
  */
 DALI_CORE_API bool TextureUploadWithContent(Dali::Texture texture, Dali::PixelData pixelData, Dali::String context, TextureContextTypeHint::Type typeHint = TextureContextTypeHint::UNKNOWN, bool updateContextOnly = false, bool keepPreviousContext = false);
 
-} // namespace Dali::Integration
+} //namespace DALI_NAMESPACE::Integration
 
 #endif // DALI_TEXTURE_INTEG_H

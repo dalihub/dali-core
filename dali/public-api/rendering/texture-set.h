@@ -27,7 +27,7 @@
 #include <dali/public-api/rendering/shader.h>  // Dali::Shader
 #include <dali/public-api/rendering/texture.h> // Dali::Texture
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @addtogroup dali_core_rendering_effects
@@ -169,6 +169,6 @@ public:
 /**
  * @}
  */
-} //namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TEXTURE_SET_H

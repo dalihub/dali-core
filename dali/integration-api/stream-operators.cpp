@@ -19,7 +19,7 @@
 
 #include <string_view>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 
 std::ostream& operator<<(std::ostream& outStream, const String& string)
@@ -102,4 +102,4 @@ std::ostream& operator<<(std::ostream& stream, const Insets& insets)
   return stream << "[" << insets.start << ", " << insets.end << ", " << insets.top << ", " << insets.bottom << "]";
 }
 
-} //namespace Dali
+} //namespace DALI_NAMESPACE

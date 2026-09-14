@@ -26,7 +26,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/event/common/scene-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Integration
 {
@@ -265,16 +265,6 @@ bool Scene::IsStencilBufferEnabled() const
   return GetImplementation(*this).IsStencilBufferEnabled();
 }
 
-void Scene::SetMultiSampledAntiAliasingEnabled(bool enabled)
-{
-  GetImplementation(*this).SetMultiSampledAntiAliasingEnabled(enabled);
-}
-
-bool Scene::IsMultiSampledAntiAliasingEnabled() const
-{
-  return GetImplementation(*this).IsMultiSampledAntiAliasingEnabled();
-}
-
 void Scene::SetPartialUpdateEnabled(bool enabled)
 {
   GetImplementation(*this).SetPartialUpdateEnabled(enabled);
@@ -357,4 +347,4 @@ Scene::WheelEventGeneratedSignalType& Scene::WheelEventGeneratedSignal()
 
 } // namespace Integration
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

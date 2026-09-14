@@ -407,7 +407,7 @@ int UtcDaliConstraintsLookAt(void)
   targetPosition    = Vector3(-1.0f, 0.0f, 0.0f);
   cameraPosition    = Vector3(0.0f, 0.0f, 1.0f);
   targetOrientation = Quaternion::IDENTITY;
-  lookAtOrientation = Quaternion(Radian(Math::PI * 1.25), Vector3::YAXIS);
+  lookAtOrientation = Quaternion(Radian(static_cast<float>(Math::PI) * 1.25f), Vector3::YAXIS);
   LookAt(current, inputs);
   DALI_TEST_EQUALS(current, lookAtOrientation, Math::MACHINE_EPSILON_10, TEST_LOCATION);
 

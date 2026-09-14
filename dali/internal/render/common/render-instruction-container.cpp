@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/render/common/render-instruction.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -77,4 +77,4 @@ std::size_t RenderInstructionContainer::GetCapacity() const
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

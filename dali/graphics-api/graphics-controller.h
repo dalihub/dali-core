@@ -39,7 +39,7 @@
 #include "graphics-texture-create-info.h"
 #include "graphics-texture-upload-helper.h"
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Graphics
 {
@@ -458,6 +458,6 @@ protected:
   Controller() = default;
 };
 } // namespace Graphics
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif

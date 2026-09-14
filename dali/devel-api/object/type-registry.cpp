@@ -29,7 +29,7 @@
 using Dali::Integration::ToDaliString;
 using Dali::Integration::ToStdString;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 TypeRegistry::TypeRegistry() = default;
 
@@ -194,4 +194,4 @@ ChildPropertyRegistration::ChildPropertyRegistration(Dali::String registered, Da
   Internal::TypeRegistry::Get()->RegisterChildProperty(ToStdString(std::move(registered)), ToStdString(std::move(name)), index, type);
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/render/shaders/program.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -107,4 +107,4 @@ void ProgramController::AddProgram(size_t shaderHash, Program* program)
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

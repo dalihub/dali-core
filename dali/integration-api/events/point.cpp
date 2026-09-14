@@ -19,7 +19,7 @@
 #include <dali/integration-api/events/point.h>
 #include <dali/public-api/events/mouse-button.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Integration
 {
@@ -189,4 +189,4 @@ void Point::SetDeviceName(Dali::String& deviceName)
 
 } // namespace Integration
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

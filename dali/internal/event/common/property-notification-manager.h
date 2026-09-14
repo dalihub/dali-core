@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_PROPERTY_NOTIFICATION_MANAGER_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@
 #include <dali/internal/event/common/scene-graph-notifier-interface-mapper.h>
 #include <dali/public-api/common/dali-vector.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -84,6 +84,6 @@ private:
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_PROPERTY_NOTIFICATION_MANAGER_H

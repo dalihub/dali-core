@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,11 +23,11 @@
 #include <iostream>
 #endif
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 const uint32_t    CORE_MAJOR_VERSION = 2;
 const uint32_t    CORE_MINOR_VERSION = 5;
-const uint32_t    CORE_MICRO_VERSION = 37;
+const uint32_t    CORE_MICRO_VERSION = 39;
 const char* const CORE_BUILD_DATE    = __DATE__ " " __TIME__;
 
 #ifdef DEBUG_ENABLED
@@ -45,4 +45,4 @@ PrintVersion CORE_VERSION;
 } // unnamed namespace
 #endif
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

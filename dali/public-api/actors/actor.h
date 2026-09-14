@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/actors/actor-enumerations.h>
+#include <dali/public-api/common/insets.h>
 #include <dali/public-api/math/radian.h>
 #include <dali/public-api/math/rect.h>
 #include <dali/public-api/object/handle.h>
@@ -32,7 +33,7 @@
 
 #undef SIZE_WIDTH // Defined in later versions of cstdint but is used in this header
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @addtogroup dali_core_actors
@@ -217,15 +218,31 @@ struct Vector4;
  *     other touch points.
  *   - In PARENT propagation, local coordinates are from the top-left (0.0f, 0.0f, 0.5f) of the hit actor.
  *
+ * <i>GEOMETRY Hover Event Delivery:</i>
+ *
+ * - The primary point's geometry hit results are visited from front to back. A candidate that does not
+ *   consume the event remains an active hover target and delivery continues to the next geometry candidate.
+ *   A candidate that consumes stops delivery for that input only; every input is hit-tested again.
+ * - Actual parents do not receive a separate bubbling pass. A parent is visited only when it is also present
+ *   in the geometry hit results, after the child and any front-most sibling subtrees.
+ * - A candidate entered by a MOTION input receives STARTED followed by that MOTION. Every active GEOMETRY
+ *   hover target receives LEAVE when it exits the visited candidate prefix, regardless of SetLeaveRequired().
+ *   Multiple unrelated actors can therefore be active hover targets at the same time.
+ * - HoverEvent::GetHitActor() and the local position continue to identify the primary, front-most hit actor,
+ *   including when the event is delivered to a later geometry candidate.
+ *
  * - Leave State
  *   - A "Leave" state is set when the first point exits the bounds of the previous first point's
  *     hit actor (primary hit actor).
  *   - When this happens, the last primary hit actor's touch or hover signal is emitted with a "Leave" state
  *     (only if it requires leave signals); see SetLeaveRequired().
+ *   - GEOMETRY hover is the exception: every active target that exits the visited prefix receives "Leave"
+ *     regardless of SetLeaveRequired().
  *
  * - Interrupted State
  *   - If a system event occurs which interrupts the touch or hover processing, then the last primary hit
  *     actor's touch or hover signals are emitted with an "Interrupted" state.
+ *   - For GEOMETRY hover, the interrupted state is delivered to every active target.
  *   - If the last primary hit actor, or one of its parents, is no longer touchable or hoverable, then its
  *     touch or hover signals are also emitted with an "Interrupted" state.
  *   - If the consumed actor on touch-down is not the same as the consumed actor on touch-up, then
@@ -698,14 +715,15 @@ public:
       /**
        * @brief Extends the touch hit area of an actor beyond (positive) or within (negative) its visual bounds.
        *        Affects only touch detection, not rendering or layout.
-       * @details Name "touchHitAreaMargin", type Property::EXTENTS (start, end, top, bottom in pixels).
+       * @details Name "touchHitAreaMargin", type Property::INSETS (start, end, top, bottom in pixels).
        *          Positive values expand the hit area outward; negative values shrink it inward.
+       *          Start and end are the left and right edges; they are not swapped for a right-to-left layout direction.
        * @SINCE_2_5.29
        * For example
        * @code{.cpp}
        *  Actor actor = Actor::New();
        *  actor.SetProperty(Actor::Property::SIZE, Vector2(20.0f, 20.0f));
-       *  actor.SetProperty(Actor::Property::TOUCH_HIT_AREA_MARGIN, Extents(10, 20, 30, 40));
+       *  actor.SetProperty(Actor::Property::TOUCH_HIT_AREA_MARGIN, Insets(10.0f, 20.0f, 30.0f, 40.0f));
        *  actor.TouchEventSignal().Connect(OnTouchCallback);
        *
        * +---------------------+
@@ -2056,6 +2074,8 @@ public:
    * @pre The actor has been initialized.
    * @note When enabled, the actor receives a touch or hover event with a "Leave" state once the primary
    *       point moves outside its bounds.
+   * @note GEOMETRY hover delivery guarantees STARTED and LEAVE for every active visited candidate and does
+   *       not consult this property. PARENT hover and touch delivery retain the property-controlled behavior.
    * @see Actor::Property::LEAVE_REQUIRED
    * @SINCE_2_5.30
    */
@@ -2074,23 +2094,24 @@ public:
    * @brief Sets the touch hit area margin.
    *
    * Extends (positive values) or shrinks (negative values) the actor's touch hit area beyond its visual
-   * bounds. This affects only touch detection, not rendering or layout.
+   * bounds. This affects only touch detection, not rendering or layout. Start and end are the left and
+   * right edges; they are not swapped for a right-to-left layout direction.
    *
    * @param[in] margin The margin (start, end, top, bottom in pixels) applied around the actor's bounds
    * @pre The actor has been initialized.
    * @see Actor::Property::TOUCH_HIT_AREA_MARGIN
-   * @SINCE_2_5.30
+   * @SINCE_2_5.40
    */
-  void SetTouchHitAreaMargin(const Extents& margin);
+  void SetTouchHitAreaMargin(const Insets& margin);
 
   /**
    * @brief Gets the touch hit area margin.
    * @return The touch hit area margin (start, end, top, bottom in pixels)
    * @pre The actor has been initialized.
    * @see Actor::Property::TOUCH_HIT_AREA_MARGIN
-   * @SINCE_2_5.30
+   * @SINCE_2_5.40
    */
-  Extents GetTouchHitAreaMargin() const;
+  Insets GetTouchHitAreaMargin() const;
 
   /**
    * @brief Sets whether the actor only receives touch events that originated on itself.
@@ -2819,8 +2840,12 @@ public: // Signals
    * @code
    *   bool YourCallbackName(Actor actor, HoverEvent event);
    * @endcode
-   * The return value of True, indicates that the hover event should be consumed.
-   * Otherwise the signal will be emitted on the next sensitive parent of the actor.
+   * The return value of True indicates that the hover event should be consumed. In PARENT propagation,
+   * False continues delivery through the actor's actual parent chain. In GEOMETRY propagation, False
+   * continues to the next front-to-back geometry candidate and True stops the candidate walk for the
+   * current input. A later geometry candidate can be an unrelated sibling; parents receive no separate
+   * bubbling pass. In GEOMETRY propagation, all callbacks connected to this actor are invoked and their
+   * return values are combined.
    * @SINCE_1_0.0
    * @return The signal to connect to
    * @pre The Actor has been initialized.
@@ -3110,6 +3135,6 @@ inline void UnparentAndReset(Actor& actor)
 /**
  * @}
  */
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_ACTOR_H

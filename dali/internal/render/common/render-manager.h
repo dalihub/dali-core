@@ -29,7 +29,7 @@
 
 #include <dali/graphics-api/graphics-texture-upload-helper.h> // for Graphics::UploadParams
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Integration
 {
@@ -320,6 +320,6 @@ private:
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_SCENE_GRAPH_RENDER_MANAGER_H

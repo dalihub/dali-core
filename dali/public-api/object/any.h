@@ -27,7 +27,7 @@
 #include <dali/public-api/common/dali-string.h>
 #include <dali/public-api/object/type-info-id.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @addtogroup dali_core_object
@@ -601,6 +601,6 @@ inline const Type& AnyCastReference(const Any& any)
 /**
  * @}
  */
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_ANY_TYPE_H

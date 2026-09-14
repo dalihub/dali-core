@@ -27,7 +27,7 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/dali-vector.h>
 
-namespace Dali::Internal::HashUtils
+namespace DALI_NAMESPACE::Internal::HashUtils
 {
 using HashType = std::size_t;
 
@@ -183,6 +183,6 @@ template<typename T>
   return HashRawBuffer(reinterpret_cast<const uint8_t*>(&value), sizeof(T), hash);
 }
 
-} // namespace Dali::Internal::HashUtils
+} //namespace DALI_NAMESPACE::Internal::HashUtils
 
 #endif // DALI_INTERNAL_HASH_UTILS_H

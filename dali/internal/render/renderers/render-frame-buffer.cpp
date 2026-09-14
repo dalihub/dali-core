@@ -23,7 +23,7 @@
 #include <dali/internal/render/common/render-manager.h> ///< TODO : Could we remove it?
 #include <dali/internal/render/renderers/render-texture.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -311,6 +311,16 @@ bool FrameBuffer::IsBufferUsageChangeableAtRuntime() const
   return mIsBufferUsageChangeableAtRuntime;
 }
 
+bool FrameBuffer::IsDepthBufferAvailable() const
+{
+  return mDepthBuffer;
+}
+
+bool FrameBuffer::IsStencilBufferAvailable() const
+{
+  return mStencilBuffer;
+}
+
 void FrameBuffer::ChangeDepthStencilEnabled(bool depthEnabled, bool stencilEnabled)
 {
   if(DALI_LIKELY(mIsBufferUsageChangeableAtRuntime))
@@ -349,4 +359,4 @@ void FrameBuffer::UpdateFramebufferRenderbufferUsage()
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

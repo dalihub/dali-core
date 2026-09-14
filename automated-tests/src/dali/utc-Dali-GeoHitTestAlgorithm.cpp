@@ -569,7 +569,7 @@ int UtcDaliGeoHitTestAlgorithmOrder(void)
   offRenderTask.SetScreenToFrameBufferMappingActor(blue);
 
   Dali::Texture texture      = Dali::Texture::New(TextureType::TEXTURE_2D, Pixel::RGB888, unsigned(stageSize.width), unsigned(stageSize.height));
-  FrameBuffer   renderTarget = FrameBuffer::New(stageSize.width, stageSize.height, FrameBuffer::Attachment::DEPTH);
+  FrameBuffer   renderTarget = FrameBuffer::New(static_cast<uint32_t>(stageSize.width), static_cast<uint32_t>(stageSize.height), FrameBuffer::Attachment::DEPTH);
   renderTarget.AttachColorTexture(texture);
   offRenderTask.SetFrameBuffer(renderTarget);
 
@@ -628,7 +628,7 @@ int UtcDaliGeoHitTestAlgorithmExclusiveMultiple(void)
   offRenderTask.SetScreenToFrameBufferMappingActor(blue);
 
   Dali::Texture texture      = Dali::Texture::New(TextureType::TEXTURE_2D, Pixel::RGB888, unsigned(stageSize.width), unsigned(stageSize.height));
-  FrameBuffer   renderTarget = FrameBuffer::New(stageSize.width, stageSize.height, FrameBuffer::Attachment::DEPTH);
+  FrameBuffer   renderTarget = FrameBuffer::New(static_cast<uint32_t>(stageSize.width), static_cast<uint32_t>(stageSize.height), FrameBuffer::Attachment::DEPTH);
   renderTarget.AttachColorTexture(texture);
   offRenderTask.SetFrameBuffer(renderTarget);
 
@@ -775,7 +775,7 @@ int UtcDaliGeoHitTestAlgorithmBuildPickingRay02(void)
   offRenderTask.SetScreenToFrameBufferMappingActor(green);
 
   Dali::Texture texture      = Dali::Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, unsigned(actorSize.width), unsigned(actorSize.height));
-  FrameBuffer   renderTarget = FrameBuffer::New(actorSize.width, actorSize.height, FrameBuffer::Attachment::DEPTH_STENCIL);
+  FrameBuffer   renderTarget = FrameBuffer::New(static_cast<uint32_t>(actorSize.width), static_cast<uint32_t>(actorSize.height), FrameBuffer::Attachment::DEPTH_STENCIL);
   renderTarget.AttachColorTexture(texture);
   offRenderTask.SetFrameBuffer(renderTarget);
 

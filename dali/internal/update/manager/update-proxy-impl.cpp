@@ -22,7 +22,7 @@
 #include <dali/internal/update/manager/update-manager.h>
 #include <dali/internal/update/manager/update-proxy-property-modifier.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -536,4 +536,4 @@ bool UpdateProxy::BakeCustomProperty(uint32_t id, ConstString propertyName, cons
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

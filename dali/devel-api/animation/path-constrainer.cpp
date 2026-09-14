@@ -22,7 +22,7 @@
 #include <dali/internal/event/animation/path-constrainer-impl.h>
 #include <dali/internal/event/animation/path-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 PathConstrainer PathConstrainer::New()
 {
@@ -62,4 +62,4 @@ void PathConstrainer::Remove(Dali::Handle& target)
   GetImplementation(*this).Remove(target);
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

@@ -23,7 +23,7 @@
 #include <dali/public-api/common/type-traits.h>
 #include <dali/public-api/math/vector4.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @addtogroup dali_core_math
@@ -489,6 +489,6 @@ struct TypeTraits<Matrix> : public BasicTypes<Matrix>
 /**
  * @}
  */
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_MATRIX_H

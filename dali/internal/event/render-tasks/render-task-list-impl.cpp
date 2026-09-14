@@ -41,7 +41,7 @@ Debug::Filter* gLogRenderList = Debug::Filter::New(Debug::Concise, false, "LOG_R
 }
 #endif
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -441,4 +441,4 @@ const SceneGraph::RenderTaskList& RenderTaskList::GetSceneObject() const
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

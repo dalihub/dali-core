@@ -18,7 +18,7 @@
 // CLASS HEADER
 #include <dali/public-api/animation/time-period.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 TimePeriod::TimePeriod(float duration)
 : delaySeconds(0.0f),
@@ -34,4 +34,4 @@ TimePeriod::TimePeriod(float delay, float duration)
 
 TimePeriod::~TimePeriod() = default;
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

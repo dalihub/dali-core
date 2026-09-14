@@ -34,7 +34,7 @@
 extern Debug::Filter* gRenderTaskLogFilter;
 #endif
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -374,4 +374,4 @@ bool RenderTaskProcessor::Process(RenderTaskList&             renderTasks,
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

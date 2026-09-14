@@ -22,7 +22,7 @@
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/update/frame-callback-interface-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 FrameCallbackInterface::FrameCallbackInterface()
 : mImpl(new Impl)
@@ -40,4 +40,4 @@ FrameCallbackInterface::~FrameCallbackInterface()
   delete mImpl;
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

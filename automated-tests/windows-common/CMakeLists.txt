@@ -68,6 +68,7 @@ TARGET_COMPILE_OPTIONS(dali-core-test-objects PRIVATE
   "${DALI_WINDOWS_DEPENDENCIES_INCLUDE_DIR}/dali-windows-dependencies.h"
   /vmg
   /wd4251
+  /wd4275
   /utf-8
 )
 TARGET_LINK_LIBRARIES(dali-core-test-objects PRIVATE dali-windows-dependencies::dali-windows-dependencies)
@@ -169,7 +170,7 @@ FUNCTION(ADD_CORE_TEST_RUNNER TARGET ARRAY_NAME HEADER_NAME SUITE_LABEL)
     NOMINMAX
     WIN32_LEAN_AND_MEAN
   )
-  TARGET_COMPILE_OPTIONS(${TARGET} PRIVATE /vmg /utf-8 /W3)
+  TARGET_COMPILE_OPTIONS(${TARGET} PRIVATE /vmg /utf-8 /W3 /wd4251 /wd4275)
   TARGET_SOURCES(${TARGET} PRIVATE $<TARGET_OBJECTS:dali-core-test-objects>)
   TARGET_LINK_LIBRARIES(${TARGET} PRIVATE dali-windows-dependencies::dali-windows-dependencies)
   INSTALL(TARGETS ${TARGET} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})

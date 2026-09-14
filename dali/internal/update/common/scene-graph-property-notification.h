@@ -24,7 +24,7 @@
 #include <dali/internal/update/common/property-base.h>
 #include <dali/public-api/object/property-notification.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -148,6 +148,6 @@ protected:
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_SCENE_GRAPH_PROPERTY_NOTIFICATION_H

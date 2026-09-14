@@ -18,7 +18,7 @@
 // CLASS HEADER
 #include <dali/devel-api/animation/animation-data.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 AnimationData::AnimationData() = default;
 
@@ -65,4 +65,4 @@ void AnimationData::Clear()
   mAnimationDataList.Clear();
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

@@ -25,7 +25,7 @@
 #include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/internal/event/object/default-property-metadata.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -77,6 +77,6 @@ bool AdjustValue(PropertyType& currentValue, const Property::Value& value)
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_PROPERTY_HELPER_H

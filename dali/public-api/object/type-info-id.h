@@ -19,10 +19,11 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/dali-namespace.h>
 #include <cstdint>
 #include <cstring>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 
 /**
@@ -93,7 +94,9 @@ public:
    *
    * @SINCE_2_5.21
    */
-  constexpr TypeInfoId(): mId(0), mName(nullptr)
+  constexpr TypeInfoId()
+  : mId(0),
+    mName(nullptr)
   {
   }
 
@@ -104,7 +107,9 @@ public:
    * @param[in] id The FNV-1a hash of the type name
    * @param[in] name The human-readable type name (must point to static-duration storage)
    */
-  constexpr TypeInfoId(IdType id, const char* name): mId(id), mName(name)
+  constexpr TypeInfoId(IdType id, const char* name)
+  : mId(id),
+    mName(name)
   {
   }
 
@@ -198,7 +203,7 @@ private:
  * @}
  */
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 /**
  * @brief Macro to create a TypeInfoId from a C++ type at call sites.

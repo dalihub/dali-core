@@ -30,7 +30,7 @@
 #include <dali/internal/event/events/wheel-event-impl.h>
 #include <dali/public-api/math/vector2.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -207,4 +207,4 @@ void WheelEventProcessor::ProcessWheelEvent(const Integration::WheelEvent& event
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

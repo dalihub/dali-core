@@ -39,7 +39,7 @@ Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_TYP
 
 } // namespace
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -451,4 +451,4 @@ TypeRegistry::TypeInfoPointer TypeRegistry::GetTypeInfo(const Dali::BaseObject* 
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

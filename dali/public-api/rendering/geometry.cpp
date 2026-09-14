@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/event/rendering/geometry-impl.h> // Dali::Internal::Geometry
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 Geometry Geometry::New()
 {
@@ -87,4 +87,4 @@ Geometry::Geometry(Internal::Geometry* pointer)
 {
 }
 
-} //namespace Dali
+} //namespace DALI_NAMESPACE

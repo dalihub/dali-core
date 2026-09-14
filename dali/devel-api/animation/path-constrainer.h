@@ -26,7 +26,7 @@
 #include <dali/public-api/object/handle.h>
 #include <dali/public-api/object/property-index-ranges.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal DALI_INTERNAL
 {
@@ -129,6 +129,6 @@ public: // Not intended for application developers
   explicit DALI_INTERNAL PathConstrainer(Internal::PathConstrainer* pathConstrainer);
 };
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_PATH_CONSTRAINER_H

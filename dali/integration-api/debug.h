@@ -36,7 +36,7 @@
 #include <dali/public-api/common/dali-common.h>
 
 // Using Debug namespace alias shortens the log usage significantly
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Integration
 {
@@ -44,10 +44,10 @@ namespace Log
 {
 }
 } // namespace Integration
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 namespace Debug = Dali::Integration::Log;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 struct Vector2;
 struct Vector3;
@@ -708,6 +708,6 @@ public:
 
 } // namespace TimeChecker
 } // namespace Integration
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTEGRATION_DEBUG_H

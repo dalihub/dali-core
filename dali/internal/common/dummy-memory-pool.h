@@ -25,8 +25,9 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/common/memory-pool-interface.h>
+#include <dali/public-api/common/dali-namespace.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -108,6 +109,6 @@ private:
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_FIXED_SIZE_MEMORY_POOL_H

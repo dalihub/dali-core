@@ -18,7 +18,7 @@
 // CLASS HEADER
 #include <dali/devel-api/events/touch-point.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 TouchPoint::TouchPoint(int32_t id, PointState::Type state, float screenX, float screenY)
 : deviceId(id),
@@ -38,4 +38,4 @@ TouchPoint::TouchPoint(int32_t id, PointState::Type state, float screenX, float 
 
 TouchPoint::~TouchPoint() = default;
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

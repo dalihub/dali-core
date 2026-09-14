@@ -23,7 +23,7 @@
 
 using DrawableActorImpl = Dali::Internal::DrawableActor;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 DrawableActor DrawableActor::New(RenderCallback& callback)
 {
@@ -36,4 +36,4 @@ DrawableActor::DrawableActor(Internal::DrawableActor* internal)
 {
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

@@ -100,7 +100,7 @@ int UtcDaliMatrixConstructor04P(void)
 {
   Quaternion q(Quaternion::IDENTITY);
   Matrix     m(q);
-  DALI_TEST_EQUALS(Matrix(Matrix::IDENTITY), m, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(Matrix(Matrix::IDENTITY), m, 0.001f, TEST_LOCATION);
   END_TEST;
 }
 
@@ -146,7 +146,7 @@ int UtcDaliMatrixAssignP(void)
 {
   Matrix a(Matrix::IDENTITY);
   Matrix b = a;
-  DALI_TEST_EQUALS(a, b, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(a, b, 0.001f, TEST_LOCATION);
   END_TEST;
 }
 
@@ -154,7 +154,7 @@ int UtcDaliMatrixAssign02P(void)
 {
   Matrix a(Matrix::IDENTITY);
   a = a; // self assign does the do nothing branch
-  DALI_TEST_EQUALS(Matrix(Matrix::IDENTITY), a, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(Matrix(Matrix::IDENTITY), a, 0.001f, TEST_LOCATION);
   END_TEST;
 }
 
@@ -185,7 +185,7 @@ int UtcDaliMatrixInvertTransformP(void)
 {
   for(int i = 0; i < 1000; ++i)
   {
-    float   f = i;
+    float   f = static_cast<float>(i);
     Vector3 axis(cosf(f * 0.001f), cosf(f * 0.02f), cosf(f * 0.03f));
     axis.Normalize();
     Vector3 center(f, cosf(f) * 100.0f, cosf(f * 0.5f) * 50.0f);
@@ -276,7 +276,7 @@ int UtcDaliMatrixInvert01P(void)
   // fail on particular orientations.
   for(int i = 0; i < 1000; ++i)
   {
-    float   f = i;
+    float   f = static_cast<float>(i);
     Vector3 axis(cosf(f * 0.001f), cosf(f * 0.02f), cosf(f * 0.03f));
     axis.Normalize();
     Vector3 center(f, cosf(f) * 100.0f, cosf(f * 0.5f) * 50.0f);
@@ -431,8 +431,8 @@ int UtcDaliMatrixGetScale(void)
           Vector3 scale2   = m1.GetScale();
           Vector2 scale2XY = m1.GetScaleXY();
 
-          DALI_TEST_EQUALS(vScale, scale2, 0.001, TEST_LOCATION);
-          DALI_TEST_EQUALS(vScaleXY, scale2XY, 0.001, TEST_LOCATION);
+          DALI_TEST_EQUALS(vScale, scale2, 0.001f, TEST_LOCATION);
+          DALI_TEST_EQUALS(vScaleXY, scale2XY, 0.001f, TEST_LOCATION);
         }
       }
     }
@@ -468,7 +468,7 @@ int UtcDaliMatrixOrthoNormalize0P(void)
 
   for(int i = 0; i < 1000; ++i)
   {
-    float   f = i;
+    float   f = static_cast<float>(i);
     Vector3 axis(cosf(f * 0.001f), cosf(f * 0.02f), cosf(f * 0.03f));
     axis.Normalize();
 
@@ -494,7 +494,7 @@ int UtcDaliMatrixOrthoNormalize1P(void)
   // OrthoNormalize is not flipping the axes and is maintaining the translation
   for(int i = 0; i < 1000; ++i)
   {
-    float   f = i;
+    float   f = static_cast<float>(i);
     Vector3 axis(cosf(f * 0.001f), cosf(f * 0.02f), cosf(f * 0.03f));
     axis.Normalize();
     Vector3 center(10.0f, 15.0f, 5.0f);
@@ -711,7 +711,7 @@ int UtcDaliMatrixSetTransformComponents01P(void)
           Vector3 vForward3(vForward.x, vForward.y, vForward.z);
           result1.SetTransformComponents(Vector3::ONE, Quaternion(Radian(Degree(angle)), vForward3), Vector3::ZERO);
 
-          DALI_TEST_EQUALS(m1, result1, 0.001, TEST_LOCATION);
+          DALI_TEST_EQUALS(m1, result1, 0.001f, TEST_LOCATION);
 
           Matrix m2(false);
           m2.SetTransformComponents(vForward, Quaternion::IDENTITY, Vector3::ZERO);
@@ -721,7 +721,7 @@ int UtcDaliMatrixSetTransformComponents01P(void)
           result2a.SetYAxis(result2a.GetYAxis() * vForward[1]);
           result2a.SetZAxis(result2a.GetZAxis() * vForward[2]);
 
-          DALI_TEST_EQUALS(m2, result2a, 0.001, TEST_LOCATION);
+          DALI_TEST_EQUALS(m2, result2a, 0.001f, TEST_LOCATION);
 
           Matrix m3(false);
           m3.SetTransformComponents(vForward, rotation1, Vector3::ZERO);
@@ -732,7 +732,7 @@ int UtcDaliMatrixSetTransformComponents01P(void)
           result3.SetZAxis(result3.GetZAxis() * vForward[2]);
 
           Matrix::Multiply(result3, result3, m1);
-          DALI_TEST_EQUALS(m3, result3, 0.001, TEST_LOCATION);
+          DALI_TEST_EQUALS(m3, result3, 0.001f, TEST_LOCATION);
         }
       }
     }
@@ -766,7 +766,7 @@ int UtcDaliMatrixSetInverseTransformComponent01P(void)
           Matrix result;
           Matrix::Multiply(result, m1, m2);
 
-          DALI_TEST_EQUALS(result, Matrix::IDENTITY, 0.001, TEST_LOCATION);
+          DALI_TEST_EQUALS(result, Matrix::IDENTITY, 0.001f, TEST_LOCATION);
         }
       }
     }
@@ -805,7 +805,7 @@ int UtcDaliMatrixSetInverseTransformComponent02P(void)
           Matrix result;
           Matrix::Multiply(result, m1, m2);
 
-          DALI_TEST_EQUALS(result, Matrix::IDENTITY, 0.001, TEST_LOCATION);
+          DALI_TEST_EQUALS(result, Matrix::IDENTITY, 0.001f, TEST_LOCATION);
         }
       }
     }
@@ -820,9 +820,9 @@ int UtcDaliMatrixGetTransformComponents01P(void)
   Vector3    scale2;
   Quaternion q2;
   m2.GetTransformComponents(pos2, q2, scale2);
-  DALI_TEST_EQUALS(Vector3(0.0f, 0.0f, 0.0f), pos2, 0.001, TEST_LOCATION);
-  DALI_TEST_EQUALS(Vector3(1.0f, 1.0f, 1.0f), scale2, 0.001, TEST_LOCATION);
-  DALI_TEST_EQUALS(Quaternion(), q2, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector3(0.0f, 0.0f, 0.0f), pos2, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector3(1.0f, 1.0f, 1.0f), scale2, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Quaternion(), q2, 0.001f, TEST_LOCATION);
   END_TEST;
 }
 
@@ -852,9 +852,9 @@ int UtcDaliMatrixGetTransformComponents02P(void)
           Vector3    scale2;
           m1.GetTransformComponents(position2, rotation2, scale2);
 
-          DALI_TEST_EQUALS(position1, position2, 0.001, TEST_LOCATION);
-          DALI_TEST_EQUALS(scale1, scale2, 0.001, TEST_LOCATION);
-          DALI_TEST_EQUALS(rotation1, rotation2, 0.001, TEST_LOCATION);
+          DALI_TEST_EQUALS(position1, position2, 0.001f, TEST_LOCATION);
+          DALI_TEST_EQUALS(scale1, scale2, 0.001f, TEST_LOCATION);
+          DALI_TEST_EQUALS(rotation1, rotation2, 0.001f, TEST_LOCATION);
         }
       }
     }
@@ -869,9 +869,9 @@ int UtcDaliMatrixGetTransformComponents03P(void)
   Vector3    scale2;
   Quaternion q2;
   m2.GetTransformComponents(pos2, q2, scale2);
-  DALI_TEST_EQUALS(Vector3(0.0f, 0.0f, 0.0f), pos2, 0.001, TEST_LOCATION);
-  DALI_TEST_EQUALS(Vector3(0.0f, 0.0f, 0.0f), scale2, 0.001, TEST_LOCATION);
-  // DALI_TEST_EQUALS(Quaternion(), q2, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector3(0.0f, 0.0f, 0.0f), pos2, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector3(0.0f, 0.0f, 0.0f), scale2, 0.001f, TEST_LOCATION);
+  // DALI_TEST_EQUALS(Quaternion(), q2, 0.001f, TEST_LOCATION);
   END_TEST;
 }
 

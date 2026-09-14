@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
 #include <dali/devel-api/animation/key-frames-devel.h>
 #include <dali/internal/event/animation/key-frames-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace DevelKeyFrames
 {
@@ -45,4 +45,4 @@ bool OptimizeKeyFramesLinear(KeyFrames keyFrames)
 
 } // namespace DevelKeyFrames
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

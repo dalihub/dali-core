@@ -51,7 +51,7 @@
 // EXTERNAL INCLUDES
 #include <cstddef>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 class FrameCallbackInterface;
 
@@ -1367,6 +1367,6 @@ inline void RemoveUniformBlockMessage(UpdateManager& manager, Render::UniformBlo
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_SCENE_GRAPH_UPDATE_MANAGER_H

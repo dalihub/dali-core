@@ -27,7 +27,7 @@
 #include <dali/internal/event/animation/property-constraint-ptr.h>
 #include <dali/internal/event/animation/property-constraint.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace // unnamed namespace
 {
@@ -264,4 +264,4 @@ Constraint Constraint::New(Handle handle, Property::Index targetIndex, Property:
   return constraint;
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

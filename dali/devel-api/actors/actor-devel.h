@@ -23,7 +23,7 @@
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/math/rect.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace DevelActor
 {
@@ -589,6 +589,6 @@ DALI_CORE_API Vector3 GetNaturalSize(const Actor& actor);
 
 } // namespace DevelActor
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_ACTOR_DEVEL_H

@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/event/common/base-object-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 struct WeakHandleBase::Impl : public BaseObject::Impl::Observer
 {
@@ -165,4 +165,4 @@ void WeakHandleBase::Reset()
   }
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

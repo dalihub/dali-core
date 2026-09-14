@@ -702,41 +702,6 @@ int UtcDaliSceneDepthBufferClearWithLayer3D(void)
   END_TEST;
 }
 
-int UtcDaliSceneSetMSAAEnabled(void)
-{
-  TestApplication application;
-  tet_infoline("Testing Dali::Integration::Scene::SetMSAAEnabled");
-
-  Dali::Integration::Scene scene = application.GetScene();
-
-  // Test default value
-  DALI_TEST_CHECK(!scene.IsMultiSampledAntiAliasingEnabled());
-
-  Actor actor = CreateRenderableActor();
-  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  scene.Add(actor);
-
-  // Test setting to true
-  scene.SetMultiSampledAntiAliasingEnabled(true);
-  DALI_TEST_CHECK(scene.IsMultiSampledAntiAliasingEnabled());
-
-  // Render the scene (ensures scene graph objects are updated
-  application.SendNotification();
-  application.Render();
-
-  actor.SetProperty(Actor::Property::OPACITY, 0.5f);
-
-  // Test setting to false
-  scene.SetMultiSampledAntiAliasingEnabled(false);
-  DALI_TEST_CHECK(!scene.IsMultiSampledAntiAliasingEnabled());
-
-  // Render the scene (ensures scene graph objects are updated)
-  application.SendNotification();
-  application.Render();
-
-  END_TEST;
-}
-
 int UtcDaliSceneRemove(void)
 {
   TestApplication application;
@@ -1547,10 +1512,10 @@ int UtcDaliSceneSurfaceResizedMultipleRenderTasks(void)
   actor.AddRenderer(renderer);
   int testWidth  = 400;
   int testHeight = 400;
-  actor.SetProperty(Actor::Property::SIZE, Vector2(testWidth, testHeight));
+  actor.SetProperty(Actor::Property::SIZE, Vector2(static_cast<float>(testWidth), static_cast<float>(testHeight)));
   scene.Add(actor);
 
-  CameraActor offscreenCameraActor = CameraActor::New(Size(testWidth, testHeight));
+  CameraActor offscreenCameraActor = CameraActor::New(Size(static_cast<float>(testWidth), static_cast<float>(testHeight)));
   application.GetScene().Add(offscreenCameraActor);
 
   FrameBuffer newFrameBuffer = FrameBuffer::New(testWidth, testHeight, FrameBuffer::Attachment::NONE);
@@ -1560,7 +1525,7 @@ int UtcDaliSceneSurfaceResizedMultipleRenderTasks(void)
   newTask.SetSourceActor(actor);
   newTask.SetFrameBuffer(newFrameBuffer);
   newTask.SetViewportPosition(Vector2(0, 0));
-  newTask.SetViewportSize(Vector2(testWidth, testHeight));
+  newTask.SetViewportSize(Vector2(static_cast<float>(testWidth), static_cast<float>(testHeight)));
 
   // Render before resizing surface
   application.SendNotification();
@@ -2834,7 +2799,7 @@ int UtcDaliSceneEnsureReplacedSurfaceKeepsClearColor(void)
   scissorTrace.Enable(true);
   enabledDisableTrace.Enable(true);
 
-  defaultScene.GetRenderTaskList().GetTask(0).SetViewport(Viewport(0.0f, 0.0f, 100.0f, 100.0f));
+  defaultScene.GetRenderTaskList().GetTask(0).SetViewport(Viewport(0, 0, 100, 100));
 
   application.SendNotification();
   application.Render();
@@ -3275,7 +3240,7 @@ int UtcDaliSceneSurfaceResizedWithOverlayLayer(void)
   DALI_TEST_EQUALS(scene.GetRootLayer(), defaultTask.GetSourceActor(), TEST_LOCATION);
 
   Vector2  sceneSize = scene.GetSize();
-  Viewport sceneViewport(0, 0, sceneSize.x, sceneSize.y);
+  Viewport sceneViewport(0, 0, static_cast<int>(sceneSize.x), static_cast<int>(sceneSize.y));
   Viewport defaultViewport = defaultTask.GetViewport();
   DALI_TEST_EQUALS(defaultViewport, sceneViewport, TEST_LOCATION);
 
@@ -3290,7 +3255,7 @@ int UtcDaliSceneSurfaceResizedWithOverlayLayer(void)
   Vector2 newSize(1000.0f, 2000.0f);
   DALI_TEST_CHECK(scene.GetSize() != newSize);
   scene.SurfaceResized(newSize.width, newSize.height);
-  Viewport newViewport(0, 0, newSize.x, newSize.y);
+  Viewport newViewport(0, 0, static_cast<int>(newSize.x), static_cast<int>(newSize.y));
   DALI_TEST_EQUALS(newViewport, defaultTask.GetViewport(), TEST_LOCATION);
   DALI_TEST_EQUALS(newViewport, overlayTask.GetViewport(), TEST_LOCATION);
 
@@ -3314,7 +3279,7 @@ int UtcDaliSceneKeepRendering(void)
   while(keepUpdating)
   {
     application.SendNotification();
-    keepUpdating = application.Render(1000.0f /*1 second*/);
+    keepUpdating = application.Render(1000u /*1 second*/);
   }
 
   // Force rendering for the next 5 seconds
@@ -3322,17 +3287,17 @@ int UtcDaliSceneKeepRendering(void)
 
   application.SendNotification();
 
-  keepUpdating = application.Render(1000.0f /*1 second*/);
+  keepUpdating = application.Render(1000u /*1 second*/);
   DALI_TEST_CHECK(keepUpdating);
-  keepUpdating = application.Render(1000.0f /*2 seconds*/);
+  keepUpdating = application.Render(1000u /*2 seconds*/);
   DALI_TEST_CHECK(keepUpdating);
-  keepUpdating = application.Render(1000.0f /*3 seconds*/);
+  keepUpdating = application.Render(1000u /*3 seconds*/);
   DALI_TEST_CHECK(keepUpdating);
-  keepUpdating = application.Render(1000.0f /*4 seconds*/);
+  keepUpdating = application.Render(1000u /*4 seconds*/);
   DALI_TEST_CHECK(keepUpdating);
-  keepUpdating = application.Render(1000.0f /*5 seconds*/);
+  keepUpdating = application.Render(1000u /*5 seconds*/);
   DALI_TEST_CHECK(keepUpdating);
-  keepUpdating = application.Render(1000.0f /*6 seconds*/); // After 5 sec
+  keepUpdating = application.Render(1000u /*6 seconds*/); // After 5 sec
   DALI_TEST_CHECK(!keepUpdating);
 
   END_TEST;
@@ -3380,7 +3345,7 @@ int UtcDaliSceneKeepRenderingMultipleScene(void)
   while(keepUpdating)
   {
     application.SendNotification();
-    keepUpdating = application.RenderWithPartialUpdate(1000.0f /*1 second*/);
+    keepUpdating = application.RenderWithPartialUpdate(1000u /*1 second*/);
   }
 
   drawTrace.Enable(true);
@@ -3389,7 +3354,7 @@ int UtcDaliSceneKeepRenderingMultipleScene(void)
   defaultScene.KeepRendering(5.0f);
 
   application.SendNotification();
-  keepUpdating = application.RenderWithPartialUpdate(1000.0f /*1 second*/);
+  keepUpdating = application.RenderWithPartialUpdate(1000u /*1 second*/);
 
   DALI_TEST_CHECK(keepUpdating);
   DALI_TEST_EQUALS(drawTrace.CountMethod("DrawElements"), 1, TEST_LOCATION); // Only default scene should be drawn
@@ -3400,28 +3365,28 @@ int UtcDaliSceneKeepRenderingMultipleScene(void)
   scene.KeepRendering(5.0f);
 
   application.SendNotification();
-  keepUpdating = application.RenderWithPartialUpdate(3000.0f /*4 second*/);
+  keepUpdating = application.RenderWithPartialUpdate(3000u /*4 second*/);
 
   DALI_TEST_CHECK(keepUpdating);
   DALI_TEST_EQUALS(drawTrace.CountMethod("DrawElements"), 2, TEST_LOCATION); // Both scenes should be drawn
 
   drawTrace.Reset();
 
-  keepUpdating = application.RenderWithPartialUpdate(1000.0f /*5 second*/);
+  keepUpdating = application.RenderWithPartialUpdate(1000u /*5 second*/);
 
   DALI_TEST_CHECK(keepUpdating);
   DALI_TEST_EQUALS(drawTrace.CountMethod("DrawElements"), 2, TEST_LOCATION); // Still both scenes should be drawn
 
   drawTrace.Reset();
 
-  keepUpdating = application.RenderWithPartialUpdate(1000.0f /*6 second*/);
+  keepUpdating = application.RenderWithPartialUpdate(1000u /*6 second*/);
 
   DALI_TEST_CHECK(keepUpdating);
   DALI_TEST_EQUALS(drawTrace.CountMethod("DrawElements"), 1, TEST_LOCATION); // Only the new scenes should be drawn
 
   drawTrace.Reset();
 
-  keepUpdating = application.RenderWithPartialUpdate(1000.0f /*7 second*/);
+  keepUpdating = application.RenderWithPartialUpdate(1000u /*7 second*/);
 
   DALI_TEST_CHECK(!keepUpdating);
   DALI_TEST_EQUALS(drawTrace.CountMethod("DrawElements"), 0, TEST_LOCATION); // Nothing drawn
@@ -3464,7 +3429,7 @@ int UtcDaliSceneEnableDisablePartialUpdate(void)
   // Aligned by 16
   const BoundsInteger ACTOR_CLIPPING_RECT = BoundsInteger(CLIPPING_RECT_X, CLIPPING_RECT_Y, CLIPPING_RECT_WIDTH, CLIPPING_RECT_HEIGHT); // in screen coordinates, includes 1 last frames updates
   Size                sceneSize           = scene.GetSize();
-  const BoundsInteger SCENE_CLIPPING_RECT = BoundsInteger(0, 0, sceneSize.width, sceneSize.height);
+  const BoundsInteger SCENE_CLIPPING_RECT = BoundsInteger(0, 0, static_cast<int>(sceneSize.width), static_cast<int>(sceneSize.height));
 
   BoundsInteger clippingRect = ACTOR_CLIPPING_RECT;
   DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
@@ -3861,22 +3826,22 @@ int UtcDaliSceneSetForceRenderingP(void)
   application.SendNotification();
 
   // Test that core wants to keep rendering for 5 frames, with uploadOnly flags
-  keepUpdating = application.Render(1000.0f, TEST_LOCATION, true);
+  keepUpdating = application.Render(1000u, TEST_LOCATION, true);
   DALI_TEST_CHECK(application.GetRenderNeedsPostRender());
   DALI_TEST_CHECK(keepUpdating);
-  keepUpdating = application.Render(1000.0f, TEST_LOCATION, true);
+  keepUpdating = application.Render(1000u, TEST_LOCATION, true);
   DALI_TEST_CHECK(application.GetRenderNeedsPostRender());
   DALI_TEST_CHECK(keepUpdating);
-  keepUpdating = application.Render(1000.0f, TEST_LOCATION, true);
+  keepUpdating = application.Render(1000u, TEST_LOCATION, true);
   DALI_TEST_CHECK(application.GetRenderNeedsPostRender());
   DALI_TEST_CHECK(keepUpdating);
-  keepUpdating = application.Render(1000.0f, TEST_LOCATION, true);
+  keepUpdating = application.Render(1000u, TEST_LOCATION, true);
   DALI_TEST_CHECK(application.GetRenderNeedsPostRender());
   DALI_TEST_CHECK(keepUpdating);
-  keepUpdating = application.Render(1000.0f, TEST_LOCATION, true);
+  keepUpdating = application.Render(1000u, TEST_LOCATION, true);
   DALI_TEST_CHECK(application.GetRenderNeedsPostRender());
   DALI_TEST_CHECK(!keepUpdating); // After 5 frames rendering, we don't need to keep rendering next frame.
-  keepUpdating = application.Render(1000.0f, TEST_LOCATION, true);
+  keepUpdating = application.Render(1000u, TEST_LOCATION, true);
   DALI_TEST_CHECK(!application.GetRenderNeedsPostRender());
   DALI_TEST_CHECK(!keepUpdating);
 
@@ -3884,10 +3849,10 @@ int UtcDaliSceneSetForceRenderingP(void)
   scene.SetForceRendering(3u);
   application.SendNotification();
 
-  keepUpdating = application.Render(1000.0f, TEST_LOCATION, true);
+  keepUpdating = application.Render(1000u, TEST_LOCATION, true);
   DALI_TEST_CHECK(application.GetRenderNeedsPostRender());
   DALI_TEST_CHECK(keepUpdating);
-  keepUpdating = application.Render(1000.0f, TEST_LOCATION, true);
+  keepUpdating = application.Render(1000u, TEST_LOCATION, true);
   DALI_TEST_CHECK(application.GetRenderNeedsPostRender());
   DALI_TEST_CHECK(keepUpdating);
 
@@ -3895,7 +3860,7 @@ int UtcDaliSceneSetForceRenderingP(void)
   scene.SetForceRendering(3u);
   application.SendNotification();
 
-  keepUpdating = application.Render(1000.0f, TEST_LOCATION, true);
+  keepUpdating = application.Render(1000u, TEST_LOCATION, true);
   DALI_TEST_CHECK(application.GetRenderNeedsPostRender());
   DALI_TEST_CHECK(keepUpdating);
 
@@ -3903,13 +3868,13 @@ int UtcDaliSceneSetForceRenderingP(void)
   scene.SetForceRendering(1u);
   application.SendNotification();
 
-  keepUpdating = application.Render(1000.0f, TEST_LOCATION, true);
+  keepUpdating = application.Render(1000u, TEST_LOCATION, true);
   DALI_TEST_CHECK(application.GetRenderNeedsPostRender());
   DALI_TEST_CHECK(keepUpdating);
-  keepUpdating = application.Render(1000.0f, TEST_LOCATION, true);
+  keepUpdating = application.Render(1000u, TEST_LOCATION, true);
   DALI_TEST_CHECK(application.GetRenderNeedsPostRender());
   DALI_TEST_CHECK(!keepUpdating); // After 3 frames rendering, we don't need to keep rendering next frame.
-  keepUpdating = application.Render(1000.0f, TEST_LOCATION, true);
+  keepUpdating = application.Render(1000u, TEST_LOCATION, true);
   DALI_TEST_CHECK(!application.GetRenderNeedsPostRender());
   DALI_TEST_CHECK(!keepUpdating);
 
@@ -3941,7 +3906,7 @@ int UtcDaliSceneSetForceRenderingN(void)
   application.SendNotification();
 
   // Test that core does not want to keep rendering, with uploadOnly flags
-  keepUpdating = application.Render(1000.0f, TEST_LOCATION, true);
+  keepUpdating = application.Render(1000u, TEST_LOCATION, true);
   DALI_TEST_CHECK(!application.GetRenderNeedsPostRender());
   DALI_TEST_CHECK(!keepUpdating);
 
@@ -3990,16 +3955,16 @@ int UtcDaliSceneSetForceRenderingMultipleScene(void)
   application.SendNotification();
 
   // Test that core wants to keep rendering for 3 frames, with uploadOnly flags
-  keepUpdating = application.Render(1000.0f, TEST_LOCATION, true);
+  keepUpdating = application.Render(1000u, TEST_LOCATION, true);
   DALI_TEST_CHECK(application.GetRenderNeedsPostRender());
   DALI_TEST_CHECK(keepUpdating);
-  keepUpdating = application.Render(1000.0f, TEST_LOCATION, true);
+  keepUpdating = application.Render(1000u, TEST_LOCATION, true);
   DALI_TEST_CHECK(application.GetRenderNeedsPostRender());
   DALI_TEST_CHECK(keepUpdating); // Second scene still need to render frames
-  keepUpdating = application.Render(1000.0f, TEST_LOCATION, true);
+  keepUpdating = application.Render(1000u, TEST_LOCATION, true);
   DALI_TEST_CHECK(application.GetRenderNeedsPostRender());
   DALI_TEST_CHECK(!keepUpdating); // After 3 frames
-  keepUpdating = application.Render(1000.0f, TEST_LOCATION, true);
+  keepUpdating = application.Render(1000u, TEST_LOCATION, true);
   DALI_TEST_CHECK(!application.GetRenderNeedsPostRender());
   DALI_TEST_CHECK(!keepUpdating);
 

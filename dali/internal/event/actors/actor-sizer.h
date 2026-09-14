@@ -22,7 +22,7 @@
 #include <dali/internal/event/actors/actor-declarations.h>
 #include <dali/public-api/math/vector3.h>
 
-namespace Dali::Internal
+namespace DALI_NAMESPACE::Internal
 {
 class Actor;
 class Animation;
@@ -365,6 +365,6 @@ private:
   bool             mInsideOnSizeSet : 1;
 };
 
-} // namespace Dali::Internal
+} //namespace DALI_NAMESPACE::Internal
 
 #endif //DALI_INTERNAL_ACTOR_SIZER_H

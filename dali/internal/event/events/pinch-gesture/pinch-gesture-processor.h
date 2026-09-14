@@ -23,7 +23,7 @@
 #include <dali/internal/event/events/pinch-gesture/pinch-gesture-detector-impl.h>
 #include <dali/internal/event/render-tasks/render-task-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -163,6 +163,6 @@ private:
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_PINCH_GESTURE_EVENT_PROCESSOR_H

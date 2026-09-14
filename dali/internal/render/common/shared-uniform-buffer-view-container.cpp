@@ -32,7 +32,7 @@
 #include <dali/internal/render/renderers/uniform-buffer.h>
 #include <dali/internal/render/shaders/program.h>
 
-namespace Dali::Internal
+namespace DALI_NAMESPACE::Internal
 {
 #if defined(DEBUG_ENABLED)
 namespace
@@ -209,4 +209,4 @@ void SharedUniformBufferViewContainer::Finalize()
   mImpl->mTotalAlignedBlockSize = 0u;
 }
 
-} // namespace Dali::Internal
+} //namespace DALI_NAMESPACE::Internal

@@ -22,7 +22,7 @@
 #include <dali/public-api/object/base-handle.h>
 #include <memory>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @brief Base class to provide observer interface for BaseOject destruction  store a weak pointer to an internal DALi object.
@@ -65,6 +65,6 @@ private:
   /// @endcond
 };
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_BASE_OBJECT_OBSERVER_H

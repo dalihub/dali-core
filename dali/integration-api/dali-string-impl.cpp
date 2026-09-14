@@ -42,7 +42,7 @@ inline const std::string& GetStdStringFromStorage(const void* storage)
 
 } // unnamed namespace
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -101,4 +101,4 @@ String StringImpl::ToDaliString(std::string&& stdString) noexcept
 }
 
 } // namespace Internal
-} // namespace Dali
+} //namespace DALI_NAMESPACE

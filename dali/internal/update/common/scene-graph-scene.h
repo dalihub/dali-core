@@ -38,7 +38,7 @@
 #include <dali/internal/update/nodes/scene-graph-layer.h>
 #include <dali/public-api/math/compile-time-math.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -329,8 +329,6 @@ I   * @param[in] callback The function to call
 
   bool IsStencilBufferEnabled() const;
 
-  bool IsMultiSampledAntiAliasingEnabled() const;
-
   /**
    * @brief Queries whether the scene will update partial area.
    *
@@ -461,7 +459,6 @@ private:
   bool mNeedFullUpdate : 1;                   ///< A flag to update full area
   bool mDepthBufferEnabled : 1;               ///< True if this scene has a depth buffer
   bool mStencilBufferEnabled : 1;             ///< True if this scene has a stencil buffer
-  bool mMSAAEnabled : 1;                      ///< True if this scene has MSAA enabled
   bool mPartialUpdateEnabled : 1;             ///< True if the partial update is enabled
   bool mHasRenderInstructionToScene : 1;      ///< True if has render instruction to the scene. Update at PreRender time.
   bool mRenderPassDirty : 1;                  ///< True if depth/stencil flags changed since last BuildRenderPasses
@@ -582,6 +579,6 @@ inline void SetForceRenderingFramesCountMessage(EventThreadServices& eventThread
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_SCENE_GRAPH_SCENE_H

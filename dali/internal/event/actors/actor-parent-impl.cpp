@@ -28,7 +28,7 @@
 // EXTERNAL INCLUDES
 #include <algorithm>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -793,4 +793,4 @@ void ActorParentImpl::EmitOrderChangedAndRebuild(Actor& child)
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

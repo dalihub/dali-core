@@ -29,7 +29,7 @@
 #include <dali/integration-api/ordered-set.h>
 #include <dali/internal/common/memory-pool-object-allocator.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -121,6 +121,6 @@ private:
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_MEMORY_POOL_RELAYOUT_CONTAINER_H

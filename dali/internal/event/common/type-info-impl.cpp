@@ -31,7 +31,7 @@
 using Dali::Integration::ToDaliString;
 using Dali::Integration::ToDaliStringView;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -1109,4 +1109,4 @@ Property::Value TypeInfo::GetProperty(const BaseObject* object, const std::strin
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

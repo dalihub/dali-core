@@ -21,7 +21,7 @@
 #include <dali/internal/update/common/uniform-map.h>
 #include <dali/public-api/math/vector4.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -52,6 +52,6 @@ protected:
 
 } // namespace SceneGraph
 } // namespace Internal
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_SCENE_GRAPH_NODE_DATA_PROVIDER_H

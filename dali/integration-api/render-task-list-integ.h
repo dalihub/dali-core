@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_RENDER_TASK_LIST_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/render-tasks/render-task-list.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 class Actor;
 class CameraActor;
@@ -56,6 +56,6 @@ DALI_CORE_API Dali::RenderTask CreateTask(Dali::RenderTaskList& taskList, Dali::
 
 } // namespace Integration
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTEGRATION_RENDER_TASK_LIST_H

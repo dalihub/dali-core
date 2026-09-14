@@ -34,7 +34,7 @@
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 #if defined(BACKTRACE_ENABLED)
 
@@ -167,4 +167,4 @@ DALI_CORE_API void DaliAssertMessage(const char* location, const char* condition
 #endif
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

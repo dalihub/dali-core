@@ -24,7 +24,7 @@
 #include <dali/internal/render/renderers/render-geometry-messages.h>
 #include <dali/internal/update/manager/update-manager.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -128,4 +128,4 @@ Geometry::~Geometry()
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

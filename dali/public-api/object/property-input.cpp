@@ -18,8 +18,8 @@
 // CLASS HEADER
 #include <dali/public-api/object/property-input.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 PropertyInput::~PropertyInput() = default;
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

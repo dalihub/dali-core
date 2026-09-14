@@ -2,7 +2,7 @@
 #define DALI_GEOMETRY_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@
 #include <dali/public-api/object/property-index-ranges.h> // DEFAULT_DERIVED_HANDLE_PROPERTY_START_INDEX
 #include <dali/public-api/rendering/vertex-buffer.h>      // Dali::VertexBuffer
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @addtogroup dali_core_rendering_effects
@@ -206,6 +206,6 @@ public:
 /**
  * @}
  */
-} //namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_GEOMETRY_H

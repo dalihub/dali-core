@@ -23,7 +23,7 @@
 #include <dali/public-api/math/radian.h>
 #include <dali/public-api/math/vector2.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal DALI_INTERNAL
 {
@@ -123,6 +123,6 @@ public: // Not intended for application developers
   /// @endcond
 };
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_ROTATION_GESTURE_H

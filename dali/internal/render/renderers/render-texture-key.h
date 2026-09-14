@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_RENDER_TEXTURE_KEY_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,9 @@
  */
 
 #include <dali/internal/common/memory-pool-key.h>
+#include <dali/public-api/common/dali-namespace.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal::Render
 {
@@ -36,6 +37,6 @@ struct TypeTraits<Internal::Render::TextureKey> : public BasicTypes<Internal::Re
   };
 };
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif //DALI_INTERNAL_RENDER_RENDER_TEXTURE_KEY_H

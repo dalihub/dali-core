@@ -1,6 +1,6 @@
 Name:       dali2
 Summary:    DALi 3D Engine
-Version:    2.5.37
+Version:    2.5.39
 Release:    1
 Group:      System/Libraries
 License:    Apache-2.0 and BSD-3-Clause and MIT
@@ -103,6 +103,9 @@ cmake \
 %endif
 %if 0%{?enable_gpu_memory_profile}
       -DENABLE_GPU_MEMORY_PROFILE=ON \
+%endif
+%if 0%{?enable_tizen_namespace}
+      -DENABLE_TIZEN_NAMESPACE=ON \
 %endif
       -DCMAKE_INSTALL_PREFIX=%{_prefix} \
       -DCMAKE_INSTALL_LIBDIR=%{_libdir} \

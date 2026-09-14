@@ -21,7 +21,7 @@
 #include <dali/internal/event/animation/animation-playlist.h>
 #include <dali/internal/event/common/thread-local-storage.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace DevelAnimation
 {
@@ -54,4 +54,4 @@ Animation GetAnimationAt(uint32_t index)
 
 } // namespace DevelAnimation
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

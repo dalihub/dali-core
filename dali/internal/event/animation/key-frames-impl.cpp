@@ -18,7 +18,7 @@
 // CLASS HEADER
 #include <dali/internal/event/animation/key-frames-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -209,4 +209,4 @@ bool KeyFrames::OptimizeKeyFramesLinear()
 }
 
 } // namespace Internal
-} // namespace Dali
+} //namespace DALI_NAMESPACE

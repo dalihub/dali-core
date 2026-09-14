@@ -22,7 +22,7 @@
 #include <dali/internal/render/shaders/program.h> ///< for Program::LifecycleObserver
 #include <dali/internal/update/common/property-owner.h>
 
-namespace Dali::Internal
+namespace DALI_NAMESPACE::Internal
 {
 namespace Render
 {
@@ -114,6 +114,6 @@ private:
 };
 } // namespace Render
 
-} // namespace Dali::Internal
+} //namespace DALI_NAMESPACE::Internal
 
 #endif // DALI_INTERNAL_RENDER_RENDER_UNIFORM_BLOCK_H

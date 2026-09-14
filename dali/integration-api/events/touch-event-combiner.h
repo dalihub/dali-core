@@ -23,7 +23,7 @@
 #include <dali/integration-api/events/point.h>
 #include <dali/public-api/math/vector2.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Integration
 {
@@ -168,6 +168,6 @@ private:
 
 } // namespace Integration
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTEGRATION_TOUCH_EVENT_COMBINER_H

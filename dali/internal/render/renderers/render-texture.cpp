@@ -26,7 +26,7 @@
 #include <dali/internal/render/common/render-manager.h>
 #include <dali/internal/update/common/scene-graph-memory-pool-collection.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -420,4 +420,4 @@ Rect<uint16_t> Texture::GetUpdatedArea()
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

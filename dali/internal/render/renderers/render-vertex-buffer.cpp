@@ -21,7 +21,7 @@
 // INTERNAL HEADERS
 #include <dali/internal/event/rendering/vertex-buffer-impl.h> // Dali::Internal::VertexBuffer
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -117,4 +117,4 @@ uint32_t VertexBuffer::GetDivisor()
 
 } // namespace Render
 } // namespace Internal
-} // namespace Dali
+} //namespace DALI_NAMESPACE

@@ -23,7 +23,7 @@
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/public-api/math/vector2.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace
 {
@@ -84,4 +84,4 @@ void Stage::KeepRendering(float durationSeconds)
   }
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

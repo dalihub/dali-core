@@ -28,7 +28,7 @@
 #include <dali/public-api/object/property-index-ranges.h>
 #include <dali/public-api/signals/dali-signal.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 struct Radian;
 
@@ -386,6 +386,6 @@ public: // Not intended for Application developers
  * @}
  */
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_PAN_GESTURE_DETECTOR_H

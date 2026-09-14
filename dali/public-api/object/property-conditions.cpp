@@ -22,7 +22,7 @@
 #include <dali/internal/event/common/property-conditions-impl.h>
 #include <dali/public-api/object/property-value.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 PropertyCondition::PropertyCondition()
 : BaseHandle(new Internal::PropertyCondition())
@@ -119,4 +119,4 @@ PropertyCondition VariableStepCondition(const Dali::Vector<float>& stepAmount)
   return condition;
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

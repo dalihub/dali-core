@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
 #include <dali/internal/event/events/tap-gesture/tap-gesture-impl.h>
 #include <dali/public-api/common/dali-common.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 TapGesture::TapGesture(Internal::TapGesture* internal)
 : Gesture(internal)
@@ -61,4 +61,4 @@ const Vector2& TapGesture::GetLocalPoint() const
   return GetImplementation(*this).GetLocalPoint();
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

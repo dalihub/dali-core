@@ -51,7 +51,7 @@
 #define DALI_ASSERT_VECTOR(cond)
 #endif
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @addtogroup dali_core_common
@@ -259,11 +259,11 @@ protected: // for Derived classes
 
 private:
   // not copyable as it does not know the size of elements
-  VectorBase(const VectorBase&) = delete;            ///< Deleted copy constructor. @SINCE_1_0.0
+  VectorBase(const VectorBase&)            = delete; ///< Deleted copy constructor. @SINCE_1_0.0
   VectorBase& operator=(const VectorBase&) = delete; ///< Deleted copy assignment operator. @SINCE_1_0.0
 
   // not movable as this is handled by deriving classes
-  VectorBase(VectorBase&&) = delete;            ///< Deleted move constructor. @SINCE_1_9.25
+  VectorBase(VectorBase&&)            = delete; ///< Deleted move constructor. @SINCE_1_9.25
   VectorBase& operator=(VectorBase&&) = delete; ///< Deleted copy assignment operator. @SINCE_1_9.25
 
 protected:     // Data
@@ -273,7 +273,7 @@ protected:     // Data
 /**
  * @}
  */
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #if defined(DALI_VECTOR_BASE_RESTORE_COPY_MEMORY_MACRO)
 #pragma pop_macro("CopyMemory")

@@ -42,7 +42,7 @@ Debug::Filter* gRenderListLogFilter = Debug::Filter::New(Debug::NoLogging, false
 #endif
 } // namespace
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -151,6 +151,7 @@ bool CompareItems3DWithClipping(const RenderInstructionProcessor::SortAttributes
  * @param viewportSet Whether the viewport is set or not
  * @param viewport The viewport
  * @param cullingEnabled Whether frustum culling is enabled or not
+ * @param hasFrameBuffer Whether this render instruction targets a framebuffer
  * @param stopperNode Marker node that stops rendering(must be rendered)
  */
 inline void AddRendererToRenderList(uint32_t                  renderPass,
@@ -163,6 +164,7 @@ inline void AddRendererToRenderList(uint32_t                  renderPass,
                                     bool                      viewportSet,
                                     const Viewport&           viewport,
                                     bool                      cullingEnabled,
+                                    bool                      hasFrameBuffer,
                                     Node*                     stopperNode)
 {
   bool  inside(true);
@@ -243,11 +245,15 @@ inline void AddRendererToRenderList(uint32_t                  renderPass,
     {
       const bool isVisualRendererUnder3D = (isLayer3d && !!(renderable.mRenderer && renderable.mRenderer->GetVisualProperties()));
 
-      const Renderer::OpacityType opacityType = rendererExist ? (isVisualRendererUnder3D ? Renderer::TRANSLUCENT : renderable.mRenderer->GetOpacityType(renderPass, *node)) : Renderer::OPAQUE;
+      const Renderer::OpacityType opacityType                 = rendererExist ? (isVisualRendererUnder3D ? Renderer::TRANSLUCENT : renderable.mRenderer->GetOpacityType(renderPass, *node)) : Renderer::OPAQUE;
+      const bool                  drawOffscreenRenderingCache = hasFrameBuffer && (node->GetCacheRendererCount() > 0u);
 
       // We can skip render when node is not clipping and transparent
       // We must not skip when node is a stopper
-      skipRender = (opacityType == Renderer::TRANSPARENT &&
+      // We must also not skip an offscreen-cache source. Its world color is deliberately
+      // ignored later while drawing into the framebuffer and applied to the cached result.
+      skipRender = (!drawOffscreenRenderingCache &&
+                    opacityType == Renderer::TRANSPARENT &&
                     node->GetClippingMode() == ClippingMode::DISABLED &&
                     node != stopperNode);
 
@@ -319,6 +325,7 @@ inline void AddRendererToRenderList(uint32_t                  renderPass,
  * @param viewportSet Whether the viewport is set or not
  * @param viewport The viewport
  * @param cullingEnabled Whether frustum culling is enabled or not
+ * @param hasFrameBuffer Whether this render instruction targets a framebuffer
  * @param stopperNode Marker node that stops rendering(must be rendered)
  */
 inline void AddRenderersToRenderList(uint32_t                  renderPass,
@@ -331,6 +338,7 @@ inline void AddRenderersToRenderList(uint32_t                  renderPass,
                                      bool                      viewportSet,
                                      const Viewport&           viewport,
                                      bool                      cullingEnabled,
+                                     bool                      hasFrameBuffer,
                                      Node*                     stopperNode)
 {
   DALI_LOG_INFO(gRenderListLogFilter, Debug::Verbose, "AddRenderersToRenderList()\n");
@@ -347,6 +355,7 @@ inline void AddRenderersToRenderList(uint32_t                  renderPass,
                             viewportSet,
                             viewport,
                             cullingEnabled,
+                            hasFrameBuffer,
                             stopperNode);
   }
 }
@@ -642,6 +651,7 @@ void RenderInstructionProcessor::Prepare(SortedLayerPointers&        sortedLayer
                                  viewportSet,
                                  viewport,
                                  cull,
+                                 instruction.mFrameBuffer != nullptr,
                                  stopperNode);
 
         // We only use the clipping version of the sort comparitor if any clipping nodes exist within the RenderList.
@@ -678,6 +688,7 @@ void RenderInstructionProcessor::Prepare(SortedLayerPointers&        sortedLayer
                                  viewportSet,
                                  viewport,
                                  cull,
+                                 instruction.mFrameBuffer != nullptr,
                                  stopperNode);
 
         // Clipping hierarchy is irrelevant when sorting overlay items, so we specify using the non-clipping version of the sort comparitor.
@@ -711,4 +722,4 @@ void RenderInstructionProcessor::Prepare(SortedLayerPointers&        sortedLayer
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

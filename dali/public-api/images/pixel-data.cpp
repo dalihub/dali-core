@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/event/images/pixel-data-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 PixelData PixelData::New(uint8_t*        buffer,
                          uint32_t        bufferSize,
@@ -88,4 +88,4 @@ uint32_t PixelData::GetTotalAllocatedSize()
   return Internal::PixelData::GetTotalAllocatedSize();
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

@@ -29,7 +29,7 @@
 #include <dali/internal/event/rendering/texture-impl.h>
 #endif
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -191,4 +191,4 @@ FrameBuffer::~FrameBuffer()
 }
 
 } // namespace Internal
-} // namespace Dali
+} //namespace DALI_NAMESPACE

@@ -27,7 +27,7 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/signals/callback.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -196,6 +196,6 @@ protected:
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_SCENE_GRAPH_CONSTRAINT_H

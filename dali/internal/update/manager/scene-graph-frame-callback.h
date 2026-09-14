@@ -30,7 +30,7 @@
 #include <dali/internal/update/manager/update-proxy-impl.h>
 #include <dali/public-api/update/frame-callback-interface.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -179,6 +179,6 @@ inline bool operator==(const OwnerPointer<FrameCallback>& frameCallback, const F
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_SCENE_GRAPH_FRAME_CALLBACK_H

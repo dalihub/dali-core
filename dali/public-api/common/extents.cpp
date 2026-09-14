@@ -18,7 +18,7 @@
 // CLASS HEADER
 #include <dali/public-api/common/extents.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 Extents::Extents()
 : start(0),
@@ -59,4 +59,4 @@ bool Extents::operator!=(const Extents& rhs) const
   return !(*this == rhs);
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

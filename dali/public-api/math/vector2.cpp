@@ -27,7 +27,7 @@
 #include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/math/vector3.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 const Vector2 Vector2::ONE(1.0f, 1.0f);
 const Vector2 Vector2::XAXIS(1.0f, 0.0f);
@@ -115,4 +115,4 @@ Vector2 Clamp(const Vector2& v, const float& min, const float& max)
   return result;
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
