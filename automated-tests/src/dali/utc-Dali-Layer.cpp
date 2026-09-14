@@ -76,7 +76,7 @@ int UtcDaliLayerDownCast(void)
 
   Layer actor1  = Layer::New();
   Actor anActor = Actor::New();
-  anActor.Add(actor1);
+  DevelActor::Add(anActor, actor1);
 
   Actor child = anActor.GetChildAt(0);
   Layer layer = DownCast<Layer>(child);
@@ -888,7 +888,7 @@ int UtcDaliLayerIgnored(void)
   Layer child2 = Layer::New();
   child2.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   child2.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
-  parent.Add(child2);
+  DevelActor::Add(parent, child2);
 
   DALI_TEST_EQUALS(child1.IsIgnored(), false, TEST_LOCATION);
   DALI_TEST_EQUALS(child2.IsIgnored(), false, TEST_LOCATION);
@@ -1125,7 +1125,7 @@ int utcDaliLayerUnderClippingNode(void)
   application.GetScene().Add(layer1);
   layer1.Add(parentClipper);
 
-  parentClipper.Add(layer2);
+  DevelActor::Add(parentClipper, layer2);
 
   DALI_TEST_EQUALS(root.GetProperty<int>(Layer::Property::DEPTH), 0u, TEST_LOCATION);
   DALI_TEST_EQUALS(layer1.GetProperty<int>(Layer::Property::DEPTH), 1u, TEST_LOCATION);

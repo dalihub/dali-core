@@ -68,7 +68,12 @@ Layer Actor::GetLayer()
 
 void Actor::Add(Actor actor)
 {
-  GetImplementation(*this).Add(GetImplementation(actor));
+  auto& actorImpl = GetImplementation(actor);
+
+  // We should not add a layer as a child
+  DALI_ASSERT_ALWAYS(!actorImpl.IsLayer() && "Cannot add a Layer to an actor");
+
+  GetImplementation(*this).Add(actorImpl);
 }
 
 void Actor::InsertAbove(Actor child, Actor target)

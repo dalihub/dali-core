@@ -1225,7 +1225,7 @@ int UtcDaliTouchEventMultipleRenderTasksWithChildLayer(void)
   Layer layer = Layer::New();
   layer.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
   layer.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
-  actor.Add(layer);
+  DevelActor::Add(actor, layer);
 
   // Create render task
   Viewport   viewport(static_cast<int>(sceneSize.width * 0.5f), static_cast<int>(sceneSize.height * 0.5f), static_cast<int>(sceneSize.width * 0.5f), static_cast<int>(sceneSize.height * 0.5f));

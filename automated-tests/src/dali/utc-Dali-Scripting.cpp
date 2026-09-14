@@ -399,7 +399,7 @@ int UtcDaliScriptingCreatePropertyMapActor(void)
   {
     Actor actor = Actor::New();
     Actor child = Layer::New();
-    actor.Add(child);
+    DevelActor::Add(actor, child);
 
     application.GetScene().Add(actor);
     application.SendNotification();

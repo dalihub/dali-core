@@ -2413,7 +2413,7 @@ int UtcDaliCustomActorReordering(void)
   OffScreenCustomActor J_offScreenCustomActor = OffScreenCustomActor::New(OffScreenRenderable::Type::BACKWARD);
 
   A_layer.Add(B_offScreenCustomActor);
-  A_layer.Add(C_layer);
+  DevelActor::Add(A_layer, C_layer);
   B_offScreenCustomActor.Add(D_actor);
   B_offScreenCustomActor.Add(E_offScreenCustomActor);
   E_offScreenCustomActor.Add(F_offScreenCustomActor);
