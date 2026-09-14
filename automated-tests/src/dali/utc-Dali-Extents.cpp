@@ -16,6 +16,7 @@
  */
 
 #include <dali-test-suite-utils.h>
+#include <dali/devel-api/common/extents.h>
 #include <dali/public-api/dali-core.h>
 #include <stdlib.h>
 

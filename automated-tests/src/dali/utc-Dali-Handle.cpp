@@ -17,7 +17,9 @@
 
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/object/handle-devel.h>
+#include <dali/devel-api/object/property-devel.h>
 #include <dali/devel-api/object/property-map-devel.h>
+#include <dali/devel-api/object/property-value-devel.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/dali-core.h>
 #include <mesh-builder.h>
@@ -810,7 +812,7 @@ int UtcDaliHandleRegisterProperty03(void)
   DALI_TEST_EQUALS(actor.GetPropertyCount(), defaultPropertyCount + 1, TEST_LOCATION); // Property count should be different
 
   DALI_TEST_EQUALS(actor.GetProperty<Vector4>(Actor::Property::COLOR_MULTIPLIER), testColor, TEST_LOCATION); // Value should not have changed
-  DALI_TEST_EQUALS(actor.GetProperty<Vector4>(testIndex), Color::BLACK, TEST_LOCATION);           // Value should not have changed
+  DALI_TEST_EQUALS(actor.GetProperty<Vector4>(testIndex), Color::BLACK, TEST_LOCATION);                      // Value should not have changed
 
   // Check that name lookup returns the default property
   DALI_TEST_EQUALS((int)actor.GetPropertyIndex(Property::Key("colorMultiplier")), (int)Actor::Property::COLOR_MULTIPLIER, TEST_LOCATION);
@@ -1303,29 +1305,37 @@ int UtcDaliHandleCustomPropertyInvalidToExtents(void)
 
   Handle handle = Handle::New();
 
+  auto getExtents = [&handle](Property::Index index)
+  {
+    Extents extents;
+    GetExtents(handle.GetProperty(index), extents);
+    return extents;
+  };
+
   Extents         startValue(1, 2, 3, 4);
   Property::Index index = handle.RegisterProperty("testProperty", startValue, Property::READ_WRITE);
-  DALI_TEST_EQUALS(handle.GetProperty<Extents>(index), startValue, TEST_LOCATION);
+  DALI_TEST_EQUALS(handle.GetPropertyType(index), DevelProperty::EXTENTS, TEST_LOCATION);
+  DALI_TEST_EQUALS(getExtents(index), startValue, TEST_LOCATION);
 
   application.SendNotification();
   application.Render(0);
-  DALI_TEST_EQUALS(handle.GetProperty<Extents>(index), startValue, TEST_LOCATION);
+  DALI_TEST_EQUALS(getExtents(index), startValue, TEST_LOCATION);
 
   // Negative test i.e. there is no conversion from float to Extents
   handle.SetProperty(index, float(1.5));
 
   application.SendNotification();
   application.Render(0);
-  DALI_TEST_EQUALS(handle.GetProperty<Extents>(index), startValue, TEST_LOCATION);
+  DALI_TEST_EQUALS(getExtents(index), startValue, TEST_LOCATION);
 
   // Positive test (sanity check)
   Extents endValue(5, 6, 7, 8);
   handle.SetProperty(index, endValue);
-  DALI_TEST_EQUALS(handle.GetProperty<Extents>(index), endValue, TEST_LOCATION);
+  DALI_TEST_EQUALS(getExtents(index), endValue, TEST_LOCATION);
 
   application.SendNotification();
   application.Render(0);
-  DALI_TEST_EQUALS(handle.GetProperty<Extents>(index), endValue, TEST_LOCATION);
+  DALI_TEST_EQUALS(getExtents(index), endValue, TEST_LOCATION);
 
   END_TEST;
 }
@@ -2017,9 +2027,6 @@ int UtcDaliHandleGetProperties(void)
         break;
       case Property::MAP:
         DALI_TEST_EQUALS(value.GetMap()->Count(), handleValue.GetMap()->Count(), TEST_LOCATION);
-        break;
-      case Property::EXTENTS:
-        DALI_TEST_EQUALS(value.Get<Extents>(), handleValue.Get<Extents>(), TEST_LOCATION);
         break;
       case Property::INSETS:
         DALI_TEST_CHECK(value.Get<Insets>() == handleValue.Get<Insets>());

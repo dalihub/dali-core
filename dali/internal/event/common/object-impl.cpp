@@ -24,6 +24,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/object/handle-devel.h>
+#include <dali/devel-api/object/property-devel.h>
 #include <dali/integration-api/debug.h>
 #include <dali/internal/common/const-string.h>
 #include <dali/internal/event/animation/constraint-impl.h>
@@ -1249,6 +1250,9 @@ Property::Index Object::RegisterSceneGraphProperty(ConstString name, Property::I
   // Create a new property
   Dali::Internal::OwnerPointer<PropertyBase> newProperty;
 
+  // DevelProperty::EXTENTS cannot be a case label of a Property::Type switch.
+  DALI_ASSERT_ALWAYS(propertyValue.GetType() != DevelProperty::EXTENTS && "Property type is not animatable");
+
   switch(propertyValue.GetType())
   {
     case Property::BOOLEAN:
@@ -1309,7 +1313,6 @@ Property::Index Object::RegisterSceneGraphProperty(ConstString name, Property::I
     case Property::STRING:
     case Property::ARRAY:
     case Property::MAP:
-    case Property::EXTENTS:
     case Property::INSETS:
     case Property::NONE:
     {

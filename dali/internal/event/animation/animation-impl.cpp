@@ -162,7 +162,6 @@ inline bool IsAnimatable(Property::Type type)
     case Property::STRING:
     case Property::ARRAY:
     case Property::MAP:
-    case Property::EXTENTS:
     case Property::INSETS:
     {
       break;

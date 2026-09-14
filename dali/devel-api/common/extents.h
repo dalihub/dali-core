@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/object/property-value.h>
 
 namespace DALI_NAMESPACE
 {
@@ -110,6 +111,14 @@ struct DALI_CORE_API Extents
    * @return True if the extents are not equal
    */
   bool operator!=(const Extents& rhs) const;
+
+  /**
+   * @brief Creates a property value holding these extents.
+   *
+   * The property value type is DevelProperty::EXTENTS. Use GetExtents() to retrieve them.
+   * @return The property value
+   */
+  operator Property::Value() const;
 
 public:
   int16_t start;  ///< The start extent.  @SINCE_1_2.62

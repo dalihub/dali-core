@@ -13,6 +13,7 @@ SET( devel_api_src_files
   ${devel_api_src_dir}/animation/key-frames-devel.cpp
   ${devel_api_src_dir}/animation/path-constrainer.cpp
   ${devel_api_src_dir}/common/addon-binder.cpp
+  ${devel_api_src_dir}/common/extents.cpp
   ${devel_api_src_dir}/common/hash.cpp
   ${devel_api_src_dir}/common/singleton-service.cpp
   ${devel_api_src_dir}/common/stage.cpp
@@ -78,6 +79,7 @@ SET( devel_api_core_common_header_files
   ${devel_api_src_dir}/common/addon-binder.h
   ${devel_api_src_dir}/common/bitwise-enum.h
   ${devel_api_src_dir}/common/circular-queue.h
+  ${devel_api_src_dir}/common/extents.h
   ${devel_api_src_dir}/common/free-list.h
   ${devel_api_src_dir}/common/hash.h
   ${devel_api_src_dir}/common/list-wrapper.h
@@ -114,6 +116,7 @@ SET( devel_api_core_object_header_files
   ${devel_api_src_dir}/object/csharp-type-info.h
   ${devel_api_src_dir}/object/csharp-type-registry.h
   ${devel_api_src_dir}/object/handle-devel.h
+  ${devel_api_src_dir}/object/property-devel.h
   ${devel_api_src_dir}/object/property-helper-devel.h
   ${devel_api_src_dir}/object/property-map-devel.h
   ${devel_api_src_dir}/object/property-array-devel.h

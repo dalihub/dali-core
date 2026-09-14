@@ -25,10 +25,12 @@
 #include <ostream>
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/common/extents.h>
+#include <dali/devel-api/object/property-devel.h>
+#include <dali/devel-api/object/property-value-devel.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/stream-operators.h>
 #include <dali/integration-api/string-utils.h>
-#include <dali/public-api/common/extents.h>
 #include <dali/public-api/common/insets.h>
 #include <dali/public-api/math/angle-axis.h>
 #include <dali/public-api/math/matrix.h>
@@ -132,7 +134,7 @@ struct Property::Value::Impl
 
   Impl(Extents extentsValue)
   {
-    SetType(Property::EXTENTS);
+    SetType(DevelProperty::EXTENTS);
     ConstructInplace(mData.mExtents.member, std::move(extentsValue));
   }
 
@@ -300,6 +302,14 @@ struct Property::Value::Impl
       SetType(other.GetType());
     }
 
+    // DevelProperty::EXTENTS cannot be a case label of a Property::Type switch.
+    if(GetType() == DevelProperty::EXTENTS)
+    {
+      auto obj = other.GetExtents();
+      ConstructInplace(mData.mExtents.member, std::move(obj));
+      return *this;
+    }
+
     switch(GetType())
     {
       case Property::NONE:
@@ -319,12 +329,6 @@ struct Property::Value::Impl
       case Property::INTEGER:
       {
         mData.mInt.member = other.GetInt();
-        break;
-      }
-      case Property::EXTENTS:
-      {
-        auto obj = other.GetExtents();
-        ConstructInplace(mData.mExtents.member, std::move(obj));
         break;
       }
       case Property::VECTOR2:
@@ -463,6 +467,11 @@ struct Property::Value::Impl
       return false;
     }
 
+    if(GetType() == DevelProperty::EXTENTS)
+    {
+      return mData.mExtents.member == other.mData.mExtents.member;
+    }
+
     switch(GetType())
     {
       case Property::NONE:
@@ -512,10 +521,6 @@ struct Property::Value::Impl
       case Property::STRING:
       {
         return *mData.mString.member == *other.mData.mString.member;
-      }
-      case Property::EXTENTS:
-      {
-        return mData.mExtents.member == other.mData.mExtents.member;
       }
       case Property::INSETS:
       {
@@ -648,6 +653,14 @@ struct Property::Value::Impl
     {
       hash = Dali::Internal::HashUtils::INITIAL_HASH_VALUE;
 
+      if(GetType() == DevelProperty::EXTENTS)
+      {
+        Dali::Internal::HashUtils::HashRawValue(mData.mExtents.member.start, hash);
+        Dali::Internal::HashUtils::HashRawValue(mData.mExtents.member.end, hash);
+        Dali::Internal::HashUtils::HashRawValue(mData.mExtents.member.top, hash);
+        Dali::Internal::HashUtils::HashRawValue(mData.mExtents.member.bottom, hash);
+      }
+
       switch(GetType())
       {
         case Property::NONE:
@@ -713,14 +726,6 @@ struct Property::Value::Impl
           Dali::Internal::HashUtils::HashStringView(Dali::Integration::ToStdStringView(*mData.mString.member), hash);
           break;
         }
-        case Property::EXTENTS:
-        {
-          Dali::Internal::HashUtils::HashRawValue(mData.mExtents.member.start, hash);
-          Dali::Internal::HashUtils::HashRawValue(mData.mExtents.member.end, hash);
-          Dali::Internal::HashUtils::HashRawValue(mData.mExtents.member.top, hash);
-          Dali::Internal::HashUtils::HashRawValue(mData.mExtents.member.bottom, hash);
-          break;
-        }
         case Property::INSETS:
         {
           Dali::Internal::HashUtils::HashRawValue(mData.mInsets.member->start, hash);
@@ -775,6 +780,12 @@ private:
    */
   void Destroy()
   {
+    if(GetType() == DevelProperty::EXTENTS)
+    {
+      mData.mExtents.member.~Extents();
+      return;
+    }
+
     switch(GetType())
     {
       case Property::NONE:
@@ -783,11 +794,6 @@ private:
       case Property::INTEGER:
       {
         break; // nothing to do
-      }
-      case Property::EXTENTS:
-      {
-        mData.mExtents.member.~Extents();
-        break;
       }
       case Property::VECTOR2:
       {
@@ -1029,11 +1035,6 @@ Property::Value::Value(Property::Map mapValue)
   Impl::New(mStorage, std::move(mapValue));
 }
 
-Property::Value::Value(const Extents& extentsValue)
-{
-  Impl::New(mStorage, extentsValue);
-}
-
 Property::Value::Value(const Insets& insetsValue)
 {
   Impl::New(mStorage, insetsValue);
@@ -1041,6 +1042,12 @@ Property::Value::Value(const Insets& insetsValue)
 
 Property::Value::Value(Type type)
 {
+  if(type == DevelProperty::EXTENTS)
+  {
+    Impl::New(mStorage, Extents());
+    return;
+  }
+
   switch(type)
   {
     case Property::BOOLEAN:
@@ -1106,11 +1113,6 @@ Property::Value::Value(Type type)
     case Property::MAP:
     {
       Impl::New(mStorage, Property::Map());
-      break;
-    }
-    case Property::EXTENTS:
-    {
-      Impl::New(mStorage, Extents());
       break;
     }
     case Property::INSETS:
@@ -1497,30 +1499,6 @@ Property::Map* Property::Value::GetMap()
   return nullptr;
 }
 
-bool Property::Value::Get(Extents& extentsValue) const
-{
-  bool converted = false;
-
-  const auto& obj = Read();
-
-  if(obj.GetType() == EXTENTS)
-  {
-    extentsValue = obj.GetExtents();
-    converted    = true;
-  }
-  else if(obj.GetType() == VECTOR4)
-  {
-    auto& vec4          = obj.GetVector4();
-    extentsValue.start  = static_cast<int16_t>(std::roundf(vec4.x));
-    extentsValue.end    = static_cast<int16_t>(std::roundf(vec4.y));
-    extentsValue.top    = static_cast<int16_t>(std::roundf(vec4.z));
-    extentsValue.bottom = static_cast<int16_t>(std::roundf(vec4.w));
-    converted           = true;
-  }
-
-  return converted;
-}
-
 bool Property::Value::Get(Insets& insetsValue) const
 {
   bool converted = false;
@@ -1553,6 +1531,11 @@ std::size_t Property::Value::GetHash() const
 std::ostream& operator<<(std::ostream& stream, const Property::Value& value)
 {
   const auto& obj = value.Read();
+
+  if(obj.GetType() == DevelProperty::EXTENTS)
+  {
+    return stream << obj.GetExtents();
+  }
 
   switch(obj.GetType())
   {
@@ -1621,11 +1604,6 @@ std::ostream& operator<<(std::ostream& stream, const Property::Value& value)
       stream << obj.GetMap();
       break;
     }
-    case Dali::Property::EXTENTS:
-    {
-      stream << obj.GetExtents();
-      break;
-    }
     case Dali::Property::INSETS:
     {
       stream << obj.GetInsets();
@@ -1637,6 +1615,40 @@ std::ostream& operator<<(std::ostream& stream, const Property::Value& value)
     }
   }
   return stream;
+}
+
+// Extents is a devel type, but its storage is part of Property::Value::Impl, so these are defined here.
+Extents::operator Property::Value() const
+{
+  const Property::Value::Impl extents(*this);
+
+  Property::Value value;
+  value.Write() = extents;
+  return value;
+}
+
+bool GetExtents(const Property::Value& value, Extents& extentsValue)
+{
+  bool converted = false;
+
+  const auto& obj = value.Read();
+
+  if(obj.GetType() == DevelProperty::EXTENTS)
+  {
+    extentsValue = obj.GetExtents();
+    converted    = true;
+  }
+  else if(obj.GetType() == Property::VECTOR4)
+  {
+    auto& vec4          = obj.GetVector4();
+    extentsValue.start  = static_cast<int16_t>(std::roundf(vec4.x));
+    extentsValue.end    = static_cast<int16_t>(std::roundf(vec4.y));
+    extentsValue.top    = static_cast<int16_t>(std::roundf(vec4.z));
+    extentsValue.bottom = static_cast<int16_t>(std::roundf(vec4.w));
+    converted           = true;
+  }
+
+  return converted;
 }
 
 } //namespace DALI_NAMESPACE
