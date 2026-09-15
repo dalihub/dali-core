@@ -41,7 +41,9 @@ GestureDetector::GestureDetector(GestureType::Value type, const SceneGraph::Prop
   mFeededActor(),
   mRenderTask(nullptr),
   mGestureRecognizer(),
-  mIsDetected(false)
+  mIsDetected(false),
+  mRecognizerSettingsDirty(false),
+  mAppliedGestureOptionsEpoch(0u)
 {
 }
 
@@ -308,6 +310,7 @@ bool GestureDetector::HandleEvent(Dali::Actor& actor, const Dali::TouchEvent& to
         point.SetDeviceClass(touch.GetDeviceClass(i));
         point.SetDeviceSubclass(touch.GetDeviceSubclass(i));
         point.SetMouseButton(touch.GetMouseButton(i));
+        point.SetDeviceName(touch.GetDeviceName(i));
         point.SetHitActor(touch.GetHitActor(i));
         point.SetLocalPosition(touch.GetLocalPosition(i));
         touchEvent.points.push_back(point);
@@ -360,6 +363,21 @@ void GestureDetector::Clear()
     mGestureEventProcessor.UnregisterGestureDetector(this);
   }
   SetDetected(false);
+}
+
+void GestureDetector::MarkRecognizerSettingsDirty()
+{
+  mRecognizerSettingsDirty = true;
+}
+
+bool GestureDetector::ConsumeRecognizerUpdateRequired()
+{
+  const uint32_t epoch    = mGestureEventProcessor.GetGestureOptionsEpoch();
+  const bool     required = mRecognizerSettingsDirty || (mAppliedGestureOptionsEpoch != epoch);
+
+  mRecognizerSettingsDirty    = false;
+  mAppliedGestureOptionsEpoch = epoch;
+  return required;
 }
 
 bool GestureDetector::IsAttached(Actor& actor) const

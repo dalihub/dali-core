@@ -22,7 +22,9 @@
 #include <cstdint> // uint32_t
 
 // INTERNAL INCLUDES
+#include <dali/public-api/common/unique-ptr.h>
 #include <dali/public-api/events/gesture-detector.h>
+#include <dali/public-api/events/gesture-device-selector.h>
 #include <dali/public-api/signals/dali-signal.h>
 
 namespace DALI_NAMESPACE
@@ -35,7 +37,8 @@ namespace DALI_NAMESPACE
 namespace Internal DALI_INTERNAL
 {
 class TapGestureDetector;
-}
+struct TapGestureProfile;
+} //namespace Internal DALI_INTERNAL
 
 class TapGesture;
 
@@ -75,6 +78,141 @@ public: // Typedefs
    * @SINCE_1_0.0
    */
   using DetectedSignalType = Signal<void(Actor, TapGesture)>;
+
+  /**
+   * @brief A complete set of tap recognition options for one input device profile.
+   *
+   * Holds the same options as the detector itself: the tap count range and whether every tap in
+   * the range is delivered immediately.
+   *
+   * Register a profile for a device with SetDeviceOptions(). The usual way to build one is to copy
+   * the detector's default options and change what differs:
+   * @code
+   * TapGestureDetector::Options remote = detector.GetDefaultOptions();
+   * remote.SetMaximumTapsRequired(1u); // no double tap from the remote controller
+   * detector.SetDeviceOptions(GestureDeviceSelector::ByDeviceClassAndSubclass(Device::Class::POINTER, Device::Subclass::REMOCON), remote);
+   * @endcode
+   *
+   * This is a value type: copies are independent.
+   * @SINCE_2_5.40
+   */
+  class DALI_CORE_API Options
+  {
+  public:
+    /**
+     * @brief Creates options with the detector defaults: exactly one tap, not receiving every tap event.
+     * @SINCE_2_5.40
+     */
+    Options();
+
+    /**
+     * @brief Copy constructor.
+     * @SINCE_2_5.40
+     * @param[in] rhs The options to copy
+     */
+    Options(const Options& rhs);
+
+    /**
+     * @brief Move constructor.
+     * @SINCE_2_5.40
+     * @param[in] rhs The options to move
+     */
+    Options(Options&& rhs) noexcept;
+
+    /**
+     * @brief Copy assignment operator.
+     * @SINCE_2_5.40
+     * @param[in] rhs The options to copy
+     * @return A reference to this
+     */
+    Options& operator=(const Options& rhs);
+
+    /**
+     * @brief Move assignment operator.
+     * @SINCE_2_5.40
+     * @param[in] rhs The options to move
+     * @return A reference to this
+     */
+    Options& operator=(Options&& rhs) noexcept;
+
+    /**
+     * @brief Destructor.
+     * @SINCE_2_5.40
+     */
+    ~Options();
+
+    /**
+     * @brief Sets the minimum number of taps required by these options.
+     *
+     * The tap count is the number of times a user should "tap" the screen.
+     * @SINCE_2_5.40
+     * @param[in] minimumTaps The minimum taps required
+     * @note The default is '1', the maximum is 2.
+     * @see Dali::TapGestureDetector::SetMinimumTapsRequired()
+     */
+    void SetMinimumTapsRequired(uint32_t minimumTaps);
+
+    /**
+     * @brief Sets the maximum number of taps required by these options.
+     *
+     * The tap count is the number of times a user should "tap" the screen.
+     * @SINCE_2_5.40
+     * @param[in] maximumTaps The maximum taps required
+     * @note The default is '1', the maximum is 2.
+     * @see Dali::TapGestureDetector::SetMaximumTapsRequired()
+     */
+    void SetMaximumTapsRequired(uint32_t maximumTaps);
+
+    /**
+     * @brief Sets whether every tap between the minimum and maximum is delivered immediately.
+     * @SINCE_2_5.40
+     * @param[in] enabled true to deliver every tap, false to wait for the maximum or the multi-tap timeout
+     * @see Dali::TapGestureDetector::ReceiveAllTapEvents()
+     */
+    void SetReceiveAllTapEventsEnabled(bool enabled);
+
+    /**
+     * @brief Retrieves the minimum number of taps required by these options.
+     *
+     * @SINCE_2_5.40
+     * @return The minimum taps required
+     */
+    uint32_t GetMinimumTapsRequired() const;
+
+    /**
+     * @brief Retrieves the maximum number of taps required by these options.
+     *
+     * @SINCE_2_5.40
+     * @return The maximum taps required
+     */
+    uint32_t GetMaximumTapsRequired() const;
+
+    /**
+     * @brief Retrieves whether every tap between the minimum and maximum is delivered immediately.
+     * @SINCE_2_5.40
+     * @return true if every tap is delivered
+     */
+    bool IsReceiveAllTapEventsEnabled() const;
+
+  public: // Not intended for Application developers
+    /// @cond internal
+    /**
+     * @brief Creates options from an internal profile.
+     * @param[in] profile The profile to copy
+     */
+    explicit DALI_INTERNAL Options(const Internal::TapGestureProfile& profile);
+
+    /**
+     * @brief Retrieves the internal profile.
+     * @return The profile
+     */
+    DALI_INTERNAL const Internal::TapGestureProfile& GetProfile() const;
+    /// @endcond
+
+  private:
+    struct Impl;
+    UniquePtr<Impl> mImpl;
+  };
 
 public: // Creation & Destruction
   /**
@@ -208,6 +346,72 @@ public: // Getters
    * @pre The gesture detector has been initialized.
    */
   uint32_t GetMaximumTapsRequired() const;
+
+  /**
+   * @brief Retrieves whether every tap between the minimum and maximum is delivered immediately.
+   *
+   * @SINCE_2_5.40
+   * @return true if every tap is delivered
+   * @pre The gesture detector has been initialized.
+   * @see ReceiveAllTapEvents()
+   */
+  bool IsReceiveAllTapEventsEnabled() const;
+
+public: // Per-device options
+  /**
+   * @brief Retrieves a copy of the options that apply to devices without a registered profile.
+   *
+   * These are the values set through the detector's own setters (SetMinimumTapsRequired(),
+   * ReceiveAllTapEvents(), ...). The copy is independent of the detector.
+   *
+   * @SINCE_2_5.40
+   * @return The default options
+   * @pre The gesture detector has been initialized.
+   */
+  Options GetDefaultOptions() const;
+
+  /**
+   * @brief Registers the options to use for taps made by the devices matching the selector.
+   *
+   * The options are copied and replace any options previously registered for the same selector.
+   * When a tap sequence starts, the detector picks the options in this order: a matching device-name
+   * selector, then a matching class-and-subclass selector, then a matching class selector, then the
+   * default options. The choice is kept for every tap of that sequence. Taps made by different
+   * devices never combine into one multi-tap.
+   *
+   * @SINCE_2_5.40
+   * @param[in] selector The devices the options apply to
+   * @param[in] options  The options. Minimum and maximum taps must be greater than zero and minimum
+   *                     must not exceed maximum.
+   * @pre The gesture detector has been initialized.
+   */
+  void SetDeviceOptions(const GestureDeviceSelector& selector, const Options& options);
+
+  /**
+   * @brief Retrieves the options registered for exactly this selector.
+   *
+   * Only options registered with SetDeviceOptions() for the same selector are returned; the
+   * fallback order used during recognition is not applied.
+   *
+   * @SINCE_2_5.40
+   * @param[in]  selector The selector the options were registered with
+   * @param[out] options  Receives a copy of the options. Left unchanged when none are registered.
+   * @return true if options are registered for the selector
+   * @pre The gesture detector has been initialized.
+   */
+  bool GetDeviceOptions(const GestureDeviceSelector& selector, Options& options) const;
+
+  /**
+   * @brief Removes the options registered for exactly this selector.
+   *
+   * Devices that matched the selector fall back to the next matching selector or the default
+   * options from the next tap sequence on. Does nothing if no options are registered for the selector.
+   *
+   * @SINCE_2_5.40
+   * @param[in] selector The selector the options were registered with
+   * @pre The gesture detector has been initialized.
+   */
+  void ClearDeviceOptions(const GestureDeviceSelector& selector);
 
 public: // Signals
   /**

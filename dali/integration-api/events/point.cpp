@@ -182,7 +182,7 @@ const Dali::String& Point::GetDeviceName() const
   return mDeviceName;
 }
 
-void Point::SetDeviceName(Dali::String& deviceName)
+void Point::SetDeviceName(const Dali::String& deviceName)
 {
   mDeviceName = deviceName;
 }

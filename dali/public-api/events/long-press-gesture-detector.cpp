@@ -18,8 +18,15 @@
 // CLASS HEADER
 #include <dali/public-api/events/long-press-gesture-detector.h>
 
+// EXTERNAL INCLUDES
+#include <dali/integration-api/debug.h>
+
 // INTERNAL INCLUDES
 #include <dali/internal/event/events/long-press-gesture/long-press-gesture-detector-impl.h>
+#include <dali/internal/event/events/long-press-gesture/long-press-gesture-profile.h>
+
+#define DALI_ASSERT_VALID_LONG_PRESS_OPTIONS(impl) \
+  DALI_ASSERT_ALWAYS((impl) && "Cannot use a moved-from LongPressGestureDetector::Options object")
 
 namespace DALI_NAMESPACE
 {
@@ -91,4 +98,115 @@ LongPressGestureDetector::DetectedSignalType& LongPressGestureDetector::Detected
   return GetImplementation(*this).DetectedSignal();
 }
 
+LongPressGestureDetector::Options LongPressGestureDetector::GetDefaultOptions() const
+{
+  return Options(GetImplementation(*this).GetDefaultProfile());
+}
+
+void LongPressGestureDetector::SetDeviceOptions(const GestureDeviceSelector& selector, const Options& options)
+{
+  const Internal::LongPressGestureProfile& profile = options.GetProfile();
+  DALI_LOG_RELEASE_INFO("detector=%p selector(match=%d class=%d subclass=%d name='%s') minimumTouches=%u maximumTouches=%u\n",
+                        &GetImplementation(*this), static_cast<int>(selector.GetMatchType()), static_cast<int>(selector.GetDeviceClass()), static_cast<int>(selector.GetDeviceSubclass()), selector.GetDeviceName().CStr(), profile.minimumTouches, profile.maximumTouches);
+  GetImplementation(*this).SetDeviceProfile(selector, profile);
+}
+
+bool LongPressGestureDetector::GetDeviceOptions(const GestureDeviceSelector& selector, Options& options) const
+{
+  const Internal::LongPressGestureProfile* profile = GetImplementation(*this).GetDeviceProfile(selector);
+  if(profile)
+  {
+    options = Options(*profile);
+    return true;
+  }
+  return false;
+}
+
+void LongPressGestureDetector::ClearDeviceOptions(const GestureDeviceSelector& selector)
+{
+  DALI_LOG_RELEASE_INFO("detector=%p selector(match=%d class=%d subclass=%d name='%s')\n", &GetImplementation(*this), static_cast<int>(selector.GetMatchType()), static_cast<int>(selector.GetDeviceClass()), static_cast<int>(selector.GetDeviceSubclass()), selector.GetDeviceName().CStr());
+  GetImplementation(*this).ClearDeviceProfile(selector);
+}
+
+// LongPressGestureDetector::Options
+
+struct LongPressGestureDetector::Options::Impl
+{
+  Impl() = default;
+
+  explicit Impl(const Internal::LongPressGestureProfile& profile)
+  : mProfile(profile)
+  {
+  }
+
+  Internal::LongPressGestureProfile mProfile;
+};
+
+LongPressGestureDetector::Options::Options()
+: mImpl(MakeUnique<Impl>())
+{
+}
+
+LongPressGestureDetector::Options::Options(const Internal::LongPressGestureProfile& profile)
+: mImpl(MakeUnique<Impl>(profile))
+{
+}
+
+LongPressGestureDetector::Options::Options(const Options& rhs)
+: mImpl(nullptr)
+{
+  DALI_ASSERT_VALID_LONG_PRESS_OPTIONS(rhs.mImpl);
+  mImpl = MakeUnique<Impl>(*rhs.mImpl);
+}
+
+LongPressGestureDetector::Options::Options(Options&& rhs) noexcept = default;
+
+LongPressGestureDetector::Options& LongPressGestureDetector::Options::operator=(const Options& rhs)
+{
+  if(this != &rhs)
+  {
+    DALI_ASSERT_VALID_LONG_PRESS_OPTIONS(rhs.mImpl);
+    mImpl = MakeUnique<Impl>(*rhs.mImpl);
+  }
+  return *this;
+}
+
+LongPressGestureDetector::Options& LongPressGestureDetector::Options::operator=(Options&& rhs) noexcept = default;
+
+LongPressGestureDetector::Options::~Options() = default;
+
+void LongPressGestureDetector::Options::SetTouchesRequired(uint32_t touches)
+{
+  DALI_ASSERT_VALID_LONG_PRESS_OPTIONS(mImpl);
+  mImpl->mProfile.minimumTouches = touches;
+  mImpl->mProfile.maximumTouches = touches;
+}
+
+void LongPressGestureDetector::Options::SetTouchesRequired(uint32_t minTouches, uint32_t maxTouches)
+{
+  DALI_ASSERT_VALID_LONG_PRESS_OPTIONS(mImpl);
+  mImpl->mProfile.minimumTouches = minTouches;
+  mImpl->mProfile.maximumTouches = maxTouches;
+}
+
+uint32_t LongPressGestureDetector::Options::GetMinimumTouchesRequired() const
+{
+  DALI_ASSERT_VALID_LONG_PRESS_OPTIONS(mImpl);
+  return mImpl->mProfile.minimumTouches;
+}
+
+uint32_t LongPressGestureDetector::Options::GetMaximumTouchesRequired() const
+{
+  DALI_ASSERT_VALID_LONG_PRESS_OPTIONS(mImpl);
+  return mImpl->mProfile.maximumTouches;
+}
+
+const Internal::LongPressGestureProfile& LongPressGestureDetector::Options::GetProfile() const
+{
+  DALI_ASSERT_VALID_LONG_PRESS_OPTIONS(mImpl);
+  return mImpl->mProfile;
+}
+
 } //namespace DALI_NAMESPACE
+
+#undef DALI_ASSERT_VALID_LONG_PRESS_OPTIONS

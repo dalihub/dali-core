@@ -68,6 +68,12 @@ struct TapGestureEvent : public GestureEvent
   unsigned int numberOfTouches;
 
   /**
+   * The multi-tap interval selected by the recognizer for this device, in milliseconds.
+   * Detectors use the same interval when waiting to emit a pending tap.
+   */
+  uint32_t maximumMultiTapInterval;
+
+  /**
    * This is the point, in screen coordinates, where the tap occurred.
    * If a multi-touch tap, then this should be the centroid of all the touch points.
    */

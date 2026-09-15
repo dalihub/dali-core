@@ -20,6 +20,8 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/events/gesture-detector-impl.h>
+#include <dali/internal/event/events/gesture-device-profile-table.h>
+#include <dali/internal/event/events/gesture-threshold-values.h>
 #include <dali/internal/event/events/long-press-gesture/long-press-gesture-processor.h>
 #include <dali/internal/event/events/pan-gesture/pan-gesture-processor.h>
 #include <dali/internal/event/events/pinch-gesture/pinch-gesture-processor.h>
@@ -351,6 +353,122 @@ public: // Called by Core
    */
   float GetTapGestureMaximumMotionDistance() const;
 
+  /**
+   * @brief Retrieves the epoch of the application-wide gesture recognition thresholds.
+   *
+   * The value increases whenever a recognition threshold changes. Detector-owned recognizers
+   * (geometry hit-test / HandleEvent path) compare it with the epoch they last applied to decide
+   * whether they must be updated before processing the next touch event.
+   * @return The current threshold epoch
+   */
+  uint32_t GetGestureOptionsEpoch() const;
+
+public: // Application-wide per-device thresholds
+  /**
+   * @brief Registers the pan thresholds for the devices matching the selector, replacing any registered for the same selector.
+   * @param[in] selector   The devices the thresholds apply to
+   * @param[in] thresholds The thresholds
+   */
+  void SetPanDeviceThresholds(const GestureDeviceSelector& selector, const PanThresholdValues& thresholds);
+
+  /**
+   * @brief Retrieves the pan thresholds registered for exactly this selector.
+   * @param[in] selector The selector
+   * @return The thresholds, or nullptr if none are registered for the selector
+   */
+  const PanThresholdValues* GetPanDeviceThresholds(const GestureDeviceSelector& selector) const;
+
+  /**
+   * @brief Removes the pan thresholds registered for exactly this selector.
+   * @param[in] selector The selector
+   */
+  void ClearPanDeviceThresholds(const GestureDeviceSelector& selector);
+
+  /**
+   * @brief Registers the tap thresholds for the devices matching the selector, replacing any registered for the same selector.
+   * @param[in] selector   The devices the thresholds apply to
+   * @param[in] thresholds The thresholds
+   */
+  void SetTapDeviceThresholds(const GestureDeviceSelector& selector, const TapThresholdValues& thresholds);
+
+  /**
+   * @brief Retrieves the tap thresholds registered for exactly this selector.
+   * @param[in] selector The selector
+   * @return The thresholds, or nullptr if none are registered for the selector
+   */
+  const TapThresholdValues* GetTapDeviceThresholds(const GestureDeviceSelector& selector) const;
+
+  /**
+   * @brief Removes the tap thresholds registered for exactly this selector.
+   * @param[in] selector The selector
+   */
+  void ClearTapDeviceThresholds(const GestureDeviceSelector& selector);
+
+  /**
+   * @brief Registers the longpress thresholds for the devices matching the selector, replacing any registered for the same selector.
+   * @param[in] selector   The devices the thresholds apply to
+   * @param[in] thresholds The thresholds
+   */
+  void SetLongPressDeviceThresholds(const GestureDeviceSelector& selector, const LongPressThresholdValues& thresholds);
+
+  /**
+   * @brief Retrieves the longpress thresholds registered for exactly this selector.
+   * @param[in] selector The selector
+   * @return The thresholds, or nullptr if none are registered for the selector
+   */
+  const LongPressThresholdValues* GetLongPressDeviceThresholds(const GestureDeviceSelector& selector) const;
+
+  /**
+   * @brief Removes the longpress thresholds registered for exactly this selector.
+   * @param[in] selector The selector
+   */
+  void ClearLongPressDeviceThresholds(const GestureDeviceSelector& selector);
+
+  /**
+   * @brief Registers the pinch thresholds for the devices matching the selector, replacing any registered for the same selector.
+   * @param[in] selector   The devices the thresholds apply to
+   * @param[in] thresholds The thresholds
+   */
+  void SetPinchDeviceThresholds(const GestureDeviceSelector& selector, const PinchThresholdValues& thresholds);
+
+  /**
+   * @brief Retrieves the pinch thresholds registered for exactly this selector.
+   * @param[in] selector The selector
+   * @return The thresholds, or nullptr if none are registered for the selector
+   */
+  const PinchThresholdValues* GetPinchDeviceThresholds(const GestureDeviceSelector& selector) const;
+
+  /**
+   * @brief Removes the pinch thresholds registered for exactly this selector.
+   * @param[in] selector The selector
+   */
+  void ClearPinchDeviceThresholds(const GestureDeviceSelector& selector);
+
+  /**
+   * @brief Registers the rotation thresholds for the devices matching the selector, replacing any registered for the same selector.
+   * @param[in] selector   The devices the thresholds apply to
+   * @param[in] thresholds The thresholds
+   */
+  void SetRotationDeviceThresholds(const GestureDeviceSelector& selector, const RotationThresholdValues& thresholds);
+
+  /**
+   * @brief Retrieves the rotation thresholds registered for exactly this selector.
+   * @param[in] selector The selector
+   * @return The thresholds, or nullptr if none are registered for the selector
+   */
+  const RotationThresholdValues* GetRotationDeviceThresholds(const GestureDeviceSelector& selector) const;
+
+  /**
+   * @brief Removes the rotation thresholds registered for exactly this selector.
+   * @param[in] selector The selector
+   */
+  void ClearRotationDeviceThresholds(const GestureDeviceSelector& selector);
+
+  /**
+   * @return the long press gesture processor
+   */
+  const LongPressGestureProcessor& GetLongPressGestureProcessor();
+
 public: // needed for PanGesture
   /**
    * @return the pan gesture processor
@@ -386,8 +504,13 @@ private:
   Integration::RenderController& mRenderController;
   GestureDetectorContainer       mGestureDetectors;
 
-  int32_t envOptionMinimumPanDistance;
-  int32_t envOptionMinimumPanEvents;
+  uint32_t mGestureOptionsEpoch; ///< Incremented whenever an application-wide recognition threshold changes.
+
+  GestureDeviceProfileTable<PanThresholdValues>       mPanDeviceThresholds;       ///< Application-wide per-device pan thresholds.
+  GestureDeviceProfileTable<TapThresholdValues>       mTapDeviceThresholds;       ///< Application-wide per-device tap thresholds.
+  GestureDeviceProfileTable<LongPressThresholdValues> mLongPressDeviceThresholds; ///< Application-wide per-device long press thresholds.
+  GestureDeviceProfileTable<PinchThresholdValues>     mPinchDeviceThresholds;     ///< Application-wide per-device pinch thresholds.
+  GestureDeviceProfileTable<RotationThresholdValues>  mRotationDeviceThresholds;  ///< Application-wide per-device rotation thresholds.
 };
 
 } // namespace Internal

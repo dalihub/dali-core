@@ -18,8 +18,15 @@
 // CLASS HEADER
 #include <dali/public-api/events/tap-gesture-detector.h>
 
+// EXTERNAL INCLUDES
+#include <dali/integration-api/debug.h>
+
 // INTERNAL INCLUDES
 #include <dali/internal/event/events/tap-gesture/tap-gesture-detector-impl.h>
+#include <dali/internal/event/events/tap-gesture/tap-gesture-profile.h>
+
+#define DALI_ASSERT_VALID_TAP_OPTIONS(impl) \
+  DALI_ASSERT_ALWAYS((impl) && "Cannot use a moved-from TapGestureDetector::Options object")
 
 namespace DALI_NAMESPACE
 {
@@ -89,4 +96,130 @@ TapGestureDetector::DetectedSignalType& TapGestureDetector::DetectedSignal()
   return GetImplementation(*this).DetectedSignal();
 }
 
+bool TapGestureDetector::IsReceiveAllTapEventsEnabled() const
+{
+  return GetImplementation(*this).IsReceiveAllTapEventsEnabled();
+}
+
+TapGestureDetector::Options TapGestureDetector::GetDefaultOptions() const
+{
+  return Options(GetImplementation(*this).GetDefaultProfile());
+}
+
+void TapGestureDetector::SetDeviceOptions(const GestureDeviceSelector& selector, const Options& options)
+{
+  const Internal::TapGestureProfile& profile = options.GetProfile();
+  DALI_LOG_RELEASE_INFO("detector=%p selector(match=%d class=%d subclass=%d name='%s') minimumTaps=%u maximumTaps=%u receiveAllTapEvents=%d\n",
+                        &GetImplementation(*this), static_cast<int>(selector.GetMatchType()), static_cast<int>(selector.GetDeviceClass()), static_cast<int>(selector.GetDeviceSubclass()), selector.GetDeviceName().CStr(), profile.minimumTaps, profile.maximumTaps, profile.receiveAllTapEvents);
+  GetImplementation(*this).SetDeviceProfile(selector, profile);
+}
+
+bool TapGestureDetector::GetDeviceOptions(const GestureDeviceSelector& selector, Options& options) const
+{
+  const Internal::TapGestureProfile* profile = GetImplementation(*this).GetDeviceProfile(selector);
+  if(profile)
+  {
+    options = Options(*profile);
+    return true;
+  }
+  return false;
+}
+
+void TapGestureDetector::ClearDeviceOptions(const GestureDeviceSelector& selector)
+{
+  DALI_LOG_RELEASE_INFO("detector=%p selector(match=%d class=%d subclass=%d name='%s')\n", &GetImplementation(*this), static_cast<int>(selector.GetMatchType()), static_cast<int>(selector.GetDeviceClass()), static_cast<int>(selector.GetDeviceSubclass()), selector.GetDeviceName().CStr());
+  GetImplementation(*this).ClearDeviceProfile(selector);
+}
+
+// TapGestureDetector::Options
+
+struct TapGestureDetector::Options::Impl
+{
+  Impl() = default;
+
+  explicit Impl(const Internal::TapGestureProfile& profile)
+  : mProfile(profile)
+  {
+  }
+
+  Internal::TapGestureProfile mProfile;
+};
+
+TapGestureDetector::Options::Options()
+: mImpl(MakeUnique<Impl>())
+{
+}
+
+TapGestureDetector::Options::Options(const Internal::TapGestureProfile& profile)
+: mImpl(MakeUnique<Impl>(profile))
+{
+}
+
+TapGestureDetector::Options::Options(const Options& rhs)
+: mImpl(nullptr)
+{
+  DALI_ASSERT_VALID_TAP_OPTIONS(rhs.mImpl);
+  mImpl = MakeUnique<Impl>(*rhs.mImpl);
+}
+
+TapGestureDetector::Options::Options(Options&& rhs) noexcept = default;
+
+TapGestureDetector::Options& TapGestureDetector::Options::operator=(const Options& rhs)
+{
+  if(this != &rhs)
+  {
+    DALI_ASSERT_VALID_TAP_OPTIONS(rhs.mImpl);
+    mImpl = MakeUnique<Impl>(*rhs.mImpl);
+  }
+  return *this;
+}
+
+TapGestureDetector::Options& TapGestureDetector::Options::operator=(Options&& rhs) noexcept = default;
+
+TapGestureDetector::Options::~Options() = default;
+
+void TapGestureDetector::Options::SetMinimumTapsRequired(uint32_t minimumTaps)
+{
+  DALI_ASSERT_VALID_TAP_OPTIONS(mImpl);
+  mImpl->mProfile.minimumTaps = minimumTaps;
+}
+
+void TapGestureDetector::Options::SetMaximumTapsRequired(uint32_t maximumTaps)
+{
+  DALI_ASSERT_VALID_TAP_OPTIONS(mImpl);
+  mImpl->mProfile.maximumTaps = maximumTaps;
+}
+
+void TapGestureDetector::Options::SetReceiveAllTapEventsEnabled(bool enabled)
+{
+  DALI_ASSERT_VALID_TAP_OPTIONS(mImpl);
+  mImpl->mProfile.receiveAllTapEvents = enabled;
+}
+
+uint32_t TapGestureDetector::Options::GetMinimumTapsRequired() const
+{
+  DALI_ASSERT_VALID_TAP_OPTIONS(mImpl);
+  return mImpl->mProfile.minimumTaps;
+}
+
+uint32_t TapGestureDetector::Options::GetMaximumTapsRequired() const
+{
+  DALI_ASSERT_VALID_TAP_OPTIONS(mImpl);
+  return mImpl->mProfile.maximumTaps;
+}
+
+bool TapGestureDetector::Options::IsReceiveAllTapEventsEnabled() const
+{
+  DALI_ASSERT_VALID_TAP_OPTIONS(mImpl);
+  return mImpl->mProfile.receiveAllTapEvents;
+}
+
+const Internal::TapGestureProfile& TapGestureDetector::Options::GetProfile() const
+{
+  DALI_ASSERT_VALID_TAP_OPTIONS(mImpl);
+  return mImpl->mProfile;
+}
+
 } //namespace DALI_NAMESPACE
+
+#undef DALI_ASSERT_VALID_TAP_OPTIONS

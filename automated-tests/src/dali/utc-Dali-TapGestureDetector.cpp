@@ -19,6 +19,7 @@
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/events/touch-integ.h>
+#include <dali/integration-api/input-options.h>
 #include <dali/integration-api/render-task-list-integ.h>
 #include <dali/internal/event/events/touch-event-impl.h>
 #include <dali/internal/event/render-tasks/render-task-impl.h>
@@ -27,6 +28,8 @@
 #include <test-touch-event-utils.h>
 
 #include <iostream>
+#include <utility>
+#include <vector>
 
 using namespace Dali;
 
@@ -1528,6 +1531,421 @@ int UtcDaliTapGestureHandleEvent(void)
 
   DALI_TEST_EQUALS(true, pData.functorCalled, TEST_LOCATION);
   pData.Reset();
+
+  END_TEST;
+}
+
+namespace
+{
+/**
+ * Feeds one tap (DOWN then UP after holdMilliseconds) straight into the detector through
+ * HandleEvent(), i.e. the detector-owned recognizer path used by geometry hit-testing.
+ */
+void FeedHandleEventTap(TapGestureDetector& detector, Actor& actor, Dali::RenderTask& task, uint32_t startTime, uint32_t holdMilliseconds)
+{
+  auto feed = [&](PointState::Type state, uint32_t time)
+  {
+    Dali::Integration::TouchEvent tp = GenerateSingleTouch(state, Vector2(50.0f, 50.0f), 1, time);
+    Internal::TouchEventPtr       touchEventImpl(new Internal::TouchEvent(time));
+    touchEventImpl->AddPoint(tp.GetPoint(0));
+    touchEventImpl->SetRenderTask(task);
+    Dali::TouchEvent touchEventHandle(touchEventImpl.Get());
+    detector.HandleEvent(actor, touchEventHandle);
+  };
+
+  feed(PointState::DOWN, startTime);
+  feed(PointState::UP, startTime + holdMilliseconds);
+}
+} // namespace
+
+int UtcDaliTapGestureHandleEventAppliesUpdatedMaximumHoldingTime(void)
+{
+  TestApplication          application;
+  Dali::Integration::Scene scene = application.GetScene();
+  Dali::RenderTask         task  = scene.GetRenderTaskList().GetTask(0);
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
+  scene.Add(actor);
+
+  application.SendNotification();
+  application.Render();
+
+  SignalData             data;
+  GestureReceivedFunctor functor(data);
+
+  TapGestureDetector detector = TapGestureDetector::New();
+  detector.DetectedSignal().Connect(&application, functor);
+
+  // A 200ms hold is inside the default 330ms. This also creates the detector-owned recognizer.
+  FeedHandleEventTap(detector, actor, task, 100u, 200u);
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  data.Reset();
+
+  // Tighten the application-wide holding time after the recognizer exists: the same hold must be rejected.
+  Dali::Integration::SetTapGestureMaximumHoldingTime(100u);
+  FeedHandleEventTap(detector, actor, task, 5000u, 200u);
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+
+  // Relax it: accepted again.
+  Dali::Integration::SetTapGestureMaximumHoldingTime(Dali::Integration::DEFAULT_TAP_GESTURE_MAXIMUM_HOLDING_TIME);
+  FeedHandleEventTap(detector, actor, task, 10000u, 200u);
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliTapGestureGetDeviceName(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+  application.Render();
+
+  SignalData             data;
+  GestureReceivedFunctor functor(data);
+
+  TapGestureDetector detector = TapGestureDetector::New();
+  detector.Attach(actor);
+  detector.DetectedSignal().Connect(&application, functor);
+
+  const Dali::String deviceName("Pointing Device");
+  auto               tapWithName = [&](PointState::Type state, uint32_t time)
+  {
+    Dali::Integration::TouchEvent touchEvent = GenerateSingleTouch(state, Vector2(50.0f, 50.0f), 1, time);
+    touchEvent.points[0].SetDeviceName(deviceName);
+    application.ProcessEvent(touchEvent);
+  };
+
+  tapWithName(PointState::DOWN, 100u);
+  tapWithName(PointState::UP, 150u);
+  application.SendNotification();
+
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(data.receivedGesture.GetDeviceName(), deviceName, TEST_LOCATION);
+
+  END_TEST;
+}
+
+namespace
+{
+struct TapCounter
+{
+  std::vector<TapGesture> taps;
+};
+
+struct CountingTapFunctor
+{
+  explicit CountingTapFunctor(TapCounter& counter)
+  : mCounter(counter)
+  {
+  }
+
+  void operator()(Actor /*actor*/, TapGesture tap)
+  {
+    mCounter.taps.push_back(tap);
+  }
+
+  TapCounter& mCounter;
+};
+
+Dali::Integration::TouchEvent GenerateDeviceTapTouch(PointState::Type state, Device::Class::Type deviceClass, Device::Subclass::Type deviceSubclass, const Dali::String& deviceName, uint32_t time)
+{
+  Dali::Integration::TouchEvent touchEvent;
+  Dali::Integration::Point      point;
+  point.SetState(state);
+  point.SetDeviceId(4);
+  point.SetScreenPosition(Vector2(50.0f, 50.0f));
+  point.SetDeviceClass(deviceClass);
+  point.SetDeviceSubclass(deviceSubclass);
+  point.SetDeviceName(deviceName);
+  point.SetMouseButton(MouseButton::PRIMARY);
+  touchEvent.points.push_back(point);
+  touchEvent.time = time;
+  return touchEvent;
+}
+
+/**
+ * One tap (DOWN then UP 50ms later) from the given device through the scene (classic path).
+ */
+void EmitDeviceTap(TestApplication& application, Device::Class::Type deviceClass, Device::Subclass::Type deviceSubclass, const Dali::String& deviceName, uint32_t time)
+{
+  application.ProcessEvent(GenerateDeviceTapTouch(PointState::DOWN, deviceClass, deviceSubclass, deviceName, time));
+  application.ProcessEvent(GenerateDeviceTapTouch(PointState::UP, deviceClass, deviceSubclass, deviceName, time + 50u));
+  application.SendNotification();
+}
+
+const Dali::String TAP_REMOTE_NAME("Pointing Device");
+} // namespace
+
+int UtcDaliTapGestureDetectorOptionsP(void)
+{
+  TestApplication application;
+
+  TapGestureDetector::Options options;
+  DALI_TEST_EQUALS(options.GetMinimumTapsRequired(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(options.GetMaximumTapsRequired(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(options.IsReceiveAllTapEventsEnabled(), false, TEST_LOCATION);
+
+  options.SetMinimumTapsRequired(2u);
+  options.SetMaximumTapsRequired(3u);
+  options.SetReceiveAllTapEventsEnabled(true);
+  DALI_TEST_EQUALS(options.GetMinimumTapsRequired(), 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(options.GetMaximumTapsRequired(), 3u, TEST_LOCATION);
+  DALI_TEST_EQUALS(options.IsReceiveAllTapEventsEnabled(), true, TEST_LOCATION);
+
+  TapGestureDetector::Options copied(options);
+  copied.SetMinimumTapsRequired(1u);
+  DALI_TEST_EQUALS(options.GetMinimumTapsRequired(), 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(copied.GetMinimumTapsRequired(), 1u, TEST_LOCATION);
+
+  TapGestureDetector::Options assigned;
+  assigned = options;
+  DALI_TEST_EQUALS(assigned.GetMaximumTapsRequired(), 3u, TEST_LOCATION);
+
+  TapGestureDetector::Options moved(std::move(copied));
+  DALI_TEST_EQUALS(moved.GetMinimumTapsRequired(), 1u, TEST_LOCATION);
+  DALI_TEST_ASSERTION(copied.GetMinimumTapsRequired(), "moved-from TapGestureDetector::Options");
+
+  END_TEST;
+}
+
+int UtcDaliTapGestureDetectorGetDefaultOptionsP(void)
+{
+  TestApplication application;
+
+  TapGestureDetector detector = TapGestureDetector::New();
+  DALI_TEST_EQUALS(detector.IsReceiveAllTapEventsEnabled(), false, TEST_LOCATION);
+
+  detector.SetMinimumTapsRequired(2u);
+  detector.SetMaximumTapsRequired(3u);
+  detector.ReceiveAllTapEvents(true);
+  DALI_TEST_EQUALS(detector.IsReceiveAllTapEventsEnabled(), true, TEST_LOCATION);
+
+  TapGestureDetector::Options defaults = detector.GetDefaultOptions();
+  DALI_TEST_EQUALS(defaults.GetMinimumTapsRequired(), 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(defaults.GetMaximumTapsRequired(), 3u, TEST_LOCATION);
+  DALI_TEST_EQUALS(defaults.IsReceiveAllTapEventsEnabled(), true, TEST_LOCATION);
+
+  // The copy does not write back to the detector.
+  defaults.SetMinimumTapsRequired(1u);
+  defaults.SetReceiveAllTapEventsEnabled(false);
+  DALI_TEST_EQUALS(detector.GetMinimumTapsRequired(), 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(detector.IsReceiveAllTapEventsEnabled(), true, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliTapGestureDetectorDeviceOptionsSetGetClearP(void)
+{
+  TestApplication application;
+
+  TapGestureDetector          detector = TapGestureDetector::New();
+  const GestureDeviceSelector remote   = GestureDeviceSelector::ByDeviceClassAndSubclass(Device::Class::POINTER, Device::Subclass::REMOCON);
+  const GestureDeviceSelector touch    = GestureDeviceSelector::ByDeviceClass(Device::Class::TOUCH);
+
+  TapGestureDetector::Options queried;
+  DALI_TEST_CHECK(!detector.GetDeviceOptions(remote, queried));
+
+  TapGestureDetector::Options remoteOptions = detector.GetDefaultOptions();
+  remoteOptions.SetMaximumTapsRequired(1u);
+  remoteOptions.SetReceiveAllTapEventsEnabled(true);
+  detector.SetDeviceOptions(remote, remoteOptions);
+
+  DALI_TEST_CHECK(detector.GetDeviceOptions(remote, queried));
+  DALI_TEST_EQUALS(queried.GetMaximumTapsRequired(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(queried.IsReceiveAllTapEventsEnabled(), true, TEST_LOCATION);
+
+  // Exact lookup only; output untouched on a miss.
+  queried.SetMaximumTapsRequired(9u);
+  DALI_TEST_CHECK(!detector.GetDeviceOptions(touch, queried));
+  DALI_TEST_EQUALS(queried.GetMaximumTapsRequired(), 9u, TEST_LOCATION);
+
+  // Defaults untouched.
+  DALI_TEST_EQUALS(detector.GetMaximumTapsRequired(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(detector.IsReceiveAllTapEventsEnabled(), false, TEST_LOCATION);
+
+  remoteOptions.SetMaximumTapsRequired(3u);
+  detector.SetDeviceOptions(remote, remoteOptions); // replaces
+  DALI_TEST_CHECK(detector.GetDeviceOptions(remote, queried));
+  DALI_TEST_EQUALS(queried.GetMaximumTapsRequired(), 3u, TEST_LOCATION);
+
+  detector.ClearDeviceOptions(remote);
+  DALI_TEST_CHECK(!detector.GetDeviceOptions(remote, queried));
+  detector.ClearDeviceOptions(remote); // no-op
+
+  END_TEST;
+}
+
+int UtcDaliTapGestureDetectorDeviceOptionsInvalidN(void)
+{
+  TestApplication application;
+
+  TapGestureDetector          detector = TapGestureDetector::New();
+  const GestureDeviceSelector touch    = GestureDeviceSelector::ByDeviceClass(Device::Class::TOUCH);
+
+  TapGestureDetector::Options options;
+  options.SetMinimumTapsRequired(0u);
+  DALI_TEST_ASSERTION(detector.SetDeviceOptions(touch, options), "positive tap counts");
+
+  options.SetMinimumTapsRequired(3u);
+  options.SetMaximumTapsRequired(2u);
+  DALI_TEST_ASSERTION(detector.SetDeviceOptions(touch, options), "minimum taps <= maximum taps");
+
+  TapGestureDetector::Options queried;
+  DALI_TEST_CHECK(!detector.GetDeviceOptions(touch, queried));
+
+  END_TEST;
+}
+
+int UtcDaliTapGestureDetectorDeviceOptionsMaximumTaps(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
+  application.GetScene().Add(actor);
+  application.SendNotification();
+  application.Render();
+
+  TapCounter         counter;
+  CountingTapFunctor functor(counter);
+
+  // Double taps by default; the remote controller only ever single-taps.
+  TapGestureDetector detector = TapGestureDetector::New();
+  detector.SetMaximumTapsRequired(2u);
+  detector.Attach(actor);
+  detector.DetectedSignal().Connect(&application, functor);
+
+  TapGestureDetector::Options remoteOptions = detector.GetDefaultOptions();
+  remoteOptions.SetMaximumTapsRequired(1u);
+  detector.SetDeviceOptions(GestureDeviceSelector::ByDeviceClassAndSubclass(Device::Class::POINTER, Device::Subclass::REMOCON), remoteOptions);
+
+  // Two quick touch-screen taps: one double tap.
+  EmitDeviceTap(application, Device::Class::TOUCH, Device::Subclass::FINGER, Dali::String(""), 100u);
+  EmitDeviceTap(application, Device::Class::TOUCH, Device::Subclass::FINGER, Dali::String(""), 250u);
+  DALI_TEST_EQUALS(counter.taps.size(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(counter.taps[0].GetNumberOfTaps(), 2u, TEST_LOCATION);
+  counter.taps.clear();
+
+  // Two quick remote taps: two single taps, delivered immediately.
+  EmitDeviceTap(application, Device::Class::POINTER, Device::Subclass::REMOCON, TAP_REMOTE_NAME, 5000u);
+  DALI_TEST_EQUALS(counter.taps.size(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(counter.taps[0].GetNumberOfTaps(), 1u, TEST_LOCATION);
+  EmitDeviceTap(application, Device::Class::POINTER, Device::Subclass::REMOCON, TAP_REMOTE_NAME, 5150u);
+  DALI_TEST_EQUALS(counter.taps.size(), 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(counter.taps[1].GetNumberOfTaps(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(counter.taps[1].GetDeviceName(), TAP_REMOTE_NAME, TEST_LOCATION);
+  counter.taps.clear();
+
+  // Clearing the profile restores double taps for the remote.
+  detector.ClearDeviceOptions(GestureDeviceSelector::ByDeviceClassAndSubclass(Device::Class::POINTER, Device::Subclass::REMOCON));
+  EmitDeviceTap(application, Device::Class::POINTER, Device::Subclass::REMOCON, TAP_REMOTE_NAME, 10000u);
+  EmitDeviceTap(application, Device::Class::POINTER, Device::Subclass::REMOCON, TAP_REMOTE_NAME, 10150u);
+  DALI_TEST_EQUALS(counter.taps.size(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(counter.taps[0].GetNumberOfTaps(), 2u, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliTapGestureDetectorTapsFromDifferentDevicesDoNotCombine(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
+  application.GetScene().Add(actor);
+  application.SendNotification();
+  application.Render();
+
+  TapCounter         counter;
+  CountingTapFunctor functor(counter);
+
+  TapGestureDetector detector = TapGestureDetector::New();
+  detector.SetMaximumTapsRequired(2u);
+  detector.Attach(actor);
+  detector.DetectedSignal().Connect(&application, functor);
+
+  // A touch tap starts a possible double tap: nothing is delivered yet, the detector waits.
+  EmitDeviceTap(application, Device::Class::TOUCH, Device::Subclass::FINGER, Dali::String(""), 100u);
+  DALI_TEST_EQUALS(counter.taps.size(), 0u, TEST_LOCATION);
+
+  // A remote tap inside the multi-tap interval does not become the second tap of that sequence:
+  // the waiting touch tap is delivered as a single tap and the remote tap starts its own sequence.
+  EmitDeviceTap(application, Device::Class::POINTER, Device::Subclass::REMOCON, TAP_REMOTE_NAME, 250u);
+  DALI_TEST_EQUALS(counter.taps.size(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(counter.taps[0].GetNumberOfTaps(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(counter.taps[0].GetDeviceClass(), Device::Class::TOUCH, TEST_LOCATION);
+
+  // The remote's own single tap is delivered when its multi-tap wait expires.
+  application.GetPlatform().TriggerTimer();
+  DALI_TEST_EQUALS(counter.taps.size(), 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(counter.taps[1].GetNumberOfTaps(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(counter.taps[1].GetDeviceClass(), Device::Class::POINTER, TEST_LOCATION);
+  DALI_TEST_EQUALS(counter.taps[1].GetDeviceName(), TAP_REMOTE_NAME, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliTapGestureDetectorDeviceOptionsHandleEvent(void)
+{
+  TestApplication          application;
+  Dali::Integration::Scene scene = application.GetScene();
+  Dali::RenderTask         task  = scene.GetRenderTaskList().GetTask(0);
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
+  scene.Add(actor);
+  application.SendNotification();
+  application.Render();
+
+  TapCounter         counter;
+  CountingTapFunctor functor(counter);
+
+  TapGestureDetector detector = TapGestureDetector::New();
+  detector.SetMaximumTapsRequired(2u);
+  detector.DetectedSignal().Connect(&application, functor);
+
+  TapGestureDetector::Options remoteOptions = detector.GetDefaultOptions();
+  remoteOptions.SetMaximumTapsRequired(1u);
+  detector.SetDeviceOptions(GestureDeviceSelector::ByDeviceClass(Device::Class::POINTER), remoteOptions);
+
+  auto feedTap = [&](Device::Class::Type deviceClass, uint32_t time)
+  {
+    for(PointState::Type state : {PointState::DOWN, PointState::UP})
+    {
+      Dali::Integration::TouchEvent tp = GenerateDeviceTapTouch(state, deviceClass, Device::Subclass::NONE, Dali::String(""), time);
+      Internal::TouchEventPtr       touchEventImpl(new Internal::TouchEvent(time));
+      touchEventImpl->AddPoint(tp.GetPoint(0));
+      touchEventImpl->SetRenderTask(task);
+      Dali::TouchEvent touchEventHandle(touchEventImpl.Get());
+      detector.HandleEvent(actor, touchEventHandle);
+      time += 50u;
+    }
+  };
+
+  // Touch: one double tap.
+  feedTap(Device::Class::TOUCH, 100u);
+  feedTap(Device::Class::TOUCH, 250u);
+  DALI_TEST_EQUALS(counter.taps.size(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(counter.taps[0].GetNumberOfTaps(), 2u, TEST_LOCATION);
+  counter.taps.clear();
+
+  // Pointer: two single taps.
+  feedTap(Device::Class::POINTER, 5000u);
+  feedTap(Device::Class::POINTER, 5150u);
+  DALI_TEST_EQUALS(counter.taps.size(), 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(counter.taps[0].GetNumberOfTaps(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(counter.taps[1].GetNumberOfTaps(), 1u, TEST_LOCATION);
 
   END_TEST;
 }

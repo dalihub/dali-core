@@ -54,7 +54,7 @@ uint32_t GetMilliSeconds()
 }
 } // unnamed namespace
 
-PanGestureRecognizer::PanGestureRecognizer(Observer& observer, Vector2 screenSize, const PanGestureRequest& request, int32_t minimumDistance, int32_t minimumPanEvents)
+PanGestureRecognizer::PanGestureRecognizer(Observer& observer, Vector2 screenSize, const PanGestureRequest& request)
 : GestureRecognizer(screenSize, GestureType::PAN),
   mObserver(observer),
   mState(CLEAR),
@@ -67,22 +67,12 @@ PanGestureRecognizer::PanGestureRecognizer(Observer& observer, Vector2 screenSiz
   mMinimumMotionEvents(MINIMUM_MOTION_EVENTS_BEFORE_PAN),
   mMotionEvents(0),
   mMaximumMotionEventAge(request.maxMotionEventAge),
-  mPrimaryDeviceId(-1)
+  mCurrentMotionEventAge(0u),
+  mPrimaryDeviceId(-1),
+  mBaseThresholds(),
+  mDeviceThresholds()
 {
-  if(minimumDistance >= 0)
-  {
-    mMinimumDistanceSquared = minimumDistance * minimumDistance;
-
-    // Usually, we do not want to apply the threshold straight away, but phased over the first few pans
-    // Set our distance to threshold adjustments ratio here.
-    float fMinimumDistance     = static_cast<float>(minimumDistance);
-    mThresholdTotalAdjustments = static_cast<unsigned int>(fMinimumDistance * MINIMUM_MOTION_DISTANCE_TO_THRESHOLD_ADJUSTMENTS_RATIO);
-  }
-
-  if(minimumPanEvents >= 1)
-  {
-    mMinimumMotionEvents = minimumPanEvents - 1; // Down is the first event
-  }
+  ApplyRequest(request);
 }
 
 PanGestureRecognizer::~PanGestureRecognizer() = default;
@@ -203,8 +193,10 @@ void PanGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
             case PointState::MOTION:
             {
               // Check whether this motion event is acceptable or not.
-              // If event time is too old, we should skip this event.
-              if(GetMilliSeconds() - event.time > mMaximumMotionEventAge)
+              // mMaximumMotionEventAge is the widest age any detector accepts; each detector applies
+              // its own limit to the age carried by the event.
+              const uint32_t motionEventAge = GetMilliSeconds() - event.time;
+              if(motionEventAge > mMaximumMotionEventAge)
               {
                 // Too old event. Skip it.
                 mTouchEvents.pop_back();
@@ -212,7 +204,9 @@ void PanGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
               else
               {
                 // Pan is continuing, tell Core.
+                mCurrentMotionEventAge = motionEventAge;
                 SendPan(GestureState::CONTINUING, event);
+                mCurrentMotionEventAge = 0u;
               }
               break;
             }
@@ -300,11 +294,36 @@ void PanGestureRecognizer::CancelEvent()
 
 void PanGestureRecognizer::Update(const GestureRequest& request)
 {
-  const PanGestureRequest& pan = static_cast<const PanGestureRequest&>(request);
+  ApplyRequest(static_cast<const PanGestureRequest&>(request));
+}
 
-  mMinimumTouchesRequired = pan.minTouches;
-  mMaximumTouchesRequired = pan.maxTouches;
-  mMaximumMotionEventAge  = pan.maxMotionEventAge;
+void PanGestureRecognizer::ApplyRequest(const PanGestureRequest& request)
+{
+  mMinimumTouchesRequired = request.minTouches;
+  mMaximumTouchesRequired = request.maxTouches;
+  mMaximumMotionEventAge  = request.maxMotionEventAge;
+
+  mBaseThresholds.minimumDistance  = request.minimumDistance;
+  mBaseThresholds.minimumPanEvents = request.minimumPanEvents;
+  mDeviceThresholds                = request.deviceThresholds;
+  ApplyThresholdsForSequence();
+}
+
+void PanGestureRecognizer::OnSequenceSourceChanged()
+{
+  ApplyThresholdsForSequence();
+}
+
+void PanGestureRecognizer::ApplyThresholdsForSequence()
+{
+  const PanThresholdValues* thresholds = mSequenceSource.valid ? mDeviceThresholds.Resolve(mSequenceSource) : nullptr;
+  ApplyThresholds(thresholds ? *thresholds : mBaseThresholds);
+}
+
+void PanGestureRecognizer::ApplyThresholds(const PanThresholdValues& thresholds)
+{
+  SetMinimumDistance(thresholds.minimumDistance);
+  SetMinimumPanEvents(thresholds.minimumPanEvents);
 }
 
 bool PanGestureRecognizer::SendPan(GestureState state, const Integration::TouchEvent& currentEvent)
@@ -312,6 +331,7 @@ bool PanGestureRecognizer::SendPan(GestureState state, const Integration::TouchE
   PanGestureEvent gesture(state);
   gesture.currentPosition = currentEvent.points[0].GetScreenPosition();
   gesture.numberOfTouches = currentEvent.GetPointCount();
+  gesture.motionEventAge  = mCurrentMotionEventAge;
 
   if(mTouchEvents.size() > 1)
   {
@@ -366,6 +386,7 @@ bool PanGestureRecognizer::SendPan(GestureState state, const Integration::TouchE
 
   gesture.time         = currentEvent.time;
   gesture.triggerPoint = mTriggerPoint;
+  gesture.source       = mSequenceSource;
 
   if(mScene)
   {

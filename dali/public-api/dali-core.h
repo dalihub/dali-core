@@ -58,6 +58,8 @@
 
 #include <dali/public-api/events/device.h>
 #include <dali/public-api/events/gesture-detector.h>
+#include <dali/public-api/events/gesture-device-selector.h>
+#include <dali/public-api/events/gesture-thresholds.h>
 #include <dali/public-api/events/gesture-enumerations.h>
 #include <dali/public-api/events/gesture.h>
 #include <dali/public-api/events/hover-event.h>

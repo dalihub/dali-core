@@ -35,7 +35,7 @@ namespace DALI_NAMESPACE
 namespace Internal
 {
 
-TapGestureRecognizer::TapGestureRecognizer(Observer& observer, Vector2 screenSize, const TapGestureRequest& request, uint32_t maximumMultiTapInterval, uint32_t maximumHoldingTime, float maximumMotionDistance)
+TapGestureRecognizer::TapGestureRecognizer(Observer& observer, Vector2 screenSize, const TapGestureRequest& request)
 : GestureRecognizer(screenSize, GestureType::TAP),
   mObserver(observer),
   mState(CLEAR),
@@ -44,10 +44,11 @@ TapGestureRecognizer::TapGestureRecognizer(Observer& observer, Vector2 screenSiz
   mTouchTime(0u),
   mLastTapTime(0u),
   mDeltaBetweenTouchDownTouchUp(0u),
-  mMaximumMultiTapInterval(maximumMultiTapInterval),
-  mMaximumHoldingTime(maximumHoldingTime),
-  mMaximumMotionDistance(maximumMotionDistance)
+  mMaximumMultiTapInterval(request.maximumMultiTapInterval),
+  mMaximumHoldingTime(request.maximumHoldingTime),
+  mMaximumMotionDistance(request.maximumMotionDistance)
 {
+  ApplyRequest(request);
 }
 
 TapGestureRecognizer::~TapGestureRecognizer() = default;
@@ -132,7 +133,8 @@ void TapGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
 
           if(distanceDelta.x > mMaximumMotionDistance ||
              distanceDelta.y > mMaximumMotionDistance ||
-             timeDelta > mMaximumMultiTapInterval) // If the time between tabs is long, it starts over from SetupForTouchDown.
+             timeDelta > mMaximumMultiTapInterval ||            // If the time between taps is long, it starts over from SetupForTouchDown.
+             !mTapSequenceSource.IsSameDevice(mSequenceSource)) // Taps from different devices never combine into one multi-tap.
           {
             SetupForTouchDown(event, point);
           }
@@ -166,6 +168,7 @@ void TapGestureRecognizer::CancelEvent()
 void TapGestureRecognizer::SetupForTouchDown(const Integration::TouchEvent& event, const Integration::Point& point)
 {
   mCurrentActor.ResetActor();
+  mTapSequenceSource = mSequenceSource;
   EmitPossibleState(event, point.GetScreenPosition());
 }
 
@@ -205,22 +208,34 @@ bool TapGestureRecognizer::UpdateCurrentActor()
 
 void TapGestureRecognizer::Update(const GestureRequest& request)
 {
-  // Nothing to do.
+  ApplyRequest(static_cast<const TapGestureRequest&>(request));
 }
 
-void TapGestureRecognizer::SetMaximumMultiTapInterval(uint32_t time)
+void TapGestureRecognizer::ApplyRequest(const TapGestureRequest& request)
 {
-  mMaximumMultiTapInterval = time;
+  mBaseThresholds.maximumMultiTapInterval = request.maximumMultiTapInterval;
+  mBaseThresholds.maximumHoldingTime      = request.maximumHoldingTime;
+  mBaseThresholds.maximumMotionDistance   = request.maximumMotionDistance;
+  mDeviceThresholds                       = request.deviceThresholds;
+  ApplyThresholdsForSequence();
 }
 
-void TapGestureRecognizer::SetMaximumHoldingTime(uint32_t time)
+void TapGestureRecognizer::OnSequenceSourceChanged()
 {
-  mMaximumHoldingTime = time;
+  ApplyThresholdsForSequence();
 }
 
-void TapGestureRecognizer::SetMaximumMotionDistance(float distance)
+void TapGestureRecognizer::ApplyThresholdsForSequence()
 {
-  mMaximumMotionDistance = distance;
+  const TapThresholdValues* thresholds = mSequenceSource.valid ? mDeviceThresholds.Resolve(mSequenceSource) : nullptr;
+  ApplyThresholds(thresholds ? *thresholds : mBaseThresholds);
+}
+
+void TapGestureRecognizer::ApplyThresholds(const TapThresholdValues& thresholds)
+{
+  mMaximumMultiTapInterval = thresholds.maximumMultiTapInterval;
+  mMaximumHoldingTime      = thresholds.maximumHoldingTime;
+  mMaximumMotionDistance   = thresholds.maximumMotionDistance;
 }
 
 void TapGestureRecognizer::EmitGesture(GestureState state, uint32_t time)
@@ -257,7 +272,9 @@ void TapGestureRecognizer::EmitTap(uint32_t time, TapGestureEvent& event)
 
 void TapGestureRecognizer::ProcessEvent(TapGestureEvent& event)
 {
-  event.triggerPoint = mTriggerPoint;
+  event.triggerPoint            = mTriggerPoint;
+  event.source                  = mSequenceSource;
+  event.maximumMultiTapInterval = mMaximumMultiTapInterval;
 
   if(mScene)
   {

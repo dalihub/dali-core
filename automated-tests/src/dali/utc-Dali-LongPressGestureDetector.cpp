@@ -27,6 +27,7 @@
 #include <dali/public-api/dali-core.h>
 #include <stdlib.h>
 #include <test-touch-event-utils.h>
+#include <utility>
 
 #include <iostream>
 
@@ -1271,6 +1272,307 @@ int UtcDaliLongPressGestureHandleEvent(void)
 
   DALI_TEST_EQUALS(true, pData.functorCalled, TEST_LOCATION);
   pData.Reset();
+
+  END_TEST;
+}
+
+int UtcDaliLongPressGestureHandleEventAppliesUpdatedTouchesRequired(void)
+{
+  TestApplication          application;
+  Dali::Integration::Scene scene = application.GetScene();
+  Dali::RenderTask         task  = scene.GetRenderTaskList().GetTask(0);
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
+  scene.Add(actor);
+
+  application.SendNotification();
+  application.Render();
+
+  SignalData             data;
+  GestureReceivedFunctor functor(data);
+
+  LongPressGestureDetector detector = LongPressGestureDetector::New();
+  detector.DetectedSignal().Connect(&application, functor);
+
+  auto feed = [&](PointState::Type state, uint32_t time)
+  {
+    Dali::Integration::TouchEvent tp = GenerateSingleTouch(state, Vector2(50.0f, 50.0f), time);
+    Internal::TouchEventPtr       touchEventImpl(new Internal::TouchEvent(time));
+    touchEventImpl->AddPoint(tp.GetPoint(0));
+    touchEventImpl->SetRenderTask(task);
+    Dali::TouchEvent touchEventHandle(touchEventImpl.Get());
+    detector.HandleEvent(actor, touchEventHandle);
+  };
+
+  // Single-touch long press with the default requirement of one touch. This creates the detector-owned recognizer.
+  feed(PointState::DOWN, 100u);
+  TestTriggerLongPress(application);
+  feed(PointState::UP, 800u);
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  data.Reset();
+
+  // Change this detector's own requirement after its recognizer exists: a single touch must no longer long-press.
+  detector.SetTouchesRequired(2u);
+  feed(PointState::DOWN, 5000u);
+  TestTriggerLongPress(application);
+  feed(PointState::UP, 5800u);
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+
+  // And back again.
+  detector.SetTouchesRequired(1u);
+  feed(PointState::DOWN, 10000u);
+  TestTriggerLongPress(application);
+  feed(PointState::UP, 10800u);
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+
+  END_TEST;
+}
+
+namespace
+{
+Dali::Integration::TouchEvent GenerateDeviceLongPressTouch(Device::Class::Type deviceClass, Device::Subclass::Type deviceSubclass, uint32_t time, PointState::Type state, const Vector2& position, PointState::Type secondState = PointState::INTERRUPTED, const Vector2& secondPosition = Vector2::ZERO)
+{
+  Dali::Integration::TouchEvent touchEvent;
+  auto                          addPoint = [&](PointState::Type pointState, const Vector2& pointPosition, int32_t deviceId)
+  {
+    Dali::Integration::Point point;
+    point.SetState(pointState);
+    point.SetDeviceId(deviceId);
+    point.SetScreenPosition(pointPosition);
+    point.SetDeviceClass(deviceClass);
+    point.SetDeviceSubclass(deviceSubclass);
+    point.SetMouseButton(MouseButton::PRIMARY);
+    touchEvent.points.push_back(point);
+  };
+  addPoint(state, position, 4);
+  if(secondState != PointState::INTERRUPTED)
+  {
+    addPoint(secondState, secondPosition, 7);
+  }
+  touchEvent.time = time;
+  return touchEvent;
+}
+
+/**
+ * A long press with one finger of the given device through the scene: DOWN, timer, UP.
+ */
+void EmitDeviceLongPress(TestApplication& application, Device::Class::Type deviceClass, Device::Subclass::Type deviceSubclass, uint32_t time)
+{
+  application.ProcessEvent(GenerateDeviceLongPressTouch(deviceClass, deviceSubclass, time, PointState::DOWN, Vector2(50.0f, 50.0f)));
+  TestTriggerLongPress(application);
+  application.ProcessEvent(GenerateDeviceLongPressTouch(deviceClass, deviceSubclass, time + 700u, PointState::UP, Vector2(50.0f, 50.0f)));
+  application.SendNotification();
+}
+
+/**
+ * A long press with two fingers of the given device through the scene.
+ */
+void EmitTwoFingerDeviceLongPress(TestApplication& application, Device::Class::Type deviceClass, Device::Subclass::Type deviceSubclass, uint32_t time)
+{
+  const Vector2 a(50.0f, 50.0f);
+  const Vector2 b(50.0f, 80.0f);
+  application.ProcessEvent(GenerateDeviceLongPressTouch(deviceClass, deviceSubclass, time, PointState::DOWN, a));
+  application.ProcessEvent(GenerateDeviceLongPressTouch(deviceClass, deviceSubclass, time + 16u, PointState::STATIONARY, a, PointState::DOWN, b));
+  TestTriggerLongPress(application);
+  application.ProcessEvent(GenerateDeviceLongPressTouch(deviceClass, deviceSubclass, time + 700u, PointState::UP, a, PointState::UP, b));
+  application.SendNotification();
+}
+} // namespace
+
+int UtcDaliLongPressGestureDetectorOptionsP(void)
+{
+  TestApplication application;
+
+  LongPressGestureDetector::Options options;
+  DALI_TEST_EQUALS(options.GetMinimumTouchesRequired(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(options.GetMaximumTouchesRequired(), 1u, TEST_LOCATION);
+
+  options.SetTouchesRequired(2u);
+  DALI_TEST_EQUALS(options.GetMinimumTouchesRequired(), 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(options.GetMaximumTouchesRequired(), 2u, TEST_LOCATION);
+
+  options.SetTouchesRequired(1u, 3u);
+  DALI_TEST_EQUALS(options.GetMinimumTouchesRequired(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(options.GetMaximumTouchesRequired(), 3u, TEST_LOCATION);
+
+  LongPressGestureDetector::Options copied(options);
+  copied.SetTouchesRequired(2u);
+  DALI_TEST_EQUALS(options.GetMinimumTouchesRequired(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(copied.GetMinimumTouchesRequired(), 2u, TEST_LOCATION);
+
+  LongPressGestureDetector::Options moved(std::move(copied));
+  DALI_TEST_EQUALS(moved.GetMaximumTouchesRequired(), 2u, TEST_LOCATION);
+  DALI_TEST_ASSERTION(copied.GetMinimumTouchesRequired(), "moved-from LongPressGestureDetector::Options");
+
+  END_TEST;
+}
+
+int UtcDaliLongPressGestureDetectorGetDefaultOptionsP(void)
+{
+  TestApplication application;
+
+  LongPressGestureDetector detector = LongPressGestureDetector::New(2u, 3u);
+
+  LongPressGestureDetector::Options defaults = detector.GetDefaultOptions();
+  DALI_TEST_EQUALS(defaults.GetMinimumTouchesRequired(), 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(defaults.GetMaximumTouchesRequired(), 3u, TEST_LOCATION);
+
+  detector.SetTouchesRequired(1u);
+  defaults = detector.GetDefaultOptions();
+  DALI_TEST_EQUALS(defaults.GetMaximumTouchesRequired(), 1u, TEST_LOCATION);
+
+  // The copy does not write back to the detector.
+  defaults.SetTouchesRequired(4u);
+  DALI_TEST_EQUALS(detector.GetMaximumTouchesRequired(), 1u, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliLongPressGestureDetectorDeviceOptionsSetGetClearP(void)
+{
+  TestApplication application;
+
+  LongPressGestureDetector    detector = LongPressGestureDetector::New();
+  const GestureDeviceSelector touch    = GestureDeviceSelector::ByDeviceClass(Device::Class::TOUCH);
+  const GestureDeviceSelector mouse    = GestureDeviceSelector::ByDeviceClass(Device::Class::MOUSE);
+
+  LongPressGestureDetector::Options queried;
+  DALI_TEST_CHECK(!detector.GetDeviceOptions(touch, queried));
+
+  LongPressGestureDetector::Options touchOptions = detector.GetDefaultOptions();
+  touchOptions.SetTouchesRequired(2u);
+  detector.SetDeviceOptions(touch, touchOptions);
+
+  DALI_TEST_CHECK(detector.GetDeviceOptions(touch, queried));
+  DALI_TEST_EQUALS(queried.GetMinimumTouchesRequired(), 2u, TEST_LOCATION);
+
+  queried.SetTouchesRequired(9u);
+  DALI_TEST_CHECK(!detector.GetDeviceOptions(mouse, queried));
+  DALI_TEST_EQUALS(queried.GetMinimumTouchesRequired(), 9u, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(detector.GetMinimumTouchesRequired(), 1u, TEST_LOCATION);
+
+  touchOptions.SetTouchesRequired(2u, 3u);
+  detector.SetDeviceOptions(touch, touchOptions);
+  DALI_TEST_CHECK(detector.GetDeviceOptions(touch, queried));
+  DALI_TEST_EQUALS(queried.GetMaximumTouchesRequired(), 3u, TEST_LOCATION);
+
+  detector.ClearDeviceOptions(touch);
+  DALI_TEST_CHECK(!detector.GetDeviceOptions(touch, queried));
+  detector.ClearDeviceOptions(touch);
+
+  END_TEST;
+}
+
+int UtcDaliLongPressGestureDetectorDeviceOptionsInvalidN(void)
+{
+  TestApplication application;
+
+  LongPressGestureDetector    detector = LongPressGestureDetector::New();
+  const GestureDeviceSelector touch    = GestureDeviceSelector::ByDeviceClass(Device::Class::TOUCH);
+
+  LongPressGestureDetector::Options options;
+  options.SetTouchesRequired(0u);
+  DALI_TEST_ASSERTION(detector.SetDeviceOptions(touch, options), "positive touch counts");
+
+  options.SetTouchesRequired(3u, 2u);
+  DALI_TEST_ASSERTION(detector.SetDeviceOptions(touch, options), "minimum touches <= maximum touches");
+
+  LongPressGestureDetector::Options queried;
+  DALI_TEST_CHECK(!detector.GetDeviceOptions(touch, queried));
+
+  END_TEST;
+}
+
+int UtcDaliLongPressGestureDetectorDeviceOptionsTouchesRequired(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(200.0f, 200.0f));
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
+  application.GetScene().Add(actor);
+  application.SendNotification();
+  application.Render();
+
+  SignalData             data;
+  GestureReceivedFunctor functor(data);
+
+  LongPressGestureDetector detector = LongPressGestureDetector::New();
+  detector.Attach(actor);
+  detector.DetectedSignal().Connect(&application, functor);
+
+  // Touch screens must long-press with two fingers; everything else keeps the one-finger default.
+  LongPressGestureDetector::Options touchOptions = detector.GetDefaultOptions();
+  touchOptions.SetTouchesRequired(2u);
+  detector.SetDeviceOptions(GestureDeviceSelector::ByDeviceClass(Device::Class::TOUCH), touchOptions);
+
+  EmitDeviceLongPress(application, Device::Class::TOUCH, Device::Subclass::FINGER, 100u);
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+
+  EmitDeviceLongPress(application, Device::Class::MOUSE, Device::Subclass::NONE, 5000u);
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(data.receivedGesture.GetNumberOfTouches(), 1u, TEST_LOCATION);
+  data.Reset();
+
+  EmitTwoFingerDeviceLongPress(application, Device::Class::TOUCH, Device::Subclass::FINGER, 10000u);
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(data.receivedGesture.GetNumberOfTouches(), 2u, TEST_LOCATION);
+  data.Reset();
+
+  detector.ClearDeviceOptions(GestureDeviceSelector::ByDeviceClass(Device::Class::TOUCH));
+  EmitDeviceLongPress(application, Device::Class::TOUCH, Device::Subclass::FINGER, 15000u);
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliLongPressGestureDetectorDeviceOptionsHandleEvent(void)
+{
+  TestApplication          application;
+  Dali::Integration::Scene scene = application.GetScene();
+  Dali::RenderTask         task  = scene.GetRenderTaskList().GetTask(0);
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(200.0f, 200.0f));
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
+  scene.Add(actor);
+  application.SendNotification();
+  application.Render();
+
+  SignalData             data;
+  GestureReceivedFunctor functor(data);
+
+  LongPressGestureDetector detector = LongPressGestureDetector::New();
+  detector.DetectedSignal().Connect(&application, functor);
+
+  LongPressGestureDetector::Options touchOptions = detector.GetDefaultOptions();
+  touchOptions.SetTouchesRequired(2u);
+  detector.SetDeviceOptions(GestureDeviceSelector::ByDeviceClass(Device::Class::TOUCH), touchOptions);
+
+  auto feed = [&](Device::Class::Type deviceClass, PointState::Type state, uint32_t time)
+  {
+    Dali::Integration::TouchEvent tp = GenerateDeviceLongPressTouch(deviceClass, Device::Subclass::NONE, time, state, Vector2(50.0f, 50.0f));
+    Internal::TouchEventPtr       touchEventImpl(new Internal::TouchEvent(time));
+    touchEventImpl->AddPoint(tp.GetPoint(0));
+    touchEventImpl->SetRenderTask(task);
+    Dali::TouchEvent touchEventHandle(touchEventImpl.Get());
+    detector.HandleEvent(actor, touchEventHandle);
+  };
+
+  // One finger on a touch screen: rejected by the touch profile.
+  feed(Device::Class::TOUCH, PointState::DOWN, 100u);
+  TestTriggerLongPress(application);
+  feed(Device::Class::TOUCH, PointState::UP, 800u);
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+
+  // One "finger" from a mouse: default applies.
+  feed(Device::Class::MOUSE, PointState::DOWN, 5000u);
+  TestTriggerLongPress(application);
+  feed(Device::Class::MOUSE, PointState::UP, 5800u);
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
 
   END_TEST;
 }

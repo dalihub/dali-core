@@ -20,7 +20,9 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/events/actor-observer.h>
+#include <dali/internal/event/events/gesture-device-profile-table.h>
 #include <dali/internal/event/events/gesture-processor.h>
+#include <dali/internal/event/events/gesture-threshold-values.h>
 #include <dali/internal/event/events/tap-gesture/tap-gesture-detector-impl.h>
 
 namespace DALI_NAMESPACE
@@ -32,6 +34,8 @@ class Actor;
 
 struct GestureEvent;
 struct TapGestureEvent;
+
+struct TapGestureRequest;
 
 /**
  * Tap Gesture Event Processing:
@@ -135,6 +139,18 @@ public: // To be called by GestureEventProcessor
    */
   float GetMaximumMotionDistance() const;
 
+  /**
+   * @brief Replaces the application-wide per-device thresholds and pushes them to the recognizer.
+   * @param[in] thresholds The per-device threshold table
+   */
+  void SetDeviceThresholds(const GestureDeviceProfileTable<TapThresholdValues>& thresholds);
+
+  /**
+   * @brief Retrieves the application-wide per-device thresholds.
+   * @return The per-device threshold table
+   */
+  const GestureDeviceProfileTable<TapThresholdValues>& GetDeviceThresholds() const;
+
 private:
   // Undefined
   TapGestureProcessor(const TapGestureProcessor&);
@@ -142,8 +158,15 @@ private:
 
 private:
   /**
-   * Iterates through our GestureDetectors and determines if we need to ask the adaptor to update
-   * its detection policy.  If it does, it sends the appropriate gesture update request to adaptor.
+   * Builds the request the shared recognizer should use: the union of the attached detectors'
+   * tap/touch requirements plus the current recognition thresholds.
+   * @param[out] request The request to fill.
+   */
+  void FillRequest(TapGestureRequest& request) const;
+
+  /**
+   * Rebuilds the request from the attached detectors and the current thresholds and pushes it to
+   * the recognizer. Requires at least one attached detector.
    */
   void UpdateDetection();
 
@@ -169,9 +192,6 @@ private:
 private:
   TapGestureDetectorContainer mTapGestureDetectors;
 
-  uint32_t mMinTouchesRequired;
-  uint32_t mMaxTouchesRequired;
-
   ActorObserver          mCurrentTapActor;   ///< Observer for the current gesture actor
   const TapGestureEvent* mCurrentTapEvent;   ///< Pointer to current TapEvent, used when calling ProcessAndEmit()
   bool                   mPossibleProcessed; ///< Indication of whether we've processed a touch down for this gestuee
@@ -179,6 +199,8 @@ private:
   uint32_t mMaximumMultiTapInterval; ///< The maximum interval allowed between the taps of a multi tap gesture (millisecond)
   uint32_t mMaximumHoldingTime;      ///< The maximum time the touch point can be held down while still being recognized as a tap gesture (millisecond)
   float    mMaximumMotionDistance;   ///< The maximum distance the touch point can move while still being recognized as a tap gesture
+
+  GestureDeviceProfileTable<TapThresholdValues> mDeviceThresholds; ///< Application-wide per-device thresholds.
 };
 
 } // namespace Internal

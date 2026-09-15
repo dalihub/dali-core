@@ -57,6 +57,7 @@ SET( internal_src_files
   ${internal_src_dir}/event/events/gesture-detector-impl.cpp
   ${internal_src_dir}/event/events/gesture-event.cpp
   ${internal_src_dir}/event/events/gesture-event-processor.cpp
+  ${internal_src_dir}/event/events/gesture-input-source.cpp
   ${internal_src_dir}/event/events/gesture-processor.cpp
   ${internal_src_dir}/event/events/geometry-hover-event-processor.cpp
   ${internal_src_dir}/event/events/geometry-touch-event-processor.cpp
@@ -77,6 +78,7 @@ SET( internal_src_files
   ${internal_src_dir}/event/events/pan-gesture/pan-gesture-detector-impl.cpp
   ${internal_src_dir}/event/events/pan-gesture/pan-gesture-event.cpp
   ${internal_src_dir}/event/events/pan-gesture/pan-gesture-processor.cpp
+  ${internal_src_dir}/event/events/pan-gesture/pan-gesture-profile.cpp
   ${internal_src_dir}/event/events/pan-gesture/pan-gesture-recognizer.cpp
   ${internal_src_dir}/event/events/pinch-gesture/pinch-gesture-detector-impl.cpp
   ${internal_src_dir}/event/events/pinch-gesture/pinch-gesture-event.cpp

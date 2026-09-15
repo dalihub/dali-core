@@ -40,7 +40,7 @@ const float MAXIMUM_MOTION_ALLOWED = 60.0f;
 
 } // unnamed namespace
 
-LongPressGestureRecognizer::LongPressGestureRecognizer(Observer& observer, Vector2 screenSize, const LongPressGestureRequest& request, uint32_t minimumHoldingTime)
+LongPressGestureRecognizer::LongPressGestureRecognizer(Observer& observer, Vector2 screenSize, const LongPressGestureRequest& request)
 : GestureRecognizer(screenSize, GestureType::LONG_PRESS),
   mObserver(observer),
   mState(CLEAR),
@@ -48,8 +48,11 @@ LongPressGestureRecognizer::LongPressGestureRecognizer(Observer& observer, Vecto
   mMaximumTouchesRequired(request.maxTouches),
   mTouchTime(0),
   mTimerId(0),
-  mMinimumHoldingTime(minimumHoldingTime)
+  mMinimumHoldingTime(request.minimumHoldingTime),
+  mBaseThresholds(),
+  mDeviceThresholds()
 {
+  ApplyRequest(request);
 }
 
 LongPressGestureRecognizer::~LongPressGestureRecognizer()
@@ -215,15 +218,33 @@ void LongPressGestureRecognizer::CancelEvent()
 
 void LongPressGestureRecognizer::Update(const GestureRequest& request)
 {
-  const LongPressGestureRequest& longPress = static_cast<const LongPressGestureRequest&>(request);
-
-  mMinimumTouchesRequired = longPress.minTouches;
-  mMaximumTouchesRequired = longPress.maxTouches;
+  ApplyRequest(static_cast<const LongPressGestureRequest&>(request));
 }
 
-void LongPressGestureRecognizer::SetMinimumHoldingTime(uint32_t time)
+void LongPressGestureRecognizer::ApplyRequest(const LongPressGestureRequest& request)
 {
-  mMinimumHoldingTime = time;
+  mMinimumTouchesRequired = request.minTouches;
+  mMaximumTouchesRequired = request.maxTouches;
+
+  mBaseThresholds.minimumHoldingTime = request.minimumHoldingTime;
+  mDeviceThresholds                  = request.deviceThresholds;
+  ApplyThresholdsForSequence();
+}
+
+void LongPressGestureRecognizer::OnSequenceSourceChanged()
+{
+  ApplyThresholdsForSequence();
+}
+
+void LongPressGestureRecognizer::ApplyThresholdsForSequence()
+{
+  const LongPressThresholdValues* thresholds = mSequenceSource.valid ? mDeviceThresholds.Resolve(mSequenceSource) : nullptr;
+  ApplyThresholds(thresholds ? *thresholds : mBaseThresholds);
+}
+
+void LongPressGestureRecognizer::ApplyThresholds(const LongPressThresholdValues& thresholds)
+{
+  mMinimumHoldingTime = thresholds.minimumHoldingTime;
 }
 
 bool LongPressGestureRecognizer::TimerCallback()
@@ -263,6 +284,7 @@ void LongPressGestureRecognizer::EmitGesture(GestureState state)
       longPress.time += mMinimumHoldingTime;
     }
     longPress.triggerPoint = mTriggerPoint;
+    longPress.source       = mSequenceSource;
 
     if(mScene)
     {

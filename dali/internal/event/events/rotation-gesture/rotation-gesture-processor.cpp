@@ -225,7 +225,10 @@ void RotationGestureProcessor::AddGestureDetector(RotationGestureDetector* gestu
 
   if(createRecognizer)
   {
-    mGestureRecognizer = new RotationGestureRecognizer(*this, mMinimumTouchEvents, mMinimumTouchEventsAfterStart);
+    RotationGestureRequest request;
+    FillRequest(request);
+
+    mGestureRecognizer = new RotationGestureRecognizer(*this, request);
   }
 }
 
@@ -265,11 +268,7 @@ void RotationGestureProcessor::SetMinimumTouchEvents(uint32_t value)
 
     if(mGestureRecognizer)
     {
-      RotationGestureRecognizer* rotationRecognizer = dynamic_cast<RotationGestureRecognizer*>(mGestureRecognizer.Get());
-      if(rotationRecognizer)
-      {
-        rotationRecognizer->SetMinimumTouchEvents(value);
-      }
+      UpdateDetection();
     }
   }
 }
@@ -282,13 +281,40 @@ void RotationGestureProcessor::SetMinimumTouchEventsAfterStart(uint32_t value)
 
     if(mGestureRecognizer)
     {
-      RotationGestureRecognizer* rotationRecognizer = dynamic_cast<RotationGestureRecognizer*>(mGestureRecognizer.Get());
-      if(rotationRecognizer)
-      {
-        rotationRecognizer->SetMinimumTouchEventsAfterStart(value);
-      }
+      UpdateDetection();
     }
   }
+}
+
+void RotationGestureProcessor::FillRequest(RotationGestureRequest& request) const
+{
+  request.minimumTouchEvents           = mMinimumTouchEvents;
+  request.minimumTouchEventsAfterStart = mMinimumTouchEventsAfterStart;
+  request.deviceThresholds             = mDeviceThresholds;
+}
+
+void RotationGestureProcessor::SetDeviceThresholds(const GestureDeviceProfileTable<RotationThresholdValues>& thresholds)
+{
+  mDeviceThresholds = thresholds;
+
+  if(mGestureRecognizer)
+  {
+    UpdateDetection();
+  }
+}
+
+const GestureDeviceProfileTable<RotationThresholdValues>& RotationGestureProcessor::GetDeviceThresholds() const
+{
+  return mDeviceThresholds;
+}
+
+void RotationGestureProcessor::UpdateDetection()
+{
+  DALI_ASSERT_DEBUG(mGestureRecognizer);
+
+  RotationGestureRequest request;
+  FillRequest(request);
+  mGestureRecognizer->Update(request);
 }
 
 uint32_t RotationGestureProcessor::GetMinimumTouchEvents() const
