@@ -826,7 +826,7 @@ int UtcDaliGeoTouchStreamOwnerRemainsStableWhenCallbackReturnsFalse(void)
   END_TEST;
 }
 
-int UtcDaliGeoTouchStreamInterceptStopsBeforeCurrentOwner(void)
+int UtcDaliGeoTouchStreamInterceptIncludesCurrentOwner(void)
 {
   TestApplication application;
   TouchTrace      trace;
@@ -853,8 +853,66 @@ int UtcDaliGeoTouchStreamInterceptStopsBeforeCurrentOwner(void)
 
   DALI_TEST_EQUALS(1u, trace.Count("root-intercept", CallbackKind::INTERCEPT, PointState::MOTION), TEST_LOCATION);
   DALI_TEST_EQUALS(1u, trace.Count("parent-intercept", CallbackKind::INTERCEPT, PointState::MOTION), TEST_LOCATION);
-  DALI_TEST_EQUALS(0u, trace.Count("child-intercept", CallbackKind::INTERCEPT, PointState::MOTION), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, trace.Count("child-intercept", CallbackKind::INTERCEPT, PointState::MOTION), TEST_LOCATION);
   DALI_TEST_EQUALS(1u, trace.Count("child-touch", CallbackKind::TOUCH, PointState::MOTION), TEST_LOCATION);
+  DALI_TEST_CHECK(trace.FirstIndexOf("child-intercept", CallbackKind::INTERCEPT, PointState::MOTION) <
+                  trace.FirstIndexOf("child-touch", CallbackKind::TOUCH, PointState::MOTION));
+  END_TEST;
+}
+
+int UtcDaliGeoTouchStreamOwnerRecognizesPanThroughIntercept(void)
+{
+  TestApplication application;
+  TouchTrace      touchTrace;
+  PanTrace        panTrace;
+
+  Actor actor = CreateTouchableActor("scroll-owner");
+  application.GetScene().Add(actor);
+
+  PanGestureDetector detector = PanGestureDetector::New();
+  PanTraceFunctor    panFunctor(panTrace);
+  detector.DetectedSignal().Connect(&application, panFunctor);
+
+  // Like PickerList/RecyclerView, consume DOWN in the touch callback, recognize the pan
+  // through interception, then feed subsequent events through the touch callback.
+  bool intercepted = false;
+  actor.InterceptTouchEventSignal().Connect(&application, [&](Actor receiver, TouchEvent touch)
+  {
+    touchTrace.Record("owner-intercept", CallbackKind::INTERCEPT, touch);
+    intercepted = detector.HandleEvent(receiver, touch);
+    return intercepted;
+  });
+  actor.TouchEventSignal().Connect(&application, [&](Actor receiver, TouchEvent touch)
+  {
+    touchTrace.Record("owner-touch", CallbackKind::TOUCH, touch);
+    if(intercepted)
+    {
+      detector.HandleEvent(receiver, touch);
+      if(touch.GetState(0u) == PointState::UP || touch.GetState(0u) == PointState::INTERRUPTED)
+      {
+        intercepted = false;
+      }
+    }
+    return true;
+  });
+  PrepareScene(application);
+
+  uint32_t time = 100u;
+  TestStartPan(application, Vector2(10.0f, 10.0f), Vector2(10.0f, 30.0f), time);
+  DALI_TEST_EQUALS(1u, panTrace.Count(GestureState::STARTED), TEST_LOCATION);
+
+  TestMovePan(application, Vector2(10.0f, 60.0f), time);
+  time += TestGetFrameInterval();
+  TestEndPan(application, Vector2(10.0f, 80.0f), time);
+
+  DALI_TEST_CHECK(touchTrace.Count("owner-intercept", CallbackKind::INTERCEPT, PointState::MOTION) >= 1u);
+  DALI_TEST_EQUALS(3u, touchTrace.Count("owner-touch", CallbackKind::TOUCH, PointState::MOTION), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, touchTrace.Count("owner-touch", CallbackKind::TOUCH, PointState::UP), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, touchTrace.Count("owner-touch", CallbackKind::TOUCH, PointState::INTERRUPTED), TEST_LOCATION);
+  DALI_TEST_CHECK(panTrace.Count(GestureState::CONTINUING) >= 1u);
+  DALI_TEST_EQUALS(1u, panTrace.Count(GestureState::FINISHED), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, panTrace.Count(GestureState::CANCELLED), TEST_LOCATION);
+  DALI_TEST_CHECK(!intercepted);
   END_TEST;
 }
 
