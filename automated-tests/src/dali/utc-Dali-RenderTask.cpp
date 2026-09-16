@@ -18,6 +18,7 @@
 #include <dali-test-suite-utils.h>
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/actors/actor-enumerations-devel.h>
+#include <dali/devel-api/actors/layer-devel.h>
 #include <dali/devel-api/events/hit-test-algorithm.h>
 #include <dali/devel-api/threading/thread.h>
 #include <dali/integration-api/debug.h>
@@ -1449,7 +1450,7 @@ int UtcDaliRenderTaskSetExclusive(void)
   actor2.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
 
   // Force actor2 to be rendered before actor1
-  Layer layer = Layer::New();
+  Layer layer = DevelLayer::New();
   application.GetScene().Add(layer);
   layer.Add(actor2);
   layer.LowerToBottom();
@@ -1475,7 +1476,7 @@ int UtcDaliRenderTaskSetExclusive(void)
   actor3.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
 
   // Force actor3 to be rendered before actor2
-  layer = Layer::New();
+  layer = DevelLayer::New();
   application.GetScene().Add(layer);
   layer.Add(actor3);
   layer.LowerToBottom();

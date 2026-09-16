@@ -18,6 +18,7 @@
 #include <dali-test-suite-utils.h>
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/actors/actor-enumerations-devel.h>
+#include <dali/devel-api/actors/layer-devel.h>
 #include <dali/public-api/dali-core.h>
 #include <stdlib.h>
 
@@ -64,6 +65,19 @@ int UtcDaliLayerNew(void)
 {
   TestApplication application;
   Layer           layer = Layer::New();
+  DALI_TEST_EQUALS(layer.GetProperty<String>(DevelActor::Property::WIDTH_RESIZE_POLICY), String("FILL_TO_PARENT"), TEST_LOCATION);
+  DALI_TEST_EQUALS(layer.GetProperty<String>(DevelActor::Property::HEIGHT_RESIZE_POLICY), String("FILL_TO_PARENT"), TEST_LOCATION);
+
+  DALI_TEST_CHECK(layer);
+  END_TEST;
+}
+
+int UtcDaliDevelLayerNew(void)
+{
+  TestApplication application;
+  Layer           layer = DevelLayer::New();
+  DALI_TEST_EQUALS(layer.GetProperty<String>(DevelActor::Property::WIDTH_RESIZE_POLICY), String("USE_NATURAL_SIZE"), TEST_LOCATION);
+  DALI_TEST_EQUALS(layer.GetProperty<String>(DevelActor::Property::HEIGHT_RESIZE_POLICY), String("USE_NATURAL_SIZE"), TEST_LOCATION);
 
   DALI_TEST_CHECK(layer);
   END_TEST;
@@ -1003,8 +1017,8 @@ int utcDaliLayerPartialUpdate(void)
   clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
-  Layer layer1 = Layer::New();
-  Layer layer2 = Layer::New();
+  Layer layer1 = DevelLayer::New();
+  Layer layer2 = DevelLayer::New();
 
   // get root
   Layer root = application.GetScene().GetLayer(0);
@@ -1109,8 +1123,8 @@ int utcDaliLayerUnderClippingNode(void)
    * Check whether glScissor for D was called.
    */
 
-  Layer layer1 = Layer::New();
-  Layer layer2 = Layer::New();
+  Layer layer1 = DevelLayer::New();
+  Layer layer2 = DevelLayer::New();
 
   // get root
   Layer root = application.GetScene().GetLayer(0);

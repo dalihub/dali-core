@@ -227,6 +227,7 @@ public:
    *
    * @SINCE_1_0.0
    * @return A handle to a newly allocated Layer
+   * @note By default fills the size of the window this is being added to
    */
   static Layer New();
 
