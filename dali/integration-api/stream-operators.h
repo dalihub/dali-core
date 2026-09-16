@@ -21,8 +21,8 @@
 #include <iostream>
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/common/extents.h>
 #include <dali/public-api/common/dali-string.h>
-#include <dali/public-api/common/extents.h>
 #include <dali/public-api/common/insets.h>
 #include <dali/public-api/math/angle-axis.h> // incl vec3
 #include <dali/public-api/math/matrix3.h>    // incl vec3,mat

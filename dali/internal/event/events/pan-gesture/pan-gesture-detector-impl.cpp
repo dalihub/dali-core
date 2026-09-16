@@ -19,7 +19,9 @@
 #include <dali/internal/event/events/pan-gesture/pan-gesture-detector-impl.h>
 
 // EXTERNAL INCLUDES
+#include <algorithm>
 #include <cstring> // for strcmp
+#include <limits>
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/object/type-registry.h>
@@ -76,24 +78,6 @@ SignalConnectorType signalConnector1(mType, Dali::String(SIGNAL_PAN_DETECTED), &
 Integration::Log::Filter* gLogFilter = Integration::Log::Filter::New(Debug::NoLogging, false, "LOG_PAN_GESTURE_DETECTOR");
 #endif
 
-/**
- * Returns the angle going in the opposite direction to that specified by angle.
- */
-float GetOppositeAngle(float angle)
-{
-  // Calculate the opposite angle so that we cover both directions.
-  if(angle <= 0.0f)
-  {
-    angle += Math::PI;
-  }
-  else
-  {
-    angle -= Math::PI;
-  }
-
-  return angle;
-}
-
 } // unnamed namespace
 
 PanGestureDetectorPtr PanGestureDetector::New()
@@ -106,18 +90,12 @@ void PanGestureDetector::SetMinimumTouchesRequired(uint32_t minimum)
 {
   DALI_ASSERT_ALWAYS(minimum > 0 && "Can only set a positive number of required touches");
 
-  if(mMinimumTouches != minimum)
+  if(mDefaultProfile.minimumTouches != minimum)
   {
     DALI_LOG_INFO(gLogFilter, Debug::Concise, "Minimum Touches Set: %u\n", minimum);
 
-    mMinimumTouches = minimum;
-
-    if(!mAttachedActors.empty())
-    {
-      DALI_LOG_INFO(gLogFilter, Debug::General, "Updating Gesture Detector\n");
-
-      mGestureEventProcessor.GestureDetectorUpdated(this);
-    }
+    mDefaultProfile.minimumTouches = minimum;
+    NotifyProfilesChanged();
   }
 }
 
@@ -125,161 +103,147 @@ void PanGestureDetector::SetMaximumTouchesRequired(uint32_t maximum)
 {
   DALI_ASSERT_ALWAYS(maximum > 0 && "Can only set a positive number of maximum touches");
 
-  if(mMaximumTouches != maximum)
+  if(mDefaultProfile.maximumTouches != maximum)
   {
     DALI_LOG_INFO(gLogFilter, Debug::Concise, "Maximum Touches Set: %u\n", maximum);
 
-    mMaximumTouches = maximum;
-
-    if(!mAttachedActors.empty())
-    {
-      DALI_LOG_INFO(gLogFilter, Debug::General, "Updating Gesture Detector\n");
-
-      mGestureEventProcessor.GestureDetectorUpdated(this);
-    }
+    mDefaultProfile.maximumTouches = maximum;
+    NotifyProfilesChanged();
   }
 }
 
 void PanGestureDetector::SetMaximumMotionEventAge(uint32_t maximumAge)
 {
-  if(mMaximumMotionEventAge != maximumAge)
+  if(mDefaultProfile.maximumMotionEventAge != maximumAge)
   {
     DALI_LOG_INFO(gLogFilter, Debug::Concise, "Maximum Motion Age Set: %u ms\n", maximumAge);
 
-    mMaximumMotionEventAge = maximumAge;
-
-    if(!mAttachedActors.empty())
-    {
-      DALI_LOG_INFO(gLogFilter, Debug::General, "Updating Gesture Detector\n");
-
-      mGestureEventProcessor.GestureDetectorUpdated(this);
-    }
+    mDefaultProfile.maximumMotionEventAge = maximumAge;
+    NotifyProfilesChanged();
   }
 }
 
 uint32_t PanGestureDetector::GetMinimumTouchesRequired() const
 {
-  return mMinimumTouches;
+  return mDefaultProfile.minimumTouches;
 }
 
 uint32_t PanGestureDetector::GetMaximumTouchesRequired() const
 {
-  return mMaximumTouches;
+  return mDefaultProfile.maximumTouches;
 }
 
 uint32_t PanGestureDetector::GetMaximumMotionEventAge() const
 {
-  return mMaximumMotionEventAge;
+  return mDefaultProfile.maximumMotionEventAge;
 }
 
 void PanGestureDetector::AddAngle(Radian angle, Radian threshold)
 {
-  threshold = fabsf(threshold); // Ensure the threshold is positive.
-
-  // If the threshold is greater than PI, then just use PI
-  // This means that any panned angle will invoke the pan gesture. We should still add this angle as
-  // an angle may have been added previously with a small threshold.
-  if(threshold > Math::PI)
-  {
-    threshold = Math::PI;
-  }
-
-  angle = WrapInDomain(angle, -Math::PI, Math::PI);
-
+  mDefaultProfile.AddAngle(angle, threshold);
   DALI_LOG_INFO(gLogFilter, Debug::Concise, "Angle Added: %.2f, Threshold: %.2f\n", Degree(angle), Degree(threshold));
-
-  AngleThresholdPair pair(angle, threshold);
-  mAngleContainer.push_back(pair);
 }
 
 void PanGestureDetector::AddDirection(Radian direction, Radian threshold)
 {
-  AddAngle(direction, threshold);
-
-  // Calculate the opposite angle so that we cover the entire direction.
-  direction = GetOppositeAngle(direction);
-
-  AddAngle(direction, threshold);
+  mDefaultProfile.AddDirection(direction, threshold);
 }
 
 uint32_t PanGestureDetector::GetAngleCount() const
 {
-  return static_cast<uint32_t>(mAngleContainer.size());
+  return mDefaultProfile.GetAngleCount();
 }
 
 PanGestureDetector::AngleThresholdPair PanGestureDetector::GetAngle(uint32_t index) const
 {
-  PanGestureDetector::AngleThresholdPair ret(Radian(0), Radian(0));
-
-  if(index < mAngleContainer.size())
-  {
-    ret = mAngleContainer[index];
-  }
-
-  return ret;
+  return mDefaultProfile.GetAngle(index);
 }
 
 void PanGestureDetector::ClearAngles()
 {
-  mAngleContainer.clear();
+  mDefaultProfile.ClearAngles();
 }
 
 void PanGestureDetector::RemoveAngle(Radian angle)
 {
-  angle = WrapInDomain(angle, -Math::PI, Math::PI);
-
-  for(AngleContainer::iterator iter = mAngleContainer.begin(), endIter = mAngleContainer.end(); iter != endIter; ++iter)
-  {
-    if(iter->first == angle)
-    {
-      mAngleContainer.erase(iter);
-      break;
-    }
-  }
+  mDefaultProfile.RemoveAngle(angle);
 }
 
 void PanGestureDetector::RemoveDirection(Radian direction)
 {
-  RemoveAngle(direction);
-
-  // Calculate the opposite angle so that we cover the entire direction.
-  direction = GetOppositeAngle(direction);
-
-  RemoveAngle(direction);
+  mDefaultProfile.RemoveDirection(direction);
 }
 
 bool PanGestureDetector::RequiresDirectionalPan() const
 {
-  // If no directional angles have been added to the container then we do not require directional panning
-  return !mAngleContainer.empty();
+  return mActiveProfile.RequiresDirectionalPan();
 }
 
 bool PanGestureDetector::CheckAngleAllowed(Radian angle) const
 {
-  bool allowed(false);
-  if(mAngleContainer.empty())
+  return mActiveProfile.IsAngleAllowed(angle);
+}
+
+const PanGestureProfile& PanGestureDetector::GetDefaultProfile() const
+{
+  return mDefaultProfile;
+}
+
+void PanGestureDetector::SetDeviceProfile(const GestureDeviceSelector& selector, const PanGestureProfile& profile)
+{
+  DALI_ASSERT_ALWAYS(profile.minimumTouches > 0u && profile.maximumTouches > 0u && "Pan options require positive touch counts");
+  DALI_ASSERT_ALWAYS(profile.minimumTouches <= profile.maximumTouches && "Pan options require minimum touches <= maximum touches");
+
+  mDeviceProfiles.Set(selector, profile);
+  NotifyProfilesChanged();
+}
+
+const PanGestureProfile* PanGestureDetector::GetDeviceProfile(const GestureDeviceSelector& selector) const
+{
+  return mDeviceProfiles.Find(selector);
+}
+
+void PanGestureDetector::ClearDeviceProfile(const GestureDeviceSelector& selector)
+{
+  if(mDeviceProfiles.Clear(selector))
   {
-    allowed = true;
+    NotifyProfilesChanged();
   }
-  else
+}
+
+const PanGestureProfile& PanGestureDetector::GetActiveProfile() const
+{
+  return mActiveProfile;
+}
+
+void PanGestureDetector::WidenRecognitionEnvelope(uint32_t& minimumTouches, uint32_t& maximumTouches, uint32_t& maximumMotionEventAge) const
+{
+  auto widen = [&](const PanGestureProfile& profile)
   {
-    for(AngleContainer::const_iterator iter = mAngleContainer.begin(), endIter = mAngleContainer.end(); iter != endIter; ++iter)
-    {
-      float angleAllowed(iter->first);
-      float threshold(iter->second);
+    minimumTouches        = std::min(minimumTouches, profile.minimumTouches);
+    maximumTouches        = std::max(maximumTouches, profile.maximumTouches);
+    maximumMotionEventAge = std::max(maximumMotionEventAge, profile.maximumMotionEventAge);
+  };
 
-      DALI_LOG_INFO(gLogFilter, Debug::General, "AngleToCheck: %.2f, CompareWith: %.2f, Threshold: %.2f\n", Degree(angle), Degree(angleAllowed), Degree(threshold));
+  widen(mDefaultProfile);
+  mDeviceProfiles.ForEach(widen);
+}
 
-      float relativeAngle(fabsf(WrapInDomain(angle - angleAllowed, -Math::PI, Math::PI)));
-      if(relativeAngle <= threshold)
-      {
-        allowed = true;
-        break;
-      }
-    }
+void PanGestureDetector::SelectActiveProfile(const GestureInputSource& source)
+{
+  const PanGestureProfile* profile = mDeviceProfiles.Resolve(source);
+  mActiveProfile                   = profile ? *profile : mDefaultProfile;
+}
+
+void PanGestureDetector::NotifyProfilesChanged()
+{
+  MarkRecognizerSettingsDirty();
+
+  if(!mAttachedActors.empty())
+  {
+    DALI_LOG_INFO(gLogFilter, Debug::General, "Updating Gesture Detector\n");
+    mGestureEventProcessor.GestureDetectorUpdated(this);
   }
-
-  return allowed;
 }
 
 void PanGestureDetector::EmitPanGestureSignal(Dali::Actor actor, const Dali::PanGesture& pan)
@@ -324,9 +288,9 @@ void PanGestureDetector::SetPanGestureProperties(const Dali::PanGesture& pan)
 
 PanGestureDetector::PanGestureDetector(const SceneGraph::PanGesture& sceneObject)
 : GestureDetector(GestureType::PAN),
-  mMinimumTouches(1),
-  mMaximumTouches(1),
-  mMaximumMotionEventAge(std::numeric_limits<uint32_t>::max()),
+  mDefaultProfile(),
+  mDeviceProfiles(),
+  mActiveProfile(),
   mPossiblePanPosition(0.f, 0.f),
   mSceneObject(const_cast<SceneGraph::PanGesture*>(&sceneObject))
 {
@@ -496,28 +460,55 @@ const PropertyInputImpl* PanGestureDetector::GetSceneObjectInputProperty(Propert
   return property;
 }
 
+void PanGestureDetector::FillRequest(PanGestureRequest& request) const
+{
+  const PanGestureProcessor& panGestureProcessor = mGestureEventProcessor.GetPanGestureProcessor();
+
+  uint32_t minimumTouches        = std::numeric_limits<uint32_t>::max();
+  uint32_t maximumTouches        = 0u;
+  uint32_t maximumMotionEventAge = 0u;
+  WidenRecognitionEnvelope(minimumTouches, maximumTouches, maximumMotionEventAge);
+
+  request.minTouches        = minimumTouches;
+  request.maxTouches        = maximumTouches;
+  request.maxMotionEventAge = maximumMotionEventAge;
+  request.minimumDistance   = panGestureProcessor.GetMinimumDistance();
+  request.minimumPanEvents  = panGestureProcessor.GetMinimumPanEvents();
+  request.deviceThresholds  = panGestureProcessor.GetDeviceThresholds();
+}
+
 void PanGestureDetector::ProcessTouchEvent(Scene& scene, const Integration::TouchEvent& event)
 {
   if(!mGestureRecognizer)
   {
-    const PanGestureProcessor& panGestureProcessor = mGestureEventProcessor.GetPanGestureProcessor();
-    int32_t                    minDistance         = panGestureProcessor.GetMinimumDistance();
-    int32_t                    minPanEvents        = panGestureProcessor.GetMinimumPanEvents();
-
     PanGestureRequest request;
-    request.minTouches        = GetMinimumTouchesRequired();
-    request.maxTouches        = GetMaximumTouchesRequired();
-    request.maxMotionEventAge = GetMaximumMotionEventAge();
+    FillRequest(request);
 
     Size size          = scene.GetSize();
-    mGestureRecognizer = new PanGestureRecognizer(*this, Vector2(size.width, size.height), static_cast<const PanGestureRequest&>(request), minDistance, minPanEvents);
+    mGestureRecognizer = new PanGestureRecognizer(*this, Vector2(size.width, size.height), request);
+    ConsumeRecognizerUpdateRequired(); // The new recognizer already reflects the current settings.
+  }
+  else if(ConsumeRecognizerUpdateRequired())
+  {
+    PanGestureRequest request;
+    FillRequest(request);
+    mGestureRecognizer->Update(request);
   }
   mGestureRecognizer->SendEvent(scene, event);
 }
 
 void PanGestureDetector::Process(Scene& scene, const PanGestureEvent& panEvent)
 {
-  switch(panEvent.state)
+  GestureState state = panEvent.state;
+  if(state == GestureState::CONTINUING &&
+     (panEvent.numberOfTouches < mActiveProfile.minimumTouches || panEvent.numberOfTouches > mActiveProfile.maximumTouches))
+  {
+    // The recognizer accepts every registered profile. End this detector's pan when its own
+    // touch range is exceeded, even if the motion is too old to emit a CONTINUING signal.
+    state = GestureState::FINISHED;
+  }
+
+  switch(state)
   {
     case GestureState::POSSIBLE:
     {
@@ -537,13 +528,13 @@ void PanGestureDetector::Process(Scene& scene, const PanGestureEvent& panEvent)
         feededActor->ScreenToLocal(*mRenderTask.Get(), actorCoords.x, actorCoords.y, panEvent.currentPosition.x, panEvent.currentPosition.y);
         if(mCurrentPanActor.GetActor() == feededActor)
         {
-          EmitPanSignal(feededActor, panEvent, actorCoords, panEvent.state, mRenderTask, scene);
+          EmitPanSignal(feededActor, panEvent, actorCoords, state, mRenderTask, scene);
         }
         else
         {
           mPossiblePanPosition = panEvent.previousPosition;
           mCurrentPanActor.SetActor(feededActor);
-          EmitPanSignal(feededActor, panEvent, actorCoords, panEvent.state, mRenderTask, scene);
+          EmitPanSignal(feededActor, panEvent, actorCoords, state, mRenderTask, scene);
         }
       }
       break;
@@ -551,6 +542,12 @@ void PanGestureDetector::Process(Scene& scene, const PanGestureEvent& panEvent)
 
     case GestureState::CONTINUING:
     {
+      if(panEvent.motionEventAge > mActiveProfile.maximumMotionEventAge)
+      {
+        // Too old for the profile of this gesture: skip this motion, the pan itself stays alive.
+        break;
+      }
+
       Actor* currentGesturedActor = mCurrentPanActor.GetActor();
       Actor* feededActor          = GetCurrentGesturedActor();
       if(currentGesturedActor && currentGesturedActor->NeedGesturePropagation() && feededActor && feededActor != currentGesturedActor)
@@ -579,10 +576,10 @@ void PanGestureDetector::Process(Scene& scene, const PanGestureEvent& panEvent)
       {
         Vector2 actorCoords;
         currentGesturedActor->ScreenToLocal(*mRenderTask.Get(), actorCoords.x, actorCoords.y, panEvent.currentPosition.x, panEvent.currentPosition.y);
-        EmitPanSignal(currentGesturedActor, panEvent, actorCoords, panEvent.state, mRenderTask, scene);
+        EmitPanSignal(currentGesturedActor, panEvent, actorCoords, state, mRenderTask, scene);
       }
 
-      if((panEvent.state == GestureState::FINISHED) || (panEvent.state == GestureState::CANCELLED))
+      if((state == GestureState::FINISHED) || (state == GestureState::CANCELLED))
       {
         mCurrentPanActor.SetActor(nullptr);
       }
@@ -602,10 +599,13 @@ bool PanGestureDetector::CheckGestureDetector(const GestureEvent* gestureEvent, 
   CheckGestureDetector(gestureEvent, actor, renderTask);
   const PanGestureEvent* panEvent(static_cast<const PanGestureEvent*>(gestureEvent));
 
+  // A pan is checked here once, when it starts: pick the profile for the device that started it.
+  SelectActiveProfile(panEvent->source);
+
   bool retVal(false);
 
-  if((panEvent->numberOfTouches >= GetMinimumTouchesRequired()) &&
-     (panEvent->numberOfTouches <= GetMaximumTouchesRequired()))
+  if((panEvent->numberOfTouches >= mActiveProfile.minimumTouches) &&
+     (panEvent->numberOfTouches <= mActiveProfile.maximumTouches))
   {
     // Check if the detector requires directional panning.
     if(RequiresDirectionalPan() && renderTask)
@@ -683,7 +683,7 @@ void PanGestureDetector::EmitPanSignal(Actor*                 actor,
                                        Scene&                 scene)
 {
   SetDetected(true);
-  Internal::PanGesturePtr pan(new Internal::PanGesture(panEvent.state));
+  Internal::PanGesturePtr pan(new Internal::PanGesture(state));
 
   pan->SetTime(panEvent.time);
 
@@ -699,7 +699,7 @@ void PanGestureDetector::EmitPanSignal(Actor*                 actor,
 
   pan->SetDisplacement(localCurrent - localPrevious);
   Vector2 previousPos(panEvent.previousPosition);
-  if(panEvent.state == GestureState::STARTED)
+  if(state == GestureState::STARTED)
   {
     previousPos = mPossiblePanPosition;
   }
@@ -722,7 +722,7 @@ void PanGestureDetector::EmitPanSignal(Actor*                 actor,
 
   // When the gesture ends, we may incorrectly get a ZERO velocity (as we have lifted our finger without any movement)
   // so we should use the last recorded velocity instead in this scenario.
-  if((panEvent.state == GestureState::FINISHED) && (pan->GetScreenVelocity() == Vector2::ZERO) &&
+  if((state == GestureState::FINISHED) && (pan->GetScreenVelocity() == Vector2::ZERO) &&
      (panEvent.timeDelta < MAXIMUM_TIME_WITH_VALID_LAST_VELOCITY))
   {
     pan->SetVelocity(mLastVelocity);

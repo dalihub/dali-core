@@ -29,6 +29,7 @@ namespace DALI_NAMESPACE
 namespace Internal
 {
 class PinchGestureDetector;
+struct PinchGestureRequest;
 
 using PinchGestureDetectorPtr       = IntrusivePtr<PinchGestureDetector>;
 using PinchGestureDetectorContainer = DerivedGestureDetectorContainer<PinchGestureDetector>::type;
@@ -110,6 +111,13 @@ private: // GestureDetector overrides
    * @copydoc Dali::Internal::GestureDetector::OnTouchEvent(Dali::Actor, Dali::TouchEvent)
    */
   bool OnTouchEvent(Dali::Actor actor, Dali::TouchEvent touch) override;
+
+  /**
+   * Fills the request for the detector-owned recognizer used by HandleEvent(): this detector's own
+   * settings plus the application-wide recognition thresholds.
+   * @param[out] request The request to fill
+   */
+  void FillRequest(PinchGestureRequest& request) const;
 
   /**
    * @copydoc Dali::Internal::GestureDetector::ProcessTouchEvent(Scene&, const Integration::TouchEvent&)

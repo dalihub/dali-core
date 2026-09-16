@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/integration-api/events/event.h>
 #include <dali/integration-api/events/point.h>
+#include <dali/internal/event/events/gesture-input-source.h>
 #include <dali/public-api/events/gesture-enumerations.h>
 
 namespace DALI_NAMESPACE
@@ -61,6 +62,11 @@ struct GestureEvent
    * The touch point that triggered the gesture.
    */
   Integration::Point triggerPoint;
+
+  /**
+   * The input device that started the gesture sequence, captured at its first DOWN.
+   */
+  GestureInputSource source;
 
 protected: // Constructors only to be used by derived structures.
   /**

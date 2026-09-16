@@ -49,12 +49,11 @@ public:
 
   /**
    * Constructor
-   * @param[in] screenSize       The size of the screen.
-   * @param[in] request          The details of the request.
-   * @param[in] minimumDistance  The minimum required motion distance to start pan gesture. If this value is less than 0, we use default setuped distance.
-   * @param[in] minimumPanEvents The minimum required motion event number to start pan gesture. If this value is less than 1, we use default setuped number.
+   * @param[in] observer   Used to send events to Core.
+   * @param[in] screenSize The size of the screen.
+   * @param[in] request    The details of the request, including the recognition thresholds.
    */
-  PanGestureRecognizer(Observer& observer, Vector2 screenSize, const PanGestureRequest& request, int32_t minimumDistance, int32_t minimumPanEvents);
+  PanGestureRecognizer(Observer& observer, Vector2 screenSize, const PanGestureRequest& request);
 
   /**
    * Virtual destructor.
@@ -88,6 +87,31 @@ public:
    * @copydoc Dali::Internal::GestureDetector::Update(const Integration::GestureRequest&)
    */
   void Update(const GestureRequest& request) override;
+
+  /**
+   * @copydoc Dali::Internal::GestureRecognizer::OnSequenceSourceChanged()
+   */
+  void OnSequenceSourceChanged() override;
+
+private:
+  /**
+   * @brief Takes every parameter from the request: touch requirements, application-wide thresholds and
+   * the per-device threshold table, then applies the thresholds for the current sequence.
+   * @param[in] request The request
+   */
+  void ApplyRequest(const PanGestureRequest& request);
+
+  /**
+   * @brief Applies the thresholds registered for the device of the current sequence, or the
+   * application-wide ones when the device has no entry.
+   */
+  void ApplyThresholdsForSequence();
+
+  /**
+   * @brief Applies one set of thresholds to the recognizer state.
+   * @param[in] thresholds The thresholds
+   */
+  void ApplyThresholds(const PanThresholdValues& thresholds);
 
 private:
   /**
@@ -133,8 +157,11 @@ private:
   uint32_t mMotionEvents;           ///< The motion events received so far (before pan is emitted).
 
   uint32_t mMaximumMotionEventAge; ///< The maximum acceptable motion event age as Milliseconds.
+  uint32_t mCurrentMotionEventAge; ///< Age of the motion event being forwarded as CONTINUING (ms).
 
-  int mPrimaryDeviceId;
+  int                                           mPrimaryDeviceId;
+  PanThresholdValues                            mBaseThresholds;   ///< Application-wide thresholds for devices without an entry.
+  GestureDeviceProfileTable<PanThresholdValues> mDeviceThresholds; ///< Application-wide per-device thresholds.
 };
 
 } // namespace Internal

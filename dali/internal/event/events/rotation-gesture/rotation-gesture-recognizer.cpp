@@ -25,6 +25,7 @@
 #include <dali/devel-api/events/touch-point.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/internal/event/common/scene-impl.h>
+#include <dali/internal/event/events/gesture-requests.h>
 #include <dali/internal/event/events/rotation-gesture/rotation-gesture-event.h>
 #include <dali/public-api/math/vector2.h>
 
@@ -50,15 +51,18 @@ inline Vector2 GetCenterPoint(const Integration::Point& point1, const Integratio
 
 } // unnamed namespace
 
-RotationGestureRecognizer::RotationGestureRecognizer(Observer& observer, uint32_t minimumTouchEvents, uint32_t minimumTouchEventsAfterStart)
+RotationGestureRecognizer::RotationGestureRecognizer(Observer& observer, const RotationGestureRequest& request)
 : GestureRecognizer(GestureType::ROTATION),
   mObserver(observer),
   mState(CLEAR),
   mTouchEvents(),
   mStartingAngle(0.0f),
-  mMinimumTouchEvents(minimumTouchEvents),
-  mMinimumTouchEventsAfterStart(minimumTouchEventsAfterStart)
+  mMinimumTouchEvents(request.minimumTouchEvents),
+  mMinimumTouchEventsAfterStart(request.minimumTouchEventsAfterStart),
+  mBaseThresholds(),
+  mDeviceThresholds()
 {
+  ApplyRequest(request);
 }
 
 void RotationGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
@@ -194,6 +198,36 @@ void RotationGestureRecognizer::CancelEvent()
   }
 }
 
+void RotationGestureRecognizer::Update(const GestureRequest& request)
+{
+  ApplyRequest(static_cast<const RotationGestureRequest&>(request));
+}
+
+void RotationGestureRecognizer::ApplyRequest(const RotationGestureRequest& request)
+{
+  mBaseThresholds.minimumTouchEvents           = request.minimumTouchEvents;
+  mBaseThresholds.minimumTouchEventsAfterStart = request.minimumTouchEventsAfterStart;
+  mDeviceThresholds                            = request.deviceThresholds;
+  ApplyThresholdsForSequence();
+}
+
+void RotationGestureRecognizer::OnSequenceSourceChanged()
+{
+  ApplyThresholdsForSequence();
+}
+
+void RotationGestureRecognizer::ApplyThresholdsForSequence()
+{
+  const RotationThresholdValues* thresholds = mSequenceSource.valid ? mDeviceThresholds.Resolve(mSequenceSource) : nullptr;
+  ApplyThresholds(thresholds ? *thresholds : mBaseThresholds);
+}
+
+void RotationGestureRecognizer::ApplyThresholds(const RotationThresholdValues& thresholds)
+{
+  SetMinimumTouchEvents(thresholds.minimumTouchEvents);
+  SetMinimumTouchEventsAfterStart(thresholds.minimumTouchEventsAfterStart);
+}
+
 void RotationGestureRecognizer::SetMinimumTouchEvents(uint32_t value)
 {
   mMinimumTouchEvents = value;
@@ -228,6 +262,7 @@ void RotationGestureRecognizer::SendRotation(GestureState state, const Integrati
 
   gesture.time         = currentEvent.time;
   gesture.triggerPoint = mTriggerPoint;
+  gesture.source       = mSequenceSource;
 
   if(mScene)
   {

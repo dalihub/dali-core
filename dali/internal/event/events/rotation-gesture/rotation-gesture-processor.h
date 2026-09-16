@@ -19,7 +19,9 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/internal/event/events/gesture-device-profile-table.h>
 #include <dali/internal/event/events/gesture-processor.h>
+#include <dali/internal/event/events/gesture-threshold-values.h>
 #include <dali/internal/event/events/rotation-gesture/rotation-gesture-detector-impl.h>
 #include <dali/internal/event/render-tasks/render-task-impl.h>
 
@@ -30,6 +32,7 @@ namespace Internal
 class Scene;
 
 struct RotationGestureEvent;
+struct RotationGestureRequest;
 
 /**
  * Rotation Gesture Event Processing:
@@ -112,7 +115,31 @@ public: // To be called by GestureEventProcessor
    */
   uint32_t GetMinimumTouchEventsAfterStart() const;
 
+  /**
+   * @brief Replaces the application-wide per-device thresholds and pushes them to the recognizer.
+   * @param[in] thresholds The per-device threshold table
+   */
+  void SetDeviceThresholds(const GestureDeviceProfileTable<RotationThresholdValues>& thresholds);
+
+  /**
+   * @brief Retrieves the application-wide per-device thresholds.
+   * @return The per-device threshold table
+   */
+  const GestureDeviceProfileTable<RotationThresholdValues>& GetDeviceThresholds() const;
+
 private:
+  /**
+   * Builds the request the shared recognizer should use from the current recognition thresholds.
+   * @param[out] request The request to fill.
+   */
+  void FillRequest(RotationGestureRequest& request) const;
+
+  /**
+   * Rebuilds the request from the current thresholds and pushes it to the recognizer.
+   * Requires an existing recognizer.
+   */
+  void UpdateDetection();
+
   // GestureProcessor overrides
 
   /**
@@ -139,6 +166,8 @@ private:
 
   uint32_t mMinimumTouchEvents;
   uint32_t mMinimumTouchEventsAfterStart;
+
+  GestureDeviceProfileTable<RotationThresholdValues> mDeviceThresholds; ///< Application-wide per-device thresholds.
 };
 
 } // namespace Internal

@@ -18,8 +18,15 @@
 // CLASS HEADER
 #include <dali/public-api/events/pan-gesture-detector.h>
 
+// EXTERNAL INCLUDES
+#include <dali/integration-api/debug.h>
+
 // INTERNAL INCLUDES
 #include <dali/internal/event/events/pan-gesture/pan-gesture-detector-impl.h>
+#include <dali/internal/event/events/pan-gesture/pan-gesture-profile.h>
+
+#define DALI_ASSERT_VALID_PAN_OPTIONS(impl) \
+  DALI_ASSERT_ALWAYS((impl) && "Cannot use a moved-from PanGestureDetector::Options object")
 
 namespace DALI_NAMESPACE
 {
@@ -135,4 +142,167 @@ void PanGestureDetector::SetPanGestureProperties(const Dali::PanGesture& pan)
   Internal::PanGestureDetector::SetPanGestureProperties(pan);
 }
 
+PanGestureDetector::Options PanGestureDetector::GetDefaultOptions() const
+{
+  return Options(GetImplementation(*this).GetDefaultProfile());
+}
+
+void PanGestureDetector::SetDeviceOptions(const GestureDeviceSelector& selector, const Options& options)
+{
+  const Internal::PanGestureProfile& profile = options.GetProfile();
+  DALI_LOG_RELEASE_INFO("detector=%p selector(match=%d class=%d subclass=%d name='%s') minimumTouches=%u maximumTouches=%u maximumMotionEventAge=%u angles=%u\n",
+                        &GetImplementation(*this), static_cast<int>(selector.GetMatchType()), static_cast<int>(selector.GetDeviceClass()), static_cast<int>(selector.GetDeviceSubclass()), selector.GetDeviceName().CStr(), profile.minimumTouches, profile.maximumTouches, profile.maximumMotionEventAge, profile.GetAngleCount());
+  GetImplementation(*this).SetDeviceProfile(selector, profile);
+}
+
+bool PanGestureDetector::GetDeviceOptions(const GestureDeviceSelector& selector, Options& options) const
+{
+  const Internal::PanGestureProfile* profile = GetImplementation(*this).GetDeviceProfile(selector);
+  if(profile)
+  {
+    options = Options(*profile);
+    return true;
+  }
+  return false;
+}
+
+void PanGestureDetector::ClearDeviceOptions(const GestureDeviceSelector& selector)
+{
+  DALI_LOG_RELEASE_INFO("detector=%p selector(match=%d class=%d subclass=%d name='%s')\n", &GetImplementation(*this), static_cast<int>(selector.GetMatchType()), static_cast<int>(selector.GetDeviceClass()), static_cast<int>(selector.GetDeviceSubclass()), selector.GetDeviceName().CStr());
+  GetImplementation(*this).ClearDeviceProfile(selector);
+}
+
+// PanGestureDetector::Options
+
+struct PanGestureDetector::Options::Impl
+{
+  Impl() = default;
+
+  explicit Impl(const Internal::PanGestureProfile& profile)
+  : mProfile(profile)
+  {
+  }
+
+  Internal::PanGestureProfile mProfile;
+};
+
+PanGestureDetector::Options::Options()
+: mImpl(MakeUnique<Impl>())
+{
+}
+
+PanGestureDetector::Options::Options(const Internal::PanGestureProfile& profile)
+: mImpl(MakeUnique<Impl>(profile))
+{
+}
+
+PanGestureDetector::Options::Options(const Options& rhs)
+: mImpl(nullptr)
+{
+  DALI_ASSERT_VALID_PAN_OPTIONS(rhs.mImpl);
+  mImpl = MakeUnique<Impl>(*rhs.mImpl);
+}
+
+PanGestureDetector::Options::Options(Options&& rhs) noexcept = default;
+
+PanGestureDetector::Options& PanGestureDetector::Options::operator=(const Options& rhs)
+{
+  if(this != &rhs)
+  {
+    DALI_ASSERT_VALID_PAN_OPTIONS(rhs.mImpl);
+    mImpl = MakeUnique<Impl>(*rhs.mImpl);
+  }
+  return *this;
+}
+
+PanGestureDetector::Options& PanGestureDetector::Options::operator=(Options&& rhs) noexcept = default;
+
+PanGestureDetector::Options::~Options() = default;
+
+void PanGestureDetector::Options::SetMinimumTouchesRequired(uint32_t minimum)
+{
+  DALI_ASSERT_VALID_PAN_OPTIONS(mImpl);
+  mImpl->mProfile.minimumTouches = minimum;
+}
+
+void PanGestureDetector::Options::SetMaximumTouchesRequired(uint32_t maximum)
+{
+  DALI_ASSERT_VALID_PAN_OPTIONS(mImpl);
+  mImpl->mProfile.maximumTouches = maximum;
+}
+
+void PanGestureDetector::Options::SetMaximumMotionEventAge(uint32_t maximumAge)
+{
+  DALI_ASSERT_VALID_PAN_OPTIONS(mImpl);
+  mImpl->mProfile.maximumMotionEventAge = maximumAge;
+}
+
+uint32_t PanGestureDetector::Options::GetMinimumTouchesRequired() const
+{
+  DALI_ASSERT_VALID_PAN_OPTIONS(mImpl);
+  return mImpl->mProfile.minimumTouches;
+}
+
+uint32_t PanGestureDetector::Options::GetMaximumTouchesRequired() const
+{
+  DALI_ASSERT_VALID_PAN_OPTIONS(mImpl);
+  return mImpl->mProfile.maximumTouches;
+}
+
+uint32_t PanGestureDetector::Options::GetMaximumMotionEventAge() const
+{
+  DALI_ASSERT_VALID_PAN_OPTIONS(mImpl);
+  return mImpl->mProfile.maximumMotionEventAge;
+}
+
+void PanGestureDetector::Options::AddAngle(Radian angle, Radian threshold)
+{
+  DALI_ASSERT_VALID_PAN_OPTIONS(mImpl);
+  mImpl->mProfile.AddAngle(angle, threshold);
+}
+
+void PanGestureDetector::Options::AddDirection(Radian direction, Radian threshold)
+{
+  DALI_ASSERT_VALID_PAN_OPTIONS(mImpl);
+  mImpl->mProfile.AddDirection(direction, threshold);
+}
+
+uint32_t PanGestureDetector::Options::GetAngleCount() const
+{
+  DALI_ASSERT_VALID_PAN_OPTIONS(mImpl);
+  return mImpl->mProfile.GetAngleCount();
+}
+
+PanGestureDetector::AngleThresholdPair PanGestureDetector::Options::GetAngle(uint32_t index) const
+{
+  DALI_ASSERT_VALID_PAN_OPTIONS(mImpl);
+  return mImpl->mProfile.GetAngle(index);
+}
+
+void PanGestureDetector::Options::ClearAngles()
+{
+  DALI_ASSERT_VALID_PAN_OPTIONS(mImpl);
+  mImpl->mProfile.ClearAngles();
+}
+
+void PanGestureDetector::Options::RemoveAngle(Radian angle)
+{
+  DALI_ASSERT_VALID_PAN_OPTIONS(mImpl);
+  mImpl->mProfile.RemoveAngle(angle);
+}
+
+void PanGestureDetector::Options::RemoveDirection(Radian direction)
+{
+  DALI_ASSERT_VALID_PAN_OPTIONS(mImpl);
+  mImpl->mProfile.RemoveDirection(direction);
+}
+
+const Internal::PanGestureProfile& PanGestureDetector::Options::GetProfile() const
+{
+  DALI_ASSERT_VALID_PAN_OPTIONS(mImpl);
+  return mImpl->mProfile;
+}
+
 } //namespace DALI_NAMESPACE
+
+#undef DALI_ASSERT_VALID_PAN_OPTIONS

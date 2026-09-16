@@ -50,12 +50,11 @@ public:
 
   /**
    * Constructor
-   * @param[in] coreEventInterface Used to send events to Core.
-   * @param[in] screenSize  The size of the screen.
-   * @param[in] request     The long press gesture request.
-   * @param[in] minimumHoldingTime The minimum holding time required in milliseconds.
+   * @param[in] observer   Used to send events to Core.
+   * @param[in] screenSize The size of the screen.
+   * @param[in] request    The long press gesture request, including the minimum holding time.
    */
-  LongPressGestureRecognizer(Observer& observer, Vector2 screenSize, const LongPressGestureRequest& request, uint32_t minimumHoldingTime);
+  LongPressGestureRecognizer(Observer& observer, Vector2 screenSize, const LongPressGestureRequest& request);
 
   /**
    * Virtual destructor.
@@ -79,11 +78,29 @@ public:
   void Update(const GestureRequest& request) override;
 
   /**
-   * @brief This method sets the minimum holding time required to be recognized as a long press gesture
-   *
-   * @param[in] value The time value in milliseconds
+   * @copydoc Dali::Internal::GestureRecognizer::OnSequenceSourceChanged()
    */
-  void SetMinimumHoldingTime(uint32_t time);
+  void OnSequenceSourceChanged() override;
+
+private:
+  /**
+   * @brief Takes every parameter from the request: touch requirements, application-wide thresholds and
+   * the per-device threshold table, then applies the thresholds for the current sequence.
+   * @param[in] request The request
+   */
+  void ApplyRequest(const LongPressGestureRequest& request);
+
+  /**
+   * @brief Applies the thresholds registered for the device of the current sequence, or the
+   * application-wide ones when the device has no entry.
+   */
+  void ApplyThresholdsForSequence();
+
+  /**
+   * @brief Applies one set of thresholds to the recognizer state.
+   * @param[in] thresholds The thresholds
+   */
+  void ApplyThresholds(const LongPressThresholdValues& thresholds);
 
 private:
   /**
@@ -123,7 +140,9 @@ private:
 
   uint32_t mTimerId;
 
-  uint32_t mMinimumHoldingTime;
+  uint32_t                                            mMinimumHoldingTime;
+  LongPressThresholdValues                            mBaseThresholds;   ///< Application-wide thresholds for devices without an entry.
+  GestureDeviceProfileTable<LongPressThresholdValues> mDeviceThresholds; ///< Application-wide per-device thresholds.
 };
 
 } // namespace Internal

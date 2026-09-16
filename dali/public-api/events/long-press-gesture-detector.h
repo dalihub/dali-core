@@ -22,7 +22,9 @@
 #include <cstdint> // uint32_t
 
 // INTERNAL INCLUDES
+#include <dali/public-api/common/unique-ptr.h>
 #include <dali/public-api/events/gesture-detector.h>
+#include <dali/public-api/events/gesture-device-selector.h>
 #include <dali/public-api/signals/dali-signal.h>
 
 namespace DALI_NAMESPACE
@@ -35,7 +37,8 @@ namespace DALI_NAMESPACE
 namespace Internal DALI_INTERNAL
 {
 class LongPressGestureDetector;
-}
+struct LongPressGestureProfile;
+} //namespace Internal DALI_INTERNAL
 
 class LongPressGesture;
 
@@ -65,6 +68,129 @@ class DALI_CORE_API LongPressGestureDetector : public GestureDetector
 {
 public:                                                             // Typedefs
   using DetectedSignalType = Signal<void(Actor, LongPressGesture)>; ///< Gesture detected signal type @SINCE_1_0.0
+
+  /**
+   * @brief A complete set of long press recognition options for one input device profile.
+   *
+   * Holds the same options as the detector itself: the touch count range.
+   *
+   * Register a profile for a device with SetDeviceOptions(). The usual way to build one is to copy
+   * the detector's default options and change what differs:
+   * @code
+   * LongPressGestureDetector::Options touch = detector.GetDefaultOptions();
+   * touch.SetTouchesRequired(2u); // two fingers on a touch screen
+   * detector.SetDeviceOptions(GestureDeviceSelector::ByDeviceClass(Device::Class::TOUCH), touch);
+   * @endcode
+   *
+   * This is a value type: copies are independent.
+   * @SINCE_2_5.40
+   */
+  class DALI_CORE_API Options
+  {
+  public:
+    /**
+     * @brief Creates options with the detector default: exactly one touch.
+     * @SINCE_2_5.40
+     */
+    Options();
+
+    /**
+     * @brief Copy constructor.
+     * @SINCE_2_5.40
+     * @param[in] rhs The options to copy
+     */
+    Options(const Options& rhs);
+
+    /**
+     * @brief Move constructor.
+     * @SINCE_2_5.40
+     * @param[in] rhs The options to move
+     */
+    Options(Options&& rhs) noexcept;
+
+    /**
+     * @brief Copy assignment operator.
+     * @SINCE_2_5.40
+     * @param[in] rhs The options to copy
+     * @return A reference to this
+     */
+    Options& operator=(const Options& rhs);
+
+    /**
+     * @brief Move assignment operator.
+     * @SINCE_2_5.40
+     * @param[in] rhs The options to move
+     * @return A reference to this
+     */
+    Options& operator=(Options&& rhs) noexcept;
+
+    /**
+     * @brief Destructor.
+     * @SINCE_2_5.40
+     */
+    ~Options();
+
+    /**
+     * @brief Sets the number of touches required by these options.
+     *
+     * The number of touches corresponds to the number of fingers a user has on the screen.
+     * This sets the minimum and maximum touches to the input parameter.
+     *
+     * @SINCE_2_5.40
+     * @param[in] touches Touches required
+     * @note The default is '1'.
+     * @see Dali::LongPressGestureDetector::SetTouchesRequired(uint32_t)
+     */
+    void SetTouchesRequired(uint32_t touches);
+
+    /**
+     * @brief Sets the minimum and maximum touches required by these options.
+     *
+     * The number of touches corresponds to the number of fingers a user has on the screen.
+     *
+     * @SINCE_2_5.40
+     * @param[in] minTouches Minimum Touches required
+     * @param[in] maxTouches Maximum Touches required
+     * @note The default is '1'.
+     * @see Dali::LongPressGestureDetector::SetTouchesRequired(uint32_t,uint32_t)
+     */
+    void SetTouchesRequired(uint32_t minTouches, uint32_t maxTouches);
+
+    /**
+     * @brief Retrieves the minimum number of touches required by these options.
+     *
+     * @SINCE_2_5.40
+     * @return The minimum number of touches required
+     */
+    uint32_t GetMinimumTouchesRequired() const;
+
+    /**
+     * @brief Retrieves the maximum number of touches required by these options.
+     *
+     * @SINCE_2_5.40
+     * @return The maximum number of touches required
+     */
+    uint32_t GetMaximumTouchesRequired() const;
+
+  public: // Not intended for Application developers
+    /// @cond internal
+    /**
+     * @brief Creates options from an internal profile.
+     * @param[in] profile The profile to copy
+     */
+    explicit DALI_INTERNAL Options(const Internal::LongPressGestureProfile& profile);
+
+    /**
+     * @brief Retrieves the internal profile.
+     * @return The profile
+     */
+    DALI_INTERNAL const Internal::LongPressGestureProfile& GetProfile() const;
+    /// @endcond
+
+  private:
+    struct Impl;
+    UniquePtr<Impl> mImpl;
+  };
 
 public: // Creation & Destruction
   /**
@@ -207,6 +333,60 @@ public: // Getters
    * @pre The gesture detector has been initialized.
    */
   uint32_t GetMaximumTouchesRequired() const;
+
+public: // Per-device options
+  /**
+   * @brief Retrieves a copy of the options that apply to devices without a registered profile.
+   *
+   * These are the values set through SetTouchesRequired(). The copy is independent of the detector.
+   *
+   * @SINCE_2_5.40
+   * @return The default options
+   * @pre The gesture detector has been initialized.
+   */
+  Options GetDefaultOptions() const;
+
+  /**
+   * @brief Registers the options to use for long presses made by the devices matching the selector.
+   *
+   * The options are copied and replace any options previously registered for the same selector.
+   * When a long press starts, the detector picks the options in this order: a matching device-name
+   * selector, then a matching class-and-subclass selector, then a matching class selector, then the
+   * default options.
+   *
+   * @SINCE_2_5.40
+   * @param[in] selector The devices the options apply to
+   * @param[in] options  The options. Minimum and maximum touches must be greater than zero and
+   *                     minimum must not exceed maximum.
+   * @pre The gesture detector has been initialized.
+   */
+  void SetDeviceOptions(const GestureDeviceSelector& selector, const Options& options);
+
+  /**
+   * @brief Retrieves the options registered for exactly this selector.
+   *
+   * Only options registered with SetDeviceOptions() for the same selector are returned; the
+   * fallback order used during recognition is not applied.
+   *
+   * @SINCE_2_5.40
+   * @param[in]  selector The selector the options were registered with
+   * @param[out] options  Receives a copy of the options. Left unchanged when none are registered.
+   * @return true if options are registered for the selector
+   * @pre The gesture detector has been initialized.
+   */
+  bool GetDeviceOptions(const GestureDeviceSelector& selector, Options& options) const;
+
+  /**
+   * @brief Removes the options registered for exactly this selector.
+   *
+   * Devices that matched the selector fall back to the next matching selector or the default
+   * options from the next long press on. Does nothing if no options are registered for the selector.
+   *
+   * @SINCE_2_5.40
+   * @param[in] selector The selector the options were registered with
+   * @pre The gesture detector has been initialized.
+   */
+  void ClearDeviceOptions(const GestureDeviceSelector& selector);
 
 public: // Signals
   /**

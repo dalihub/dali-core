@@ -20,7 +20,10 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/events/gesture-detector-impl.h>
+#include <dali/internal/event/events/gesture-device-profile-table.h>
+#include <dali/internal/event/events/gesture-input-source.h>
 #include <dali/internal/event/events/pan-gesture/pan-gesture-event.h>
+#include <dali/internal/event/events/pan-gesture/pan-gesture-profile.h>
 #include <dali/public-api/events/gesture.h>
 #include <dali/public-api/events/pan-gesture-detector.h>
 #include <dali/public-api/events/pan-gesture.h>
@@ -34,6 +37,7 @@ struct Radian;
 namespace Internal
 {
 class PanGestureDetector;
+struct PanGestureRequest;
 using PanGestureDetectorPtr       = IntrusivePtr<PanGestureDetector>;
 using PanGestureDetectorContainer = DerivedGestureDetectorContainer<PanGestureDetector>::type;
 
@@ -136,6 +140,49 @@ public:
    */
   bool CheckAngleAllowed(Radian angle) const;
 
+public: // Per-device profiles
+  /**
+   * @brief Retrieves the options used for devices without a registered profile.
+   * @return The default profile
+   */
+  const PanGestureProfile& GetDefaultProfile() const;
+
+  /**
+   * @copydoc Dali::PanGestureDetector::SetDeviceOptions()
+   */
+  void SetDeviceProfile(const GestureDeviceSelector& selector, const PanGestureProfile& profile);
+
+  /**
+   * @brief Retrieves the profile registered for exactly this selector.
+   * @param[in] selector The selector
+   * @return The profile, or nullptr if none is registered for the selector
+   */
+  const PanGestureProfile* GetDeviceProfile(const GestureDeviceSelector& selector) const;
+
+  /**
+   * @copydoc Dali::PanGestureDetector::ClearDeviceOptions()
+   */
+  void ClearDeviceProfile(const GestureDeviceSelector& selector);
+
+  /**
+   * @brief Retrieves the profile chosen for the gesture currently being processed.
+   *
+   * Selected from the gesture's input source when the gesture starts and kept for its duration.
+   * @return The active profile
+   */
+  const PanGestureProfile& GetActiveProfile() const;
+
+  /**
+   * @brief Widens the given touch range and motion event age so they cover every profile of this detector.
+   *
+   * Used to build the shared recognizer request: the recognizer must let through anything one of the
+   * profiles may accept; the detector filters against the active profile when emitting.
+   * @param[in,out] minimumTouches        Lowered to this detector's smallest minimum
+   * @param[in,out] maximumTouches        Raised to this detector's largest maximum
+   * @param[in,out] maximumMotionEventAge Raised to this detector's largest age
+   */
+  void WidenRecognitionEnvelope(uint32_t& minimumTouches, uint32_t& maximumTouches, uint32_t& maximumMotionEventAge) const;
+
   /**
    * pan gesture-detector meets the parameters of the current gesture.
    *
@@ -229,9 +276,27 @@ private:
   bool OnTouchEvent(Dali::Actor actor, Dali::TouchEvent touch) override;
 
   /**
+   * Fills the request for the detector-owned recognizer used by HandleEvent(): this detector's own
+   * settings plus the application-wide recognition thresholds.
+   * @param[out] request The request to fill
+   */
+  void FillRequest(PanGestureRequest& request) const;
+
+  /**
    * @copydoc Dali::Internal::GestureDetector::ProcessTouchEvent(Scene&, const Integration::TouchEvent&)
    */
   void ProcessTouchEvent(Scene& scene, const Integration::TouchEvent& event) override;
+
+  /**
+   * @brief Chooses the profile for a gesture started by the given input source and makes it active.
+   * @param[in] source The input source that started the gesture
+   */
+  void SelectActiveProfile(const GestureInputSource& source);
+
+  /**
+   * @brief Tells the processor and the detector-owned recognizer that this detector's options changed.
+   */
+  void NotifyProfilesChanged();
 
   /**
    * @copydoc Dali::Internal::GestureDetector::CheckGestureDetector(const GestureEvent*, Actor*, RenderTaskPtr)
@@ -296,11 +361,9 @@ private:
 private:
   Dali::PanGestureDetector::DetectedSignalType mDetectedSignal;
 
-  uint32_t mMinimumTouches;        ///< The minimum number of fingers required to be touching for pan.
-  uint32_t mMaximumTouches;        ///< The maximum number of fingers required to be touching for pan.
-  uint32_t mMaximumMotionEventAge; ///< The maximum age of motion events as milliseconds.
-
-  AngleContainer mAngleContainer; ///< A container of all angles allowed for pan to occur.
+  PanGestureProfile                            mDefaultProfile; ///< Options for devices without a registered profile; edited by the detector's own setters.
+  GestureDeviceProfileTable<PanGestureProfile> mDeviceProfiles; ///< Options registered per device selector.
+  PanGestureProfile                            mActiveProfile;  ///< Profile chosen for the gesture in progress.
 
   Vector2                 mPossiblePanPosition; ///< The Position when possible state.
   Vector2                 mLastVelocity;        ///< The last recorded velocity in local actor coordinates.

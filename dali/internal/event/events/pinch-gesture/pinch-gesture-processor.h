@@ -19,7 +19,9 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/internal/event/events/gesture-device-profile-table.h>
 #include <dali/internal/event/events/gesture-processor.h>
+#include <dali/internal/event/events/gesture-threshold-values.h>
 #include <dali/internal/event/events/pinch-gesture/pinch-gesture-detector-impl.h>
 #include <dali/internal/event/render-tasks/render-task-impl.h>
 
@@ -30,6 +32,7 @@ namespace Internal
 class Scene;
 
 struct PinchGestureEvent;
+struct PinchGestureRequest;
 
 /**
  * Pinch Gesture Event Processing:
@@ -126,12 +129,36 @@ public: // To be called by GestureEventProcessor
    */
   uint32_t GetMinimumTouchEventsAfterStart() const;
 
+  /**
+   * @brief Replaces the application-wide per-device thresholds and pushes them to the recognizer.
+   * @param[in] thresholds The per-device threshold table
+   */
+  void SetDeviceThresholds(const GestureDeviceProfileTable<PinchThresholdValues>& thresholds);
+
+  /**
+   * @brief Retrieves the application-wide per-device thresholds.
+   * @return The per-device threshold table
+   */
+  const GestureDeviceProfileTable<PinchThresholdValues>& GetDeviceThresholds() const;
+
 private:
   // Undefined
   PinchGestureProcessor(const PinchGestureProcessor&);
   PinchGestureProcessor& operator=(const PinchGestureProcessor& rhs);
 
 private:
+  /**
+   * Builds the request the shared recognizer should use from the current recognition thresholds.
+   * @param[out] request The request to fill.
+   */
+  void FillRequest(PinchGestureRequest& request) const;
+
+  /**
+   * Rebuilds the request from the current thresholds and pushes it to the recognizer.
+   * Requires an existing recognizer.
+   */
+  void UpdateDetection();
+
   // GestureProcessor overrides
 
   /**
@@ -159,6 +186,8 @@ private:
   float    mMinimumPinchDistance;
   uint32_t mMinimumTouchEvents;
   uint32_t mMinimumTouchEventsAfterStart;
+
+  GestureDeviceProfileTable<PinchThresholdValues> mDeviceThresholds; ///< Application-wide per-device thresholds.
 };
 
 } // namespace Internal

@@ -140,11 +140,7 @@ void PinchGestureProcessor::SetMinimumPinchDistance(float value)
 
   if(mGestureRecognizer)
   {
-    PinchGestureRecognizer* pinchRecognizer = dynamic_cast<PinchGestureRecognizer*>(mGestureRecognizer.Get());
-    if(pinchRecognizer)
-    {
-      pinchRecognizer->SetMinimumPinchDistance(value);
-    }
+    UpdateDetection();
   }
 }
 
@@ -156,11 +152,7 @@ void PinchGestureProcessor::SetMinimumTouchEvents(uint32_t value)
 
     if(mGestureRecognizer)
     {
-      PinchGestureRecognizer* pinchRecognizer = dynamic_cast<PinchGestureRecognizer*>(mGestureRecognizer.Get());
-      if(pinchRecognizer)
-      {
-        pinchRecognizer->SetMinimumTouchEvents(value);
-      }
+      UpdateDetection();
     }
   }
 }
@@ -173,11 +165,7 @@ void PinchGestureProcessor::SetMinimumTouchEventsAfterStart(uint32_t value)
 
     if(mGestureRecognizer)
     {
-      PinchGestureRecognizer* pinchRecognizer = dynamic_cast<PinchGestureRecognizer*>(mGestureRecognizer.Get());
-      if(pinchRecognizer)
-      {
-        pinchRecognizer->SetMinimumTouchEventsAfterStart(value);
-      }
+      UpdateDetection();
     }
   }
 }
@@ -298,9 +286,44 @@ void PinchGestureProcessor::AddGestureDetector(PinchGestureDetector* gestureDete
 
   if(createRecognizer)
   {
+    PinchGestureRequest request;
+    FillRequest(request);
+
     Size size          = scene.GetSize();
-    mGestureRecognizer = new PinchGestureRecognizer(*this, Vector2(size.width, size.height), scene.GetDpi(), mMinimumPinchDistance, mMinimumTouchEvents, mMinimumTouchEventsAfterStart);
+    mGestureRecognizer = new PinchGestureRecognizer(*this, Vector2(size.width, size.height), scene.GetDpi(), request);
   }
+}
+
+void PinchGestureProcessor::FillRequest(PinchGestureRequest& request) const
+{
+  request.minimumDistance              = mMinimumPinchDistance;
+  request.minimumTouchEvents           = mMinimumTouchEvents;
+  request.minimumTouchEventsAfterStart = mMinimumTouchEventsAfterStart;
+  request.deviceThresholds             = mDeviceThresholds;
+}
+
+void PinchGestureProcessor::SetDeviceThresholds(const GestureDeviceProfileTable<PinchThresholdValues>& thresholds)
+{
+  mDeviceThresholds = thresholds;
+
+  if(mGestureRecognizer)
+  {
+    UpdateDetection();
+  }
+}
+
+const GestureDeviceProfileTable<PinchThresholdValues>& PinchGestureProcessor::GetDeviceThresholds() const
+{
+  return mDeviceThresholds;
+}
+
+void PinchGestureProcessor::UpdateDetection()
+{
+  DALI_ASSERT_DEBUG(mGestureRecognizer);
+
+  PinchGestureRequest request;
+  FillRequest(request);
+  mGestureRecognizer->Update(request);
 }
 
 void PinchGestureProcessor::RemoveGestureDetector(PinchGestureDetector* gestureDetector)

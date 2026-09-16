@@ -19,7 +19,9 @@
 #include <dali/internal/event/common/property-metadata.h>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/extents.h>
+#include <dali/devel-api/common/extents.h>
+#include <dali/devel-api/object/property-devel.h>
+#include <dali/devel-api/object/property-value-devel.h>
 #include <dali/public-api/common/insets.h>
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/math/matrix3.h>
@@ -74,6 +76,17 @@ inline void SetContainerValue(const ContainerType* containerPtr, Property::Value
 
 void PropertyMetadata::SetPropertyValue(const Property::Value& propertyValue)
 {
+  // DevelProperty::EXTENTS cannot be a case label of a Property::Type switch.
+  if(GetType() == DevelProperty::EXTENTS)
+  {
+    Extents extents;
+    if(GetExtents(propertyValue, extents))
+    {
+      value = extents;
+    }
+    return;
+  }
+
   switch(GetType())
   {
     case Property::NONE:
@@ -107,12 +120,6 @@ void PropertyMetadata::SetPropertyValue(const Property::Value& propertyValue)
     case Property::MAP:
     {
       SetContainerValue(propertyValue.GetMap(), value);
-      break;
-    }
-
-    case Property::EXTENTS:
-    {
-      SetValue<Extents>(propertyValue, value);
       break;
     }
 
@@ -285,7 +292,6 @@ Property::Value PropertyMetadata::GetPropertyValue() const
       case Property::STRING:
       case Property::ARRAY:
       case Property::MAP:
-      case Property::EXTENTS:
       case Property::INSETS:
       case Property::BOOLEAN:
       case Property::INTEGER:
@@ -384,7 +390,6 @@ void PropertyMetadata::AdjustPropertyValueBy(const Property::Value& relativeProp
     case Property::STRING:
     case Property::ARRAY:
     case Property::MAP:
-    case Property::EXTENTS:
     case Property::INSETS:
     case Property::MATRIX:
     case Property::MATRIX3:

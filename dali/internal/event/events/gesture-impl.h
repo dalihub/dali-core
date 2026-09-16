@@ -131,6 +131,15 @@ public:
     return mTriggerPoint.GetDeviceSubclass();
   }
 
+  /**
+   * @brief Gets the device name of the gesture source.
+   * @return The device name, empty when the platform did not report one.
+   */
+  inline const Dali::String& GetDeviceName() const
+  {
+    return mTriggerPoint.GetDeviceName();
+  }
+
   Gesture(const Gesture&)            = delete; ///< Deleted copy constructor
   Gesture(Gesture&&)                 = delete; ///< Deleted move constructor
   Gesture& operator=(const Gesture&) = delete; ///< Deleted copy assignment operator

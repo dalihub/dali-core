@@ -18,6 +18,9 @@
 // CLASS HEADER
 #include <dali/internal/event/events/tap-gesture/tap-gesture-event.h>
 
+// INTERNAL INCLUDES
+#include <dali/integration-api/input-options.h>
+
 namespace DALI_NAMESPACE
 {
 namespace Internal
@@ -25,7 +28,8 @@ namespace Internal
 TapGestureEvent::TapGestureEvent(GestureState state)
 : GestureEvent(GestureType::TAP, state),
   numberOfTaps(1),
-  numberOfTouches(1)
+  numberOfTouches(1),
+  maximumMultiTapInterval(Integration::DEFAULT_TAP_GESTURE_MAXIMUM_MULTI_TAP_INTERVAL)
 {
 }
 

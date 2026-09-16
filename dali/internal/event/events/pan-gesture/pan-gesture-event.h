@@ -76,6 +76,11 @@ struct PanGestureEvent : public GestureEvent
    * The total number of fingers touching the screen in a pan gesture.
    */
   unsigned int numberOfTouches;
+
+  /**
+   * How old the motion event behind a CONTINUING pan was when it was recognised (ms). 0 for other states.
+   */
+  uint32_t motionEventAge{0u};
 };
 
 } // namespace Internal

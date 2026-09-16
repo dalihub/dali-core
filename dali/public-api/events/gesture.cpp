@@ -70,4 +70,9 @@ Device::Subclass::Type Gesture::GetDeviceSubclass() const
   return GetImplementation(*this).GetDeviceSubclass();
 }
 
+const Dali::String& Gesture::GetDeviceName() const
+{
+  return GetImplementation(*this).GetDeviceName();
+}
+
 } //namespace DALI_NAMESPACE
