@@ -56,6 +56,9 @@ const ColorMode Node::DEFAULT_COLOR_MODE(USE_OWN_MULTIPLY_PARENT_ALPHA);
 
 uint32_t Node::mNodeCounter = 0; ///< A counter to provide unique node ids, up-to 4 billion
 
+RendererContainer Node::mEmptyRendererContainer; ///< Empty container for return by reference
+RendererKey       Node::mEmptyKey;               ///< Empty renderer key for return by value
+
 Node* Node::New()
 {
   DALI_ASSERT_DEBUG(gMemoryPoolCollection && "Node::RegisterMemoryPoolCollection not called!");
@@ -106,9 +109,8 @@ Node::Node()
   mClippingSortModifier(0u),
   mId(++mNodeCounter),
   mParent(nullptr),
+  mRareData(nullptr),
   mChildren(),
-  mClippingDepth(0u),
-  mScissorDepth(0u),
   mDepthIndex(0u),
   mDirtyFlags(NodePropertyFlags::ALL),
   mDrawMode(DrawMode::NORMAL),
@@ -134,6 +136,10 @@ Node::~Node()
   {
     mTransformManagerData.Manager()->RemoveTransform(mTransformManagerData.Id());
   }
+
+  // Clean up rare data
+  delete mRareData;
+  mRareData = nullptr;
 
 #ifdef DEBUG_ENABLED
   gNodeCount--;
@@ -284,7 +290,8 @@ void Node::RemoveRenderer(const RendererKey& renderer)
 
 void Node::AddCacheRenderer(const RendererKey& renderer)
 {
-  for(auto&& existingRenderer : mCacheRenderers)
+  EnsureRareData();
+  for(auto&& existingRenderer : mRareData->mCacheRenderers)
   {
     if(existingRenderer == renderer)
     {
@@ -295,23 +302,28 @@ void Node::AddCacheRenderer(const RendererKey& renderer)
   SetUpdated(true);
   SetDirtyFlag(NodePropertyFlags::COLOR);
 
-  mCacheRenderers.PushBack(renderer);
+  mRareData->mCacheRenderers.PushBack(renderer);
 
   renderer->AttachToNode(*this);
 }
 
 void Node::RemoveCacheRenderer(const RendererKey& renderer)
 {
-  RendererContainer::SizeType rendererCount(mCacheRenderers.Size());
+  if(!mRareData)
+  {
+    return;
+  }
+
+  RendererContainer::SizeType rendererCount(mRareData->mCacheRenderers.Size());
   for(RendererContainer::SizeType i = 0; i < rendererCount; ++i)
   {
-    if(mCacheRenderers[i] == renderer)
+    if(mRareData->mCacheRenderers[i] == renderer)
     {
       renderer->DetachFromNode(*this);
 
       SetUpdated(true);
       SetDirtyFlag(NodePropertyFlags::COLOR);
-      mCacheRenderers.Erase(mCacheRenderers.Begin() + i);
+      mRareData->mCacheRenderers.Erase(mRareData->mCacheRenderers.Begin() + i);
       return;
     }
   }
