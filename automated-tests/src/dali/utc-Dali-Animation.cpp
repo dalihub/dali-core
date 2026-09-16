@@ -12682,7 +12682,7 @@ int UtcDaliAnimationProgressCallbackP(void)
   tet_infoline("Animation Playing from 10%");
 
   application.SendNotification();
-  application.Render(0);                        // start animation
+  application.Render(0);                                               // start animation
   application.Render(static_cast<uint32_t>(durationSeconds * 100.0f)); // 20% progress
 
   tet_infoline("Animation at 20%");
@@ -13725,7 +13725,7 @@ int UtcDaliAnimationProgressSignalConnectionWithoutProgressMarkerP(void)
   animation.Play();
 
   application.SendNotification();
-  application.Render(0);                        // start animation
+  application.Render(0);                                               // start animation
   application.Render(static_cast<uint32_t>(durationSeconds * 100.0f)); // 10% progress
   application.SendNotification();
 
@@ -13796,7 +13796,7 @@ int UtcDaliAnimationMultipleProgressSignalsP(void)
   tet_infoline("Animation Playing from 10%");
 
   application.SendNotification();
-  application.Render(0);                        // start animation
+  application.Render(0);                                               // start animation
   application.Render(static_cast<uint32_t>(durationSeconds * 100.0f)); // 20% progress
 
   tet_infoline("Animation at 20% - No signals to be received");
@@ -13902,7 +13902,7 @@ int UtcDaliAnimationMultipleProgressSignalsP2(void)
   animationBeta.Play();
 
   application.SendNotification();
-  application.Render(0);                       // start animation
+  application.Render(0);                                              // start animation
   application.Render(static_cast<uint32_t>(durationSeconds * 20.0f)); // 2% progress
   application.SendNotification();
   DALI_TEST_EQUALS(0.02f, animationAlpha.GetCurrentProgress(), TEST_LOCATION);
@@ -14016,7 +14016,7 @@ int UtcDaliAnimationProgressSignalWithPlayAfterP(void)
   animationBeta.PlayAfter(delaySeconds);
 
   application.SendNotification();
-  application.Render(0);                     // start animation
+  application.Render(0);                                            // start animation
   application.Render(static_cast<uint32_t>(delaySeconds * 500.0f)); // 50% wait progress
 
   tet_infoline("Delay at 50% - No signals to be received");
@@ -14212,7 +14212,7 @@ int UtcDaliAnimationProgressCallbackWithLoopingP2(void)
   for(int count = 0; count < 4; count++)
   {
     application.SendNotification();
-    application.Render(0);                                // start animation
+    application.Render(0);                                                       // start animation
     application.Render(static_cast<uint32_t>(durationSeconds * 0.25 * 1000.0f)); // 25% progress
     DALI_TEST_EQUALS(0.25f, animation.GetCurrentProgress(), TEST_LOCATION);
 
@@ -14451,7 +14451,7 @@ int UtcDaliAnimationProgressCallbackInvalidSignalN(void)
   animation.Play();
 
   application.SendNotification();
-  application.Render(0);                                // start animation
+  application.Render(0);                                                       // start animation
   application.Render(static_cast<uint32_t>(durationSeconds * 0.25 * 1000.0f)); // 35% progress
   DALI_TEST_EQUALS(0.35f, animation.GetCurrentProgress(), TEST_LOCATION);
 
@@ -14523,7 +14523,7 @@ int UtcDaliAnimationProgressCallbackLongDurationP(void)
   animation.Play();
 
   application.SendNotification();
-  application.Render(0);                                // start animation
+  application.Render(0);                                                       // start animation
   application.Render(static_cast<uint32_t>(durationSeconds * 0.25 * 1000.0f)); // 25% progress
   DALI_TEST_EQUALS(0.25f, animation.GetCurrentProgress(), TEST_LOCATION);
 
@@ -14706,9 +14706,9 @@ int UtcDaliAnimationAnimateBetweenInvalidParameters(void)
 
   DALI_TEST_ASSERTION(
     {
-      // non animateable target (EXTENTS)
+      // non animateable target (INSETS)
       KeyFrames keyframes = KeyFrames::New();
-      keyframes.Add(0.5f, Property::Value(Property::EXTENTS)); // throws
+      keyframes.Add(0.5f, Property::Value(Property::INSETS)); // throws
       animation.AnimateBetween(Property(actor, Actor::Property::POSITION), keyframes);
     },
     "Property type is not animatable");

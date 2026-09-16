@@ -34,6 +34,8 @@ struct TouchEvent;
 
 namespace Internal
 {
+struct RotationGestureRequest;
+
 /**
  * When given a set of touch events, this detector attempts to determine if a rotation gesture has taken place.
  */
@@ -44,11 +46,10 @@ public:
 
   /**
    * Constructor
-   * @param[in] observer   The observer to send gesture too when it's detected
-   * @param[in] minimumTouchEvents The number of touch events required
-   * @param[in] minimumTouchEventsAfterStart The number of touch events required after a gesture started
+   * @param[in] observer The observer to send gesture too when it's detected
+   * @param[in] request  The rotation gesture request carrying the recognition thresholds.
    */
-  RotationGestureRecognizer(Observer& observer, uint32_t minimumTouchEvents, uint32_t minimumTouchEventsAfterStart);
+  RotationGestureRecognizer(Observer& observer, const RotationGestureRequest& request);
 
   /**
    * Virtual destructor.
@@ -69,10 +70,34 @@ public:
   /**
    * @copydoc Dali::Internal::GestureDetector::Update(const Integration::GestureRequest&)
    */
-  void Update(const GestureRequest& request) override
-  { /* Nothing to do */
-  }
+  void Update(const GestureRequest& request) override;
 
+  /**
+   * @copydoc Dali::Internal::GestureRecognizer::OnSequenceSourceChanged()
+   */
+  void OnSequenceSourceChanged() override;
+
+private:
+  /**
+   * @brief Takes every parameter from the request: touch requirements, application-wide thresholds and
+   * the per-device threshold table, then applies the thresholds for the current sequence.
+   * @param[in] request The request
+   */
+  void ApplyRequest(const RotationGestureRequest& request);
+
+  /**
+   * @brief Applies the thresholds registered for the device of the current sequence, or the
+   * application-wide ones when the device has no entry.
+   */
+  void ApplyThresholdsForSequence();
+
+  /**
+   * @brief Applies one set of thresholds to the recognizer state.
+   * @param[in] thresholds The thresholds
+   */
+  void ApplyThresholds(const RotationThresholdValues& thresholds);
+
+public:
   /**
    * Sets the minimum touch events required before a rotation can be started
    * @param[in] value The number of touch events
@@ -114,7 +139,9 @@ private:
 
   uint32_t mMinimumTouchEvents; ///< The minimum touch events required before a rotation can be started.
 
-  uint32_t mMinimumTouchEventsAfterStart; ///< The minimum touch events required after a rotation started.
+  uint32_t                                           mMinimumTouchEventsAfterStart; ///< The minimum touch events required after a rotation started.
+  RotationThresholdValues                            mBaseThresholds;               ///< Application-wide thresholds for devices without an entry.
+  GestureDeviceProfileTable<RotationThresholdValues> mDeviceThresholds;             ///< Application-wide per-device thresholds.
 };
 
 } // namespace Internal

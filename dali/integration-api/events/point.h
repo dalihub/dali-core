@@ -196,8 +196,9 @@ struct DALI_CORE_API Point
 
   /**
    * @brief Sets the device name the event originated from.
+   * @param[in] deviceName The device name.
    */
-  void SetDeviceName(Dali::String& deviceName);
+  void SetDeviceName(const Dali::String& deviceName);
 
 public: // Not intended for Integration API developers
   /**

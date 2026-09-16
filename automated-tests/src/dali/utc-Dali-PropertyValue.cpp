@@ -17,6 +17,7 @@
 
 #include <dali-test-suite-utils.h>
 #include <dali/devel-api/object/property-array-devel.h>
+#include <dali/devel-api/object/property-devel.h>
 #include <dali/devel-api/object/property-map-devel.h>
 #include <dali/devel-api/object/property-value-devel.h>
 #include <dali/public-api/dali-core.h>
@@ -384,10 +385,12 @@ int UtcDaliPropertyValueConstructorsMapTypeP(void)
 
 int UtcDaliPropertyValueConstructorsExtentsTypeP(void)
 {
-  Property::Value value(Property::EXTENTS);
+  Property::Value value(DevelProperty::EXTENTS);
 
-  DALI_TEST_CHECK(value.GetType() == Property::EXTENTS);
-  DALI_TEST_CHECK(value.Get<Extents>() == Extents(0u, 0u, 0u, 0u));
+  DALI_TEST_CHECK(value.GetType() == DevelProperty::EXTENTS);
+  Extents result(1, 1, 1, 1);
+  DALI_TEST_CHECK(GetExtents(value, result));
+  DALI_TEST_CHECK(result == Extents(0u, 0u, 0u, 0u));
 
   END_TEST;
 }
@@ -397,7 +400,9 @@ int UtcDaliPropertyValueConstructorsExtentsType2P(void)
   Property::Value value(Property::VECTOR4);
 
   DALI_TEST_CHECK(value.GetType() == Property::VECTOR4);
-  DALI_TEST_CHECK(value.Get<Extents>() == Extents(0u, 0u, 0u, 0u));
+  Extents result(1, 1, 1, 1);
+  DALI_TEST_CHECK(GetExtents(value, result));
+  DALI_TEST_CHECK(result == Extents(0u, 0u, 0u, 0u));
 
   END_TEST;
 }
@@ -784,12 +789,14 @@ int UtcDaliPropertyValueAssignmentOperatorMapP(void)
 int UtcDaliPropertyValueAssignmentOperatorExtentsP(void)
 {
   Property::Value value;
-  value = Property::Value(Extents(4, 3, 2, 1)); // mismatch
-  DALI_TEST_CHECK(Extents(4, 3, 2, 1) == value.Get<Extents>());
-  Property::Value copy(Property::EXTENTS);
+  value = Extents(4, 3, 2, 1); // mismatch
+  Extents result;
+  DALI_TEST_CHECK(GetExtents(value, result));
+  DALI_TEST_CHECK(Extents(4, 3, 2, 1) == result);
+  Property::Value copy(DevelProperty::EXTENTS);
   copy = value; // match
   Extents copyExtents;
-  copy.Get(copyExtents);
+  GetExtents(copy, copyExtents);
   DALI_TEST_CHECK(Extents(4, 3, 2, 1) == copyExtents);
   END_TEST;
 }
@@ -1266,11 +1273,19 @@ int UtcDaliPropertyValueGetMapN(void)
 
 int UtcDaliPropertyValueGetExtentsP(void)
 {
-  Property::Value value(Extents(1u, 2u, 3u, 4u));
+  Property::Value value = Extents(1u, 2u, 3u, 4u);
   Extents         result(4u, 3u, 2u, 1u);
-  DALI_TEST_EQUALS(Extents(1u, 2u, 3u, 4u), value.Get<Extents>(), TEST_LOCATION);
-  DALI_TEST_EQUALS(true, value.Get(result), TEST_LOCATION);
+  DALI_TEST_EQUALS(true, GetExtents(value, result), TEST_LOCATION);
   DALI_TEST_EQUALS(Extents(1u, 2u, 3u, 4u), result, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliPropertyValueGetExtentsN(void)
+{
+  Property::Value value(1.0f);
+  Extents         result(4u, 3u, 2u, 1u);
+  DALI_TEST_EQUALS(false, GetExtents(value, result), TEST_LOCATION);
+  DALI_TEST_EQUALS(Extents(4u, 3u, 2u, 1u), result, TEST_LOCATION);
   END_TEST;
 }
 
@@ -1582,7 +1597,7 @@ int UtcDaliPropertyValueConvertFailed(void)
   };
   // clang-format on
 
-  for(int i = Property::Type::NONE; i <= Property::Type::EXTENTS; ++i)
+  for(int i = Property::Type::NONE; i <= DevelProperty::EXTENTS; ++i)
   {
     Property::Type type(static_cast<Property::Type>(i));
 
@@ -1756,7 +1771,7 @@ int UtcDaliPropertyValueOutputStream(void)
   }
 
   {
-    value = Property::Value(Extents(1u, 2u, 3u, 4u));
+    value = Extents(1u, 2u, 3u, 4u);
     std::ostringstream stream;
     stream << value;
     DALI_TEST_CHECK(stream.str() == "[1, 2, 3, 4]");

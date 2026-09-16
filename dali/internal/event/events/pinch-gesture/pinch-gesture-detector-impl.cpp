@@ -138,17 +138,32 @@ void PinchGestureDetector::CancelProcessing()
   }
 }
 
+void PinchGestureDetector::FillRequest(PinchGestureRequest& request) const
+{
+  const PinchGestureProcessor& pinchGestureProcessor = mGestureEventProcessor.GetPinchGestureProcessor();
+
+  request.minimumDistance              = pinchGestureProcessor.GetMinimumPinchDistance();
+  request.minimumTouchEvents           = pinchGestureProcessor.GetMinimumTouchEvents();
+  request.minimumTouchEventsAfterStart = pinchGestureProcessor.GetMinimumTouchEventsAfterStart();
+  request.deviceThresholds             = pinchGestureProcessor.GetDeviceThresholds();
+}
+
 void PinchGestureDetector::ProcessTouchEvent(Scene& scene, const Integration::TouchEvent& event)
 {
   if(!mGestureRecognizer)
   {
-    const PinchGestureProcessor& mPinchGestureProcessor       = mGestureEventProcessor.GetPinchGestureProcessor();
-    float                        minimumPinchDistance         = mPinchGestureProcessor.GetMinimumPinchDistance();
-    uint32_t                     minimumTouchEvents           = mPinchGestureProcessor.GetMinimumTouchEvents();
-    uint32_t                     minimumTouchEventsAfterStart = mPinchGestureProcessor.GetMinimumTouchEventsAfterStart();
+    PinchGestureRequest request;
+    FillRequest(request);
 
     Size size          = scene.GetSize();
-    mGestureRecognizer = new PinchGestureRecognizer(*this, Vector2(size.width, size.height), scene.GetDpi(), minimumPinchDistance, minimumTouchEvents, minimumTouchEventsAfterStart);
+    mGestureRecognizer = new PinchGestureRecognizer(*this, Vector2(size.width, size.height), scene.GetDpi(), request);
+    ConsumeRecognizerUpdateRequired(); // The new recognizer already reflects the current settings.
+  }
+  else if(ConsumeRecognizerUpdateRequired())
+  {
+    PinchGestureRequest request;
+    FillRequest(request);
+    mGestureRecognizer->Update(request);
   }
   mGestureRecognizer->SendEvent(scene, event);
 }

@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali/public-api/common/extents.h>
+#include <dali/devel-api/common/extents.h>
 
 namespace DALI_NAMESPACE
 {

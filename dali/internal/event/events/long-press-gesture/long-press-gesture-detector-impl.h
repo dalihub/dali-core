@@ -20,7 +20,10 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/events/gesture-detector-impl.h>
+#include <dali/internal/event/events/gesture-device-profile-table.h>
+#include <dali/internal/event/events/gesture-input-source.h>
 #include <dali/internal/event/events/long-press-gesture/long-press-gesture-event.h>
+#include <dali/internal/event/events/long-press-gesture/long-press-gesture-profile.h>
 #include <dali/public-api/events/long-press-gesture-detector.h>
 
 namespace DALI_NAMESPACE
@@ -28,6 +31,7 @@ namespace DALI_NAMESPACE
 namespace Internal
 {
 class LongPressGestureDetector;
+struct LongPressGestureRequest;
 
 using LongPressGestureDetectorPtr       = IntrusivePtr<LongPressGestureDetector>;
 using LongPressGestureDetectorContainer = DerivedGestureDetectorContainer<LongPressGestureDetector>::type;
@@ -96,6 +100,43 @@ public:
    * @return The minimum holding time required to be recognized as a long press gesture in milliseconds
    */
   uint32_t GetMinimumHoldingTime() const;
+
+public: // Per-device profiles
+  /**
+   * @brief Retrieves the options used for devices without a registered profile.
+   * @return The default profile
+   */
+  const LongPressGestureProfile& GetDefaultProfile() const;
+
+  /**
+   * @copydoc Dali::LongPressGestureDetector::SetDeviceOptions()
+   */
+  void SetDeviceProfile(const GestureDeviceSelector& selector, const LongPressGestureProfile& profile);
+
+  /**
+   * @brief Retrieves the profile registered for exactly this selector.
+   * @param[in] selector The selector
+   * @return The profile, or nullptr if none is registered for the selector
+   */
+  const LongPressGestureProfile* GetDeviceProfile(const GestureDeviceSelector& selector) const;
+
+  /**
+   * @copydoc Dali::LongPressGestureDetector::ClearDeviceOptions()
+   */
+  void ClearDeviceProfile(const GestureDeviceSelector& selector);
+
+  /**
+   * @brief Retrieves the profile chosen for the long press currently being processed.
+   * @return The active profile
+   */
+  const LongPressGestureProfile& GetActiveProfile() const;
+
+  /**
+   * @brief Widens the given touch range so it covers every profile of this detector.
+   * @param[in,out] minimumTouches Lowered to this detector's smallest minimum
+   * @param[in,out] maximumTouches Raised to this detector's largest maximum
+   */
+  void WidenRecognitionEnvelope(uint32_t& minimumTouches, uint32_t& maximumTouches) const;
 
 public:
   /**
@@ -168,9 +209,27 @@ private: // GestureDetector overrides
   bool OnTouchEvent(Dali::Actor actor, Dali::TouchEvent touch) override;
 
   /**
+   * Fills the request for the detector-owned recognizer used by HandleEvent(): this detector's own
+   * settings plus the application-wide recognition thresholds.
+   * @param[out] request The request to fill
+   */
+  void FillRequest(LongPressGestureRequest& request) const;
+
+  /**
    * @copydoc Dali::Internal::GestureDetector::ProcessTouchEvent(Scene&, const Integration::TouchEvent&)
    */
   void ProcessTouchEvent(Scene& scene, const Integration::TouchEvent& event) override;
+
+  /**
+   * @brief Chooses the profile for a long press started by the given input source and makes it active.
+   * @param[in] source The input source that started the gesture
+   */
+  void SelectActiveProfile(const GestureInputSource& source);
+
+  /**
+   * @brief Tells the processor and the detector-owned recognizer that this detector's options changed.
+   */
+  void NotifyProfilesChanged();
 
   /**
    * @copydoc Dali::Internal::GestureDetector::CheckGestureDetector(const GestureEvent*, Actor*, RenderTaskPtr)
@@ -198,8 +257,9 @@ private: // GestureDetector overrides
 private:
   Dali::LongPressGestureDetector::DetectedSignalType mDetectedSignal;
 
-  unsigned int mMinimumTouchesRequired;
-  unsigned int mMaximumTouchesRequired;
+  LongPressGestureProfile                            mDefaultProfile; ///< Options for devices without a registered profile; edited by SetTouchesRequired().
+  GestureDeviceProfileTable<LongPressGestureProfile> mDeviceProfiles; ///< Options registered per device selector.
+  LongPressGestureProfile                            mActiveProfile;  ///< Profile chosen for the long press in progress.
 
   ActorObserver mCurrentLongPressActor; ///< Current actor for which the long press gesture has been recognized.
 };

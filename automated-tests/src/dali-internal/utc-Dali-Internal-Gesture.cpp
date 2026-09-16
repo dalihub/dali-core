@@ -187,3 +187,24 @@ int UtcDaliGestureGetSourceSubTypeP(void)
 
   END_TEST;
 }
+
+int UtcDaliGestureGetDeviceNameP(void)
+{
+  TestApplication application; // Reset all test adapter return codes
+
+  Gesture gesture(new TestGesture(GestureType::PAN, GestureState::STARTED));
+
+  // Default value must be an empty name
+  DALI_TEST_CHECK(gesture.GetDeviceName().Empty());
+
+  Integration::Point point;
+  point.SetDeviceName(Dali::String("Pointing Device"));
+  GetImplementation(gesture).SetTriggerPoint(point);
+  DALI_TEST_EQUALS(gesture.GetDeviceName(), "Pointing Device", TEST_LOCATION);
+
+  point.SetDeviceName(Dali::String(""));
+  GetImplementation(gesture).SetTriggerPoint(point);
+  DALI_TEST_CHECK(gesture.GetDeviceName().Empty());
+
+  END_TEST;
+}

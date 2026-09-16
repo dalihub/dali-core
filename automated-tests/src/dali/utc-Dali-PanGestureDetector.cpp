@@ -28,6 +28,9 @@
 #include <dali/public-api/dali-core.h>
 #include <stdlib.h>
 #include <test-touch-event-utils.h>
+#include <limits>
+#include <utility>
+#include <vector>
 
 #include <cmath>
 #include <iostream>
@@ -3485,8 +3488,10 @@ int UtcDaliPanGestureGetSourceSubType(void)
 
   // Helper: send a pan sequence where the DOWN event carries the given subclass.
   // source=1 (PRIMARY) triggers the recognizer source update block.
-  auto EmitPanWithSubclass = [&](Device::Subclass::Type subclass, uint32_t startTime) {
-    auto MakeTouch = [&](PointState::Type state, const Vector2& pos, uint32_t time) {
+  auto EmitPanWithSubclass = [&](Device::Subclass::Type subclass, uint32_t startTime)
+  {
+    auto MakeTouch = [&](PointState::Type state, const Vector2& pos, uint32_t time)
+    {
       Dali::Integration::TouchEvent ev;
       Dali::Integration::Point      p;
       p.SetState(state);
@@ -3500,7 +3505,7 @@ int UtcDaliPanGestureGetSourceSubType(void)
       return ev;
     };
 
-    application.ProcessEvent(MakeTouch(PointState::DOWN,   Vector2(10.0f, 10.0f), startTime));
+    application.ProcessEvent(MakeTouch(PointState::DOWN, Vector2(10.0f, 10.0f), startTime));
     application.ProcessEvent(MakeTouch(PointState::MOTION, Vector2(26.0f, 10.0f), startTime + 16));
     application.ProcessEvent(MakeTouch(PointState::MOTION, Vector2(42.0f, 10.0f), startTime + 32));
     application.ProcessEvent(MakeTouch(PointState::MOTION, Vector2(58.0f, 10.0f), startTime + 48));
@@ -3537,5 +3542,756 @@ int UtcDaliPanGestureGetSourceSubType(void)
   DALI_TEST_EQUALS(data.receivedGesture.GetDeviceSubclass(), Device::Subclass::PALM, TEST_LOCATION);
   data.Reset();
 
+  END_TEST;
+}
+
+namespace
+{
+/**
+ * Feeds a single-touch pan of the given horizontal distance straight into the detector through
+ * HandleEvent(), i.e. the detector-owned recognizer path used by geometry hit-testing.
+ * Two MOTION events are sent so the recognizer's minimum pan event count is satisfied.
+ */
+void FeedHandleEventPan(PanGestureDetector& detector, Actor& actor, Dali::RenderTask& task, float distance, uint32_t startTime)
+{
+  auto feed = [&](PointState::Type state, const Vector2& position, uint32_t time)
+  {
+    Dali::Integration::TouchEvent tp = GenerateSingleTouch(state, position, time);
+    Internal::TouchEventPtr       touchEventImpl(new Internal::TouchEvent(time));
+    touchEventImpl->AddPoint(tp.GetPoint(0));
+    touchEventImpl->SetRenderTask(task);
+    Dali::TouchEvent touchEventHandle(touchEventImpl.Get());
+    detector.HandleEvent(actor, touchEventHandle);
+  };
+
+  feed(PointState::DOWN, Vector2(50.0f, 50.0f), startTime);
+  feed(PointState::MOTION, Vector2(50.0f + distance * 0.5f, 50.0f), startTime + 50u);
+  feed(PointState::MOTION, Vector2(50.0f + distance, 50.0f), startTime + 100u);
+  feed(PointState::UP, Vector2(50.0f + distance, 50.0f), startTime + 150u);
+}
+} // namespace
+
+int UtcDaliPanGestureHandleEventAppliesUpdatedMinimumDistance(void)
+{
+  TestApplication          application;
+  Dali::Integration::Scene scene = application.GetScene();
+  Dali::RenderTask         task  = scene.GetRenderTaskList().GetTask(0);
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
+  scene.Add(actor);
+
+  application.SendNotification();
+  application.Render();
+
+  SignalData             data;
+  GestureReceivedFunctor functor(data);
+
+  PanGestureDetector detector = PanGestureDetector::New();
+  detector.DetectedSignal().Connect(&application, functor);
+
+  // A 10px pan is below the default 15px minimum distance. This also creates the detector-owned recognizer.
+  FeedHandleEventPan(detector, actor, task, 10.0f, 100u);
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+
+  // Lower the application-wide threshold after the recognizer exists: the same pan must now be recognised.
+  Dali::Integration::SetPanGestureMinimumDistance(5);
+  FeedHandleEventPan(detector, actor, task, 10.0f, 5000u);
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  data.Reset();
+
+  // Raise it again: the same pan must be rejected again.
+  Dali::Integration::SetPanGestureMinimumDistance(30);
+  FeedHandleEventPan(detector, actor, task, 10.0f, 10000u);
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+
+  Dali::Integration::SetPanGestureMinimumDistance(Dali::Integration::DEFAULT_PAN_GESTURE_MINIMUM_DISTANCE);
+  END_TEST;
+}
+
+int UtcDaliPanGestureHandleEventAppliesUpdatedTouchesRequired(void)
+{
+  TestApplication          application;
+  Dali::Integration::Scene scene = application.GetScene();
+  Dali::RenderTask         task  = scene.GetRenderTaskList().GetTask(0);
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
+  scene.Add(actor);
+
+  application.SendNotification();
+  application.Render();
+
+  SignalData             data;
+  GestureReceivedFunctor functor(data);
+
+  PanGestureDetector detector = PanGestureDetector::New();
+  detector.DetectedSignal().Connect(&application, functor);
+
+  // Single-touch pan with the default requirement of exactly one touch.
+  FeedHandleEventPan(detector, actor, task, 40.0f, 100u);
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  data.Reset();
+
+  // Change this detector's own requirement after its recognizer exists: single-touch pans must stop.
+  detector.SetMaximumTouchesRequired(2u);
+  detector.SetMinimumTouchesRequired(2u);
+  FeedHandleEventPan(detector, actor, task, 40.0f, 5000u);
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+
+  // And back again.
+  detector.SetMinimumTouchesRequired(1u);
+  detector.SetMaximumTouchesRequired(1u);
+  FeedHandleEventPan(detector, actor, task, 40.0f, 10000u);
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+
+  END_TEST;
+}
+
+namespace
+{
+/**
+ * Builds a single-touch event whose point carries the given device name. The mouse button is set so
+ * the recognizer records the point as the gesture source.
+ */
+Dali::Integration::TouchEvent GenerateNamedTouch(PointState::Type state, const Vector2& position, const Dali::String& deviceName, uint32_t time)
+{
+  Dali::Integration::TouchEvent touchEvent;
+  Dali::Integration::Point      point;
+  point.SetState(state);
+  point.SetDeviceId(4);
+  point.SetScreenPosition(position);
+  point.SetDeviceClass(Device::Class::POINTER);
+  point.SetDeviceSubclass(Device::Subclass::REMOCON);
+  point.SetMouseButton(MouseButton::PRIMARY);
+  point.SetDeviceName(deviceName);
+  touchEvent.points.push_back(point);
+  touchEvent.time = time;
+  return touchEvent;
+}
+} // namespace
+
+int UtcDaliPanGestureGetDeviceName(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+  application.Render();
+
+  SignalData             data;
+  GestureReceivedFunctor functor(data);
+
+  PanGestureDetector detector = PanGestureDetector::New();
+  detector.Attach(actor);
+  detector.DetectedSignal().Connect(&application, functor);
+
+  const Dali::String deviceName("Pointing Device");
+  application.ProcessEvent(GenerateNamedTouch(PointState::DOWN, Vector2(10.0f, 10.0f), deviceName, 100));
+  application.ProcessEvent(GenerateNamedTouch(PointState::MOTION, Vector2(26.0f, 10.0f), deviceName, 116));
+  application.ProcessEvent(GenerateNamedTouch(PointState::MOTION, Vector2(42.0f, 10.0f), deviceName, 132));
+  application.ProcessEvent(GenerateNamedTouch(PointState::MOTION, Vector2(58.0f, 10.0f), deviceName, 148));
+  application.SendNotification();
+
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(data.receivedGesture.GetDeviceName(), deviceName, TEST_LOCATION);
+  DALI_TEST_EQUALS(data.receivedGesture.GetDeviceClass(), Device::Class::POINTER, TEST_LOCATION);
+  DALI_TEST_EQUALS(data.receivedGesture.GetDeviceSubclass(), Device::Subclass::REMOCON, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliPanGestureHandleEventPreservesDeviceName(void)
+{
+  TestApplication          application;
+  Dali::Integration::Scene scene = application.GetScene();
+  Dali::RenderTask         task  = scene.GetRenderTaskList().GetTask(0);
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
+  scene.Add(actor);
+
+  application.SendNotification();
+  application.Render();
+
+  SignalData             data;
+  GestureReceivedFunctor functor(data);
+
+  PanGestureDetector detector = PanGestureDetector::New();
+  detector.DetectedSignal().Connect(&application, functor);
+
+  const Dali::String deviceName("Pointing Device");
+  auto               feed = [&](PointState::Type state, const Vector2& position, uint32_t time)
+  {
+    Dali::Integration::TouchEvent tp = GenerateNamedTouch(state, position, deviceName, time);
+    Internal::TouchEventPtr       touchEventImpl(new Internal::TouchEvent(time));
+    touchEventImpl->AddPoint(tp.GetPoint(0));
+    touchEventImpl->SetRenderTask(task);
+    Dali::TouchEvent touchEventHandle(touchEventImpl.Get());
+    detector.HandleEvent(actor, touchEventHandle);
+  };
+
+  // The geometry path rebuilds the Integration::Point from the public TouchEvent; the name must survive.
+  feed(PointState::DOWN, Vector2(50.0f, 50.0f), 100u);
+  feed(PointState::MOTION, Vector2(70.0f, 50.0f), 150u);
+  feed(PointState::MOTION, Vector2(90.0f, 50.0f), 200u);
+  feed(PointState::UP, Vector2(90.0f, 50.0f), 250u);
+
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(data.receivedGesture.GetDeviceName(), deviceName, TEST_LOCATION);
+
+  END_TEST;
+}
+
+namespace
+{
+/**
+ * Builds a touch event whose points all carry the given device metadata. The mouse button is set on
+ * every point so the trigger-point snapshot is recorded as well as the sequence source.
+ */
+Dali::Integration::TouchEvent GenerateDeviceTouch(Device::Class::Type deviceClass, Device::Subclass::Type deviceSubclass, const Dali::String& deviceName, uint32_t time, PointState::Type state, const Vector2& position, PointState::Type secondState = PointState::INTERRUPTED, const Vector2& secondPosition = Vector2::ZERO)
+{
+  Dali::Integration::TouchEvent touchEvent;
+  auto                          addPoint = [&](PointState::Type pointState, const Vector2& pointPosition, int32_t deviceId)
+  {
+    Dali::Integration::Point point;
+    point.SetState(pointState);
+    point.SetDeviceId(deviceId);
+    point.SetScreenPosition(pointPosition);
+    point.SetDeviceClass(deviceClass);
+    point.SetDeviceSubclass(deviceSubclass);
+    point.SetDeviceName(deviceName);
+    point.SetMouseButton(MouseButton::PRIMARY);
+    touchEvent.points.push_back(point);
+  };
+  addPoint(state, position, 4);
+  if(secondState != PointState::INTERRUPTED)
+  {
+    addPoint(secondState, secondPosition, 7);
+  }
+  touchEvent.time = time;
+  return touchEvent;
+}
+
+/**
+ * Pans horizontally by 40px with one finger of the given device through the scene (classic path).
+ */
+void EmitDevicePan(TestApplication& application, Device::Class::Type deviceClass, Device::Subclass::Type deviceSubclass, const Dali::String& deviceName, uint32_t startTime, const Vector2& displacement = Vector2(40.0f, 0.0f))
+{
+  const Vector2 start(20.0f, 20.0f);
+  application.ProcessEvent(GenerateDeviceTouch(deviceClass, deviceSubclass, deviceName, startTime, PointState::DOWN, start));
+  application.ProcessEvent(GenerateDeviceTouch(deviceClass, deviceSubclass, deviceName, startTime + 16, PointState::MOTION, start + displacement * 0.5f));
+  application.ProcessEvent(GenerateDeviceTouch(deviceClass, deviceSubclass, deviceName, startTime + 32, PointState::MOTION, start + displacement));
+  application.ProcessEvent(GenerateDeviceTouch(deviceClass, deviceSubclass, deviceName, startTime + 48, PointState::MOTION, start + displacement * 1.5f));
+  application.ProcessEvent(GenerateDeviceTouch(deviceClass, deviceSubclass, deviceName, startTime + 64, PointState::UP, start + displacement * 1.5f));
+  application.SendNotification();
+}
+
+/**
+ * Pans horizontally by 40px with two fingers of the given device through the scene (classic path).
+ */
+void EmitTwoFingerDevicePan(TestApplication& application, Device::Class::Type deviceClass, Device::Subclass::Type deviceSubclass, const Dali::String& deviceName, uint32_t startTime)
+{
+  const Vector2 a(20.0f, 20.0f);
+  const Vector2 b(20.0f, 60.0f);
+  const Vector2 step(20.0f, 0.0f);
+  application.ProcessEvent(GenerateDeviceTouch(deviceClass, deviceSubclass, deviceName, startTime, PointState::DOWN, a));
+  application.ProcessEvent(GenerateDeviceTouch(deviceClass, deviceSubclass, deviceName, startTime + 8, PointState::STATIONARY, a, PointState::DOWN, b));
+  application.ProcessEvent(GenerateDeviceTouch(deviceClass, deviceSubclass, deviceName, startTime + 16, PointState::MOTION, a + step, PointState::MOTION, b + step));
+  application.ProcessEvent(GenerateDeviceTouch(deviceClass, deviceSubclass, deviceName, startTime + 32, PointState::MOTION, a + step * 2.0f, PointState::MOTION, b + step * 2.0f));
+  application.ProcessEvent(GenerateDeviceTouch(deviceClass, deviceSubclass, deviceName, startTime + 48, PointState::MOTION, a + step * 3.0f, PointState::MOTION, b + step * 3.0f));
+  application.ProcessEvent(GenerateDeviceTouch(deviceClass, deviceSubclass, deviceName, startTime + 64, PointState::UP, a + step * 3.0f, PointState::UP, b + step * 3.0f));
+  application.SendNotification();
+}
+
+const Dali::String REMOTE_NAME("Pointing Device");
+} // namespace
+
+int UtcDaliPanGestureDetectorOptionsP(void)
+{
+  TestApplication application;
+
+  PanGestureDetector::Options options;
+  DALI_TEST_EQUALS(options.GetMinimumTouchesRequired(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(options.GetMaximumTouchesRequired(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(options.GetMaximumMotionEventAge(), std::numeric_limits<uint32_t>::max(), TEST_LOCATION);
+  DALI_TEST_EQUALS(options.GetAngleCount(), 0u, TEST_LOCATION);
+
+  options.SetMinimumTouchesRequired(2u);
+  options.SetMaximumTouchesRequired(3u);
+  options.SetMaximumMotionEventAge(120u);
+  DALI_TEST_EQUALS(options.GetMinimumTouchesRequired(), 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(options.GetMaximumTouchesRequired(), 3u, TEST_LOCATION);
+  DALI_TEST_EQUALS(options.GetMaximumMotionEventAge(), 120u, TEST_LOCATION);
+
+  // Angles are normalised like the detector's own AddAngle(): threshold made positive and clamped
+  // to PI, angle wrapped into [-PI, PI].
+  options.AddAngle(Degree(190.0f), Degree(-30.0f));
+  DALI_TEST_EQUALS(options.GetAngleCount(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(options.GetAngle(0).first, Radian(Degree(-170.0f)), 0.0001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(options.GetAngle(0).second, Radian(Degree(30.0f)), 0.0001f, TEST_LOCATION);
+
+  options.AddAngle(Degree(0.0f), Radian(10.0f)); // threshold above PI is clamped
+  DALI_TEST_EQUALS(options.GetAngle(1).second, Radian(Math::PI), 0.0001f, TEST_LOCATION);
+
+  options.AddDirection(PanGestureDetector::DIRECTION_HORIZONTAL); // adds both directions with the default threshold
+  DALI_TEST_EQUALS(options.GetAngleCount(), 4u, TEST_LOCATION);
+  DALI_TEST_EQUALS(options.GetAngle(2).second, PanGestureDetector::DEFAULT_THRESHOLD, 0.0001f, TEST_LOCATION);
+
+  options.RemoveDirection(PanGestureDetector::DIRECTION_HORIZONTAL);
+  DALI_TEST_EQUALS(options.GetAngleCount(), 2u, TEST_LOCATION);
+  options.RemoveAngle(Degree(190.0f)); // removes the wrapped -170 entry
+  DALI_TEST_EQUALS(options.GetAngleCount(), 1u, TEST_LOCATION);
+  options.ClearAngles();
+  DALI_TEST_EQUALS(options.GetAngleCount(), 0u, TEST_LOCATION);
+
+  // Out-of-range index behaves like the detector: zero pair.
+  DALI_TEST_EQUALS(options.GetAngle(5).first, Radian(0.0f), TEST_LOCATION);
+
+  // Copies are independent.
+  PanGestureDetector::Options copied(options);
+  copied.SetMinimumTouchesRequired(1u);
+  DALI_TEST_EQUALS(options.GetMinimumTouchesRequired(), 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(copied.GetMinimumTouchesRequired(), 1u, TEST_LOCATION);
+
+  PanGestureDetector::Options moved(std::move(copied));
+  DALI_TEST_EQUALS(moved.GetMinimumTouchesRequired(), 1u, TEST_LOCATION);
+  DALI_TEST_ASSERTION(copied.GetMinimumTouchesRequired(), "moved-from PanGestureDetector::Options");
+
+  END_TEST;
+}
+
+int UtcDaliPanGestureDetectorGetDefaultOptionsP(void)
+{
+  TestApplication application;
+
+  PanGestureDetector detector = PanGestureDetector::New();
+  detector.SetMinimumTouchesRequired(2u);
+  detector.SetMaximumTouchesRequired(3u);
+  detector.SetMaximumMotionEventAge(80u);
+  detector.AddDirection(PanGestureDetector::DIRECTION_VERTICAL);
+
+  PanGestureDetector::Options defaults = detector.GetDefaultOptions();
+  DALI_TEST_EQUALS(defaults.GetMinimumTouchesRequired(), 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(defaults.GetMaximumTouchesRequired(), 3u, TEST_LOCATION);
+  DALI_TEST_EQUALS(defaults.GetMaximumMotionEventAge(), 80u, TEST_LOCATION);
+  DALI_TEST_EQUALS(defaults.GetAngleCount(), 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(defaults.GetAngle(0).first, detector.GetAngle(0).first, 0.0001f, TEST_LOCATION);
+
+  // The copy does not write back to the detector.
+  defaults.SetMinimumTouchesRequired(1u);
+  defaults.ClearAngles();
+  DALI_TEST_EQUALS(detector.GetMinimumTouchesRequired(), 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(detector.GetAngleCount(), 2u, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliPanGestureDetectorDeviceOptionsSetGetClearP(void)
+{
+  TestApplication application;
+
+  PanGestureDetector detector = PanGestureDetector::New();
+
+  const GestureDeviceSelector remote = GestureDeviceSelector::ByDeviceClassAndSubclass(Device::Class::POINTER, Device::Subclass::REMOCON);
+  const GestureDeviceSelector touch  = GestureDeviceSelector::ByDeviceClass(Device::Class::TOUCH);
+
+  PanGestureDetector::Options queried;
+  DALI_TEST_CHECK(!detector.GetDeviceOptions(remote, queried));
+
+  PanGestureDetector::Options remoteOptions = detector.GetDefaultOptions();
+  remoteOptions.SetMaximumMotionEventAge(120u);
+  detector.SetDeviceOptions(remote, remoteOptions);
+
+  // Exact lookup returns an independent copy of what was registered.
+  DALI_TEST_CHECK(detector.GetDeviceOptions(remote, queried));
+  DALI_TEST_EQUALS(queried.GetMaximumMotionEventAge(), 120u, TEST_LOCATION);
+  remoteOptions.SetMaximumMotionEventAge(999u); // caller's copy changes nothing registered
+  DALI_TEST_CHECK(detector.GetDeviceOptions(remote, queried));
+  DALI_TEST_EQUALS(queried.GetMaximumMotionEventAge(), 120u, TEST_LOCATION);
+
+  // A different selector is not found and leaves the output untouched.
+  queried.SetMaximumMotionEventAge(5u);
+  DALI_TEST_CHECK(!detector.GetDeviceOptions(touch, queried));
+  DALI_TEST_EQUALS(queried.GetMaximumMotionEventAge(), 5u, TEST_LOCATION);
+
+  // The detector's own defaults are untouched by device options.
+  DALI_TEST_EQUALS(detector.GetMaximumMotionEventAge(), std::numeric_limits<uint32_t>::max(), TEST_LOCATION);
+
+  // Registering again replaces; clearing removes; clearing again is a no-op.
+  remoteOptions.SetMaximumMotionEventAge(60u);
+  detector.SetDeviceOptions(remote, remoteOptions);
+  DALI_TEST_CHECK(detector.GetDeviceOptions(remote, queried));
+  DALI_TEST_EQUALS(queried.GetMaximumMotionEventAge(), 60u, TEST_LOCATION);
+  detector.ClearDeviceOptions(remote);
+  DALI_TEST_CHECK(!detector.GetDeviceOptions(remote, queried));
+  detector.ClearDeviceOptions(remote);
+
+  END_TEST;
+}
+
+int UtcDaliPanGestureDetectorDeviceOptionsInvalidN(void)
+{
+  TestApplication application;
+
+  PanGestureDetector          detector = PanGestureDetector::New();
+  const GestureDeviceSelector touch    = GestureDeviceSelector::ByDeviceClass(Device::Class::TOUCH);
+
+  PanGestureDetector::Options options;
+  options.SetMinimumTouchesRequired(0u);
+  DALI_TEST_ASSERTION(detector.SetDeviceOptions(touch, options), "positive touch counts");
+
+  options.SetMinimumTouchesRequired(3u);
+  options.SetMaximumTouchesRequired(2u);
+  DALI_TEST_ASSERTION(detector.SetDeviceOptions(touch, options), "minimum touches <= maximum touches");
+
+  // Nothing was registered by the rejected calls.
+  PanGestureDetector::Options queried;
+  DALI_TEST_CHECK(!detector.GetDeviceOptions(touch, queried));
+
+  END_TEST;
+}
+
+int UtcDaliPanGestureDetectorDeviceOptionsTouchesRequired(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(200.0f, 200.0f));
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
+  application.GetScene().Add(actor);
+  application.SendNotification();
+  application.Render();
+
+  SignalData             data;
+  GestureReceivedFunctor functor(data);
+
+  PanGestureDetector detector = PanGestureDetector::New();
+  detector.Attach(actor);
+  detector.DetectedSignal().Connect(&application, functor);
+
+  // Touch screens must pan with exactly two fingers; everything else keeps the one-finger default.
+  PanGestureDetector::Options touchOptions = detector.GetDefaultOptions();
+  touchOptions.SetMinimumTouchesRequired(2u);
+  touchOptions.SetMaximumTouchesRequired(2u);
+  detector.SetDeviceOptions(GestureDeviceSelector::ByDeviceClass(Device::Class::TOUCH), touchOptions);
+
+  // One finger on a touch screen: rejected by the touch profile.
+  EmitDevicePan(application, Device::Class::TOUCH, Device::Subclass::FINGER, Dali::String(""), 100u);
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+
+  // One "finger" from a mouse: no profile, the default (1..1) applies.
+  EmitDevicePan(application, Device::Class::MOUSE, Device::Subclass::NONE, Dali::String(""), 5000u);
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(data.receivedGesture.GetNumberOfTouches(), 1u, TEST_LOCATION);
+  data.Reset();
+
+  // Two fingers on a touch screen: accepted by the touch profile.
+  EmitTwoFingerDevicePan(application, Device::Class::TOUCH, Device::Subclass::FINGER, Dali::String(""), 10000u);
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(data.receivedGesture.GetNumberOfTouches(), 2u, TEST_LOCATION);
+  data.Reset();
+
+  // Clearing the profile restores the default for touch screens.
+  detector.ClearDeviceOptions(GestureDeviceSelector::ByDeviceClass(Device::Class::TOUCH));
+  EmitDevicePan(application, Device::Class::TOUCH, Device::Subclass::FINGER, Dali::String(""), 15000u);
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliPanGestureDetectorDeviceOptionsAngle(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(200.0f, 200.0f));
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
+  application.GetScene().Add(actor);
+  application.SendNotification();
+  application.Render();
+
+  SignalData             data;
+  GestureReceivedFunctor functor(data);
+
+  PanGestureDetector detector = PanGestureDetector::New();
+  detector.Attach(actor);
+  detector.DetectedSignal().Connect(&application, functor);
+
+  // Pointing devices may only pan horizontally; the default accepts any direction.
+  PanGestureDetector::Options pointerOptions = detector.GetDefaultOptions();
+  pointerOptions.AddDirection(PanGestureDetector::DIRECTION_HORIZONTAL);
+  detector.SetDeviceOptions(GestureDeviceSelector::ByDeviceClass(Device::Class::POINTER), pointerOptions);
+
+  const Vector2 vertical(0.0f, 40.0f);
+  EmitDevicePan(application, Device::Class::POINTER, Device::Subclass::REMOCON, REMOTE_NAME, 100u, vertical);
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+
+  EmitDevicePan(application, Device::Class::TOUCH, Device::Subclass::FINGER, Dali::String(""), 5000u, vertical);
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  data.Reset();
+
+  EmitDevicePan(application, Device::Class::POINTER, Device::Subclass::REMOCON, REMOTE_NAME, 10000u);
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliPanGestureDetectorDeviceOptionsPrecedence(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(200.0f, 200.0f));
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
+  application.GetScene().Add(actor);
+  application.SendNotification();
+  application.Render();
+
+  SignalData             data;
+  GestureReceivedFunctor functor(data);
+
+  PanGestureDetector detector = PanGestureDetector::New();
+  detector.Attach(actor);
+  detector.DetectedSignal().Connect(&application, functor);
+
+  // Class+subclass profile allows any direction; the named model is restricted to horizontal.
+  detector.SetDeviceOptions(GestureDeviceSelector::ByDeviceClassAndSubclass(Device::Class::POINTER, Device::Subclass::REMOCON), detector.GetDefaultOptions());
+  PanGestureDetector::Options namedOptions = detector.GetDefaultOptions();
+  namedOptions.AddDirection(PanGestureDetector::DIRECTION_HORIZONTAL);
+  detector.SetDeviceOptions(GestureDeviceSelector::ByDeviceName(REMOTE_NAME), namedOptions);
+
+  const Vector2 vertical(0.0f, 40.0f);
+
+  // Same class and subclass, different name: the class+subclass profile applies.
+  EmitDevicePan(application, Device::Class::POINTER, Device::Subclass::REMOCON, Dali::String("Other Remote"), 100u, vertical);
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  data.Reset();
+
+  // The named model: the name profile wins over the class+subclass profile.
+  EmitDevicePan(application, Device::Class::POINTER, Device::Subclass::REMOCON, REMOTE_NAME, 5000u, vertical);
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+
+  // Remove the name profile: the named model falls back to the class+subclass profile.
+  detector.ClearDeviceOptions(GestureDeviceSelector::ByDeviceName(REMOTE_NAME));
+  EmitDevicePan(application, Device::Class::POINTER, Device::Subclass::REMOCON, REMOTE_NAME, 10000u, vertical);
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliPanGestureDetectorDeviceOptionsKeptForGestureInProgress(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(200.0f, 200.0f));
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
+  application.GetScene().Add(actor);
+  application.SendNotification();
+  application.Render();
+
+  SignalData             data;
+  GestureReceivedFunctor functor(data);
+
+  PanGestureDetector detector = PanGestureDetector::New();
+  detector.Attach(actor);
+  detector.DetectedSignal().Connect(&application, functor);
+
+  const Vector2 start(20.0f, 20.0f);
+  const Vector2 step(20.0f, 0.0f);
+  auto          touch = [&](uint32_t time, PointState::Type state, const Vector2& position)
+  {
+    application.ProcessEvent(GenerateDeviceTouch(Device::Class::TOUCH, Device::Subclass::FINGER, Dali::String(""), time, state, position));
+    application.SendNotification();
+  };
+
+  // Start a one-finger pan with the default profile.
+  touch(100u, PointState::DOWN, start);
+  touch(116u, PointState::MOTION, start + step);
+  touch(132u, PointState::MOTION, start + step * 2.0f);
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(data.receivedGesture.GetState(), GestureState::STARTED, TEST_LOCATION);
+  data.Reset();
+
+  // Register a touch profile requiring two fingers while the one-finger pan is in progress.
+  PanGestureDetector::Options touchOptions = detector.GetDefaultOptions();
+  touchOptions.SetMinimumTouchesRequired(2u);
+  touchOptions.SetMaximumTouchesRequired(2u);
+  detector.SetDeviceOptions(GestureDeviceSelector::ByDeviceClass(Device::Class::TOUCH), touchOptions);
+
+  // The gesture in progress keeps the profile it started with.
+  touch(148u, PointState::MOTION, start + step * 3.0f);
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(data.receivedGesture.GetState(), GestureState::CONTINUING, TEST_LOCATION);
+  data.Reset();
+  touch(164u, PointState::UP, start + step * 3.0f);
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(data.receivedGesture.GetState(), GestureState::FINISHED, TEST_LOCATION);
+  data.Reset();
+
+  // The next one-finger touch pan uses the new profile and is rejected.
+  EmitDevicePan(application, Device::Class::TOUCH, Device::Subclass::FINGER, Dali::String(""), 5000u);
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliPanGestureDetectorDeviceOptionsHandleEvent(void)
+{
+  TestApplication          application;
+  Dali::Integration::Scene scene = application.GetScene();
+  Dali::RenderTask         task  = scene.GetRenderTaskList().GetTask(0);
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(200.0f, 200.0f));
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
+  scene.Add(actor);
+  application.SendNotification();
+  application.Render();
+
+  SignalData             data;
+  GestureReceivedFunctor functor(data);
+
+  PanGestureDetector detector = PanGestureDetector::New();
+  detector.DetectedSignal().Connect(&application, functor);
+
+  // Geometry path: pointing devices may only pan horizontally.
+  PanGestureDetector::Options pointerOptions = detector.GetDefaultOptions();
+  pointerOptions.AddDirection(PanGestureDetector::DIRECTION_HORIZONTAL);
+  detector.SetDeviceOptions(GestureDeviceSelector::ByDeviceClass(Device::Class::POINTER), pointerOptions);
+
+  auto feedPan = [&](Device::Class::Type deviceClass, uint32_t startTime, const Vector2& displacement)
+  {
+    const Vector2 start(50.0f, 50.0f);
+    auto          feed = [&](PointState::Type state, const Vector2& position, uint32_t time)
+    {
+      Dali::Integration::TouchEvent tp = GenerateDeviceTouch(deviceClass, Device::Subclass::NONE, Dali::String(""), time, state, position);
+      Internal::TouchEventPtr       touchEventImpl(new Internal::TouchEvent(time));
+      touchEventImpl->AddPoint(tp.GetPoint(0));
+      touchEventImpl->SetRenderTask(task);
+      Dali::TouchEvent touchEventHandle(touchEventImpl.Get());
+      detector.HandleEvent(actor, touchEventHandle);
+    };
+    feed(PointState::DOWN, start, startTime);
+    feed(PointState::MOTION, start + displacement * 0.5f, startTime + 50u);
+    feed(PointState::MOTION, start + displacement, startTime + 100u);
+    feed(PointState::UP, start + displacement, startTime + 150u);
+  };
+
+  const Vector2 vertical(0.0f, 40.0f);
+  feedPan(Device::Class::POINTER, 100u, vertical);
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+
+  feedPan(Device::Class::TOUCH, 5000u, vertical);
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  data.Reset();
+
+  feedPan(Device::Class::POINTER, 10000u, Vector2(40.0f, 0.0f));
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+
+  END_TEST;
+}
+
+namespace
+{
+void CheckPanDeviceTouchRange(bool belowMinimum, bool handleEvent)
+{
+  TestApplication application;
+  application.GetScene().SetGeometryHittestEnabled(true);
+  Dali::RenderTask task = application.GetScene().GetRenderTaskList().GetTask(0);
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(200.0f, 200.0f));
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
+  application.GetScene().Add(actor);
+  application.SendNotification();
+  application.Render();
+
+  PanGestureDetector detector = PanGestureDetector::New();
+  if(!handleEvent)
+  {
+    detector.Attach(actor);
+  }
+
+  // Keep the recognizer's envelope at 1..2, while the active touch profile accepts only one count.
+  detector.SetMaximumTouchesRequired(2u);
+  PanGestureDetector::Options options = detector.GetDefaultOptions();
+  options.SetMinimumTouchesRequired(belowMinimum ? 2u : 1u);
+  options.SetMaximumTouchesRequired(belowMinimum ? 2u : 1u);
+  detector.SetDeviceOptions(GestureDeviceSelector::ByDeviceClass(Device::Class::TOUCH), options);
+
+  std::vector<PanGesture> gestures;
+  detector.DetectedSignal().Connect(&application, [&](Actor, PanGesture pan)
+  {
+    gestures.push_back(pan);
+  });
+
+  uint32_t time = 1000u;
+  auto     feed = [&](PointState::Type state, float x, PointState::Type secondState = PointState::INTERRUPTED)
+  {
+    const Integration::TouchEvent event = GenerateDeviceTouch(Device::Class::TOUCH, Device::Subclass::FINGER, Dali::String(""), time, state, Vector2(x, 20.0f), secondState, Vector2(x, 60.0f));
+    time += 16u;
+    if(handleEvent)
+    {
+      Internal::TouchEventPtr touch(new Internal::TouchEvent(event.time));
+      for(const Integration::Point& point : event.points)
+      {
+        touch->AddPoint(point);
+      }
+      touch->SetRenderTask(task);
+      Dali::TouchEvent touchHandle(touch.Get());
+      detector.HandleEvent(actor, touchHandle);
+    }
+    else
+    {
+      application.ProcessEvent(event);
+    }
+    application.SendNotification();
+  };
+
+  const PointState::Type secondMotion = belowMinimum ? PointState::MOTION : PointState::INTERRUPTED;
+  feed(PointState::DOWN, 20.0f);
+  if(belowMinimum)
+  {
+    feed(PointState::STATIONARY, 20.0f, PointState::DOWN);
+  }
+  feed(PointState::MOTION, 40.0f, secondMotion);
+  feed(PointState::MOTION, 60.0f, secondMotion);
+  DALI_TEST_EQUALS(gestures.size(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(gestures.back().GetState(), GestureState::STARTED, TEST_LOCATION);
+
+  feed(PointState::STATIONARY, 60.0f, belowMinimum ? PointState::UP : PointState::DOWN);
+  feed(PointState::MOTION, 80.0f, belowMinimum ? PointState::INTERRUPTED : PointState::MOTION);
+  DALI_TEST_EQUALS(gestures.size(), 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(gestures.back().GetState(), GestureState::FINISHED, TEST_LOCATION);
+  DALI_TEST_EQUALS(gestures.back().GetNumberOfTouches(), belowMinimum ? 1u : 2u, TEST_LOCATION);
+
+  // Returning to the accepted range must not resume this pan or emit another FINISHED on release.
+  feed(PointState::STATIONARY, 80.0f, belowMinimum ? PointState::DOWN : PointState::UP);
+  feed(PointState::MOTION, 100.0f, secondMotion);
+  feed(PointState::UP, 100.0f, belowMinimum ? PointState::UP : PointState::INTERRUPTED);
+  DALI_TEST_EQUALS(gestures.size(), 2u, TEST_LOCATION);
+}
+} // namespace
+
+int UtcDaliPanGestureDetectorDeviceOptionsFinishBelowMinimumTouches(void)
+{
+  CheckPanDeviceTouchRange(true, false);
+  CheckPanDeviceTouchRange(true, true);
+  END_TEST;
+}
+
+int UtcDaliPanGestureDetectorDeviceOptionsFinishAboveMaximumTouches(void)
+{
+  CheckPanDeviceTouchRange(false, false);
+  CheckPanDeviceTouchRange(false, true);
   END_TEST;
 }

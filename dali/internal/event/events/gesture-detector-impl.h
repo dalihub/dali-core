@@ -239,14 +239,33 @@ private:
   void Clear();
 
 protected:
-  GestureType::Value            mType;                  ///< The gesture detector will detect this type of gesture.
-  GestureDetectorActorContainer mAttachedActors;        ///< Object::Observer is used to provide weak-pointer behaviour
-  GestureDetectorActorContainer mPendingAttachActors;   ///< Object::Observer is used to provide weak-pointer behaviour
-  GestureEventProcessor&        mGestureEventProcessor; ///< A reference to the gesture event processor.
-  ActorObserver                 mFeededActor;           ///< The Actor that feeds touch events
-  RenderTaskPtr                 mRenderTask;            ///< The render task used to generate this touch event.
-  GestureRecognizerPtr          mGestureRecognizer;     ///< The gesture recognizer
-  bool                          mIsDetected : 1;        ///< Whether gesture detected.
+  /**
+   * @brief Marks this detector's own recognition settings as changed.
+   *
+   * The detector-owned recognizer used by HandleEvent() is refreshed with Update() before the
+   * next touch event it processes.
+   */
+  void MarkRecognizerSettingsDirty();
+
+  /**
+   * @brief Checks whether the detector-owned recognizer must be refreshed and clears the pending state.
+   *
+   * A refresh is required when this detector's own settings changed (MarkRecognizerSettingsDirty())
+   * or when the application-wide recognition thresholds changed since the last refresh.
+   * @return true if the recognizer must be updated with a freshly built request
+   */
+  bool ConsumeRecognizerUpdateRequired();
+
+  GestureType::Value            mType;                        ///< The gesture detector will detect this type of gesture.
+  GestureDetectorActorContainer mAttachedActors;              ///< Object::Observer is used to provide weak-pointer behaviour
+  GestureDetectorActorContainer mPendingAttachActors;         ///< Object::Observer is used to provide weak-pointer behaviour
+  GestureEventProcessor&        mGestureEventProcessor;       ///< A reference to the gesture event processor.
+  ActorObserver                 mFeededActor;                 ///< The Actor that feeds touch events
+  RenderTaskPtr                 mRenderTask;                  ///< The render task used to generate this touch event.
+  GestureRecognizerPtr          mGestureRecognizer;           ///< The gesture recognizer
+  bool                          mIsDetected : 1;              ///< Whether gesture detected.
+  bool                          mRecognizerSettingsDirty : 1; ///< Detector-owned recognizer must be refreshed with this detector's settings.
+  uint32_t                      mAppliedGestureOptionsEpoch;  ///< Threshold epoch last applied to the detector-owned recognizer.
 };
 
 } // namespace Internal

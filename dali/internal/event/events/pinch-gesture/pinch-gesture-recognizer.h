@@ -34,6 +34,8 @@ struct TouchEvent;
 
 namespace Internal
 {
+struct PinchGestureRequest;
+
 /**
  * When given a set of touch events, this detector attempts to determine if a pinch gesture has taken place.
  */
@@ -44,13 +46,12 @@ public:
 
   /**
    * Constructor
+   * @param[in] observer   Used to send events to Core.
    * @param[in] screenSize The size of the screen.
-   * @param[in] screenDpi The dpi value of the screen
-   * @param[in] minimumPinchDistance in pixels
-   * @param[in] minimumTouchEvents The number of touch events required
-   * @param[in] minimumTouchEventsAfterStart The number of touch events required after a gesture started
+   * @param[in] screenDpi  The dpi value of the screen, used when the request asks for the default distance.
+   * @param[in] request    The pinch gesture request carrying the recognition thresholds.
    */
-  PinchGestureRecognizer(Observer& observer, Vector2 screenSize, Vector2 screenDpi, float minimumPinchDistance, uint32_t minimumTouchEvents, uint32_t minimumTouchEventsAfterStart);
+  PinchGestureRecognizer(Observer& observer, Vector2 screenSize, Vector2 screenDpi, const PinchGestureRequest& request);
 
   /**
    * Virtual destructor.
@@ -87,6 +88,31 @@ public:
    */
   void Update(const GestureRequest& request) override;
 
+  /**
+   * @copydoc Dali::Internal::GestureRecognizer::OnSequenceSourceChanged()
+   */
+  void OnSequenceSourceChanged() override;
+
+private:
+  /**
+   * @brief Takes every parameter from the request: touch requirements, application-wide thresholds and
+   * the per-device threshold table, then applies the thresholds for the current sequence.
+   * @param[in] request The request
+   */
+  void ApplyRequest(const PinchGestureRequest& request);
+
+  /**
+   * @brief Applies the thresholds registered for the device of the current sequence, or the
+   * application-wide ones when the device has no entry.
+   */
+  void ApplyThresholdsForSequence();
+
+  /**
+   * @brief Applies one set of thresholds to the recognizer state.
+   * @param[in] thresholds The thresholds
+   */
+  void ApplyThresholds(const PinchThresholdValues& thresholds);
+
 private:
   /**
    * Emits the pinch gesture event to the core.
@@ -120,7 +146,9 @@ private:
 
   uint32_t mMinimumTouchEvents; ///< The minimum touch events required before a pinch can be started.
 
-  uint32_t mMinimumTouchEventsAfterStart; ///< The minimum touch events required after a pinch started.
+  uint32_t                                        mMinimumTouchEventsAfterStart; ///< The minimum touch events required after a pinch started.
+  PinchThresholdValues                            mBaseThresholds;               ///< Application-wide thresholds for devices without an entry.
+  GestureDeviceProfileTable<PinchThresholdValues> mDeviceThresholds;             ///< Application-wide per-device thresholds.
 };
 
 } // namespace Internal

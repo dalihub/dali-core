@@ -20,7 +20,10 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/events/gesture-detector-impl.h>
+#include <dali/internal/event/events/gesture-device-profile-table.h>
+#include <dali/internal/event/events/gesture-input-source.h>
 #include <dali/internal/event/events/tap-gesture/tap-gesture-event.h>
+#include <dali/internal/event/events/tap-gesture/tap-gesture-profile.h>
 #include <dali/public-api/events/tap-gesture-detector.h>
 #include <dali/public-api/events/tap-gesture.h>
 
@@ -29,6 +32,7 @@ namespace DALI_NAMESPACE
 namespace Internal
 {
 class TapGestureDetector;
+struct TapGestureRequest;
 
 using TapGestureDetectorPtr       = IntrusivePtr<TapGestureDetector>;
 using TapGestureDetectorContainer = DerivedGestureDetectorContainer<TapGestureDetector>::type;
@@ -94,14 +98,50 @@ public:
    */
   void ReceiveAllTapEvents(bool receive);
 
+  /**
+   * @copydoc Dali::TapGestureDetector::IsReceiveAllTapEventsEnabled()
+   */
+  bool IsReceiveAllTapEventsEnabled() const;
+
+public: // Per-device profiles
+  /**
+   * @brief Retrieves the options used for devices without a registered profile.
+   * @return The default profile
+   */
+  const TapGestureProfile& GetDefaultProfile() const;
+
+  /**
+   * @copydoc Dali::TapGestureDetector::SetDeviceOptions()
+   */
+  void SetDeviceProfile(const GestureDeviceSelector& selector, const TapGestureProfile& profile);
+
+  /**
+   * @brief Retrieves the profile registered for exactly this selector.
+   * @param[in] selector The selector
+   * @return The profile, or nullptr if none is registered for the selector
+   */
+  const TapGestureProfile* GetDeviceProfile(const GestureDeviceSelector& selector) const;
+
+  /**
+   * @copydoc Dali::TapGestureDetector::ClearDeviceOptions()
+   */
+  void ClearDeviceProfile(const GestureDeviceSelector& selector);
+
+  /**
+   * @brief Retrieves the profile chosen for the tap sequence currently being processed.
+   * @return The active profile
+   */
+  const TapGestureProfile& GetActiveProfile() const;
+
 public:
   /**
    * Called by the TapGestureProcessor when a tap gesture event occurs within the bounds of our
    * attached actor.
    * @param[in]  tappedActor  The tapped actor.
    * @param[in]  tap          The tap gesture.
+   * @param[in]  maximumMultiTapInterval The interval selected by the recognizer, in milliseconds.
    */
-  void EmitTapGestureSignal(Dali::Actor tappedActor, const Dali::TapGesture& tap);
+  void EmitTapGestureSignal(Dali::Actor tappedActor, const Dali::TapGesture& tap, uint32_t maximumMultiTapInterval);
 
 public: // Signals
   /**
@@ -144,7 +184,7 @@ private:
    * @brief Checks if MinimumTapsRequired is less than or equal to MaximumTapsRequired.
    * @return true if MinimumTapsRequired is less than or equal to MaximumTapsRequired.
    */
-  bool CheckMinMaxTapsRequired();
+  bool CheckMinMaxTapsRequired(const TapGestureProfile& profile) const;
 
 private: // GestureDetector overrides
   /**
@@ -168,9 +208,30 @@ private: // GestureDetector overrides
   bool OnTouchEvent(Dali::Actor actor, Dali::TouchEvent touch) override;
 
   /**
+   * Fills the request for the detector-owned recognizer used by HandleEvent(): this detector's own
+   * settings plus the application-wide recognition thresholds.
+   * @param[out] request The request to fill
+   */
+  void FillRequest(TapGestureRequest& request) const;
+
+  /**
    * @copydoc Dali::Internal::GestureDetector::ProcessTouchEvent(Scene&, const Integration::TouchEvent&)
    */
   void ProcessTouchEvent(Scene& scene, const Integration::TouchEvent& event) override;
+
+  /**
+   * @brief Chooses the profile for the tap sequence the event belongs to and makes it active.
+   *
+   * A new profile is chosen when a sequence starts (first tap) or when the device differs from the
+   * one the active profile was chosen for; further taps of the same sequence keep it.
+   * @param[in] tapEvent The tap event being processed
+   */
+  void SelectActiveProfile(const TapGestureEvent& tapEvent);
+
+  /**
+   * @brief Tells the processor and the detector-owned recognizer that this detector's options changed.
+   */
+  void NotifyProfilesChanged();
 
   /**
    * @copydoc Dali::Internal::GestureDetector::CheckGestureDetector(const GestureEvent*, Actor*, RenderTaskPtr)
@@ -198,16 +259,16 @@ private: // GestureDetector overrides
 private:
   Dali::TapGestureDetector::DetectedSignalType mDetectedSignal;
 
-  uint32_t         mMinimumTapsRequired; ///< Minimum number of taps required.
-  uint32_t         mMaximumTapsRequired; ///< Maximum number of taps required.
-  uint32_t         mTouchesRequired;
-  uint32_t         mTimerId;
-  uint32_t         mWaitTime;
-  Dali::Actor      mTappedActor;
-  Dali::TapGesture mTap;
-  ActorObserver    mCurrentTapActor; ///< The current actor that has been gestured.
-  bool             mReceiveAllTapEvents : 1;
-  bool             mPossibleProcessed : 1; ///< Indication of whether we've processed a touch down for this gestuee
+  TapGestureProfile                            mDefaultProfile; ///< Options for devices without a registered profile; edited by the detector's own setters.
+  GestureDeviceProfileTable<TapGestureProfile> mDeviceProfiles; ///< Options registered per device selector.
+  TapGestureProfile                            mActiveProfile;  ///< Profile chosen for the tap sequence in progress.
+  GestureInputSource                           mActiveSource;   ///< The device the active profile was chosen for.
+  uint32_t                                     mTouchesRequired;
+  uint32_t                                     mTimerId;
+  Dali::Actor                                  mTappedActor;
+  Dali::TapGesture                             mTap;
+  ActorObserver                                mCurrentTapActor;       ///< The current actor that has been gestured.
+  bool                                         mPossibleProcessed : 1; ///< Indication of whether we've processed a touch down for this gestuee
 };
 
 } // namespace Internal

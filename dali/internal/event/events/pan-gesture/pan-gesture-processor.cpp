@@ -34,6 +34,7 @@
 #include <dali/internal/event/events/multi-point-event-util.h>
 #include <dali/internal/event/events/pan-gesture/pan-gesture-event.h>
 #include <dali/internal/event/events/pan-gesture/pan-gesture-impl.h>
+#include <dali/internal/event/events/pan-gesture/pan-gesture-profile.h>
 #include <dali/internal/event/events/pan-gesture/pan-gesture-recognizer.h>
 #include <dali/internal/event/render-tasks/render-task-impl.h>
 #include <dali/internal/update/gestures/scene-graph-pan-gesture.h>
@@ -103,10 +104,11 @@ struct IsNotAttachedAndOutsideTouchesRangeFunctor
     {
       PanGestureDetector* panDetector(static_cast<PanGestureDetector*>(detector));
 
-      // Ensure number of touch points is within the range of our emitter. If it isn't then remove
-      // this emitter and add it to the outsideTouchesRangeEmitters container
-      if((numberOfTouches < panDetector->GetMinimumTouchesRequired()) ||
-         (numberOfTouches > panDetector->GetMaximumTouchesRequired()))
+      // Ensure number of touch points is within the range of the profile this emitter chose for the
+      // gesture. If it isn't then remove this emitter and add it to the outsideTouchesRangeEmitters container
+      const PanGestureProfile& profile = panDetector->GetActiveProfile();
+      if((numberOfTouches < profile.minimumTouches) ||
+         (numberOfTouches > profile.maximumTouches))
       {
         remove = true;
         outsideTouchesRangeEmitters.push_back(detector);
@@ -129,9 +131,6 @@ PanGestureProcessor::PanGestureProcessor(SceneGraph::UpdateManager& updateManage
   mCurrentPanEmitters(),
   mCurrentRenderTask(),
   mPossiblePanPosition(),
-  mMinTouchesRequired(1),
-  mMaxTouchesRequired(1),
-  mMaxMotionEventAge(std::numeric_limits<uint32_t>::max()),
   mMinimumDistance(Integration::DEFAULT_PAN_GESTURE_MINIMUM_DISTANCE),
   mMinimumPanEvents(Integration::DEFAULT_PAN_GESTURE_MINIMUM_PAN_EVENTS),
   mCurrentPanEvent(nullptr),
@@ -287,7 +286,7 @@ void PanGestureProcessor::Process(Scene& scene, const PanGestureEvent& panEvent)
   mCurrentScene = nullptr;
 }
 
-void PanGestureProcessor::AddGestureDetector(PanGestureDetector* gestureDetector, Scene& scene, int32_t minDistance, int32_t minPanEvents)
+void PanGestureProcessor::AddGestureDetector(PanGestureDetector* gestureDetector, Scene& scene)
 {
   bool firstRegistration(mPanGestureDetectors.empty());
 
@@ -295,17 +294,11 @@ void PanGestureProcessor::AddGestureDetector(PanGestureDetector* gestureDetector
 
   if(firstRegistration)
   {
-    mMinTouchesRequired = gestureDetector->GetMinimumTouchesRequired();
-    mMaxTouchesRequired = gestureDetector->GetMaximumTouchesRequired();
-    mMaxMotionEventAge  = gestureDetector->GetMaximumMotionEventAge();
-
     PanGestureRequest request;
-    request.minTouches        = mMinTouchesRequired;
-    request.maxTouches        = mMaxTouchesRequired;
-    request.maxMotionEventAge = mMaxMotionEventAge;
+    FillRequest(request);
 
     Size size          = scene.GetSize();
-    mGestureRecognizer = new PanGestureRecognizer(*this, Vector2(size.width, size.height), static_cast<const PanGestureRequest&>(request), minDistance, minPanEvents);
+    mGestureRecognizer = new PanGestureRecognizer(*this, Vector2(size.width, size.height), request);
   }
   else
   {
@@ -475,11 +468,7 @@ void PanGestureProcessor::SetMinimumDistance(int32_t value)
     mMinimumDistance = value;
     if(mGestureRecognizer)
     {
-      PanGestureRecognizer* panRecognizer = dynamic_cast<PanGestureRecognizer*>(mGestureRecognizer.Get());
-      if(panRecognizer)
-      {
-        panRecognizer->SetMinimumDistance(value);
-      }
+      UpdateDetection();
     }
   }
 }
@@ -491,11 +480,7 @@ void PanGestureProcessor::SetMinimumPanEvents(int32_t value)
     mMinimumPanEvents = value;
     if(mGestureRecognizer)
     {
-      PanGestureRecognizer* panRecognizer = dynamic_cast<PanGestureRecognizer*>(mGestureRecognizer.Get());
-      if(panRecognizer)
-      {
-        panRecognizer->SetMinimumPanEvents(value);
-      }
+      UpdateDetection();
     }
   }
 }
@@ -515,52 +500,54 @@ const SceneGraph::PanGesture& PanGestureProcessor::GetSceneObject() const
   return *mSceneObject;
 }
 
-void PanGestureProcessor::UpdateDetection()
+void PanGestureProcessor::FillRequest(PanGestureRequest& request) const
 {
-  DALI_ASSERT_DEBUG(!mPanGestureDetectors.empty());
-
+  // The shared recognizer must let through anything any detector's profile may accept: the
+  // smallest minimum, the largest maximum and the largest motion event age. Each detector filters
+  // against its own active profile when emitting.
   uint32_t minimumRequired       = std::numeric_limits<uint32_t>::max();
-  uint32_t maximumRequired       = 0;
-  uint32_t maximumMotionEventAge = std::numeric_limits<uint32_t>::max();
+  uint32_t maximumRequired       = 0u;
+  uint32_t maximumMotionEventAge = 0u;
 
-  for(PanGestureDetectorContainer::iterator iter = mPanGestureDetectors.begin(), endIter = mPanGestureDetectors.end(); iter != endIter; ++iter)
+  for(PanGestureDetector* detector : mPanGestureDetectors)
   {
-    PanGestureDetector* detector(*iter);
-
     if(detector)
     {
-      uint32_t minimum = detector->GetMinimumTouchesRequired();
-      if(minimum < minimumRequired)
-      {
-        minimumRequired = minimum;
-      }
-
-      uint32_t maximum = detector->GetMaximumTouchesRequired();
-      if(maximum > maximumRequired)
-      {
-        maximumRequired = maximum;
-      }
-
-      uint32_t maximumAge = detector->GetMaximumMotionEventAge();
-      if(maximumAge < maximumMotionEventAge)
-      {
-        maximumMotionEventAge = maximumAge;
-      }
+      detector->WidenRecognitionEnvelope(minimumRequired, maximumRequired, maximumMotionEventAge);
     }
   }
 
-  if((minimumRequired != mMinTouchesRequired) || (maximumRequired != mMaxTouchesRequired) || (maximumMotionEventAge != mMaxMotionEventAge))
-  {
-    mMinTouchesRequired = minimumRequired;
-    mMaxTouchesRequired = maximumRequired;
-    mMaxMotionEventAge  = maximumMotionEventAge;
+  request.minTouches        = minimumRequired;
+  request.maxTouches        = maximumRequired;
+  request.maxMotionEventAge = maximumMotionEventAge;
+  request.minimumDistance   = mMinimumDistance;
+  request.minimumPanEvents  = mMinimumPanEvents;
+  request.deviceThresholds  = mDeviceThresholds;
+}
 
-    PanGestureRequest request;
-    request.minTouches        = mMinTouchesRequired;
-    request.maxTouches        = mMaxTouchesRequired;
-    request.maxMotionEventAge = mMaxMotionEventAge;
-    mGestureRecognizer->Update(request);
+void PanGestureProcessor::SetDeviceThresholds(const GestureDeviceProfileTable<PanThresholdValues>& thresholds)
+{
+  mDeviceThresholds = thresholds;
+
+  if(mGestureRecognizer)
+  {
+    UpdateDetection();
   }
+}
+
+const GestureDeviceProfileTable<PanThresholdValues>& PanGestureProcessor::GetDeviceThresholds() const
+{
+  return mDeviceThresholds;
+}
+
+void PanGestureProcessor::UpdateDetection()
+{
+  DALI_ASSERT_DEBUG(!mPanGestureDetectors.empty());
+  DALI_ASSERT_DEBUG(mGestureRecognizer);
+
+  PanGestureRequest request;
+  FillRequest(request);
+  mGestureRecognizer->Update(request);
 }
 
 void PanGestureProcessor::EmitPanSignal(Actor*                          actor,
@@ -653,7 +640,13 @@ void PanGestureProcessor::EmitPanSignal(Actor*                          actor,
     Dali::Actor actorHandle(actor);
     for(const GestureDetectorPtr& detector : detectorSnapshot)
     {
-      static_cast<PanGestureDetector*>(detector.Get())->EmitPanGestureSignal(actorHandle, Dali::PanGesture(pan.Get()));
+      PanGestureDetector* panDetector = static_cast<PanGestureDetector*>(detector.Get());
+      if((state == GestureState::CONTINUING) && (panEvent.motionEventAge > panDetector->GetActiveProfile().maximumMotionEventAge))
+      {
+        // Too old for this detector's profile: skip the motion for it only, the pan stays alive.
+        continue;
+      }
+      panDetector->EmitPanGestureSignal(actorHandle, Dali::PanGesture(pan.Get()));
     }
 
     DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_EMIT_PAN_GESTURE_SIGNAL", [&](std::ostringstream& oss)

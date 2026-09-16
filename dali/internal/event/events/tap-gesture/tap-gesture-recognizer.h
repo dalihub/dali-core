@@ -49,14 +49,11 @@ public:
 
   /**
    * Constructor
-   * @param[in] coreEventInterface Used to send events to Core.
+   * @param[in]  observer    Used to send events to Core.
    * @param[in]  screenSize  The size of the screen.
-   * @param[in]  request     The tap gesture request.
-   * @param[in]  maximumMultiTapInterval    The maximum interval allowed between the taps of a multi tap gesture in milliseconds.
-   * @param[in]  maximumHoldingTime    The maximum time the touch point can be held down in milliseconds.
-   * @param[in]  maximumMotionDistance    The maximum distance the touch point can move in pixels.
+   * @param[in]  request     The tap gesture request. The recognition thresholds are taken from it.
    */
-  TapGestureRecognizer(Observer& observer, Vector2 screenSize, const TapGestureRequest& request, uint32_t maximumMultiTapInterval, uint32_t maximumHoldingTime, float maximumMotionDistance);
+  TapGestureRecognizer(Observer& observer, Vector2 screenSize, const TapGestureRequest& request);
 
   /**
    * Virtual destructor.
@@ -76,31 +73,37 @@ public:
 
   /**
    * @copydoc Dali::Internal::GestureDetector::Update(const Integration::GestureRequest&)
+   *
+   * Applies the recognition thresholds carried by the TapGestureRequest.
+   * The tap/touch counts in the request are not used here: this recognizer only handles
+   * single-touch sequences and leaves tap-count filtering to the detectors.
    */
   void Update(const GestureRequest& request) override;
 
   /**
-   * @brief This method sets the maximum interval allowed between the taps of a multi tap gesture (millisecond)
-   *
-   * @param[in] time The time value in milliseconds
+   * @copydoc Dali::Internal::GestureRecognizer::OnSequenceSourceChanged()
    */
-  void SetMaximumMultiTapInterval(uint32_t time);
+  void OnSequenceSourceChanged() override;
+
+private:
+  /**
+   * @brief Takes every parameter from the request: touch requirements, application-wide thresholds and
+   * the per-device threshold table, then applies the thresholds for the current sequence.
+   * @param[in] request The request
+   */
+  void ApplyRequest(const TapGestureRequest& request);
 
   /**
-   * @brief This method sets the maximum time the touch point can be held down while still being recognized as a tap gesture (millisecond)
-   *
-   * @param[in] time The time value in milliseconds
+   * @brief Applies the thresholds registered for the device of the current sequence, or the
+   * application-wide ones when the device has no entry.
    */
-  void SetMaximumHoldingTime(uint32_t time);
+  void ApplyThresholdsForSequence();
 
   /**
-   * @brief This method sets the maximum distance the touch point can move while still being recognized as a tap gesture
-   *
-   * This distance is from touch down to touch up to recognize the tap gesture.
-   *
-   * @param[in] distance The distance
+   * @brief Applies one set of thresholds to the recognizer state.
+   * @param[in] thresholds The thresholds
    */
-  void SetMaximumMotionDistance(float distance);
+  void ApplyThresholds(const TapThresholdValues& thresholds);
 
 private:
   /**
@@ -179,15 +182,18 @@ private:
 
   State mState; ///< Current state of the detector.
 
-  Vector2       mTouchPosition;                ///< The initial touch down position.
-  uint32_t      mTapsRegistered;               ///< In current detection, the number of taps registered.
-  uint32_t      mTouchTime;                    ///< The touch down time.
-  uint32_t      mLastTapTime;                  ///< Time last tap gesture was registered
-  uint32_t      mDeltaBetweenTouchDownTouchUp; ///< Time from touchdown to touchup
-  uint32_t      mMaximumMultiTapInterval;      ///< The maximum interval allowed between the taps of a multi tap gesture (millisecond)
-  uint32_t      mMaximumHoldingTime;           ///< The maximum time the touch point can be held down while still being recognized as a tap gesture (millisecond)
-  float         mMaximumMotionDistance;        ///< The maximum distance the touch point can move while still being recognized as a tap gesture
-  ActorObserver mCurrentActor;                 ///< The current actor that was hit-tested at the touch position
+  Vector2                                       mTouchPosition;                ///< The initial touch down position.
+  uint32_t                                      mTapsRegistered;               ///< In current detection, the number of taps registered.
+  uint32_t                                      mTouchTime;                    ///< The touch down time.
+  uint32_t                                      mLastTapTime;                  ///< Time last tap gesture was registered
+  uint32_t                                      mDeltaBetweenTouchDownTouchUp; ///< Time from touchdown to touchup
+  uint32_t                                      mMaximumMultiTapInterval;      ///< The maximum interval allowed between the taps of a multi tap gesture (millisecond)
+  uint32_t                                      mMaximumHoldingTime;           ///< The maximum time the touch point can be held down while still being recognized as a tap gesture (millisecond)
+  float                                         mMaximumMotionDistance;        ///< The maximum distance the touch point can move while still being recognized as a tap gesture
+  ActorObserver                                 mCurrentActor;                 ///< The current actor that was hit-tested at the touch position
+  GestureInputSource                            mTapSequenceSource;            ///< The device that made the first tap of the current sequence.
+  TapThresholdValues                            mBaseThresholds;               ///< Application-wide thresholds for devices without an entry.
+  GestureDeviceProfileTable<TapThresholdValues> mDeviceThresholds;             ///< Application-wide per-device thresholds.
 };
 
 } // namespace Internal

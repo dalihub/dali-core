@@ -19,6 +19,7 @@
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/events/touch-integ.h>
+#include <dali/integration-api/input-options.h>
 #include <dali/integration-api/render-task-list-integ.h>
 #include <dali/internal/event/events/touch-event-impl.h>
 #include <dali/internal/event/render-tasks/render-task-impl.h>
@@ -1414,6 +1415,74 @@ int UtcDaliPinchGestureHandleEvent(void)
 
   DALI_TEST_EQUALS(true, pData.functorCalled, TEST_LOCATION);
   pData.Reset();
+
+  END_TEST;
+}
+
+namespace
+{
+/**
+ * Feeds a two-finger pinch straight into the detector through HandleEvent(): DOWN, the given
+ * number of MOTION events (fingers closing from 36px apart to 20px apart), then UP.
+ */
+void FeedHandleEventPinch(PinchGestureDetector& detector, Actor& actor, Dali::RenderTask& task, uint32_t motionEvents, uint32_t startTime)
+{
+  auto feed = [&](PointState::Type state, const Vector2& a, const Vector2& b, uint32_t time)
+  {
+    Dali::Integration::TouchEvent tp = GenerateDoubleTouch(state, a, state, b, time);
+    Internal::TouchEventPtr       touchEventImpl(new Internal::TouchEvent(time));
+    touchEventImpl->AddPoint(tp.GetPoint(0));
+    touchEventImpl->AddPoint(tp.GetPoint(1));
+    touchEventImpl->SetRenderTask(task);
+    Dali::TouchEvent touchEventHandle(touchEventImpl.Get());
+    detector.HandleEvent(actor, touchEventHandle);
+  };
+
+  uint32_t time = startTime;
+  feed(PointState::DOWN, Vector2(2.0f, 20.0f), Vector2(38.0f, 20.0f), time);
+  for(uint32_t i = 0u; i < motionEvents; ++i)
+  {
+    time += 50u;
+    feed(PointState::MOTION, Vector2(10.0f, 20.0f), Vector2(30.0f, 20.0f), time);
+  }
+  feed(PointState::UP, Vector2(10.0f, 20.0f), Vector2(30.0f, 20.0f), time + 50u);
+}
+} // namespace
+
+int UtcDaliPinchGestureHandleEventAppliesUpdatedMinimumTouchEvents(void)
+{
+  TestApplication          application;
+  Dali::Integration::Scene scene = application.GetScene();
+  Dali::RenderTask         task  = scene.GetRenderTaskList().GetTask(0);
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
+  scene.Add(actor);
+
+  application.SendNotification();
+  application.Render();
+
+  SignalData             data;
+  GestureReceivedFunctor functor(data);
+
+  PinchGestureDetector detector = PinchGestureDetector::New();
+  detector.DetectedSignal().Connect(&application, functor);
+
+  // DOWN + 2 MOTION = 3 touch events, below the default minimum of 4. This creates the detector-owned recognizer.
+  FeedHandleEventPinch(detector, actor, task, 2u, 100u);
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+
+  // Lower the application-wide minimum after the recognizer exists: DOWN + 1 MOTION is now enough.
+  Dali::Integration::SetPinchGestureMinimumTouchEvents(2u);
+  FeedHandleEventPinch(detector, actor, task, 1u, 5000u);
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  data.Reset();
+
+  // Restore the default: 3 events are again too few.
+  Dali::Integration::SetPinchGestureMinimumTouchEvents(Dali::Integration::DEFAULT_PINCH_GESTURE_MINIMUM_TOUCH_EVENTS);
+  FeedHandleEventPinch(detector, actor, task, 2u, 10000u);
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 
   END_TEST;
 }

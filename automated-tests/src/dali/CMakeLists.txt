@@ -41,6 +41,8 @@ SET(TC_SOURCES
         utc-Dali-GeoTouchProcessing.cpp
         utc-Dali-GeoTouchStream.cpp
         utc-Dali-GestureDetector.cpp
+        utc-Dali-GestureDeviceSelector.cpp
+        utc-Dali-GestureThresholds.cpp
         utc-Dali-Handle.cpp
         utc-Dali-Hash.cpp
         utc-Dali-HitTestAlgorithm.cpp

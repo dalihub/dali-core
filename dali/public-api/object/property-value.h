@@ -42,7 +42,6 @@ struct Vector3;
 struct Vector4;
 class Matrix3;
 class Matrix;
-struct Extents;
 struct Insets;
 
 using KeyValuePair = Pair<Property::Key, Property::Value>;
@@ -189,14 +188,6 @@ public:
    * @param[in] mapValue A property map
    */
   Value(Property::Map mapValue);
-
-  /**
-   * @brief Creates an extents property value.
-   *
-   * @SINCE_1_2.62
-   * @param[in] extentsValue A collection of 4 uint16_t values
-   */
-  Value(const Extents& extentsValue);
 
   /**
    * @brief Creates an insets property value.
@@ -534,16 +525,6 @@ public:
   Property::Map* GetMap();
 
   /**
-   * @brief Retrieves an extents.
-   *
-   * @SINCE_1_2.62
-   * @param[out] extentsValue Extents, a collection of 4 int16_t
-   * @return @c true if the value is successfully retrieved, @c false if the type is not convertible
-   * @pre GetType() is a type convertible to Extents.
-   */
-  bool Get(Extents& extentsValue) const;
-
-  /**
    * @brief Retrieves insets.
    *
    * @SINCE_2_5.38
@@ -580,16 +561,16 @@ public: // Not intended for developer use
    * @return A const reference to the Impl object
    */
   DALI_INTERNAL const Impl& Read() const;
-  /// @endcond
-
-private:
-  /// @cond internal
 
   /**
    * @brief Retrieves an already constructed Impl object from the storage buffer.
    * @return A non const reference to the Impl object
    */
   DALI_INTERNAL Impl& Write();
+  /// @endcond
+
+private:
+  /// @cond internal
 
   /**
    * @brief An aligned storage buffer to create Impl object inplace.

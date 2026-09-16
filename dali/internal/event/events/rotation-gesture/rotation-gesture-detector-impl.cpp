@@ -27,6 +27,7 @@
 #include <dali/integration-api/string-utils.h>
 #include <dali/internal/event/common/scene-impl.h>
 #include <dali/internal/event/events/gesture-event-processor.h>
+#include <dali/internal/event/events/gesture-requests.h>
 #include <dali/internal/event/events/rotation-gesture/rotation-gesture-impl.h>
 #include <dali/internal/event/events/rotation-gesture/rotation-gesture-recognizer.h>
 #include <dali/public-api/events/rotation-gesture.h>
@@ -130,15 +131,30 @@ void RotationGestureDetector::CancelProcessing()
   }
 }
 
+void RotationGestureDetector::FillRequest(RotationGestureRequest& request) const
+{
+  const RotationGestureProcessor& rotationGestureProcessor = mGestureEventProcessor.GetRotationGestureProcessor();
+
+  request.minimumTouchEvents           = rotationGestureProcessor.GetMinimumTouchEvents();
+  request.minimumTouchEventsAfterStart = rotationGestureProcessor.GetMinimumTouchEventsAfterStart();
+  request.deviceThresholds             = rotationGestureProcessor.GetDeviceThresholds();
+}
+
 void RotationGestureDetector::ProcessTouchEvent(Scene& scene, const Integration::TouchEvent& event)
 {
   if(!mGestureRecognizer)
   {
-    const RotationGestureProcessor& rotationGestureProcessor     = mGestureEventProcessor.GetRotationGestureProcessor();
-    uint32_t                        minimumTouchEvents           = rotationGestureProcessor.GetMinimumTouchEvents();
-    uint32_t                        minimumTouchEventsAfterStart = rotationGestureProcessor.GetMinimumTouchEventsAfterStart();
+    RotationGestureRequest request;
+    FillRequest(request);
 
-    mGestureRecognizer = new RotationGestureRecognizer(*this, minimumTouchEvents, minimumTouchEventsAfterStart);
+    mGestureRecognizer = new RotationGestureRecognizer(*this, request);
+    ConsumeRecognizerUpdateRequired(); // The new recognizer already reflects the current settings.
+  }
+  else if(ConsumeRecognizerUpdateRequired())
+  {
+    RotationGestureRequest request;
+    FillRequest(request);
+    mGestureRecognizer->Update(request);
   }
   mGestureRecognizer->SendEvent(scene, event);
 }

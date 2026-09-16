@@ -3525,7 +3525,7 @@ int UtcDaliTypeInfoRegisterChildProperties01(void)
 
   ChildPropertyRegistration(customActorTypeInfo.GetName(), "widthSpecification", WIDTH_SPECIFICATION, Property::INTEGER);
   ChildPropertyRegistration(customActorTypeInfo.GetName(), "heightSpecification", HEIGHT_SPECIFICATION, Property::INTEGER);
-  ChildPropertyRegistration(myCustomTypeInfo.GetName(), "marginSpecification", MARGIN_SPECIFICATION, Property::EXTENTS);
+  ChildPropertyRegistration(myCustomTypeInfo.GetName(), "marginSpecification", MARGIN_SPECIFICATION, Property::INSETS);
 
   auto customActor = MyTestCustomActor::New();
   application.GetScene().Add(customActor);
@@ -3541,9 +3541,9 @@ int UtcDaliTypeInfoRegisterChildProperties01(void)
   value = child.GetProperty(HEIGHT_SPECIFICATION);
   DALI_TEST_EQUALS(value, Property::Value(44), TEST_LOCATION);
 
-  child.SetProperty(MARGIN_SPECIFICATION, Extents(10, 10, 10, 10));
+  child.SetProperty(MARGIN_SPECIFICATION, Insets(10.0f, 10.0f, 10.0f, 10.0f));
   value = child.GetProperty(MARGIN_SPECIFICATION);
-  DALI_TEST_EQUALS(value, Property::Value(Extents(10, 10, 10, 10)), TEST_LOCATION);
+  DALI_TEST_EQUALS(value, Property::Value(Insets(10.0f, 10.0f, 10.0f, 10.0f)), TEST_LOCATION);
 
   END_TEST;
 }
@@ -3566,7 +3566,7 @@ int UtcDaliTypeInfoRegisterChildProperties02(void)
 
   ChildPropertyRegistration(customActorTypeInfo.GetName(), "widthSpecification", WIDTH_SPECIFICATION, Property::INTEGER);
   ChildPropertyRegistration(customActorTypeInfo.GetName(), "heightSpecification", HEIGHT_SPECIFICATION, Property::INTEGER);
-  ChildPropertyRegistration(myCustomTypeInfo.GetName(), "marginSpecification", MARGIN_SPECIFICATION, Property::EXTENTS);
+  ChildPropertyRegistration(myCustomTypeInfo.GetName(), "marginSpecification", MARGIN_SPECIFICATION, Property::INSETS);
 
   auto index = customActorTypeInfo.GetChildPropertyIndex("widthSpecification");
   DALI_TEST_EQUALS(index, WIDTH_SPECIFICATION, TEST_LOCATION);
@@ -3596,7 +3596,7 @@ int UtcDaliTypeInfoRegisterChildProperties02(void)
   DALI_TEST_EQUALS(type, Property::INTEGER, TEST_LOCATION);
 
   type = myCustomTypeInfo.GetChildPropertyType(MARGIN_SPECIFICATION);
-  DALI_TEST_EQUALS(type, Property::EXTENTS, TEST_LOCATION);
+  DALI_TEST_EQUALS(type, Property::INSETS, TEST_LOCATION);
 
   END_TEST;
 }
@@ -3619,7 +3619,7 @@ int UtcDaliTypeInfoRegisterChildProperties03(void)
 
   ChildPropertyRegistration(customActorTypeInfo.GetName(), "widthSpecification", WIDTH_SPECIFICATION, Property::INTEGER);
   ChildPropertyRegistration(customActorTypeInfo.GetName(), "heightSpecification", HEIGHT_SPECIFICATION, Property::INTEGER);
-  ChildPropertyRegistration(myCustomTypeInfo.GetName(), "marginSpecification", MARGIN_SPECIFICATION, Property::EXTENTS);
+  ChildPropertyRegistration(myCustomTypeInfo.GetName(), "marginSpecification", MARGIN_SPECIFICATION, Property::INSETS);
 
   Property::IndexContainer indices;
   myCustomTypeInfo.GetChildPropertyIndices(indices);

@@ -269,13 +269,6 @@ int UtcDaliInsetsCustomProperty(void)
   application.Render(0);
   DALI_TEST_CHECK(handle.GetProperty<Insets>(index) == startValue);
 
-  // Negative test i.e. there is no conversion from Extents to Insets either
-  handle.SetProperty(index, Extents(9, 9, 9, 9));
-
-  application.SendNotification();
-  application.Render(0);
-  DALI_TEST_CHECK(handle.GetProperty<Insets>(index) == startValue);
-
   // Positive test (sanity check)
   Insets endValue(5.5f, 6.5f, 7.5f, 8.5f);
   handle.SetProperty(index, endValue);
@@ -306,18 +299,9 @@ int UtcDaliInsetsPropertyValueConversion(void)
   DALI_TEST_CHECK(vector4Value.Get(fromVector4));
   DALI_TEST_CHECK(fromVector4 == Insets(1.5f, 2.5f, 3.5f, 4.5f));
 
-  // Extents is an independent type, so it must not convert to Insets.
-  Property::Value extentsValue(Extents(1, 2, 3, 4));
-  Insets          unconverted;
-  DALI_TEST_CHECK(!extentsValue.Get(unconverted));
-
-  // Insets must not convert to Extents either.
-  Property::Value insetsValue(Insets(1.0f, 2.0f, 3.0f, 4.0f));
-  Extents         toExtents;
-  DALI_TEST_CHECK(!insetsValue.Get(toExtents));
-
   // Non-convertible type
   Property::Value floatValue(1.0f);
+  Insets          unconverted;
   DALI_TEST_CHECK(!floatValue.Get(unconverted));
 
   END_TEST;

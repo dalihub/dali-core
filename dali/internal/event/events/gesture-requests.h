@@ -19,6 +19,9 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/integration-api/input-options.h>
+#include <dali/internal/event/events/gesture-device-profile-table.h>
+#include <dali/internal/event/events/gesture-threshold-values.h>
 #include <dali/public-api/events/gesture.h>
 
 // EXTERNAL INCLUDES
@@ -68,7 +71,9 @@ struct PanGestureRequest : public GestureRequest
   : GestureRequest(GestureType::PAN),
     minTouches(1),
     maxTouches(1),
-    maxMotionEventAge(std::numeric_limits<uint32_t>::max())
+    maxMotionEventAge(std::numeric_limits<uint32_t>::max()),
+    minimumDistance(Integration::DEFAULT_PAN_GESTURE_MINIMUM_DISTANCE),
+    minimumPanEvents(Integration::DEFAULT_PAN_GESTURE_MINIMUM_PAN_EVENTS)
   {
   }
 
@@ -79,9 +84,12 @@ struct PanGestureRequest : public GestureRequest
 
   // Data Members
 
-  uint32_t minTouches;        ///< The minimum number of touch points required for a pan gesture.
-  uint32_t maxTouches;        ///< The maximum number of touch points required for a pan gesture.
-  uint32_t maxMotionEventAge; ///< The maximum age of motion events as milliseconds.
+  uint32_t                                      minTouches;        ///< The minimum number of touch points required for a pan gesture.
+  uint32_t                                      maxTouches;        ///< The maximum number of touch points required for a pan gesture.
+  uint32_t                                      maxMotionEventAge; ///< The maximum age of motion events as milliseconds.
+  int32_t                                       minimumDistance;   ///< The minimum motion distance before a pan starts (pixels). Negative keeps the recognizer's built-in value.
+  int32_t                                       minimumPanEvents;  ///< The minimum number of touch events (DOWN included) before a pan starts. Below 1 keeps the recognizer's built-in value.
+  GestureDeviceProfileTable<PanThresholdValues> deviceThresholds;  ///< Application-wide per-device thresholds; a device without an entry uses the scalar fields above.
 };
 
 /**
@@ -99,7 +107,10 @@ struct TapGestureRequest : public GestureRequest
     minTaps(1),
     maxTaps(1),
     minTouches(1),
-    maxTouches(1)
+    maxTouches(1),
+    maximumMultiTapInterval(Integration::DEFAULT_TAP_GESTURE_MAXIMUM_MULTI_TAP_INTERVAL),
+    maximumHoldingTime(Integration::DEFAULT_TAP_GESTURE_MAXIMUM_HOLDING_TIME),
+    maximumMotionDistance(Integration::DEFAULT_TAP_GESTURE_MAXIMUM_MOTION_DISTANCE)
   {
   }
 
@@ -110,10 +121,14 @@ struct TapGestureRequest : public GestureRequest
 
   // Data Members
 
-  unsigned int minTaps;    ///< The minimum number of taps required.
-  unsigned int maxTaps;    ///< The maximum number of taps required.
-  unsigned int minTouches; ///< The minimum number of touch points required for our tap gesture.
-  unsigned int maxTouches; ///< The maximum number of touch points required for our tap gesture.
+  unsigned int                                  minTaps;                 ///< The minimum number of taps required.
+  unsigned int                                  maxTaps;                 ///< The maximum number of taps required.
+  unsigned int                                  minTouches;              ///< The minimum number of touch points required for our tap gesture.
+  unsigned int                                  maxTouches;              ///< The maximum number of touch points required for our tap gesture.
+  uint32_t                                      maximumMultiTapInterval; ///< The maximum interval allowed between the taps of a multi tap gesture (milliseconds).
+  uint32_t                                      maximumHoldingTime;      ///< The maximum time the touch point can be held down to still be a tap (milliseconds).
+  float                                         maximumMotionDistance;   ///< The maximum distance the touch point can move to still be a tap (pixels).
+  GestureDeviceProfileTable<TapThresholdValues> deviceThresholds;        ///< Application-wide per-device thresholds; a device without an entry uses the scalar fields above.
 };
 
 /**
@@ -129,7 +144,8 @@ struct LongPressGestureRequest : public GestureRequest
   LongPressGestureRequest()
   : GestureRequest(GestureType::LONG_PRESS),
     minTouches(1),
-    maxTouches(1)
+    maxTouches(1),
+    minimumHoldingTime(Integration::DEFAULT_LONG_PRESS_GESTURE_MINIMUM_HOLDING_TIME)
   {
   }
 
@@ -140,8 +156,70 @@ struct LongPressGestureRequest : public GestureRequest
 
   // Data Members
 
-  unsigned int minTouches; ///< The minimum number of touch points required for a long press gesture.
-  unsigned int maxTouches; ///< The maximum number of touch points required for a long press gesture.
+  unsigned int                                        minTouches;         ///< The minimum number of touch points required for a long press gesture.
+  unsigned int                                        maxTouches;         ///< The maximum number of touch points required for a long press gesture.
+  uint32_t                                            minimumHoldingTime; ///< The time the touch must be held before a long press is recognised (milliseconds).
+  GestureDeviceProfileTable<LongPressThresholdValues> deviceThresholds;   ///< Application-wide per-device thresholds; a device without an entry uses the scalar fields above.
+};
+
+/**
+ * This is used by Core when a pinch gesture is required.
+ */
+struct PinchGestureRequest : public GestureRequest
+{
+  // Creation & Destruction
+
+  /**
+   * Default Constructor
+   */
+  PinchGestureRequest()
+  : GestureRequest(GestureType::PINCH),
+    minimumDistance(Integration::DEFAULT_PINCH_GESTURE_MINIMUM_DISTANCE),
+    minimumTouchEvents(Integration::DEFAULT_PINCH_GESTURE_MINIMUM_TOUCH_EVENTS),
+    minimumTouchEventsAfterStart(Integration::DEFAULT_PINCH_GESTURE_MINIMUM_TOUCH_EVENTS_AFTER_START)
+  {
+  }
+
+  /**
+   * Virtual destructor
+   */
+  ~PinchGestureRequest() override = default;
+
+  // Data Members
+
+  float                                           minimumDistance;              ///< The minimum distance change between the two touch points before a pinch starts (pixels). Negative means "derive from the scene DPI".
+  uint32_t                                        minimumTouchEvents;           ///< The number of touch events required before a pinch starts.
+  uint32_t                                        minimumTouchEventsAfterStart; ///< The number of touch events required between updates once a pinch has started.
+  GestureDeviceProfileTable<PinchThresholdValues> deviceThresholds;             ///< Application-wide per-device thresholds; a device without an entry uses the scalar fields above.
+};
+
+/**
+ * This is used by Core when a rotation gesture is required.
+ */
+struct RotationGestureRequest : public GestureRequest
+{
+  // Creation & Destruction
+
+  /**
+   * Default Constructor
+   */
+  RotationGestureRequest()
+  : GestureRequest(GestureType::ROTATION),
+    minimumTouchEvents(Integration::DEFAULT_ROTATION_GESTURE_MINIMUM_TOUCH_EVENTS),
+    minimumTouchEventsAfterStart(Integration::DEFAULT_ROTATION_GESTURE_MINIMUM_TOUCH_EVENTS_AFTER_START)
+  {
+  }
+
+  /**
+   * Virtual destructor
+   */
+  ~RotationGestureRequest() override = default;
+
+  // Data Members
+
+  uint32_t                                           minimumTouchEvents;           ///< The number of touch events required before a rotation starts.
+  uint32_t                                           minimumTouchEventsAfterStart; ///< The number of touch events required between updates once a rotation has started.
+  GestureDeviceProfileTable<RotationThresholdValues> deviceThresholds;             ///< Application-wide per-device thresholds; a device without an entry uses the scalar fields above.
 };
 
 } // namespace Internal

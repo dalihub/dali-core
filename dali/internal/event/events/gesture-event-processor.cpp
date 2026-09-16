@@ -43,8 +43,12 @@ GestureEventProcessor::GestureEventProcessor(SceneGraph::UpdateManager& updateMa
   mRotationGestureProcessor(),
   mRenderController(renderController),
   mGestureDetectors(),
-  envOptionMinimumPanDistance(-1),
-  envOptionMinimumPanEvents(-1)
+  mGestureOptionsEpoch(0u),
+  mPanDeviceThresholds(),
+  mTapDeviceThresholds(),
+  mLongPressDeviceThresholds(),
+  mPinchDeviceThresholds(),
+  mRotationDeviceThresholds()
 {
 }
 
@@ -111,7 +115,7 @@ void GestureEventProcessor::AddGestureDetector(GestureDetector* gestureDetector,
     case GestureType::PAN:
     {
       PanGestureDetector* pan = static_cast<PanGestureDetector*>(gestureDetector);
-      mPanGestureProcessor.AddGestureDetector(pan, scene, envOptionMinimumPanDistance, envOptionMinimumPanEvents);
+      mPanGestureProcessor.AddGestureDetector(pan, scene);
       break;
     }
 
@@ -326,49 +330,49 @@ void GestureEventProcessor::SetPanGestureMultitapSmoothingRange(int32_t value)
 
 void GestureEventProcessor::SetPanGestureMinimumDistance(int32_t value)
 {
-  if(value >= 0)
-  {
-    envOptionMinimumPanDistance = value;
-    mPanGestureProcessor.SetMinimumDistance(value);
-  }
+  ++mGestureOptionsEpoch;
+  mPanGestureProcessor.SetMinimumDistance(value);
 }
 
 void GestureEventProcessor::SetPanGestureMinimumPanEvents(int32_t value)
 {
-  if(value >= 1)
-  {
-    envOptionMinimumPanEvents = value;
-    mPanGestureProcessor.SetMinimumPanEvents(value);
-  }
+  ++mGestureOptionsEpoch;
+  mPanGestureProcessor.SetMinimumPanEvents(value);
 }
 
 void GestureEventProcessor::SetPinchGestureMinimumDistance(float value)
 {
+  ++mGestureOptionsEpoch;
   mPinchGestureProcessor.SetMinimumPinchDistance(value);
 }
 
 void GestureEventProcessor::SetPinchGestureMinimumTouchEvents(uint32_t value)
 {
+  ++mGestureOptionsEpoch;
   mPinchGestureProcessor.SetMinimumTouchEvents(value);
 }
 
 void GestureEventProcessor::SetPinchGestureMinimumTouchEventsAfterStart(uint32_t value)
 {
+  ++mGestureOptionsEpoch;
   mPinchGestureProcessor.SetMinimumTouchEventsAfterStart(value);
 }
 
 void GestureEventProcessor::SetRotationGestureMinimumTouchEvents(uint32_t value)
 {
+  ++mGestureOptionsEpoch;
   mRotationGestureProcessor.SetMinimumTouchEvents(value);
 }
 
 void GestureEventProcessor::SetRotationGestureMinimumTouchEventsAfterStart(uint32_t value)
 {
+  ++mGestureOptionsEpoch;
   mRotationGestureProcessor.SetMinimumTouchEventsAfterStart(value);
 }
 
 void GestureEventProcessor::SetLongPressGestureMinimumHoldingTime(uint32_t value)
 {
+  ++mGestureOptionsEpoch;
   mLongPressGestureProcessor.SetMinimumHoldingTime(value);
 }
 
@@ -384,6 +388,7 @@ const PanGestureProcessor& GestureEventProcessor::GetPanGestureProcessor()
 
 void GestureEventProcessor::SetTapGestureMaximumMultiTapInterval(uint32_t time)
 {
+  ++mGestureOptionsEpoch;
   mTapGestureProcessor.SetMaximumMultiTapInterval(time);
 }
 
@@ -394,6 +399,7 @@ uint32_t GestureEventProcessor::GetTapGestureMaximumMultiTapInterval() const
 
 void GestureEventProcessor::SetTapGestureMaximumHoldingTime(uint32_t time)
 {
+  ++mGestureOptionsEpoch;
   mTapGestureProcessor.SetMaximumHoldingTime(time);
 }
 
@@ -404,12 +410,128 @@ uint32_t GestureEventProcessor::GetTapGestureMaximumHoldingTime() const
 
 void GestureEventProcessor::SetTapGestureMaximumMotionDistance(float distance)
 {
+  ++mGestureOptionsEpoch;
   mTapGestureProcessor.SetMaximumMotionDistance(distance);
 }
 
 float GestureEventProcessor::GetTapGestureMaximumMotionDistance() const
 {
   return mTapGestureProcessor.GetMaximumMotionDistance();
+}
+
+uint32_t GestureEventProcessor::GetGestureOptionsEpoch() const
+{
+  return mGestureOptionsEpoch;
+}
+
+void GestureEventProcessor::SetPanDeviceThresholds(const GestureDeviceSelector& selector, const PanThresholdValues& thresholds)
+{
+  mPanDeviceThresholds.Set(selector, thresholds);
+  ++mGestureOptionsEpoch;
+  mPanGestureProcessor.SetDeviceThresholds(mPanDeviceThresholds);
+}
+
+const PanThresholdValues* GestureEventProcessor::GetPanDeviceThresholds(const GestureDeviceSelector& selector) const
+{
+  return mPanDeviceThresholds.Find(selector);
+}
+
+void GestureEventProcessor::ClearPanDeviceThresholds(const GestureDeviceSelector& selector)
+{
+  if(mPanDeviceThresholds.Clear(selector))
+  {
+    ++mGestureOptionsEpoch;
+    mPanGestureProcessor.SetDeviceThresholds(mPanDeviceThresholds);
+  }
+}
+
+void GestureEventProcessor::SetTapDeviceThresholds(const GestureDeviceSelector& selector, const TapThresholdValues& thresholds)
+{
+  mTapDeviceThresholds.Set(selector, thresholds);
+  ++mGestureOptionsEpoch;
+  mTapGestureProcessor.SetDeviceThresholds(mTapDeviceThresholds);
+}
+
+const TapThresholdValues* GestureEventProcessor::GetTapDeviceThresholds(const GestureDeviceSelector& selector) const
+{
+  return mTapDeviceThresholds.Find(selector);
+}
+
+void GestureEventProcessor::ClearTapDeviceThresholds(const GestureDeviceSelector& selector)
+{
+  if(mTapDeviceThresholds.Clear(selector))
+  {
+    ++mGestureOptionsEpoch;
+    mTapGestureProcessor.SetDeviceThresholds(mTapDeviceThresholds);
+  }
+}
+
+void GestureEventProcessor::SetLongPressDeviceThresholds(const GestureDeviceSelector& selector, const LongPressThresholdValues& thresholds)
+{
+  mLongPressDeviceThresholds.Set(selector, thresholds);
+  ++mGestureOptionsEpoch;
+  mLongPressGestureProcessor.SetDeviceThresholds(mLongPressDeviceThresholds);
+}
+
+const LongPressThresholdValues* GestureEventProcessor::GetLongPressDeviceThresholds(const GestureDeviceSelector& selector) const
+{
+  return mLongPressDeviceThresholds.Find(selector);
+}
+
+void GestureEventProcessor::ClearLongPressDeviceThresholds(const GestureDeviceSelector& selector)
+{
+  if(mLongPressDeviceThresholds.Clear(selector))
+  {
+    ++mGestureOptionsEpoch;
+    mLongPressGestureProcessor.SetDeviceThresholds(mLongPressDeviceThresholds);
+  }
+}
+
+void GestureEventProcessor::SetPinchDeviceThresholds(const GestureDeviceSelector& selector, const PinchThresholdValues& thresholds)
+{
+  mPinchDeviceThresholds.Set(selector, thresholds);
+  ++mGestureOptionsEpoch;
+  mPinchGestureProcessor.SetDeviceThresholds(mPinchDeviceThresholds);
+}
+
+const PinchThresholdValues* GestureEventProcessor::GetPinchDeviceThresholds(const GestureDeviceSelector& selector) const
+{
+  return mPinchDeviceThresholds.Find(selector);
+}
+
+void GestureEventProcessor::ClearPinchDeviceThresholds(const GestureDeviceSelector& selector)
+{
+  if(mPinchDeviceThresholds.Clear(selector))
+  {
+    ++mGestureOptionsEpoch;
+    mPinchGestureProcessor.SetDeviceThresholds(mPinchDeviceThresholds);
+  }
+}
+
+void GestureEventProcessor::SetRotationDeviceThresholds(const GestureDeviceSelector& selector, const RotationThresholdValues& thresholds)
+{
+  mRotationDeviceThresholds.Set(selector, thresholds);
+  ++mGestureOptionsEpoch;
+  mRotationGestureProcessor.SetDeviceThresholds(mRotationDeviceThresholds);
+}
+
+const RotationThresholdValues* GestureEventProcessor::GetRotationDeviceThresholds(const GestureDeviceSelector& selector) const
+{
+  return mRotationDeviceThresholds.Find(selector);
+}
+
+void GestureEventProcessor::ClearRotationDeviceThresholds(const GestureDeviceSelector& selector)
+{
+  if(mRotationDeviceThresholds.Clear(selector))
+  {
+    ++mGestureOptionsEpoch;
+    mRotationGestureProcessor.SetDeviceThresholds(mRotationDeviceThresholds);
+  }
+}
+
+const LongPressGestureProcessor& GestureEventProcessor::GetLongPressGestureProcessor()
+{
+  return mLongPressGestureProcessor;
 }
 
 const TapGestureProcessor& GestureEventProcessor::GetTapGestureProcessor()

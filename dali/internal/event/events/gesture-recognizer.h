@@ -22,7 +22,10 @@
 #include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/integration-api/events/point.h>
 #include <dali/integration-api/events/touch-event-integ.h>
+#include <dali/internal/event/events/gesture-device-profile-table.h>
 #include <dali/internal/event/events/gesture-event.h>
+#include <dali/internal/event/events/gesture-input-source.h>
+#include <dali/internal/event/events/gesture-threshold-values.h>
 #include <dali/public-api/events/gesture.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/object/ref-object.h>
@@ -111,7 +114,16 @@ public:
       {
         mTriggerPoint.SetDeviceClass(p.GetDeviceClass());
         mTriggerPoint.SetDeviceSubclass(p.GetDeviceSubclass());
+        mTriggerPoint.SetDeviceName(p.GetDeviceName());
         mTriggerPoint.SetMouseButton(p.GetMouseButton());
+      }
+
+      // The device that starts a sequence owns it: capture it at the primary DOWN regardless of the
+      // mouse button so per-device profiles also resolve for devices that never report a button.
+      if(!mSequenceSource.valid || p.GetState() == PointState::DOWN)
+      {
+        mSequenceSource = GestureInputSource::FromPoint(p);
+        OnSequenceSourceChanged();
       }
     }
     SendEvent(event);
@@ -148,10 +160,21 @@ protected:
   ~GestureRecognizer() override = default;
 
 protected:
+  /**
+   * @brief Called after the input source of a new sequence has been captured.
+   *
+   * Recognizers that keep application-wide per-device thresholds apply the ones matching the new
+   * source here. The default does nothing.
+   */
+  virtual void OnSequenceSourceChanged()
+  {
+  }
+
   Vector2            mScreenSize;
   GestureType::Value mType;
   Scene*             mScene;
-  Integration::Point mTriggerPoint; ///< Touch point that triggered the gesture.
+  Integration::Point mTriggerPoint;   ///< Touch point that triggered the gesture.
+  GestureInputSource mSequenceSource; ///< Input device that started the current sequence.
 };
 
 using GestureRecognizerPtr = IntrusivePtr<GestureRecognizer>;

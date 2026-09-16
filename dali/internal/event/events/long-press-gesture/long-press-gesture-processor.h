@@ -19,7 +19,9 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/internal/event/events/gesture-device-profile-table.h>
 #include <dali/internal/event/events/gesture-processor.h>
+#include <dali/internal/event/events/gesture-threshold-values.h>
 #include <dali/internal/event/events/long-press-gesture/long-press-gesture-detector-impl.h>
 #include <dali/internal/event/render-tasks/render-task-impl.h>
 
@@ -31,6 +33,7 @@ class Scene;
 
 struct GestureEvent;
 struct LongPressGestureEvent;
+struct LongPressGestureRequest;
 
 /**
  * Long Press Gesture Event Processing:
@@ -101,6 +104,18 @@ public: // To be called by GestureEventProcessor
    */
   uint32_t GetMinimumHoldingTime() const;
 
+  /**
+   * @brief Replaces the application-wide per-device thresholds and pushes them to the recognizer.
+   * @param[in] thresholds The per-device threshold table
+   */
+  void SetDeviceThresholds(const GestureDeviceProfileTable<LongPressThresholdValues>& thresholds);
+
+  /**
+   * @brief Retrieves the application-wide per-device thresholds.
+   * @return The per-device threshold table
+   */
+  const GestureDeviceProfileTable<LongPressThresholdValues>& GetDeviceThresholds() const;
+
 private:
   // Undefined
   LongPressGestureProcessor(const LongPressGestureProcessor&);
@@ -108,8 +123,15 @@ private:
 
 private:
   /**
-   * Iterates through our GestureDetectors and determines if we need to ask the adaptor to update
-   * its detection policy.  If it does, it sends the appropriate gesture update request to adaptor.
+   * Builds the request the shared recognizer should use: the union of the attached detectors'
+   * requirements plus the current recognition thresholds.
+   * @param[out] request The request to fill.
+   */
+  void FillRequest(LongPressGestureRequest& request) const;
+
+  /**
+   * Rebuilds the request from the attached detectors and the current thresholds and pushes it to
+   * the recognizer. Requires an existing recognizer.
    */
   void UpdateDetection();
 
@@ -136,12 +158,11 @@ private:
   GestureDetectorContainer mCurrentEmitters;
   RenderTaskPtr            mCurrentRenderTask;
 
-  uint32_t mMinTouchesRequired;
-  uint32_t mMaxTouchesRequired;
-
   const LongPressGestureEvent* mCurrentLongPressEvent; ///< Pointer to current longPressEvent, used when calling ProcessAndEmit()
 
   uint32_t mMinimumHoldingTime;
+
+  GestureDeviceProfileTable<LongPressThresholdValues> mDeviceThresholds; ///< Application-wide per-device thresholds.
 };
 
 } // namespace Internal

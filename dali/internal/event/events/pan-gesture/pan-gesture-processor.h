@@ -19,7 +19,9 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/internal/event/events/gesture-device-profile-table.h>
 #include <dali/internal/event/events/gesture-processor.h>
+#include <dali/internal/event/events/gesture-threshold-values.h>
 #include <dali/internal/event/events/pan-gesture/pan-gesture-detector-impl.h>
 #include <dali/internal/event/render-tasks/render-task-impl.h>
 
@@ -30,6 +32,7 @@ namespace Internal
 class Scene;
 struct GestureEvent;
 struct PanGestureEvent;
+struct PanGestureRequest;
 
 namespace SceneGraph
 {
@@ -81,10 +84,8 @@ public: // To be called by GestureEventProcessor
    * gesture with the adaptor.
    * @param[in] gestureDetector The gesture detector being added.
    * @param[in] scene           The scene the pan gesture event occurs in.
-   * @param[in] minDistance     The minimum required motion distance to start pan gesture. If this value is less than 0, we use default setuped distance.
-   * @param[in] minPanEvents    The minimum required motion event number to start pan gesture. If this value is less than 1, we use default setuped number.
    */
-  void AddGestureDetector(PanGestureDetector* gestureDetector, Scene& scene, int32_t minDistance, int32_t minPanEvents);
+  void AddGestureDetector(PanGestureDetector* gestureDetector, Scene& scene);
 
   /**
    * Removes the specified gesture detector from this gesture processor.  If, after removing this
@@ -256,14 +257,33 @@ public: // for PanGestureDetector
    */
   int32_t GetMinimumPanEvents() const;
 
+  /**
+   * @brief Replaces the application-wide per-device thresholds and pushes them to the recognizer.
+   * @param[in] thresholds The per-device threshold table
+   */
+  void SetDeviceThresholds(const GestureDeviceProfileTable<PanThresholdValues>& thresholds);
+
+  /**
+   * @brief Retrieves the application-wide per-device thresholds.
+   * @return The per-device threshold table
+   */
+  const GestureDeviceProfileTable<PanThresholdValues>& GetDeviceThresholds() const;
+
 private:
   // Undefined
   PanGestureProcessor(const PanGestureProcessor&);
   PanGestureProcessor& operator=(const PanGestureProcessor& rhs);
 
   /**
-   * Iterates through our GestureDetectors and determines if we need to ask the adaptor to update
-   * its detection policy.  If it does, it sends the appropriate gesture update request to adaptor.
+   * Builds the request the shared recognizer should use: the union of the attached detectors'
+   * requirements plus the current recognition thresholds.
+   * @param[out] request The request to fill.
+   */
+  void FillRequest(PanGestureRequest& request) const;
+
+  /**
+   * Rebuilds the request from the attached detectors and the current thresholds and pushes it to
+   * the recognizer. Requires an existing recognizer.
    */
   void UpdateDetection();
 
@@ -308,10 +328,6 @@ private:
   RenderTaskPtr               mCurrentRenderTask;
   Vector2                     mPossiblePanPosition;
 
-  uint32_t mMinTouchesRequired;
-  uint32_t mMaxTouchesRequired;
-  uint32_t mMaxMotionEventAge;
-
   Vector2 mLastVelocity;       ///< The last recorded velocity in local actor coordinates.
   Vector2 mLastScreenVelocity; ///< The last recorded velocity in screen coordinates.
 
@@ -321,6 +337,8 @@ private:
   const PanGestureEvent*  mCurrentPanEvent; ///< Pointer to current PanEvent, used when calling ProcessAndEmit()
   Dali::Internal::Scene*  mCurrentScene;    ///< The scene where the gesture event occurred
   SceneGraph::PanGesture* mSceneObject;     ///< Not owned, but we write to it directly
+
+  GestureDeviceProfileTable<PanThresholdValues> mDeviceThresholds; ///< Application-wide per-device thresholds.
 };
 
 } // namespace Internal

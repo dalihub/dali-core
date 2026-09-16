@@ -30,6 +30,7 @@
 #include <dali/internal/event/events/pinch-gesture/pinch-gesture-event.h>
 
 // INTERNAL INCLUDES
+#include <dali/internal/event/events/gesture-requests.h>
 
 namespace DALI_NAMESPACE
 {
@@ -63,17 +64,19 @@ inline float GetDefaultMinimumPinchDistance(const Vector2& dpi)
 
 } // unnamed namespace
 
-PinchGestureRecognizer::PinchGestureRecognizer(Observer& observer, Vector2 screenSize, Vector2 screenDpi, float minimumPinchDistance, uint32_t minimumTouchEvents, uint32_t minimumTouchEventsAfterStart)
+PinchGestureRecognizer::PinchGestureRecognizer(Observer& observer, Vector2 screenSize, Vector2 screenDpi, const PinchGestureRequest& request)
 : GestureRecognizer(screenSize, GestureType::PINCH),
   mObserver(observer),
   mState(CLEAR),
   mTouchEvents(),
   mDefaultMinimumDistanceDelta(GetDefaultMinimumPinchDistance(screenDpi)),
   mStartingDistance(0.0f),
-  mMinimumTouchEvents(minimumTouchEvents),
-  mMinimumTouchEventsAfterStart(minimumTouchEventsAfterStart)
+  mMinimumTouchEvents(request.minimumTouchEvents),
+  mMinimumTouchEventsAfterStart(request.minimumTouchEventsAfterStart),
+  mBaseThresholds(),
+  mDeviceThresholds()
 {
-  SetMinimumPinchDistance(minimumPinchDistance);
+  ApplyRequest(request);
 }
 
 PinchGestureRecognizer::~PinchGestureRecognizer() = default;
@@ -228,7 +231,34 @@ void PinchGestureRecognizer::CancelEvent()
 
 void PinchGestureRecognizer::Update(const GestureRequest& request)
 {
-  // Nothing to do.
+  ApplyRequest(static_cast<const PinchGestureRequest&>(request));
+}
+
+void PinchGestureRecognizer::ApplyRequest(const PinchGestureRequest& request)
+{
+  mBaseThresholds.minimumDistance              = request.minimumDistance;
+  mBaseThresholds.minimumTouchEvents           = request.minimumTouchEvents;
+  mBaseThresholds.minimumTouchEventsAfterStart = request.minimumTouchEventsAfterStart;
+  mDeviceThresholds                            = request.deviceThresholds;
+  ApplyThresholdsForSequence();
+}
+
+void PinchGestureRecognizer::OnSequenceSourceChanged()
+{
+  ApplyThresholdsForSequence();
+}
+
+void PinchGestureRecognizer::ApplyThresholdsForSequence()
+{
+  const PinchThresholdValues* thresholds = mSequenceSource.valid ? mDeviceThresholds.Resolve(mSequenceSource) : nullptr;
+  ApplyThresholds(thresholds ? *thresholds : mBaseThresholds);
+}
+
+void PinchGestureRecognizer::ApplyThresholds(const PinchThresholdValues& thresholds)
+{
+  SetMinimumPinchDistance(thresholds.minimumDistance);
+  SetMinimumTouchEvents(thresholds.minimumTouchEvents);
+  SetMinimumTouchEventsAfterStart(thresholds.minimumTouchEventsAfterStart);
 }
 
 void PinchGestureRecognizer::SendPinch(GestureState state, const Integration::TouchEvent& currentEvent)
@@ -267,6 +297,7 @@ void PinchGestureRecognizer::SendPinch(GestureState state, const Integration::To
 
   gesture.time         = currentEvent.time;
   gesture.triggerPoint = mTriggerPoint;
+  gesture.source       = mSequenceSource;
 
   if(mScene)
   {

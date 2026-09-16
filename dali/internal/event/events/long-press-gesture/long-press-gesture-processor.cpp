@@ -123,8 +123,6 @@ LongPressGestureProcessor::LongPressGestureProcessor()
   mLongPressGestureDetectors(),
   mCurrentEmitters(),
   mCurrentRenderTask(),
-  mMinTouchesRequired(1),
-  mMaxTouchesRequired(1),
   mCurrentLongPressEvent(nullptr),
   mMinimumHoldingTime(Integration::DEFAULT_LONG_PRESS_GESTURE_MINIMUM_HOLDING_TIME)
 {
@@ -250,16 +248,11 @@ void LongPressGestureProcessor::AddGestureDetector(LongPressGestureDetector* ges
 
   if(firstRegistration)
   {
-    mMinTouchesRequired = gestureDetector->GetMinimumTouchesRequired();
-    mMaxTouchesRequired = gestureDetector->GetMaximumTouchesRequired();
-
     LongPressGestureRequest request;
-    request.minTouches = mMinTouchesRequired;
-    request.maxTouches = mMaxTouchesRequired;
+    FillRequest(request);
 
-    Size size = scene.GetSize();
-
-    mGestureRecognizer = new LongPressGestureRecognizer(*this, Vector2(size.width, size.height), static_cast<const LongPressGestureRequest&>(request), mMinimumHoldingTime);
+    Size size          = scene.GetSize();
+    mGestureRecognizer = new LongPressGestureRecognizer(*this, Vector2(size.width, size.height), request);
   }
   else
   {
@@ -307,11 +300,7 @@ void LongPressGestureProcessor::SetMinimumHoldingTime(uint32_t time)
 
     if(mGestureRecognizer)
     {
-      LongPressGestureRecognizer* longPressRecognizer = dynamic_cast<LongPressGestureRecognizer*>(mGestureRecognizer.Get());
-      if(longPressRecognizer)
-      {
-        longPressRecognizer->SetMinimumHoldingTime(time);
-      }
+      UpdateDetection();
     }
   }
 }
@@ -321,43 +310,50 @@ uint32_t LongPressGestureProcessor::GetMinimumHoldingTime() const
   return mMinimumHoldingTime;
 }
 
-void LongPressGestureProcessor::UpdateDetection()
+void LongPressGestureProcessor::FillRequest(LongPressGestureRequest& request) const
 {
-  DALI_ASSERT_DEBUG(!mLongPressGestureDetectors.empty());
-
   unsigned int minimumRequired = UINT_MAX;
-  unsigned int maximumRequired = 0;
+  unsigned int maximumRequired = 0u;
 
-  for(LongPressGestureDetectorContainer::iterator iter = mLongPressGestureDetectors.begin(), endIter = mLongPressGestureDetectors.end(); iter != endIter; ++iter)
+  // The shared recognizer must let through anything any detector's profile may accept; each detector
+  // filters against its own active profile when the long press starts.
+  for(LongPressGestureDetector* detector : mLongPressGestureDetectors)
   {
-    LongPressGestureDetector* current(*iter);
-
-    if(current)
+    if(detector)
     {
-      unsigned int minimum = current->GetMinimumTouchesRequired();
-      if(minimum < minimumRequired)
-      {
-        minimumRequired = minimum;
-      }
-
-      unsigned int maximum = current->GetMaximumTouchesRequired();
-      if(maximum > maximumRequired)
-      {
-        maximumRequired = maximum;
-      }
+      detector->WidenRecognitionEnvelope(minimumRequired, maximumRequired);
     }
   }
 
-  if((minimumRequired != mMinTouchesRequired) || (maximumRequired != mMaxTouchesRequired))
-  {
-    mMinTouchesRequired = minimumRequired;
-    mMaxTouchesRequired = maximumRequired;
+  request.minTouches         = minimumRequired;
+  request.maxTouches         = maximumRequired;
+  request.minimumHoldingTime = mMinimumHoldingTime;
+  request.deviceThresholds   = mDeviceThresholds;
+}
 
-    LongPressGestureRequest request;
-    request.minTouches = mMinTouchesRequired;
-    request.maxTouches = mMaxTouchesRequired;
-    mGestureRecognizer->Update(request);
+void LongPressGestureProcessor::SetDeviceThresholds(const GestureDeviceProfileTable<LongPressThresholdValues>& thresholds)
+{
+  mDeviceThresholds = thresholds;
+
+  if(mGestureRecognizer)
+  {
+    UpdateDetection();
   }
+}
+
+const GestureDeviceProfileTable<LongPressThresholdValues>& LongPressGestureProcessor::GetDeviceThresholds() const
+{
+  return mDeviceThresholds;
+}
+
+void LongPressGestureProcessor::UpdateDetection()
+{
+  DALI_ASSERT_DEBUG(!mLongPressGestureDetectors.empty());
+  DALI_ASSERT_DEBUG(mGestureRecognizer);
+
+  LongPressGestureRequest request;
+  FillRequest(request);
+  mGestureRecognizer->Update(request);
 }
 
 void LongPressGestureProcessor::OnGesturedActorStageDisconnection()

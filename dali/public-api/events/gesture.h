@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/common/dali-string.h>
 #include <dali/public-api/events/device.h>
 #include <dali/public-api/events/gesture-enumerations.h>
 #include <dali/public-api/events/mouse-button.h>
@@ -146,6 +147,17 @@ public:
    * @return The device subclass (e.g. Device::Subclass::FINGER).
    */
   Device::Subclass::Type GetDeviceSubclass() const;
+
+  /**
+   * @brief Gets the name of the input device that triggered the gesture.
+   *
+   * This is the name reported by the platform for the device that started the gesture
+   * sequence (e.g. the name of a remote controller or a mouse). It is empty when the
+   * platform does not report a device name.
+   * @SINCE_2_5.40
+   * @return The device name
+   */
+  const Dali::String& GetDeviceName() const;
 
 public: // Not intended for application developers
   /// @cond internal
