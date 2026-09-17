@@ -88,7 +88,7 @@ struct Vector4;
  *     A candidate that did not consume an earlier event can consume a later event.
  *   - The first consumer becomes the stable owner. Subsequent touch events are delivered to that owner
  *     until interception or stream termination.
- *   - Intercept signals follow the current owner's ancestor path, from the root toward the owner. Before
+ *   - Intercept signals follow the path from the root to the current owner, including the owner. Before
  *     an owner exists, the initial hit actor's ancestor path is used.
  *   - If a new owner displaces actors that previously received this stream, every displaced active
  *     recipient receives exactly one interrupted event.
@@ -1011,6 +1011,7 @@ public:
    * @note If the child already has a parent, it will be removed from old parent
    * and reparented to this actor. This may change child's position, color,
    * scale etc as it now inherits them from this actor.
+   * @note A Layer cannot be added as a child and it will assert if attempted.
    */
   void Add(Actor child);
 
@@ -2901,7 +2902,7 @@ public: // Signals
    * So the child actor will not be able to receive touch events.
    * Only the parentFunctor is called.
    *
-   * @note In GEOMETRY propagation, intercept callbacks traverse the current owner's ancestor path.
+   * @note In GEOMETRY propagation, intercept callbacks traverse the path from the root to the current owner, including the owner.
    * Before an owner has been selected, they traverse the initial hit actor's ancestor path.
    *
    * @SINCE_2_5.29

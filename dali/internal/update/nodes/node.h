@@ -33,6 +33,7 @@
 #include <dali/internal/update/manager/transform-manager.h>
 #include <dali/internal/update/nodes/node-declarations.h>
 #include <dali/internal/update/nodes/node-helper.h>
+#include <dali/internal/update/nodes/node-rare-data.h>
 #include <dali/internal/update/nodes/partial-rendering-data.h>
 #include <dali/internal/update/rendering/scene-graph-renderer.h>
 #include <dali/public-api/actors/actor-enumerations.h>
@@ -161,7 +162,8 @@ public:
     // node on the parent, this will have a non-zero clipping ID that must be ignored
     if(clippingDepth > 0u)
     {
-      mClippingDepth = clippingDepth;
+      EnsureRareData();
+      mRareData->mClippingDepth = clippingDepth;
 
       // Calculate the sort value here on write, as when read (during sort) it may be accessed several times.
       // The items must be sorted by Clipping ID first (so the ID is kept in the most-significant bits).
@@ -173,11 +175,36 @@ public:
     {
       // If we do not have a clipping depth, then set this to 0 so we do not have a Clipping ID either.
       mClippingSortModifier = 0u;
+      // Note: We do NOT free mRareData here to avoid allocation churn.
+      // If mRareData exists, we just leave the depths as 0.
+      if(mRareData)
+      {
+        mRareData->mClippingDepth = 0u;
+      }
     }
 
     // The scissor depth does not modify the clipping sort modifier (as scissor clips are 2D only).
-    // For this reason we can always update the member variable.
-    mScissorDepth = scissorDepth;
+    // For this reason we can always update the value, regardless of the clipping depth above.
+    if(scissorDepth > 0u)
+    {
+      EnsureRareData();
+      mRareData->mScissorDepth = scissorDepth;
+    }
+    else if(mRareData)
+    {
+      mRareData->mScissorDepth = 0u;
+    }
+  }
+
+  /**
+   * @brief Ensures rare data is allocated (lazy allocation)
+   */
+  void EnsureRareData()
+  {
+    if(DALI_UNLIKELY(!mRareData))
+    {
+      mRareData = new NodeRareData();
+    }
   }
 
   /**
@@ -195,7 +222,7 @@ public:
    */
   uint32_t GetClippingDepth() const
   {
-    return mClippingDepth;
+    return mRareData ? mRareData->mClippingDepth : 0u;
   }
 
   /**
@@ -204,7 +231,7 @@ public:
    */
   uint32_t GetScissorDepth() const
   {
-    return mScissorDepth;
+    return mRareData ? mRareData->mScissorDepth : 0u;
   }
 
   /**
@@ -273,7 +300,7 @@ public:
    */
   const RendererContainer& GetCacheRendererContainer() const
   {
-    return mCacheRenderers;
+    return mRareData ? mRareData->mCacheRenderers : mEmptyRendererContainer;
   }
 
   /**
@@ -293,7 +320,7 @@ public:
    */
   RendererKey GetCacheRendererAt(uint32_t index) const
   {
-    return mCacheRenderers[index];
+    return mRareData && index < mRareData->mCacheRenderers.Size() ? mRareData->mCacheRenderers[index] : mEmptyKey;
   }
 
   /**
@@ -302,7 +329,7 @@ public:
    */
   uint32_t GetCacheRendererCount() const
   {
-    return static_cast<uint32_t>(mCacheRenderers.Size());
+    return mRareData ? static_cast<uint32_t>(mRareData->mCacheRenderers.Size()) : 0u;
   }
 
   // Containment methods
@@ -858,10 +885,11 @@ public:
    */
   void AddExclusiveRenderTask(RenderTask* renderTask)
   {
-    auto found = std::find(mExclusiveRenderTasks.begin(), mExclusiveRenderTasks.end(), renderTask);
-    if(found == mExclusiveRenderTasks.end())
+    EnsureRareData();
+    auto found = std::find(mRareData->mExclusiveRenderTasks.begin(), mRareData->mExclusiveRenderTasks.end(), renderTask);
+    if(found == mRareData->mExclusiveRenderTasks.end())
     {
-      mExclusiveRenderTasks.push_back(renderTask);
+      mRareData->mExclusiveRenderTasks.push_back(renderTask);
       SetUpdated(true);
     }
   }
@@ -873,10 +901,14 @@ public:
    */
   void RemoveExclusiveRenderTask(RenderTask* renderTask)
   {
-    auto found = std::find(mExclusiveRenderTasks.begin(), mExclusiveRenderTasks.end(), renderTask);
-    if(found != mExclusiveRenderTasks.end())
+    if(!mRareData)
     {
-      mExclusiveRenderTasks.erase(found);
+      return;
+    }
+    auto found = std::find(mRareData->mExclusiveRenderTasks.begin(), mRareData->mExclusiveRenderTasks.end(), renderTask);
+    if(found != mRareData->mExclusiveRenderTasks.end())
+    {
+      mRareData->mExclusiveRenderTasks.erase(found);
       SetUpdated(true);
     }
   }
@@ -887,7 +919,7 @@ public:
    */
   uint32_t GetExclusiveRenderTaskCount()
   {
-    return static_cast<uint32_t>(mExclusiveRenderTasks.size());
+    return mRareData ? static_cast<uint32_t>(mRareData->mExclusiveRenderTasks.size()) : 0u;
   }
 
   /**
@@ -896,12 +928,12 @@ public:
    */
   bool IsExclusiveRenderTask(const RenderTask* renderTask) const
   {
-    auto found = std::find(mExclusiveRenderTasks.begin(), mExclusiveRenderTasks.end(), renderTask);
-    if(found != mExclusiveRenderTasks.end())
+    if(!mRareData)
     {
-      return true;
+      return false;
     }
-    return false;
+    auto found = std::find(mRareData->mExclusiveRenderTasks.begin(), mRareData->mExclusiveRenderTasks.end(), renderTask);
+    return found != mRareData->mExclusiveRenderTasks.end();
   }
 
   /**
@@ -1211,21 +1243,19 @@ public: // Default properties
   const uint32_t mId;                   ///< The Unique ID of the node.
 
 protected:
-  static uint32_t mNodeCounter; ///< count of total nodes, used for unique ids
+  static uint32_t          mNodeCounter;            ///< count of total nodes, used for unique ids
+  static RendererContainer mEmptyRendererContainer; ///< Empty container for return by reference
+  static RendererKey       mEmptyKey;               ///< Empty renderer key for return by value
 
   PartialRenderingData mPartialRenderingData; ///< Cache to determine if this should be rendered again
 
-  Node*               mParent;               ///< Pointer to parent node (a child is owned by its parent)
-  RenderTaskContainer mExclusiveRenderTasks; ///< Nodes can be marked as exclusive to multiple RenderTasks
+  Node*         mParent;            ///< Pointer to parent node (a child is owned by its parent)
+  NodeRareData* mRareData{nullptr}; ///< Rare data (lazily allocated, ~1% of nodes)
 
-  RendererContainer mRenderers;      ///< Container of renderers; not owned
-  RendererContainer mCacheRenderers; ///< Container of renderers drawing offscreen rendering results
+  RendererContainer mRenderers; ///< Container of renderers; not owned
+  NodeContainer     mChildren;  ///< Container of children; not owned
 
-  NodeContainer mChildren; ///< Container of children; not owned
-
-  uint32_t mClippingDepth; ///< The number of stencil clipping nodes deep this node is
-  uint32_t mScissorDepth;  ///< The number of scissor clipping nodes deep this node is
-  uint32_t mDepthIndex;    ///< Depth index of the node
+  uint32_t mDepthIndex; ///< Depth index of the node (kept as direct member - hot path)
 
   std::atomic<bool> mValid{true}; ///< True if the node is valid and can process messages. Set to false during teardown. Uses atomic for cross-thread visibility.
 

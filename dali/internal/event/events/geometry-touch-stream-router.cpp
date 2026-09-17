@@ -35,6 +35,29 @@ bool IsTerminalPoint(const Integration::Point& point)
 {
   return point.GetState() == PointState::UP || point.GetState() == PointState::INTERRUPTED;
 }
+
+/**
+ * Finds the actor that should own a multi-touch gesture for the given hit candidates.
+ *
+ * A gesture detector is fed only with the points of the touch event delivered to its actor, so a
+ * pinch or a rotation on an ancestor can never be recognized while its two points are routed as
+ * separate streams. The candidate list is walked from the front-most actor towards the root, so that
+ * a hit inside a framebuffer still resolves to the ancestors of its mapping actor.
+ * @param[in] candidatesRootToFront The hit candidate list, ordered from the outermost ancestor to the front-most actor.
+ * @return The nearest candidate requiring a multi-touch gesture, or nullptr if there is none.
+ */
+Actor* FindMultiTouchGestureOwner(const std::list<ActorPtr>& candidatesRootToFront)
+{
+  for(auto candidate = candidatesRootToFront.rbegin(); candidate != candidatesRootToFront.rend(); ++candidate)
+  {
+    Actor* actor = candidate->Get();
+    if(actor && (actor->IsGestureRequired(GestureType::PINCH) || actor->IsGestureRequired(GestureType::ROTATION)))
+    {
+      return actor;
+    }
+  }
+  return nullptr;
+}
 } // unnamed namespace
 
 GeometryTouchStreamRouter::GeometryTouchStreamRouter(Scene& scene)
@@ -228,9 +251,13 @@ void GeometryTouchStreamRouter::ProcessTouchEvent(const Integration::TouchEvent&
           }
         }
 
-        const uint32_t      initialRoutingGroup = initialHit->actor->GetId();
-        const TouchStreamId streamId            = FindOrCreateStream(initialRoutingGroup, std::move(initialHit));
-        auto                stream              = mTouchStreams.find(streamId);
+        // Group the point by the nearest candidate requiring a multi-touch gesture, so that the points of such a
+        // gesture share one stream even when they hit different actors. Fall back to the hit actor itself when no
+        // candidate requires one, to keep a gesture per point available.
+        Actor*              multiTouchGestureOwner = FindMultiTouchGestureOwner(initialHit->candidatesRootToFront);
+        const uint32_t      initialRoutingGroup    = multiTouchGestureOwner ? multiTouchGestureOwner->GetId() : initialHit->actor->GetId();
+        const TouchStreamId streamId               = FindOrCreateStream(initialRoutingGroup, std::move(initialHit));
+        auto                stream                 = mTouchStreams.find(streamId);
         if(DALI_UNLIKELY(stream == mTouchStreams.end()))
         {
           DALI_LOG_ERROR("Failed to find geometry touch stream. streamId(%llu)\n", static_cast<unsigned long long>(streamId));

@@ -141,6 +141,11 @@ Vector3 GetNaturalSize(const Actor& actor)
   return GetImplementation(actor).GetNaturalSize();
 }
 
+void Add(Actor actor, Actor child)
+{
+  GetImplementation(actor).Add(GetImplementation(child));
+}
+
 } // namespace DevelActor
 
 } //namespace DALI_NAMESPACE

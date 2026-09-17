@@ -57,9 +57,9 @@ class Layer;
  * farther one.  LAYER_UI is the default mode and recommended for general
  * cases.  See Layer::Behavior and SetBehavior() for more information.
  *
- * Layer is a type of Actor, thus can have parent or children actors.  A
- * layer influences rendering of its all descendant actors, until another
- * layer appears in the actor tree and manages its own subtree.
+ * Layer is a type of Actor, so can have child actors but cannot be added to
+ * another actor (or layer). A layer influences rendering of its all descendant
+ * actors, until another layer appears in the actor tree and manages its own subtree.
  *
  * If depth test is disabled, there is no performance overhead from clearing
  * the depth buffer.
@@ -227,6 +227,7 @@ public:
    *
    * @SINCE_1_0.0
    * @return A handle to a newly allocated Layer
+   * @note By default fills the size of the window this is being added to
    */
   static Layer New();
 

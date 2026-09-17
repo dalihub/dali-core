@@ -826,7 +826,7 @@ int UtcDaliGeoTouchStreamOwnerRemainsStableWhenCallbackReturnsFalse(void)
   END_TEST;
 }
 
-int UtcDaliGeoTouchStreamInterceptStopsBeforeCurrentOwner(void)
+int UtcDaliGeoTouchStreamInterceptIncludesCurrentOwner(void)
 {
   TestApplication application;
   TouchTrace      trace;
@@ -853,8 +853,66 @@ int UtcDaliGeoTouchStreamInterceptStopsBeforeCurrentOwner(void)
 
   DALI_TEST_EQUALS(1u, trace.Count("root-intercept", CallbackKind::INTERCEPT, PointState::MOTION), TEST_LOCATION);
   DALI_TEST_EQUALS(1u, trace.Count("parent-intercept", CallbackKind::INTERCEPT, PointState::MOTION), TEST_LOCATION);
-  DALI_TEST_EQUALS(0u, trace.Count("child-intercept", CallbackKind::INTERCEPT, PointState::MOTION), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, trace.Count("child-intercept", CallbackKind::INTERCEPT, PointState::MOTION), TEST_LOCATION);
   DALI_TEST_EQUALS(1u, trace.Count("child-touch", CallbackKind::TOUCH, PointState::MOTION), TEST_LOCATION);
+  DALI_TEST_CHECK(trace.FirstIndexOf("child-intercept", CallbackKind::INTERCEPT, PointState::MOTION) <
+                  trace.FirstIndexOf("child-touch", CallbackKind::TOUCH, PointState::MOTION));
+  END_TEST;
+}
+
+int UtcDaliGeoTouchStreamOwnerRecognizesPanThroughIntercept(void)
+{
+  TestApplication application;
+  TouchTrace      touchTrace;
+  PanTrace        panTrace;
+
+  Actor actor = CreateTouchableActor("scroll-owner");
+  application.GetScene().Add(actor);
+
+  PanGestureDetector detector = PanGestureDetector::New();
+  PanTraceFunctor    panFunctor(panTrace);
+  detector.DetectedSignal().Connect(&application, panFunctor);
+
+  // Like PickerList/RecyclerView, consume DOWN in the touch callback, recognize the pan
+  // through interception, then feed subsequent events through the touch callback.
+  bool intercepted = false;
+  actor.InterceptTouchEventSignal().Connect(&application, [&](Actor receiver, TouchEvent touch)
+  {
+    touchTrace.Record("owner-intercept", CallbackKind::INTERCEPT, touch);
+    intercepted = detector.HandleEvent(receiver, touch);
+    return intercepted;
+  });
+  actor.TouchEventSignal().Connect(&application, [&](Actor receiver, TouchEvent touch)
+  {
+    touchTrace.Record("owner-touch", CallbackKind::TOUCH, touch);
+    if(intercepted)
+    {
+      detector.HandleEvent(receiver, touch);
+      if(touch.GetState(0u) == PointState::UP || touch.GetState(0u) == PointState::INTERRUPTED)
+      {
+        intercepted = false;
+      }
+    }
+    return true;
+  });
+  PrepareScene(application);
+
+  uint32_t time = 100u;
+  TestStartPan(application, Vector2(10.0f, 10.0f), Vector2(10.0f, 30.0f), time);
+  DALI_TEST_EQUALS(1u, panTrace.Count(GestureState::STARTED), TEST_LOCATION);
+
+  TestMovePan(application, Vector2(10.0f, 60.0f), time);
+  time += TestGetFrameInterval();
+  TestEndPan(application, Vector2(10.0f, 80.0f), time);
+
+  DALI_TEST_CHECK(touchTrace.Count("owner-intercept", CallbackKind::INTERCEPT, PointState::MOTION) >= 1u);
+  DALI_TEST_EQUALS(3u, touchTrace.Count("owner-touch", CallbackKind::TOUCH, PointState::MOTION), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, touchTrace.Count("owner-touch", CallbackKind::TOUCH, PointState::UP), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, touchTrace.Count("owner-touch", CallbackKind::TOUCH, PointState::INTERRUPTED), TEST_LOCATION);
+  DALI_TEST_CHECK(panTrace.Count(GestureState::CONTINUING) >= 1u);
+  DALI_TEST_EQUALS(1u, panTrace.Count(GestureState::FINISHED), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, panTrace.Count(GestureState::CANCELLED), TEST_LOCATION);
+  DALI_TEST_CHECK(!intercepted);
   END_TEST;
 }
 
@@ -1077,7 +1135,7 @@ int UtcDaliGeoTouchStreamLaterDownPreservesOwnerAndInitialHit(void)
   application.GetScene().TouchEventSignal().Connect(&application, sceneFunctor);
   PrepareScene(application);
 
-  const int32_t    childId        = child.GetProperty<int32_t>(Actor::Property::ID);
+  const int32_t    childId         = child.GetProperty<int32_t>(Actor::Property::ID);
   const RenderTask ownerRenderTask = application.GetScene().GetRenderTaskList().GetTask(0u);
 
   application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f), 4));
@@ -1358,5 +1416,269 @@ int UtcDaliGeoTouchStreamSceneSignalOncePerRawBoundaryEvent(void)
                                               Vector2(130.0f, 10.0f),
                                               7));
   DALI_TEST_EQUALS(1u, trace.Count("scene", CallbackKind::SCENE, PointState::UP), TEST_LOCATION);
+  END_TEST;
+}
+
+namespace
+{
+struct GestureStateTrace
+{
+  uint32_t Count(GestureState state) const
+  {
+    return static_cast<uint32_t>(std::count(states.begin(), states.end(), state));
+  }
+
+  std::vector<GestureState> states;
+};
+
+struct PinchTraceFunctor
+{
+  explicit PinchTraceFunctor(GestureStateTrace& trace)
+  : trace(trace)
+  {
+  }
+
+  void operator()(Actor, PinchGesture pinch)
+  {
+    trace.states.push_back(pinch.GetState());
+  }
+
+  GestureStateTrace& trace;
+};
+
+struct RotationTraceFunctor
+{
+  explicit RotationTraceFunctor(GestureStateTrace& trace)
+  : trace(trace)
+  {
+  }
+
+  void operator()(Actor, RotationGesture rotation)
+  {
+    trace.states.push_back(rotation.GetState());
+  }
+
+  GestureStateTrace& trace;
+};
+
+/**
+ * A 200x100 parent with two 100x100 touchable children side by side: "left" covers x 0..100 and
+ * "right" covers x 100..200. Every actor records its touch events without consuming them.
+ * Geometry hit-test is enabled on construction so that a gesture detector attached to the parent
+ * afterwards connects to the parent's touch signal.
+ */
+struct SideBySideChildrenFixture
+{
+  SideBySideChildrenFixture(TestApplication& application, TouchTrace& touchTrace)
+  : parentFunctor(touchTrace, "parent", false),
+    leftFunctor(touchTrace, "left", false),
+    rightFunctor(touchTrace, "right", false)
+  {
+    application.GetScene().SetGeometryHittestEnabled(true);
+
+    parent = CreateTouchableActor("parent");
+    parent.SetProperty(Actor::Property::SIZE, Vector2(200.0f, 100.0f));
+    left  = CreateTouchableActor("left");
+    right = CreateTouchableActor("right");
+    right.SetProperty(Actor::Property::POSITION, Vector2(100.0f, 0.0f));
+    parent.Add(left);
+    parent.Add(right);
+    application.GetScene().Add(parent);
+
+    parent.TouchEventSignal().Connect(&application, parentFunctor);
+    left.TouchEventSignal().Connect(&application, leftFunctor);
+    right.TouchEventSignal().Connect(&application, rightFunctor);
+  }
+
+  Actor             parent;
+  Actor             left;
+  Actor             right;
+  TouchTraceFunctor parentFunctor;
+  TouchTraceFunctor leftFunctor;
+  TouchTraceFunctor rightFunctor;
+};
+
+uint32_t PointCountOfFirst(const TouchTrace& trace, const char* receiver, PointState::Type state)
+{
+  const TraceEntry* entry = trace.Find(receiver, CallbackKind::TOUCH, state);
+  return entry ? static_cast<uint32_t>(entry->states.size()) : 0u;
+}
+} // namespace
+
+int UtcDaliGeoTouchStreamPinchOwnerGroupsPointsOnDifferentChildren(void)
+{
+  TestApplication           application;
+  TouchTrace                touchTrace;
+  GestureStateTrace         pinchTrace;
+  SideBySideChildrenFixture fixture(application, touchTrace);
+
+  PinchGestureDetector detector = PinchGestureDetector::New();
+  PinchTraceFunctor    pinchFunctor(pinchTrace);
+  detector.Attach(fixture.parent);
+  detector.DetectedSignal().Connect(&application, pinchFunctor);
+  PrepareScene(application);
+
+  // One point on "left" and one on "right". The parent requires PINCH, so both points share one stream.
+  TestStartPinch(application, Vector2(80.0f, 50.0f), Vector2(120.0f, 50.0f), Vector2(60.0f, 50.0f), Vector2(140.0f, 50.0f), 100u);
+  TestEndPinch(application, Vector2(60.0f, 50.0f), Vector2(140.0f, 50.0f), Vector2(50.0f, 50.0f), Vector2(150.0f, 50.0f), 400u);
+
+  DALI_TEST_EQUALS(1u, pinchTrace.Count(GestureState::STARTED), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, pinchTrace.Count(GestureState::FINISHED), TEST_LOCATION);
+  DALI_TEST_EQUALS(2u, PointCountOfFirst(touchTrace, "parent", PointState::DOWN), TEST_LOCATION);
+  DALI_TEST_EQUALS(2u, PointCountOfFirst(touchTrace, "parent", PointState::MOTION), TEST_LOCATION);
+
+  // The shared stream is delivered along the hit candidates of its first point only.
+  DALI_TEST_EQUALS(1u, touchTrace.Count("left", CallbackKind::TOUCH, PointState::DOWN), TEST_LOCATION);
+  DALI_TEST_EQUALS(2u, PointCountOfFirst(touchTrace, "left", PointState::DOWN), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, touchTrace.Count("right", CallbackKind::TOUCH, PointState::DOWN), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, touchTrace.Count("right", CallbackKind::TOUCH, PointState::MOTION), TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliGeoTouchStreamPinchOwnerKeepsPointsOnOneChildGrouped(void)
+{
+  TestApplication           application;
+  TouchTrace                touchTrace;
+  GestureStateTrace         pinchTrace;
+  SideBySideChildrenFixture fixture(application, touchTrace);
+
+  PinchGestureDetector detector = PinchGestureDetector::New();
+  PinchTraceFunctor    pinchFunctor(pinchTrace);
+  detector.Attach(fixture.parent);
+  detector.DetectedSignal().Connect(&application, pinchFunctor);
+  PrepareScene(application);
+
+  // Both points on "left" already shared a stream before owner grouping; this must keep working.
+  TestStartPinch(application, Vector2(20.0f, 50.0f), Vector2(80.0f, 50.0f), Vector2(10.0f, 50.0f), Vector2(90.0f, 50.0f), 100u);
+  TestEndPinch(application, Vector2(10.0f, 50.0f), Vector2(90.0f, 50.0f), Vector2(5.0f, 50.0f), Vector2(95.0f, 50.0f), 400u);
+
+  DALI_TEST_EQUALS(1u, pinchTrace.Count(GestureState::STARTED), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, pinchTrace.Count(GestureState::FINISHED), TEST_LOCATION);
+  DALI_TEST_EQUALS(2u, PointCountOfFirst(touchTrace, "left", PointState::DOWN), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, touchTrace.Count("right", CallbackKind::TOUCH, PointState::DOWN), TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliGeoTouchStreamRotationOwnerGroupsPointsOnDifferentChildren(void)
+{
+  TestApplication           application;
+  TouchTrace                touchTrace;
+  GestureStateTrace         rotationTrace;
+  SideBySideChildrenFixture fixture(application, touchTrace);
+
+  RotationGestureDetector detector = RotationGestureDetector::New();
+  RotationTraceFunctor    rotationFunctor(rotationTrace);
+  detector.Attach(fixture.parent);
+  detector.DetectedSignal().Connect(&application, rotationFunctor);
+  PrepareScene(application);
+
+  // One point on "left" and one on "right". The parent requires ROTATION, so both points share one stream.
+  TestStartRotation(application, Vector2(80.0f, 50.0f), Vector2(120.0f, 50.0f), Vector2(80.0f, 30.0f), Vector2(120.0f, 70.0f), 100u);
+  TestEndRotation(application, Vector2(80.0f, 30.0f), Vector2(120.0f, 70.0f), Vector2(90.0f, 20.0f), Vector2(110.0f, 80.0f), 400u);
+
+  DALI_TEST_EQUALS(1u, rotationTrace.Count(GestureState::STARTED), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, rotationTrace.Count(GestureState::FINISHED), TEST_LOCATION);
+  DALI_TEST_EQUALS(2u, PointCountOfFirst(touchTrace, "parent", PointState::MOTION), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, touchTrace.Count("right", CallbackKind::TOUCH, PointState::DOWN), TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliGeoTouchStreamSingleTouchGestureOwnerKeepsIndependentGroups(void)
+{
+  TestApplication           application;
+  TouchTrace                touchTrace;
+  SideBySideChildrenFixture fixture(application, touchTrace);
+
+  // A pan detector requires a single-touch gesture only, so it must not merge the two groups.
+  PanGestureDetector detector = PanGestureDetector::New();
+  detector.Attach(fixture.parent);
+  PrepareScene(application);
+
+  application.ProcessEvent(GenerateTwoTouches(PointState::DOWN, Vector2(80.0f, 50.0f), 4, PointState::DOWN, Vector2(120.0f, 50.0f), 7));
+  application.ProcessEvent(GenerateTwoTouches(PointState::MOTION, Vector2(60.0f, 50.0f), 4, PointState::MOTION, Vector2(140.0f, 50.0f), 7));
+
+  DALI_TEST_EQUALS(1u, PointCountOfFirst(touchTrace, "parent", PointState::MOTION), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, touchTrace.CountDevice("parent", CallbackKind::TOUCH, PointState::MOTION, 4), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, touchTrace.CountDevice("parent", CallbackKind::TOUCH, PointState::MOTION, 7), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, touchTrace.Count("left", CallbackKind::TOUCH, PointState::DOWN), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, touchTrace.Count("right", CallbackKind::TOUCH, PointState::DOWN), TEST_LOCATION);
+
+  application.ProcessEvent(GenerateTwoTouches(PointState::UP, Vector2(60.0f, 50.0f), 4, PointState::UP, Vector2(140.0f, 50.0f), 7));
+  END_TEST;
+}
+
+int UtcDaliGeoTouchStreamPinchOwnerGroupsPointsAcrossMappingActorEdge(void)
+{
+  TestApplication          application;
+  TouchTrace               touchTrace;
+  GestureStateTrace        pinchTrace;
+  Dali::Integration::Scene scene = application.GetScene();
+  scene.SetGeometryHittestEnabled(true);
+
+  // A 200x100 container owning a pinch detector. Its left half is the mapping actor of an offscreen
+  // render task, so a hit there resolves to an actor inside the framebuffer; its right half is a plain child.
+  Actor container = CreateTouchableActor("container");
+  container.SetProperty(Actor::Property::SIZE, Vector2(200.0f, 100.0f));
+  Actor mappingActor = CreateTouchableActor("mapping");
+  Actor right        = CreateTouchableActor("right");
+  right.SetProperty(Actor::Property::POSITION, Vector2(100.0f, 0.0f));
+  container.Add(mappingActor);
+  container.Add(right);
+  scene.Add(container);
+
+  // The offscreen tree is centred on the scene, where a 100x100 camera looks by default.
+  Actor offscreenRoot = Actor::New();
+  offscreenRoot.SetProperty(Actor::Property::NAME, "offscreen-root");
+  offscreenRoot.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  offscreenRoot.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
+  offscreenRoot.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  Actor offscreenChild = CreateTouchableActor("offscreen-child");
+  offscreenRoot.Add(offscreenChild);
+  scene.Add(offscreenRoot);
+
+  CameraActor offscreenCamera = CameraActor::New(Vector2(100.0f, 100.0f));
+  offscreenCamera.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
+  offscreenCamera.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  scene.Add(offscreenCamera);
+
+  FrameBuffer frameBuffer   = FrameBuffer::New(100u, 100u);
+  RenderTask  offscreenTask = scene.GetRenderTaskList().CreateTask();
+  offscreenTask.SetExclusive(true);
+  offscreenTask.SetInputEnabled(true);
+  offscreenTask.SetCameraActor(offscreenCamera);
+  offscreenTask.SetSourceActor(offscreenRoot);
+  offscreenTask.SetFrameBuffer(frameBuffer);
+  offscreenTask.SetScreenToFrameBufferMappingActor(mappingActor);
+
+  TouchTraceFunctor containerFunctor(touchTrace, "container", false);
+  TouchTraceFunctor mappingFunctor(touchTrace, "mapping", false);
+  TouchTraceFunctor rightFunctor(touchTrace, "right", false);
+  TouchTraceFunctor offscreenChildFunctor(touchTrace, "offscreen-child", false);
+  container.TouchEventSignal().Connect(&application, containerFunctor);
+  mappingActor.TouchEventSignal().Connect(&application, mappingFunctor);
+  right.TouchEventSignal().Connect(&application, rightFunctor);
+  offscreenChild.TouchEventSignal().Connect(&application, offscreenChildFunctor);
+
+  PinchGestureDetector detector = PinchGestureDetector::New();
+  PinchTraceFunctor    pinchFunctor(pinchTrace);
+  detector.Attach(container);
+  detector.DetectedSignal().Connect(&application, pinchFunctor);
+  PrepareScene(application);
+  application.SendNotification();
+  application.Render();
+
+  // The first point hits the offscreen child through the mapping actor, the second hits "right".
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(50.0f, 50.0f), 4));
+  DALI_TEST_EQUALS(1u, touchTrace.Count("offscreen-child", CallbackKind::TOUCH, PointState::DOWN), TEST_LOCATION);
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(50.0f, 50.0f), 4));
+  touchTrace.Clear();
+
+  TestStartPinch(application, Vector2(80.0f, 50.0f), Vector2(120.0f, 50.0f), Vector2(60.0f, 50.0f), Vector2(140.0f, 50.0f), 100u);
+  TestEndPinch(application, Vector2(60.0f, 50.0f), Vector2(140.0f, 50.0f), Vector2(50.0f, 50.0f), Vector2(150.0f, 50.0f), 400u);
+
+  DALI_TEST_EQUALS(1u, pinchTrace.Count(GestureState::STARTED), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, pinchTrace.Count(GestureState::FINISHED), TEST_LOCATION);
+  DALI_TEST_EQUALS(2u, PointCountOfFirst(touchTrace, "container", PointState::MOTION), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, touchTrace.Count("right", CallbackKind::TOUCH, PointState::DOWN), TEST_LOCATION);
   END_TEST;
 }

@@ -19,6 +19,7 @@
 #include <dali/devel-api/scripting/scripting.h>
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/object/type-registry.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
@@ -154,7 +155,7 @@ Actor NewActor(const Property::Map& map)
         Property::Array actorArray = value.Get<Property::Array>();
         for(Property::Array::SizeType i = 0; i < actorArray.Size(); ++i)
         {
-          actor.Add(NewActor(actorArray[i].Get<Property::Map>()));
+          DevelActor::Add(actor, NewActor(actorArray[i].Get<Property::Map>()));
         }
       }
       else

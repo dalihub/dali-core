@@ -18,6 +18,7 @@
 #include <dali-test-suite-utils.h>
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/actors/actor-enumerations-devel.h>
+#include <dali/devel-api/actors/layer-devel.h>
 #include <dali/devel-api/events/hit-test-algorithm.h>
 #include <dali/devel-api/threading/thread.h>
 #include <dali/integration-api/debug.h>
@@ -882,7 +883,7 @@ int UtcDaliRenderTaskRenderUntil03(void)
   Actor a2 = CreateRenderableActorWithName("a2");
 
   scene.Add(a0);
-  a0.Add(l0);
+  DevelActor::Add(a0, l0);
   l0.Add(CreateRenderableActorWithName("l0-c0"));
   l0.Add(CreateRenderableActorWithName("l0-c1"));
 
@@ -890,7 +891,7 @@ int UtcDaliRenderTaskRenderUntil03(void)
   a1.Add(target);
 
   scene.Add(a2);
-  a2.Add(l2);
+  DevelActor::Add(a2, l2);
   l2.Add(CreateRenderableActorWithName("l2-c0"));
   l2.Add(CreateRenderableActorWithName("l2-c1"));
   l2.Add(CreateRenderableActorWithName("l2-c2"));
@@ -1008,18 +1009,18 @@ int UtcDaliRenderTaskRenderUntil04(void)
   Actor a2 = CreateRenderableActorWithName("a2");
 
   scene.Add(a0);
-  a0.Add(l0);
+  DevelActor::Add(a0, l0);
   l0.Add(CreateRenderableActorWithName("l0-c0"));
   l0.Add(CreateRenderableActorWithName("l0-c1"));
 
   scene.Add(a1);
-  a1.Add(l1);
+  DevelActor::Add(a1, l1);
   l1.Add(b0);
   l1.Add(target);
   l1.Add(b1);
 
   scene.Add(a2);
-  a2.Add(l2);
+  DevelActor::Add(a2, l2);
   l2.Add(CreateRenderableActorWithName("l2-c0"));
   l2.Add(CreateRenderableActorWithName("l2-c1"));
   l2.Add(CreateRenderableActorWithName("l2-c2"));
@@ -1449,7 +1450,7 @@ int UtcDaliRenderTaskSetExclusive(void)
   actor2.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
 
   // Force actor2 to be rendered before actor1
-  Layer layer = Layer::New();
+  Layer layer = DevelLayer::New();
   application.GetScene().Add(layer);
   layer.Add(actor2);
   layer.LowerToBottom();
@@ -1475,7 +1476,7 @@ int UtcDaliRenderTaskSetExclusive(void)
   actor3.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
 
   // Force actor3 to be rendered before actor2
-  layer = Layer::New();
+  layer = DevelLayer::New();
   application.GetScene().Add(layer);
   layer.Add(actor3);
   layer.LowerToBottom();
@@ -5960,10 +5961,10 @@ int UtcDaliRenderTaskExclusiveAddCacheRendererWithZeroOpacity(void)
   Texture     frameBufferTexture = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 100, 100);
   frameBuffer.AttachColorTexture(frameBufferTexture);
 
-  Shader   cachedShader  = CreateShader();
-  Geometry quadGeometry  = CreateQuadGeometry();
-  Renderer cacheRenderer = Renderer::New(quadGeometry, cachedShader);
-  TextureSet textureSet  = TextureSet::New();
+  Shader     cachedShader  = CreateShader();
+  Geometry   quadGeometry  = CreateQuadGeometry();
+  Renderer   cacheRenderer = Renderer::New(quadGeometry, cachedShader);
+  TextureSet textureSet    = TextureSet::New();
   textureSet.SetTexture(0u, frameBufferTexture);
   cacheRenderer.SetTextures(textureSet);
   renderableActor.AddCacheRenderer(cacheRenderer);

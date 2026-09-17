@@ -587,6 +587,17 @@ DALI_CORE_API Vector3 GetTargetSize(const Actor& actor);
  */
 DALI_CORE_API Vector3 GetNaturalSize(const Actor& actor);
 
+/**
+ * @brief Like Dali::Actor::Add() but also allows Layers to be added as children.
+ *
+ * We want to stop the application from adding layers as children, but internally this is needed
+ * for some scenarios.
+ *
+ * @param[in] actor The actor to the child to
+ * @param[in] child The child to be added
+ */
+DALI_CORE_API void Add(Actor actor, Actor child);
+
 } // namespace DevelActor
 
 } //namespace DALI_NAMESPACE
