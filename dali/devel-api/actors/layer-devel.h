@@ -43,6 +43,13 @@ enum SiblingOrderMultiplier
   SIBLING_ORDER_MULTIPLIER = 1000,
 };
 
+/**
+ * @brief Creates a Layer object that does not fill the size of the window or parent actor.
+ * @return A handle to a newly allocated Layer
+ * @note Mimics older (pre 2.5.x) Layer::New behaviour where we do not set the resize-policy
+ */
+DALI_CORE_API Layer New();
+
 } // namespace DevelLayer
 
 } //namespace DALI_NAMESPACE

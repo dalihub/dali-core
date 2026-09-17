@@ -1011,6 +1011,7 @@ public:
    * @note If the child already has a parent, it will be removed from old parent
    * and reparented to this actor. This may change child's position, color,
    * scale etc as it now inherits them from this actor.
+   * @note A Layer cannot be added as a child and it will assert if attempted.
    */
   void Add(Actor child);
 

@@ -18,6 +18,7 @@
 #include <dali-test-suite-utils.h>
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/actors/actor-enumerations-devel.h>
+#include <dali/devel-api/actors/layer-devel.h>
 #include <dali/public-api/dali-core.h>
 #include <stdlib.h>
 
@@ -64,6 +65,19 @@ int UtcDaliLayerNew(void)
 {
   TestApplication application;
   Layer           layer = Layer::New();
+  DALI_TEST_EQUALS(layer.GetProperty<String>(DevelActor::Property::WIDTH_RESIZE_POLICY), String("FILL_TO_PARENT"), TEST_LOCATION);
+  DALI_TEST_EQUALS(layer.GetProperty<String>(DevelActor::Property::HEIGHT_RESIZE_POLICY), String("FILL_TO_PARENT"), TEST_LOCATION);
+
+  DALI_TEST_CHECK(layer);
+  END_TEST;
+}
+
+int UtcDaliDevelLayerNew(void)
+{
+  TestApplication application;
+  Layer           layer = DevelLayer::New();
+  DALI_TEST_EQUALS(layer.GetProperty<String>(DevelActor::Property::WIDTH_RESIZE_POLICY), String("USE_NATURAL_SIZE"), TEST_LOCATION);
+  DALI_TEST_EQUALS(layer.GetProperty<String>(DevelActor::Property::HEIGHT_RESIZE_POLICY), String("USE_NATURAL_SIZE"), TEST_LOCATION);
 
   DALI_TEST_CHECK(layer);
   END_TEST;
@@ -76,7 +90,7 @@ int UtcDaliLayerDownCast(void)
 
   Layer actor1  = Layer::New();
   Actor anActor = Actor::New();
-  anActor.Add(actor1);
+  DevelActor::Add(anActor, actor1);
 
   Actor child = anActor.GetChildAt(0);
   Layer layer = DownCast<Layer>(child);
@@ -888,7 +902,7 @@ int UtcDaliLayerIgnored(void)
   Layer child2 = Layer::New();
   child2.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   child2.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
-  parent.Add(child2);
+  DevelActor::Add(parent, child2);
 
   DALI_TEST_EQUALS(child1.IsIgnored(), false, TEST_LOCATION);
   DALI_TEST_EQUALS(child2.IsIgnored(), false, TEST_LOCATION);
@@ -1003,8 +1017,8 @@ int utcDaliLayerPartialUpdate(void)
   clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
-  Layer layer1 = Layer::New();
-  Layer layer2 = Layer::New();
+  Layer layer1 = DevelLayer::New();
+  Layer layer2 = DevelLayer::New();
 
   // get root
   Layer root = application.GetScene().GetLayer(0);
@@ -1109,8 +1123,8 @@ int utcDaliLayerUnderClippingNode(void)
    * Check whether glScissor for D was called.
    */
 
-  Layer layer1 = Layer::New();
-  Layer layer2 = Layer::New();
+  Layer layer1 = DevelLayer::New();
+  Layer layer2 = DevelLayer::New();
 
   // get root
   Layer root = application.GetScene().GetLayer(0);
@@ -1125,7 +1139,7 @@ int utcDaliLayerUnderClippingNode(void)
   application.GetScene().Add(layer1);
   layer1.Add(parentClipper);
 
-  parentClipper.Add(layer2);
+  DevelActor::Add(parentClipper, layer2);
 
   DALI_TEST_EQUALS(root.GetProperty<int>(Layer::Property::DEPTH), 0u, TEST_LOCATION);
   DALI_TEST_EQUALS(layer1.GetProperty<int>(Layer::Property::DEPTH), 1u, TEST_LOCATION);

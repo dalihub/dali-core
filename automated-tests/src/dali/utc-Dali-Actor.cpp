@@ -798,7 +798,7 @@ int UtcDaliActorAddN(void)
   // try reparenting root
   try
   {
-    parent2.Add(application.GetScene().GetLayer(0));
+    DevelActor::Add(parent2, application.GetScene().GetLayer(0));
     tet_printf("Assertion test failed - no Exception\n");
     tet_result(TET_FAIL);
   }
@@ -820,6 +820,26 @@ int UtcDaliActorAddN(void)
     Actor empty;
     parent2.Add(empty);
     tet_printf("Assertion test failed - no Exception\n");
+    tet_result(TET_FAIL);
+  }
+  catch(Dali::DaliException& e)
+  {
+    DALI_TEST_PRINT_ASSERT(e);
+    DALI_TEST_ASSERT(e, "actor", TEST_LOCATION);
+    DALI_TEST_EQUALS(parent2.GetChildCount(), 1u, TEST_LOCATION);
+  }
+  catch(...)
+  {
+    tet_printf("Assertion test failed - wrong Exception\n");
+    tet_result(TET_FAIL);
+  }
+
+  // try adding a Layer
+  try
+  {
+    Layer layer = Layer::New();
+    parent2.Add(layer);
+    tet_printf("Assertian test- failed - no Exception");
     tet_result(TET_FAIL);
   }
   catch(Dali::DaliException& e)
