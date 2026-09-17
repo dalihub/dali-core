@@ -42,10 +42,13 @@ class Scene;
 /**
  * Routes each device to the stream created from its initial geometry hit.
  *
- * Points with the same initial routing group share a stream, while independent initial
- * groups remain separate even if they later select the same owner. Device routes are
- * detached individually on terminal points. Scene touch boundaries are coordinated once
- * from the original event after all routed actor callbacks have completed.
+ * The initial routing group of a point is the nearest hit candidate requiring a multi-touch
+ * gesture (pinch or rotation), or the hit actor itself when there is none. Points with the same
+ * initial routing group share a stream, while independent initial groups remain separate even
+ * if they later select the same owner. A shared stream is delivered along the hit candidates
+ * of its first point only. Device routes are detached individually on terminal points. Scene
+ * touch boundaries are coordinated once from the original event after all routed actor
+ * callbacks have completed.
  */
 class GeometryTouchStreamRouter
 {

@@ -18,6 +18,7 @@
 #include <dali-test-suite-utils.h>
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/actors/actor-enumerations-devel.h>
+#include <dali/devel-api/actors/layer-devel.h>
 #include <dali/devel-api/events/hit-test-algorithm.h>
 #include <dali/devel-api/object/property-map-devel.h>
 #include <dali/integration-api/events/touch-event-integ.h>
@@ -372,7 +373,7 @@ int UtcDaliHitTestAlgorithmClippingActor(void)
   rootLayer.SetProperty(Actor::Property::NAME, "RootLayer");
 
   // Create a layer
-  Layer layer = Layer::New();
+  Layer layer = DevelLayer::New();
   layer.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   layer.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   layer.SetProperty(Actor::Property::NAME, "layer");
@@ -423,7 +424,7 @@ int UtcDaliHitTestAlgorithmClippingActorStress(void)
   rootLayer.SetProperty(Actor::Property::NAME, "RootLayer");
 
   // Create a layer
-  Layer layer = Layer::New();
+  Layer layer = DevelLayer::New();
   layer.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   layer.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   layer.SetProperty(Actor::Property::NAME, "layer");

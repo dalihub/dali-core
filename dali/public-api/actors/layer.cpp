@@ -28,7 +28,7 @@ Layer::Layer() = default;
 Layer Layer::New()
 {
   Internal::LayerPtr internal = Internal::Layer::New();
-
+  internal->SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
   return Layer(internal.Get());
 }
 
