@@ -144,6 +144,7 @@ SET( public_api_core_common_header_files
   ${public_api_src_dir}/common/dali-vector-complex-types.h
   ${public_api_src_dir}/common/dali-vector-trivial-types.h
   ${public_api_src_dir}/common/dali-vector.h
+  ${public_api_src_dir}/common/extents.h
   ${public_api_src_dir}/common/insets.h
   ${public_api_src_dir}/common/intrusive-ptr.h
   ${public_api_src_dir}/common/open-hash-map-managed.h
