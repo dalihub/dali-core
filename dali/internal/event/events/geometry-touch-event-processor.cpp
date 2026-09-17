@@ -127,11 +127,6 @@ Dali::Actor EmitGeoInterceptTouchSignals(const std::list<ActorPtr>& rootToTarget
   for(const auto& actorPtr : pathSnapshot)
   {
     Actor* actor = actorPtr.Get();
-    if(actor == stopBoundary)
-    {
-      break;
-    }
-
     if(TouchRecipientDispatcher::IsGeometryInterceptDispatchable(*actor, touchEvent))
     {
       DALI_TRACE_SCOPE(gTraceFilter, "DALI_EMIT_INTERCEPT_TOUCH_EVENT_SIGNAL");
@@ -139,6 +134,13 @@ Dali::Actor EmitGeoInterceptTouchSignals(const std::list<ActorPtr>& rootToTarget
       {
         return Dali::Actor(actor);
       }
+    }
+
+    // The owner may consume DOWN before recognizing a gesture through interception.
+    // Include its intercept callback so subsequent motion can start that gesture.
+    if(actor == stopBoundary)
+    {
+      break;
     }
   }
   return Dali::Actor();
