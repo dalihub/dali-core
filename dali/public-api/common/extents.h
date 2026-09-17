@@ -1,0 +1,6 @@
+#ifndef DALI_PUBLIC_API_COMMON_EXTENTS_COMPAT_H
+#define DALI_PUBLIC_API_COMMON_EXTENTS_COMPAT_H
+
+#include <dali/devel-api/common/extents.h>
+
+#endif // DALI_PUBLIC_API_COMMON_EXTENTS_COMPAT_H
