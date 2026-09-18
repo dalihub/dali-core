@@ -36,6 +36,20 @@ namespace DevelTexture
 bool DALI_CORE_API IsNative(Dali::Texture texture);
 
 /**
+ * @brief Function to determine if a texture needs a custom sampler type.
+ *
+ * A native image whose layout GL cannot describe as a plain 2D texture is
+ * sampled through a custom sampler type, and a shader that samples it has to
+ * declare that type. Whether one is needed is a property of the individual
+ * native image, not of the platform: a backend can have native image types that
+ * differ, so this has to be asked per texture.
+ *
+ * @param[in] texture The texture to query
+ * @return True if the texture is a native image that needs a custom sampler type
+ */
+bool DALI_CORE_API NeedsCustomSampler(Dali::Texture texture);
+
+/**
  * @brief Converts shader for native image.
  *
  * Applies any specific native shader prefix and sampler code to the
