@@ -166,16 +166,14 @@ public:
       mRareData->mClippingDepth = clippingDepth;
 
       // Calculate the sort value here on write, as when read (during sort) it may be accessed several times.
-      // The items must be sorted by Clipping ID first (so the ID is kept in the most significant bits).
+      // The items must be sorted by Clipping ID first (so the ID is kept in the most-significant bits).
       // For the same ID, the clipping nodes must be first, so we negate the
       // clipping enabled flag and set it as the least significant bit.
       mClippingSortModifier = (clippingId << 1u) | (mClippingMode == ClippingMode::DISABLED ? 1u : 0u);
     }
     else
     {
-      // If we do not have a clipping depth, then reset all clipping state to 0
-      // to prevent stale values from a previous render task traversal.
-      mClippingDepth        = 0u;
+      // If we do not have a clipping depth, then set this to 0 so we do not have a Clipping ID either.
       mClippingSortModifier = 0u;
       // Note: We do NOT free mRareData here to avoid allocation churn.
       // If mRareData exists, we just leave the depths as 0.

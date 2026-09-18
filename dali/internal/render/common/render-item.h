@@ -146,13 +146,6 @@ struct RenderItem
   const void*         mTextureSet; ///< Used for sorting only
   int                 mDepthIndex;
 
-  // Clipping information captured at update time (per render-task).
-  // This prevents stale clipping data from other render tasks (e.g. on-screen
-  // overwriting off-screen capture) from affecting rendering.
-  uint32_t mClippingId{0u};
-  uint32_t mClippingDepth{0u};
-  uint32_t mScissorDepth{0u};
-
   bool mIsOpaque : 1;
   bool mIsUpdated : 1;
 

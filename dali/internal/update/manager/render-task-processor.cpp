@@ -239,12 +239,6 @@ void ProcessTasks(RenderTaskList::RenderTaskContainer& taskContainer,
   {
     RenderTask& renderTask = **iter;
 
-    // Reset clipping state for each render task to prevent stale clipping
-    // information from previous render tasks (e.g. offscreen capture tasks)
-    // from affecting the current render task.
-    clippingId       = 0u;
-    hasClippingNodes = false;
-
     const bool hasFrameBuffer      = nullptr != renderTask.GetFrameBuffer();
     const bool isDefaultRenderTask = isFirstRenderTask;
     isFirstRenderTask              = false;

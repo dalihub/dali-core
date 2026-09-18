@@ -269,14 +269,6 @@ inline void AddRendererToRenderList(uint32_t                  renderPass,
       item.mIsOpaque   = isOpaque;
       item.mDepthIndex = isLayer3d ? 0 : node->GetDepthIndex();
 
-      // Capture the clipping information at this point (during the update phase for
-      // this specific render task). This prevents stale clipping data from other
-      // render tasks (e.g. on-screen overwriting off-screen capture) from affecting
-      // rendering in the render thread.
-      item.mClippingId    = node->GetClippingId();
-      item.mClippingDepth = node->GetClippingDepth();
-      item.mScissorDepth  = node->GetScissorDepth();
-
       if(DALI_LIKELY(rendererExist))
       {
         item.mRenderer   = renderable.mRenderer->GetRenderer();
