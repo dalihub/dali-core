@@ -269,6 +269,13 @@ inline void AddRendererToRenderList(uint32_t                  renderPass,
       item.mIsOpaque   = isOpaque;
       item.mDepthIndex = isLayer3d ? 0 : node->GetDepthIndex();
 
+      // Snapshot clipping info at creation time so it cannot be overwritten
+      // by a later render-task pass (e.g. on-screen overwriting off-screen).
+      item.mClippingId    = node->GetClippingId();
+      item.mClippingDepth = node->GetClippingDepth();
+      item.mScissorDepth  = node->GetScissorDepth();
+      item.mClippingMode  = node->GetClippingMode();
+
       if(DALI_LIKELY(rendererExist))
       {
         item.mRenderer   = renderable.mRenderer->GetRenderer();

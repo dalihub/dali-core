@@ -146,6 +146,14 @@ struct RenderItem
   const void*         mTextureSet; ///< Used for sorting only
   int                 mDepthIndex;
 
+  // Clipping information captured at RenderItem creation time.
+  // This prevents the on-screen render task pass from overwriting
+  // clipping info that was set by the off-screen (Capture) pass.
+  uint32_t                 mClippingId;
+  uint32_t                 mClippingDepth;
+  uint32_t                 mScissorDepth;
+  Dali::ClippingMode::Type mClippingMode;
+
   bool mIsOpaque : 1;
   bool mIsUpdated : 1;
 
