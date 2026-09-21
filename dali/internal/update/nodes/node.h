@@ -175,7 +175,6 @@ public:
     {
       // If we do not have a clipping depth, then reset all clipping state to 0
       // to prevent stale values from a previous render task traversal.
-      mClippingDepth        = 0u;
       mClippingSortModifier = 0u;
       // Note: We do NOT free mRareData here to avoid allocation churn.
       // If mRareData exists, we just leave the depths as 0.
