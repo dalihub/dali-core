@@ -307,9 +307,9 @@ inline void SetDrawCommandsMessage(EventThreadServices& eventThreadServices, con
   new(slot) LocalType(&renderer, &Renderer::SetDrawCommands, pDrawCommands, size);
 }
 
-inline void SetRenderCallbackMessage(EventThreadServices& eventThreadServices, const Renderer& renderer, Dali::RenderCallback* callback)
+inline void SetRenderCallbackMessage(EventThreadServices& eventThreadServices, const Renderer& renderer, Dali::RenderCallbackPtr callback)
 {
-  using LocalType = MessageValue1<Renderer, Dali::RenderCallback*>;
+  using LocalType = MessageValue1<Renderer, Dali::RenderCallbackPtr>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
@@ -317,14 +317,14 @@ inline void SetRenderCallbackMessage(EventThreadServices& eventThreadServices, c
   new(slot) LocalType(&renderer, &Renderer::SetRenderCallback, callback);
 }
 
-inline void TerminateRenderCallbackMessage(EventThreadServices& eventThreadServices, const Renderer& renderer, bool invokeCallback)
+inline void TerminateRenderCallbackMessage(EventThreadServices& eventThreadServices, const Renderer& renderer)
 {
-  using LocalType = MessageValue1<Renderer, bool>;
+  using LocalType = Message<Renderer>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
-  new(slot) LocalType(&renderer, &Renderer::TerminateRenderCallback, invokeCallback);
+  new(slot) LocalType(&renderer, &Renderer::TerminateRenderCallback);
 }
 
 inline void SetInstanceCountMessage(EventThreadServices& eventThreadServices, const Renderer& renderer, uint32_t instanceCount)

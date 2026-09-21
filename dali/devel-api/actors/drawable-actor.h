@@ -45,10 +45,12 @@ public:
    * @brief Creates new DrawableActor instance
    *
    * @SINCE_2_1.15
-   * @param[in] callback Reference to the valid DrawableCallback object
+   * @param[in] callback The DrawableCallback to draw through
    * @return Handle to the new DrawableActor
+   *
+   * @note The render side keeps a reference, so the callback outlives this actor.
    */
-  static DrawableActor New(RenderCallback& callback);
+  static DrawableActor New(RenderCallbackPtr callback);
 
   /**
    * @brief Constructor

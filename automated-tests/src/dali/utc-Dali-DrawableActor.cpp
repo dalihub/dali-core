@@ -27,11 +27,11 @@ struct DrawableObject
   bool Render(const RenderCallbackInput& inputData)
   {
     // Store the size and clipping box of rendered area
-    size            = inputData.size;
-    clippingBox     = inputData.clippingBox;
-    worldColorMultiplier      = inputData.worldColorMultiplier;
-    terminate       = inputData.isTerminated;
-    nativeApiUsable = inputData.isNativeApiUsable;
+    size                 = inputData.size;
+    clippingBox          = inputData.clippingBox;
+    worldColorMultiplier = inputData.worldColorMultiplier;
+    terminate            = inputData.isTerminated;
+    nativeApiUsable      = inputData.isNativeApiUsable;
     ++invokeCount;
 
     return false;
@@ -40,9 +40,9 @@ struct DrawableObject
   bool RenderWithTextures(const RenderCallbackInput& inputData)
   {
     // Store the size and clipping box of rendered area
-    size        = inputData.size;
-    clippingBox = inputData.clippingBox;
-    worldColorMultiplier  = inputData.worldColorMultiplier;
+    size                 = inputData.size;
+    clippingBox          = inputData.clippingBox;
+    worldColorMultiplier = inputData.worldColorMultiplier;
 
     auto count = inputData.textureBindings.Count();
 
@@ -91,7 +91,7 @@ int UtcDaliRendererSetRenderCallbackP(void)
   actor.SetProperty(Actor::Property::SIZE, Vector2(100, 100));
   actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Color::MAROON * Vector4(1.0f, 1.0f, 1.0f, opacity));
 
-  auto renderer = DevelRenderer::New(*callback);
+  auto renderer = DevelRenderer::New(callback);
   actor.AddRenderer(renderer);
 
   // flush the queue and render once
@@ -126,7 +126,7 @@ int UtcDaliRendererSetRenderCallbackUnsafeP(void)
   actor.SetProperty(Actor::Property::SIZE, Vector2(100, 100));
   actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Color::MAROON * Vector4(1.0f, 1.0f, 1.0f, opacity));
 
-  auto renderer = DevelRenderer::New(*callback);
+  auto renderer = DevelRenderer::New(callback);
   actor.AddRenderer(renderer);
 
   // flush the queue and render once
@@ -163,7 +163,7 @@ int UtcDaliRendererSetRenderCallbackViaDevelP(void)
   // A renderer with neither geometry nor shader is only renderable once it has a callback,
   // so attach one before adding the renderer to the actor.
   Renderer renderer = Renderer::New();
-  DevelRenderer::SetRenderCallback(renderer, firstCallback.Get());
+  DevelRenderer::SetRenderCallback(renderer, firstCallback);
   actor.AddRenderer(renderer);
 
   application.SendNotification();
@@ -173,16 +173,18 @@ int UtcDaliRendererSetRenderCallbackViaDevelP(void)
   DALI_TEST_EQUALS(second.size, Size(Vector2::ZERO), TEST_LOCATION);
 
   // Replacing the callback drops the cached render target objects of the previous one.
-  DevelRenderer::SetRenderCallback(renderer, secondCallback.Get());
+  DevelRenderer::SetRenderCallback(renderer, secondCallback);
 
   application.SendNotification();
   application.Render();
 
   DALI_TEST_EQUALS(second.size, Size(100, 100), TEST_LOCATION);
 
-  // Clearing it makes the renderer non-renderable again, so the callback stops running.
+  // Finishing with it makes the renderer non-renderable again, so the callback stops
+  // running. Detached first, as this one has nothing to release.
   second.size = Size(Vector2::ZERO);
-  DevelRenderer::SetRenderCallback(renderer, nullptr);
+  secondCallback->Invalidate();
+  DevelRenderer::TerminateRenderCallback(renderer);
 
   application.SendNotification();
   application.Render();
@@ -208,7 +210,7 @@ int UtcDaliRendererTerminateRenderCallbackP(void)
   actor.SetProperty(Actor::Property::SIZE, Vector2(100, 100));
   actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Color::MAROON * Vector4(1.0f, 1.0f, 1.0f, opacity));
 
-  auto renderer = DevelRenderer::New(*callback);
+  auto renderer = DevelRenderer::New(callback);
   actor.AddRenderer(renderer);
 
   // flush the queue and render once
@@ -224,7 +226,7 @@ int UtcDaliRendererTerminateRenderCallbackP(void)
   application.SendNotification();
   application.Render();
 
-  DevelRenderer::TerminateRenderCallback(renderer, true);
+  DevelRenderer::TerminateRenderCallback(renderer);
 
   DALI_TEST_EQUALS(drawable.terminate, false, TEST_LOCATION);
 
@@ -252,14 +254,14 @@ int UtcDaliRendererTerminateRenderCallbackNeverDrawnP(void)
 
   // Never added to an actor, so the callback is not associated with any render target and
   // there is nothing to schedule the terminate invocation against.
-  auto renderer = DevelRenderer::New(*callback);
+  auto renderer = DevelRenderer::New(callback);
 
   application.SendNotification();
   application.Render();
 
   DALI_TEST_EQUALS(drawable.invokeCount, 0u, TEST_LOCATION);
 
-  DevelRenderer::TerminateRenderCallback(renderer, true);
+  DevelRenderer::TerminateRenderCallback(renderer);
 
   application.SendNotification();
   application.Render();
@@ -271,7 +273,7 @@ int UtcDaliRendererTerminateRenderCallbackNeverDrawnP(void)
   DALI_TEST_EQUALS(drawable.nativeApiUsable, false, TEST_LOCATION);
 
   // ...and not again on subsequent frames, nor when the terminate is requested again.
-  DevelRenderer::TerminateRenderCallback(renderer, true);
+  DevelRenderer::TerminateRenderCallback(renderer);
 
   application.SendNotification();
   application.Render();
@@ -294,7 +296,7 @@ int UtcDaliRendererTerminateRenderCallbackRepeatedP(void)
   actor.SetProperty(Actor::Property::SIZE, Vector2(100, 100));
   application.GetScene().Add(actor);
 
-  auto renderer = DevelRenderer::New(*callback);
+  auto renderer = DevelRenderer::New(callback);
   actor.AddRenderer(renderer);
 
   application.SendNotification();
@@ -305,7 +307,7 @@ int UtcDaliRendererTerminateRenderCallbackRepeatedP(void)
   const uint32_t drawnCount = drawable.invokeCount;
   DALI_TEST_CHECK(drawnCount > 0u);
 
-  DevelRenderer::TerminateRenderCallback(renderer, true);
+  DevelRenderer::TerminateRenderCallback(renderer);
   actor.RemoveRenderer(renderer);
 
   application.SendNotification();
@@ -316,7 +318,7 @@ int UtcDaliRendererTerminateRenderCallbackRepeatedP(void)
   DALI_TEST_EQUALS(drawable.nativeApiUsable, true, TEST_LOCATION);
 
   // Asking again changes nothing.
-  DevelRenderer::TerminateRenderCallback(renderer, true);
+  DevelRenderer::TerminateRenderCallback(renderer);
 
   application.SendNotification();
   application.Render();
@@ -341,13 +343,13 @@ int UtcDaliRendererTerminateRenderCallbackReplacedP(void)
   actor.SetProperty(Actor::Property::SIZE, Vector2(100, 100));
   application.GetScene().Add(actor);
 
-  auto renderer = DevelRenderer::New(*firstCallback);
+  auto renderer = DevelRenderer::New(firstCallback);
   actor.AddRenderer(renderer);
 
   application.SendNotification();
   application.Render();
 
-  DevelRenderer::TerminateRenderCallback(renderer, true);
+  DevelRenderer::TerminateRenderCallback(renderer);
   actor.RemoveRenderer(renderer);
 
   application.SendNotification();
@@ -357,7 +359,7 @@ int UtcDaliRendererTerminateRenderCallbackReplacedP(void)
 
   // The replacement gets a terminate of its own - the delivery already made belongs to the
   // callback that has been swapped out.
-  DevelRenderer::SetRenderCallback(renderer, secondCallback.Get());
+  DevelRenderer::SetRenderCallback(renderer, secondCallback);
   actor.AddRenderer(renderer);
 
   application.SendNotification();
@@ -366,7 +368,7 @@ int UtcDaliRendererTerminateRenderCallbackReplacedP(void)
   DALI_TEST_EQUALS(secondDrawable.terminate, false, TEST_LOCATION);
   DALI_TEST_CHECK(secondDrawable.invokeCount > 0u);
 
-  DevelRenderer::TerminateRenderCallback(renderer, true);
+  DevelRenderer::TerminateRenderCallback(renderer);
   actor.RemoveRenderer(renderer);
 
   application.SendNotification();
@@ -391,7 +393,7 @@ int UtcDaliRendererTerminateRenderCallbackRenderTargetDestroyedP(void)
   actor.SetProperty(Actor::Property::SIZE, Vector2(100, 100));
   application.GetScene().Add(actor);
 
-  auto renderer = DevelRenderer::New(*callback);
+  auto renderer = DevelRenderer::New(callback);
   actor.AddRenderer(renderer);
 
   // Exclusive, so the offscreen target is the only one the callback is drawn into and
@@ -416,7 +418,7 @@ int UtcDaliRendererTerminateRenderCallbackRenderTargetDestroyedP(void)
 
   // Queue the terminate, then drop the render target it was queued against before the
   // terminate draw can be submitted.
-  DevelRenderer::TerminateRenderCallback(renderer, true);
+  DevelRenderer::TerminateRenderCallback(renderer);
   actor.RemoveRenderer(renderer);
 
   task.SetFrameBuffer(FrameBuffer());
@@ -460,7 +462,7 @@ int UtcDaliRendererDestroyedWithoutTerminateRenderCallbackP(void)
   task.SetFrameBuffer(frameBuffer);
 
   {
-    auto renderer = DevelRenderer::New(*callback);
+    auto renderer = DevelRenderer::New(callback);
     actor.AddRenderer(renderer);
 
     application.SendNotification();
@@ -510,7 +512,7 @@ int UtcDaliRendererTerminateRenderCallbackUnsafeP(void)
   actor.SetProperty(Actor::Property::SIZE, Vector2(100, 100));
   actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Color::MAROON * Vector4(1.0f, 1.0f, 1.0f, opacity));
 
-  auto renderer = DevelRenderer::New(*callback);
+  auto renderer = DevelRenderer::New(callback);
   actor.AddRenderer(renderer);
 
   // flush the queue and render once
@@ -526,7 +528,7 @@ int UtcDaliRendererTerminateRenderCallbackUnsafeP(void)
   application.SendNotification();
   application.Render();
 
-  DevelRenderer::TerminateRenderCallback(renderer, true);
+  DevelRenderer::TerminateRenderCallback(renderer);
 
   DALI_TEST_EQUALS(drawable.terminate, false, TEST_LOCATION);
 
@@ -559,7 +561,7 @@ int UtcDaliRendererTerminateRenderCallbackUnsafeP2(void)
   actor.SetProperty(Actor::Property::SIZE, Vector2(100, 100));
   actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Color::MAROON * Vector4(1.0f, 1.0f, 1.0f, opacity));
 
-  auto renderer = DevelRenderer::New(*callback);
+  auto renderer = DevelRenderer::New(callback);
   actor.AddRenderer(renderer);
 
   // flush the queue and render once
@@ -575,7 +577,9 @@ int UtcDaliRendererTerminateRenderCallbackUnsafeP2(void)
   application.SendNotification();
   application.Render();
 
-  DevelRenderer::TerminateRenderCallback(renderer, false);
+  // Detached first, so the terminate invocation does not reach the callback.
+  callback->Invalidate();
+  DevelRenderer::TerminateRenderCallback(renderer);
 
   DALI_TEST_EQUALS(drawable.terminate, false, TEST_LOCATION);
 
@@ -602,7 +606,7 @@ int UtcDaliDrawableActor1P(void)
 
   auto callback = RenderCallback::New<DrawableObject>(&drawable, &DrawableObject::Render);
 
-  DrawableActor drawableActor = DrawableActor::New(*callback);
+  DrawableActor drawableActor = DrawableActor::New(callback);
   application.GetScene().Add(drawableActor);
 
   const float opacity = 0.5f;
@@ -640,7 +644,7 @@ int UtcRenderCallbackTextureBindingP(void)
   callback->BindTextureResources(texturesToBind);
   DALI_TEST_EQUALS(callback->AccessTextureResources().Get().Count(), texturesToBind.Count(), TEST_LOCATION);
 
-  DrawableActor drawableActor = DrawableActor::New(*callback);
+  DrawableActor drawableActor = DrawableActor::New(callback);
   application.GetScene().Add(drawableActor);
 
   drawableActor.SetProperty(Actor::Property::SIZE, Vector2(100, 100));
@@ -683,7 +687,7 @@ int UtcRenderCallbackTextureBindingNotUploaded(void)
   texturesToBind.PushBack(uploaded);
   callback->BindTextureResources(texturesToBind);
 
-  DrawableActor drawableActor = DrawableActor::New(*callback);
+  DrawableActor drawableActor = DrawableActor::New(callback);
   application.GetScene().Add(drawableActor);
   drawableActor.SetProperty(Actor::Property::SIZE, Vector2(100, 100));
 
@@ -766,7 +770,7 @@ int UtcRenderCallbackTextureBindingAllNotUploaded(void)
   texturesToBind.PushBack(Texture::New(Dali::TextureType::TEXTURE_2D));
   callback->BindTextureResources(texturesToBind);
 
-  DrawableActor drawableActor = DrawableActor::New(*callback);
+  DrawableActor drawableActor = DrawableActor::New(callback);
   application.GetScene().Add(drawableActor);
   drawableActor.SetProperty(Actor::Property::SIZE, Vector2(100, 100));
 
@@ -810,7 +814,7 @@ int UtcDaliDrawableActor2P(void)
   actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Color::MAROON * Vector4(1.0f, 1.0f, 1.0f, opacity));
 
-  auto renderer = DevelRenderer::New(*callback);
+  auto renderer = DevelRenderer::New(callback);
   actor.AddRenderer(renderer);
 
   // flush the queue and render once
@@ -850,7 +854,7 @@ int UtcDaliDrawableActorSceneRotated(void)
   actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
-  auto renderer = DevelRenderer::New(*callback);
+  auto renderer = DevelRenderer::New(callback);
   actor.AddRenderer(renderer);
 
   // flush the queue and render once

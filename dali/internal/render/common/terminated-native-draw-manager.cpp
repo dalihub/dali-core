@@ -41,7 +41,7 @@ bool TerminatedNativeDrawManager::TerminatedCallbackExist(const SceneGraph::Rend
   return mTerminatedRenderTargets.find(&renderTarget) != mTerminatedRenderTargets.end();
 }
 
-void TerminatedNativeDrawManager::RegisterTerminatedRenderCallback(const SceneGraph::RenderTargetGraphicsObjects& renderTarget, RenderCallback* renderCallback, std::unique_ptr<Dali::RenderCallbackInput> renderCallbackInput)
+void TerminatedNativeDrawManager::RegisterTerminatedRenderCallback(const SceneGraph::RenderTargetGraphicsObjects& renderTarget, RenderCallbackPtr renderCallback, std::unique_ptr<Dali::RenderCallbackInput> renderCallbackInput)
 {
   if(mTerminatedRenderTargets.find(&renderTarget) == mTerminatedRenderTargets.end())
   {
@@ -70,7 +70,7 @@ void TerminatedNativeDrawManager::RegisterTerminatedRenderCallback(const SceneGr
 
   // Get or create container for given renderTarget
   auto& callbackList = mTerminatedRenderTargets[&renderTarget];
-  callbackList.emplace_back(renderCallback, std::move(info), std::move(renderCallbackInput));
+  callbackList.emplace_back(std::move(renderCallback), std::move(info), std::move(renderCallbackInput));
 }
 
 void TerminatedNativeDrawManager::SubmitAllTerminatedRenderCallback()
