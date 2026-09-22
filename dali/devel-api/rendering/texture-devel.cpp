@@ -27,6 +27,12 @@ bool IsNative(Dali::Texture texture)
   return impl.IsNative();
 }
 
+bool NeedsCustomSampler(Dali::Texture texture)
+{
+  auto& impl = GetImplementation(texture);
+  return impl.NeedsCustomSampler();
+}
+
 bool ApplyNativeFragmentShader(Dali::Texture texture, std::string& shader, int mask)
 {
   auto& impl = GetImplementation(texture);
