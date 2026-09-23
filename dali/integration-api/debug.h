@@ -125,10 +125,10 @@ DALI_CORE_API void LogMessage(enum DebugPriority level, const char* format, ...)
  * @param level debug level
  * @param format string format
  */
-#define LogMessageWithFunctionLine(level, format, ...)                            \
-  LogMessage(level,                                                               \
-             (std::string(DALI_LOG_FORMAT_PREFIX) + std::string(format)).c_str(), \
-             DALI_LOG_FORMAT_PREFIX_ARGS,                                         \
+#define LogMessageWithFunctionLine(level, format, ...) \
+  LogMessage(level,                                    \
+             DALI_LOG_FORMAT_PREFIX format,            \
+             DALI_LOG_FORMAT_PREFIX_ARGS,              \
              ##__VA_ARGS__)
 
 /**
