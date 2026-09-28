@@ -116,7 +116,7 @@ public:
   inline const char* GetCustomSamplerTypename() const override
   {
     mCallStack.PushCall("GetCustomSamplerTypename", "");
-    return "samplerExternalOES";
+    return mCustomSamplerTypename;
   };
 
   inline Any GetNativeImageHandle() const override
@@ -162,6 +162,10 @@ public:
   int32_t  mTargetTextureCalls;
   uint32_t mTargetTextureError{0u};
   bool     createResult;
+
+  /// Set to nullptr for a native image that samples as a plain 2D texture, which not
+  /// every native image type needs a custom sampler to do.
+  const char* mCustomSamplerTypename{"samplerExternalOES"};
 
   Dali::NativeImageInterface::PrepareTextureResult mPrepareTextureResult{Dali::NativeImageInterface::PrepareTextureResult::NO_ERROR};
 

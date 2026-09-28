@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/devel-api/signals/render-callback.h>
+#include <memory>
 #include <unordered_map>
 
 // INTERNAL INCLUDES
@@ -73,10 +74,11 @@ public: // For control terminated callback
    * @brief Register terminated render callback.
    *        It will own the reference of RenderCallbackInput. Will be removed after submit command.
    * @param[in] renderTarget The render target graphics objects that want to register terminated callback.
-   * @param[in] renderCallback The render callback. (now owned)
+   * @param[in] renderCallback The render callback to invoke. A reference is taken, so it
+   *                             outlives the renderer that queued this invocation.
    * @param[in] renderCallbackInput The input parameter of render callback.
    */
-  void RegisterTerminatedRenderCallback(const SceneGraph::RenderTargetGraphicsObjects& renderTarget, RenderCallback* renderCallback, std::unique_ptr<Dali::RenderCallbackInput> renderCallbackInput);
+  void RegisterTerminatedRenderCallback(const SceneGraph::RenderTargetGraphicsObjects& renderTarget, RenderCallbackPtr renderCallback, std::unique_ptr<Dali::RenderCallbackInput> renderCallbackInput);
 
   /**
    * @brief Submit all terminated render callbacks to graphics controller.
@@ -98,8 +100,8 @@ public: // From SceneGraph::RenderTargetGraphicsObjects::LifecycleObserver
 private:
   struct TerminateRenderCallbackInfo
   {
-    TerminateRenderCallbackInfo(RenderCallback* callback, Graphics::DrawNativeInfo&& drawInfo, std::unique_ptr<Dali::RenderCallbackInput> callbackInput)
-    : renderCallback(callback),
+    TerminateRenderCallbackInfo(RenderCallbackPtr callback, Graphics::DrawNativeInfo&& drawInfo, std::unique_ptr<Dali::RenderCallbackInput> callbackInput)
+    : renderCallback(std::move(callback)),
       info(std::move(drawInfo)),
       renderCallbackInput(std::move(callbackInput))
     {
@@ -112,7 +114,7 @@ private:
     TerminateRenderCallbackInfo(const TerminateRenderCallbackInfo&)            = delete;
     TerminateRenderCallbackInfo& operator=(const TerminateRenderCallbackInfo&) = delete;
 
-    RenderCallback*                            renderCallback;
+    RenderCallbackPtr                          renderCallback;
     Graphics::DrawNativeInfo                   info;
     std::unique_ptr<Dali::RenderCallbackInput> renderCallbackInput;
   };

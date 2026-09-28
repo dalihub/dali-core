@@ -25,9 +25,9 @@ using DrawableActorImpl = Dali::Internal::DrawableActor;
 
 namespace DALI_NAMESPACE
 {
-DrawableActor DrawableActor::New(RenderCallback& callback)
+DrawableActor DrawableActor::New(RenderCallbackPtr callback)
 {
-  auto internal = Internal::DrawableActor::New(&callback);
+  auto internal = Internal::DrawableActor::New(std::move(callback));
   return DrawableActor(internal.Get());
 }
 

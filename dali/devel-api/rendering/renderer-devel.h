@@ -19,6 +19,7 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/signals/render-callback.h>
 #include <dali/public-api/rendering/renderer.h>
 
 namespace DALI_NAMESPACE
@@ -33,10 +34,12 @@ namespace DevelRenderer
  * The callback is injected into the graphics pipeline in place of the renderer's own
  * drawing, so the renderer needs neither a geometry nor a shader.
  *
- * @param[in] renderCallback Valid RenderCallback
+ * @param[in] renderCallback The RenderCallback to draw through
  * @return A handle to the Renderer
+ *
+ * @note The render side keeps a reference, so the callback outlives this renderer.
  */
-DALI_CORE_API Renderer New(RenderCallback& renderCallback);
+DALI_CORE_API Renderer New(RenderCallbackPtr renderCallback);
 
 /**
  * @brief Sets the RenderCallback to be used for native rendering.
@@ -46,33 +49,34 @@ DALI_CORE_API Renderer New(RenderCallback& renderCallback);
  * to the client to release what the outgoing callback created. Use TerminateRenderCallback()
  * beforehand to have it release them itself.
  *
+ * A reference is taken as it is by New(), and the callback that was replaced is released
+ * once the render side is done with it.
+ *
  * @param[in] renderer A valid Renderer object
- * @param[in] callback Pointer to a valid RenderCallback object
+ * @param[in] renderCallback The RenderCallback to draw through
  */
-DALI_CORE_API void SetRenderCallback(Dali::Renderer renderer, RenderCallback* callback);
+DALI_CORE_API void SetRenderCallback(Dali::Renderer renderer, RenderCallbackPtr renderCallback);
 
 /**
- * @brief Detaches the RenderCallback from the render targets it has been drawn into.
+ * @brief Finishes with the RenderCallback the renderer draws through.
  *
- * The callback itself stays set on the renderer, so a renderer that is still on the scene
- * carries on being drawn and attaches again on the next frame. Remove the renderer from its
- * actor to stop it for good.
+ * The callback is invoked one last time with RenderCallbackInput::isTerminated set, so it
+ * can release what it created, and is then removed from the renderer. That leaves the
+ * renderer non-renderable unless it has a geometry and a shader of its own.
  *
  * @param[in] renderer A valid Renderer object
- * @param[in] invokeCallback Whether to invoke the callback one last time, with
- *                           RenderCallbackInput::isTerminated set, so it can release what it
- *                           created. Pass false to detach without telling the callback.
  *
  * @note The terminate invocation is asynchronous - it has to run in the context the
  *       resources were created in, which a later frame provides. Whatever the callback
- *       points at has to stay alive until then.
+ *       points at has to stay alive until then, or the callback has to be detached from
+ *       it with RenderCallback::Invalidate().
  * @note It is delivered once for each render target the callback has been drawn into, and
  *       only for the first request - asking again invokes nothing.
  * @note It is delivered even when there is nothing left to release it in: the callback was
  *       never drawn, or its render target has been destroyed. Check
  *       RenderCallbackInput::isNativeApiUsable before making any native API call.
  */
-DALI_CORE_API void TerminateRenderCallback(Dali::Renderer renderer, bool invokeCallback);
+DALI_CORE_API void TerminateRenderCallback(Dali::Renderer renderer);
 
 /**
  * The index of render queue used by the DrawCommand

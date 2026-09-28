@@ -21,19 +21,19 @@
 
 namespace DALI_NAMESPACE::Internal
 {
-DrawableActorPtr DrawableActor::New(RenderCallback* renderCallback)
+DrawableActorPtr DrawableActor::New(RenderCallbackPtr renderCallback)
 {
-  return DrawableActorPtr(new DrawableActor(*CreateNode(), renderCallback));
+  return DrawableActorPtr(new DrawableActor(*CreateNode(), std::move(renderCallback)));
 }
 
-DrawableActor::DrawableActor(const Internal::SceneGraph::Node& node, RenderCallback* renderCallback)
+DrawableActor::DrawableActor(const Internal::SceneGraph::Node& node, RenderCallbackPtr renderCallback)
 : Actor(Actor::BASIC, node)
 {
   auto rendererImpl = Internal::Renderer::New();
 
   rendererImpl->SetProperty(DevelRenderer::Property::RENDERING_BEHAVIOR, DevelRenderer::Rendering::CONTINUOUSLY);
 
-  rendererImpl->SetRenderCallback(renderCallback);
+  rendererImpl->SetRenderCallback(std::move(renderCallback));
 
   mRenderer = Dali::Renderer(rendererImpl.Get());
   AddRenderer(*rendererImpl.Get());

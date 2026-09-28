@@ -1363,18 +1363,17 @@ const Vector4& Renderer::GetBlendColor() const
   return Color::TRANSPARENT; // GL default
 }
 
-void Renderer::SetRenderCallback(RenderCallback* callback)
+void Renderer::SetRenderCallback(RenderCallbackPtr callback)
 {
   Dali::Internal::SceneGraph::SetRenderCallbackMessage(GetEventThreadServices(),
                                                        GetRendererSceneObject(),
-                                                       callback);
+                                                       std::move(callback));
 }
 
-void Renderer::TerminateRenderCallback(bool invokeCallback)
+void Renderer::TerminateRenderCallback()
 {
   Dali::Internal::SceneGraph::TerminateRenderCallbackMessage(GetEventThreadServices(),
-                                                             GetRendererSceneObject(),
-                                                             invokeCallback);
+                                                             GetRendererSceneObject());
 }
 
 } // namespace Internal

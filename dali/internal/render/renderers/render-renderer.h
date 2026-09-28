@@ -464,11 +464,24 @@ public:
   Program* PrepareProgram(const SceneGraph::RenderInstruction& instruction, bool cacheSharedUniformBlock);
 
   /**
-   * Sets RenderCallback object
+   * Sets a RenderCallback object this renderer takes a reference of
    *
-   * @param[in] callback Valid pointer to RenderCallback object
+   * Held until nothing refers to it any more, which is what lets the callback outlive the
+   * client that created it: a terminate invocation handed to the TerminatedNativeDrawManager
+   * takes a reference too, so it stays valid even once this renderer is gone.
+   *
+   * @param[in] callback Valid pointer to a RenderCallback object
    */
-  void SetRenderCallback(RenderCallback* callback);
+  void SetRenderCallback(RenderCallbackPtr callback);
+
+  /**
+   * Removes the RenderCallback object this renderer draws through
+   *
+   * The outgoing callback is detached from the render targets it has been drawn into
+   * without being told about it - use TerminateRenderCallback() beforehand to have it
+   * release what it created.
+   */
+  void RemoveRenderCallback();
 
   /**
    * @brief Remove RenderCallback used for native rendering.
@@ -484,7 +497,7 @@ public:
    */
   RenderCallback* GetRenderCallback()
   {
-    return mRenderCallback;
+    return mRenderCallback.Get();
   }
 
   /**
@@ -784,7 +797,7 @@ private:
 
   // For render callback features.
   Render::TerminatedNativeDrawManager* mTerminatedNativeDrawManager{nullptr};
-  RenderCallback*                      mRenderCallback{nullptr};
+  RenderCallbackPtr                    mRenderCallback{};
   std::unique_ptr<RenderCallbackInput> mRenderCallbackInput{nullptr};
   std::vector<Graphics::Texture*>      mRenderCallbackTextureBindings{};
 
