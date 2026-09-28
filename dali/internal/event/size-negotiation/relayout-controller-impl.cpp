@@ -76,7 +76,7 @@ void PrintChildren(Dali::Actor actor, int level)
 
   output << ", (" << actor.GetObjectPtr() << ")" << std::endl;
 
-  DALI_LOG_INFO(gLogFilter, Debug::Verbose, output.str().c_str());
+  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "%s", output.str().c_str());
 
   ++level;
   uint32_t numChildren = actor.GetChildCount();
