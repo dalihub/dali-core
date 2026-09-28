@@ -62,10 +62,6 @@ RenderItem::RenderItem()
   mNode(nullptr),
   mTextureSet(nullptr),
   mDepthIndex(0),
-  mClippingId(0u),
-  mClippingDepth(0u),
-  mScissorDepth(0u),
-  mClippingMode(Dali::ClippingMode::DISABLED),
   mIsOpaque(true),
   mIsUpdated(false)
 {
@@ -219,7 +215,7 @@ bool RenderItem::UsesStencilBuffer() const
   {
     case RenderMode::AUTO:
     {
-      if(mClippingId != 0u) // If there is a clipping node, then we are either reading/writing the stencil buffer.
+      if(mNode->GetClippingId() != 0u) // If there is a clipping node, then we are either reading/writing the stencil buffer.
       {
         usesStencil = true;
       }

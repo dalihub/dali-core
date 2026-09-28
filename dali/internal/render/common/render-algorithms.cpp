@@ -261,7 +261,8 @@ inline ClippingBox IntersectAABB(const ClippingBox& aabbA, const ClippingBox& aa
  */
 inline void SetupStencilClipping(const RenderItem& item, Graphics::CommandBuffer& commandBuffer, uint32_t& lastClippingDepth, uint32_t& lastClippingId)
 {
-  const uint32_t clippingId = item.mClippingId;
+  const Dali::Internal::SceneGraph::Node* node       = item.mNode;
+  const uint32_t                          clippingId = node->GetClippingId();
   // If there is no clipping Id, then either we haven't reached a clipping Node yet, or there aren't any.
   // Either way we can skip clipping setup for this renderer.
   if(clippingId == 0u)
@@ -272,14 +273,14 @@ inline void SetupStencilClipping(const RenderItem& item, Graphics::CommandBuffer
   }
   commandBuffer.SetStencilTestEnable(true);
 
-  const uint32_t clippingDepth = item.mClippingDepth;
+  const uint32_t clippingDepth = node->GetClippingDepth();
 
   // Pre-calculate a mask which has all bits set up to and including the current clipping depth.
   // EG. If depth is 3, the mask would be "111" in binary.
   const uint32_t currentDepthMask = (1u << clippingDepth) - 1u;
 
   // Are we are writing to the stencil buffer?
-  if(item.mClippingMode == Dali::ClippingMode::CLIP_CHILDREN)
+  if(item.mNode->GetClippingMode() == Dali::ClippingMode::CLIP_CHILDREN)
   {
     // We are writing to the stencil buffer.
     // If clipping Id is 1, this is the first clipping renderer within this render-list.
@@ -425,8 +426,8 @@ inline void RenderAlgorithms::SetupScissorClipping(
 {
   // Get the number of child scissors in the stack (do not include layer or root box).
   size_t         childStackDepth = mScissorStack.size() - 1u;
-  const uint32_t scissorDepth    = item.mScissorDepth;
-  const bool     clippingNode    = item.mClippingMode == Dali::ClippingMode::CLIP_TO_BOUNDING_BOX;
+  const uint32_t scissorDepth    = item.mNode->GetScissorDepth();
+  const bool     clippingNode    = item.mNode->GetClippingMode() == Dali::ClippingMode::CLIP_TO_BOUNDING_BOX;
   bool           traversedUpTree = false;
 
   // If we are using scissor clipping and we are at the same depth (or less), we need to undo previous clips.
