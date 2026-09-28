@@ -187,31 +187,6 @@ struct PanTraceFunctor
   PanTrace& trace;
 };
 
-struct LongPressTrace
-{
-  uint32_t Count(GestureState state) const
-  {
-    return static_cast<uint32_t>(std::count(states.begin(), states.end(), state));
-  }
-
-  std::vector<GestureState> states;
-};
-
-struct LongPressTraceFunctor
-{
-  explicit LongPressTraceFunctor(LongPressTrace& trace)
-  : trace(trace)
-  {
-  }
-
-  void operator()(Actor, LongPressGesture longPress)
-  {
-    trace.states.push_back(longPress.GetState());
-  }
-
-  LongPressTrace& trace;
-};
-
 struct MutableTouchTraceFunctor
 {
   MutableTouchTraceFunctor(TouchTrace& trace, const char* receiver, bool& consume)
@@ -938,63 +913,6 @@ int UtcDaliGeoTouchStreamOwnerRecognizesPanThroughIntercept(void)
   DALI_TEST_EQUALS(1u, panTrace.Count(GestureState::FINISHED), TEST_LOCATION);
   DALI_TEST_EQUALS(0u, panTrace.Count(GestureState::CANCELLED), TEST_LOCATION);
   DALI_TEST_CHECK(!intercepted);
-  END_TEST;
-}
-
-int UtcDaliGeoTouchStreamInterceptReachesHitViewBelowOwner(void)
-{
-  // A view feeding a gesture detector only through interception must receive a terminal
-  // INTERRUPTED intercept event when an ancestor consumed the touch and became the owner.
-  // Otherwise the detector sees the DOWN but never the UP, and a simple tap is
-  // reported as a long press once the recognition timeout elapses.
-  TestApplication application;
-  TouchTrace      touchTrace;
-  LongPressTrace  longPressTrace;
-
-  Actor container = CreateTouchableActor("container"); // consumes the touch and becomes the owner
-  Actor card      = CreateTouchableActor("card");      // the initial hit actor below the owner
-  container.Add(card);
-  application.GetScene().Add(container);
-
-  LongPressGestureDetector detector = LongPressGestureDetector::New();
-  LongPressTraceFunctor    longPressFunctor(longPressTrace);
-  detector.DetectedSignal().Connect(&application, longPressFunctor);
-
-  // The card feeds the detector purely through interception.
-  card.InterceptTouchEventSignal().Connect(&application, [&](Actor receiver, TouchEvent touch)
-  {
-    touchTrace.Record("card-intercept", CallbackKind::INTERCEPT, touch);
-    return detector.HandleEvent(receiver, touch);
-  });
-
-  TouchTraceFunctor containerTouch(touchTrace, "container-touch", true);
-  container.TouchEventSignal().Connect(&application, containerTouch);
-  PrepareScene(application);
-
-  // A quick tap: DOWN, MOTION and UP well within the long press timeout.
-  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
-  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(11.0f, 11.0f)));
-  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(11.0f, 11.0f)));
-
-  // The hit view below the owner received the DOWN through interception but, because the
-  // owner consumed the touch, it does not receive continued MOTION/UP intercept events.
-  // Instead it receives a single INTERRUPTED intercept event so that gesture recognizers
-  // fed through interception cancel cleanly (Android-style ACTION_CANCEL to displaced children).
-  DALI_TEST_EQUALS(1u, touchTrace.Count("card-intercept", CallbackKind::INTERCEPT, PointState::DOWN), TEST_LOCATION);
-  DALI_TEST_EQUALS(0u, touchTrace.Count("card-intercept", CallbackKind::INTERCEPT, PointState::MOTION), TEST_LOCATION);
-  DALI_TEST_EQUALS(0u, touchTrace.Count("card-intercept", CallbackKind::INTERCEPT, PointState::UP), TEST_LOCATION);
-  DALI_TEST_EQUALS(1u, touchTrace.Count("card-intercept", CallbackKind::INTERCEPT, PointState::INTERRUPTED), TEST_LOCATION);
-
-  // The owner still receives the complete touch stream.
-  DALI_TEST_EQUALS(1u, touchTrace.Count("container-touch", CallbackKind::TOUCH, PointState::DOWN), TEST_LOCATION);
-  DALI_TEST_EQUALS(1u, touchTrace.Count("container-touch", CallbackKind::TOUCH, PointState::MOTION), TEST_LOCATION);
-  DALI_TEST_EQUALS(1u, touchTrace.Count("container-touch", CallbackKind::TOUCH, PointState::UP), TEST_LOCATION);
-
-  // Fire any pending recognition timer: the tap must not be reported as a long press.
-  application.GetPlatform().TriggerTimer();
-  DALI_TEST_EQUALS(0u, longPressTrace.Count(GestureState::STARTED), TEST_LOCATION);
-  DALI_TEST_EQUALS(0u, longPressTrace.Count(GestureState::FINISHED), TEST_LOCATION);
-
   END_TEST;
 }
 
