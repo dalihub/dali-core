@@ -175,6 +175,13 @@ public:
   bool IsNative() const;
 
   /**
+   * @brief Determine if the texture's native image needs a custom sampler type
+   *
+   * @return true if the native image reports a custom sampler type
+   */
+  bool NeedsCustomSampler() const;
+
+  /**
    * @brief Apply any native texture code to the given fragment shader
    *
    * @param[in,out] shader The fragment shader

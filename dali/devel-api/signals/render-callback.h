@@ -21,11 +21,13 @@
 // INTERNAL INCLUDES
 #include <dali/devel-api/threading/mutex.h>
 #include <dali/public-api/common/dali-vector.h>
+#include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/common/unique-ptr.h>
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/math/rect.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/object/any.h>
+#include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/rendering/texture.h>
 #include <dali/public-api/signals/callback.h>
 
@@ -80,6 +82,9 @@ struct DALI_CORE_API RenderCallbackInput
   bool isNativeApiUsable;
 };
 
+class RenderCallback;
+using RenderCallbackPtr = IntrusivePtr<RenderCallback>;
+
 /**
  * @class RenderCallback
  *
@@ -89,8 +94,12 @@ struct DALI_CORE_API RenderCallbackInput
  * native API is context-less) to maintain state separation from DALi render state.
  *
  * The class wraps CallbackBase object ensuring its type-safe assignment
+ *
+ * @note The callback runs on a rendering thread and must not wait on the event thread.
+ *       Invalidate() waits for a running invocation to return, so an invocation waiting
+ *       for the event thread in turn would hold both up.
  */
-class DALI_CORE_API RenderCallback
+class DALI_CORE_API RenderCallback : public Dali::RefObject
 {
 public:
   /**
@@ -133,31 +142,20 @@ public:
   template<class T>
   using FuncType = bool (T::*)(const Dali::RenderCallbackInput&);
 
-  /**
-   * @brief Constructor of RenderCallback
-   *
-   * @param[in] object Object to invoke
-   * @param[in] func Member function to invoke
-   * @param[in] executionMode execution mode of custom code
-   */
-  template<class T>
-  RenderCallback(T* object, FuncType<T> func, ExecutionMode executionMode)
-  : mCallback(MakeCallback(object, func)),
-    mExecutionMode(executionMode)
-  {
-  }
+  RenderCallback(const RenderCallback&)            = delete;
+  RenderCallback& operator=(const RenderCallback&) = delete;
 
   /**
    * @brief Creates new instance of RenderCallback
    *
    * @param[in] object Object to invoke
    * @param[in] func Member function to invoke
-   * @return Unique pointer to the RenderCallback instance
+   * @return Reference counted pointer to the RenderCallback instance
    */
   template<class T>
-  static UniquePtr<Dali::RenderCallback> New(T* object, FuncType<T> func)
+  static RenderCallbackPtr New(T* object, FuncType<T> func)
   {
-    return MakeUnique<Dali::RenderCallback>(object, func, ExecutionMode::DEFAULT);
+    return New(MakeCallback(object, func), ExecutionMode::DEFAULT);
   }
 
   /**
@@ -166,12 +164,33 @@ public:
    * @param[in] object Object to invoke
    * @param[in] func Member function to invoke
    * @param[in] executionMode Execution mode of custom code
-   * @return Unique pointer to the RenderCallback instance
+   * @return Reference counted pointer to the RenderCallback instance
    */
   template<class T>
-  static UniquePtr<Dali::RenderCallback> New(T* object, FuncType<T> func, ExecutionMode executionMode)
+  static RenderCallbackPtr New(T* object, FuncType<T> func, ExecutionMode executionMode)
   {
-    return MakeUnique<Dali::RenderCallback>(object, func, executionMode);
+    return New(MakeCallback(object, func), executionMode);
+  }
+
+  /**
+   * @brief Stops the callback reaching the object it was created for
+   *
+   * The render side keeps a reference, so the callback outlives that object - call this
+   * from its destructor. Blocks until an invocation that is running has returned, and
+   * later ones return false without reaching it. The bound textures are released here
+   * too, as those are event thread handles.
+   *
+   * @note Event thread only, and never from inside the callback: this waits for an
+   *       invocation that is running, which would be that one.
+   * @note Calling this more than once has no further effect.
+   */
+  void Invalidate()
+  {
+    Dali::Mutex::ScopedLock lock(mDispatchMutex);
+    mInvalidated = true;
+
+    Dali::Mutex::ScopedLock texturesLock(mTextureResourcesMutex);
+    mTextureResources.Clear();
   }
 
   /**
@@ -181,7 +200,7 @@ public:
    */
   explicit operator Dali::CallbackBase*()
   {
-    return mCallback.Get();
+    return mDispatchCallback.Get();
   }
 
   /**
@@ -258,7 +277,7 @@ public:
    */
   explicit operator Dali::CallbackBase&()
   {
-    return *mCallback;
+    return *mDispatchCallback;
   }
 
   /**
@@ -285,13 +304,62 @@ public:
     return mExecutionMode;
   }
 
+protected:
+  /**
+   * @brief Constructor of RenderCallback
+   *
+   * @param[in] callback The callback to invoke, which this takes ownership of
+   * @param[in] executionMode execution mode of custom code
+   */
+  RenderCallback(Dali::CallbackBase* callback, ExecutionMode executionMode);
+
+  /**
+   * @brief A reference counted object may only be deleted by calling Unreference()
+   */
+  ~RenderCallback() override;
+
 private:
-  UniquePtr<Dali::CallbackBase> mCallback; //< Callback base object
+  /**
+   * @brief Creates an instance from a callback the templated New() already bound
+   *
+   * @param[in] callback The callback to invoke, which the instance takes ownership of
+   * @param[in] executionMode Execution mode of custom code
+   * @return Reference counted pointer to the RenderCallback instance
+   *
+   * @note Not a template, and defined inside the library on purpose: the construction is
+   *       what needs the vtable, and on Windows a client cannot emit one for a class the
+   *       library exports.
+   */
+  static RenderCallbackPtr New(Dali::CallbackBase* callback, ExecutionMode executionMode);
+
+  /**
+   * @brief Invokes the client's callback, unless it has been invalidated
+   *
+   * @param[in] input The rendering context, as filled in for the client's callback
+   * @return What the client reported, or false where it was not reached
+   */
+  bool Dispatch(const Dali::RenderCallbackInput& input)
+  {
+    Dali::Mutex::ScopedLock lock(mDispatchMutex);
+    if(mInvalidated)
+    {
+      return false;
+    }
+    return CallbackBase::ExecuteReturn<bool, const Dali::RenderCallbackInput&>(*mCallback, input);
+  }
+
+private:
+  UniquePtr<Dali::CallbackBase> mCallback;         //< Callback base object
+  UniquePtr<Dali::CallbackBase> mDispatchCallback; //< What the render side invokes, bound to this
+  Dali::Mutex                   mDispatchMutex{};  ///< Held across an invocation, so Invalidate() can wait for one
   Dali::RenderCallbackInput     mRenderCallbackInput;
   ExecutionMode                 mExecutionMode{ExecutionMode::DEFAULT};
   Dali::Vector<Dali::Texture>   mTextureResources{};
   mutable Dali::Mutex           mTextureResourcesMutex{}; ///< Guards mTextureResources across threads
+
+  bool mInvalidated{false}; ///< Guarded by mDispatchMutex
 };
+
 } //namespace DALI_NAMESPACE
 
 #endif // DALI_RENDER_CALLBACK_H

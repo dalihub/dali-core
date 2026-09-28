@@ -1770,6 +1770,60 @@ int UtcDaliTextureCheckNativeN2(void)
   END_TEST;
 }
 
+int UtcDaliTextureNeedsCustomSamplerP(void)
+{
+  TestApplication        application;
+  TestNativeImagePointer testNativeImage = TestNativeImage::New(64u, 64u);
+  Texture                nativeTexture   = Texture::New(*testNativeImage);
+
+  DALI_TEST_CHECK(nativeTexture);
+  DALI_TEST_CHECK(DevelTexture::NeedsCustomSampler(nativeTexture));
+  END_TEST;
+}
+
+int UtcDaliTextureNeedsCustomSamplerN1(void)
+{
+  TestApplication application;
+  Texture         texture = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 64u, 64u);
+
+  DALI_TEST_CHECK(texture);
+  DALI_TEST_CHECK(!DevelTexture::NeedsCustomSampler(texture));
+  END_TEST;
+}
+
+int UtcDaliTextureNeedsCustomSamplerN2(void)
+{
+  TestApplication        application;
+  TestNativeImagePointer testNativeImage = TestNativeImage::New(64u, 64u);
+
+  // The case this has to tell apart from being native at all: a native image that
+  // samples as a plain 2D texture, so no shader of its own is needed.
+  testNativeImage->mCustomSamplerTypename = nullptr;
+
+  Texture nativeTexture = Texture::New(*testNativeImage);
+
+  DALI_TEST_CHECK(nativeTexture);
+  DALI_TEST_CHECK(DevelTexture::IsNative(nativeTexture));
+  DALI_TEST_CHECK(!DevelTexture::NeedsCustomSampler(nativeTexture));
+  END_TEST;
+}
+
+int UtcDaliTextureNeedsCustomSamplerN3(void)
+{
+  TestApplication application;
+  Texture         texture;
+  try
+  {
+    bool needsCustomSampler = DevelTexture::NeedsCustomSampler(texture);
+    DALI_TEST_CHECK(needsCustomSampler != needsCustomSampler);
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true);
+  }
+  END_TEST;
+}
+
 int UtcDaliTextureApplyFragShaderP1(void)
 {
   TestApplication        application;

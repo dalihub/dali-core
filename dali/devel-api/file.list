@@ -41,6 +41,7 @@ SET( devel_api_src_files
   ${devel_api_src_dir}/rendering/texture-devel.cpp
   ${devel_api_src_dir}/rendering/vertex-buffer-devel.cpp
   ${devel_api_src_dir}/scripting/scripting.cpp
+  ${devel_api_src_dir}/signals/render-callback.cpp
   ${devel_api_src_dir}/signals/signal-delegate.cpp
   ${devel_api_src_dir}/threading/conditional-wait.cpp
   ${devel_api_src_dir}/threading/mutex.cpp

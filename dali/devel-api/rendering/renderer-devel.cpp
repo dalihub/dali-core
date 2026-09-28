@@ -23,21 +23,21 @@ namespace DALI_NAMESPACE
 {
 namespace DevelRenderer
 {
-Renderer New(RenderCallback& renderCallback)
+Renderer New(RenderCallbackPtr renderCallback)
 {
   Internal::RendererPtr renderer = Internal::Renderer::New();
-  renderer->SetRenderCallback(&renderCallback);
+  renderer->SetRenderCallback(std::move(renderCallback));
   return Renderer(renderer.Get());
 }
 
-void SetRenderCallback(Dali::Renderer renderer, RenderCallback* callback)
+void SetRenderCallback(Dali::Renderer renderer, RenderCallbackPtr renderCallback)
 {
-  GetImplementation(renderer).SetRenderCallback(callback);
+  GetImplementation(renderer).SetRenderCallback(std::move(renderCallback));
 }
 
-void TerminateRenderCallback(Dali::Renderer renderer, bool invokeCallback)
+void TerminateRenderCallback(Dali::Renderer renderer)
 {
-  GetImplementation(renderer).TerminateRenderCallback(invokeCallback);
+  GetImplementation(renderer).TerminateRenderCallback();
 }
 
 bool IsAdvancedBlendEquationApplied(const Renderer& renderer)

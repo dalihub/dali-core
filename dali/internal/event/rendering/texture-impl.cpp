@@ -660,6 +660,11 @@ bool Texture::IsNative() const
   return static_cast<bool>(mNativeImage);
 }
 
+bool Texture::NeedsCustomSampler() const
+{
+  return mNativeImage && mNativeImage->GetCustomSamplerTypename() != nullptr;
+}
+
 bool Texture::ApplyNativeFragmentShader(std::string& shader, int mask)
 {
   bool modified = false;

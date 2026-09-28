@@ -492,18 +492,22 @@ public:
   }
 
   /**
-   * Sets RenderCallback object
+   * Sets a RenderCallback object the render side takes a reference of
    *
-   * @param[in] callback Valid pointer to RenderCallback object
+   * @param[in] callback Valid pointer to a RenderCallback object
    */
-  void SetRenderCallback(RenderCallback* callback);
+  void SetRenderCallback(RenderCallbackPtr callback);
 
   /**
-   * @brief Remove RenderCallback what native rendering used.
-   *
-   * @param[in] invokeCallback Invoke render callbacks forcibly if we need to catch terminate case at callback.
+   * Removes the RenderCallback object, leaving the renderer to draw through a geometry
+   * and a shader of its own, if it has them
    */
-  void TerminateRenderCallback(bool invokeCallback);
+  void RemoveRenderCallback();
+
+  /**
+   * @brief Invokes the RenderCallback one last time, then removes it
+   */
+  void TerminateRenderCallback();
 
   /**
    * Returns currently set RenderCallback pointer or not.

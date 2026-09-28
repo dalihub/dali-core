@@ -510,21 +510,27 @@ void Renderer::SetUpdateAreaMargin(const Dali::Insets& updateAreaMargin)
   }
 }
 
-void Renderer::SetRenderCallback(RenderCallback* callback)
+void Renderer::SetRenderCallback(RenderCallbackPtr callback)
 {
-  mIsRenderableFlag &= ~RenderableFlag::HAS_RENDER_CALLBACK;
-  if(callback)
+  mIsRenderableFlag |= RenderableFlag::HAS_RENDER_CALLBACK;
+  if(DALI_LIKELY(mRenderer))
   {
-    mIsRenderableFlag |= RenderableFlag::HAS_RENDER_CALLBACK;
+    mRenderer.Get()->SetRenderCallback(std::move(callback));
   }
-  CallRenderFunction(mRenderer, &Render::Renderer::SetRenderCallback, callback);
   SetUpdated(true);
 }
 
-void Renderer::TerminateRenderCallback(bool invokeCallback)
+void Renderer::RemoveRenderCallback()
 {
-  CallRenderFunction(mRenderer, &Render::Renderer::TerminateRenderCallback, invokeCallback);
-  SetRenderCallback(nullptr);
+  mIsRenderableFlag &= ~RenderableFlag::HAS_RENDER_CALLBACK;
+  CallRenderFunction(mRenderer, &Render::Renderer::RemoveRenderCallback);
+  SetUpdated(true);
+}
+
+void Renderer::TerminateRenderCallback()
+{
+  CallRenderFunction(mRenderer, &Render::Renderer::TerminateRenderCallback, true);
+  RemoveRenderCallback();
 }
 
 bool Renderer::HasRenderCallback() const

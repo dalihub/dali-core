@@ -1372,14 +1372,25 @@ void Renderer::ClearPipelineCache(bool notifyToCache)
   }
 }
 
-void Renderer::SetRenderCallback(RenderCallback* callback)
+void Renderer::SetRenderCallback(RenderCallbackPtr callback)
 {
   // RenderCallback changed! Remove cached render target objects first, and change callback.
   if(mRenderCallback)
   {
     TerminateRenderCallback(false);
   }
-  mRenderCallback           = callback;
+  mRenderCallback           = std::move(callback);
+  mRenderCallbackTerminated = false;
+}
+
+void Renderer::RemoveRenderCallback()
+{
+  // Remove the cached render target objects of the outgoing callback before dropping it.
+  if(mRenderCallback)
+  {
+    TerminateRenderCallback(false);
+  }
+  mRenderCallback.Reset();
   mRenderCallbackTerminated = false;
 }
 
