@@ -26,6 +26,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
+#include <dali/devel-api/object/object-registry.h>
 #include <dali/devel-api/object/type-registry.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/render-controller.h>
@@ -34,7 +35,6 @@
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/common/object-registry-impl.h>
 #include <dali/internal/event/common/thread-local-storage.h>
-#include <dali/public-api/object/object-registry.h>
 
 namespace DALI_NAMESPACE
 {

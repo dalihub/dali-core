@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali/public-api/object/object-registry.h>
+#include <dali/devel-api/object/object-registry.h>
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/common/object-registry-impl.h>
