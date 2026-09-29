@@ -371,13 +371,13 @@ public:
 
 #ifdef DEBUG_ENABLED
 
-#define DALI_LOG_INFO(filter, level, format, ...)                                    \
-  if(filter && filter->IsEnabledFor(level))                                          \
-  {                                                                                  \
-    filter->Log(level,                                                               \
-                (std::string(DALI_LOG_FORMAT_PREFIX) + std::string(format)).c_str(), \
-                DALI_LOG_FORMAT_PREFIX_ARGS,                                         \
-                ##__VA_ARGS__);                                                      \
+#define DALI_LOG_INFO(filter, level, format, ...) \
+  if(filter && filter->IsEnabledFor(level))       \
+  {                                               \
+    filter->Log(level,                            \
+                DALI_LOG_FORMAT_PREFIX format,    \
+                DALI_LOG_FORMAT_PREFIX_ARGS,      \
+                ##__VA_ARGS__);                   \
   }
 
 #define DALI_LOG_STREAM(filter, level, stream) \
