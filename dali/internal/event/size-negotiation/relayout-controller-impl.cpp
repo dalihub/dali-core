@@ -26,6 +26,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
+#include <dali/devel-api/object/object-registry.h>
 #include <dali/devel-api/object/type-registry.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/render-controller.h>
@@ -34,7 +35,6 @@
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/common/object-registry-impl.h>
 #include <dali/internal/event/common/thread-local-storage.h>
-#include <dali/public-api/object/object-registry.h>
 
 namespace DALI_NAMESPACE
 {
@@ -76,7 +76,7 @@ void PrintChildren(Dali::Actor actor, int level)
 
   output << ", (" << actor.GetObjectPtr() << ")" << std::endl;
 
-  DALI_LOG_INFO(gLogFilter, Debug::Verbose, output.str().c_str());
+  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "%s", output.str().c_str());
 
   ++level;
   uint32_t numChildren = actor.GetChildCount();

@@ -570,7 +570,7 @@ struct LongPressStartedFunctor
 Internal::TouchEventPtr MakeInternalTouchEvent(const Dali::Integration::TouchEvent& touchEvent, Dali::RenderTask task)
 {
   Internal::TouchEventPtr touchEventImpl(new Internal::TouchEvent(touchEvent.time));
-  for(std::size_t i = 0u; i < touchEvent.GetPointCount(); ++i)
+  for(uint32_t i = 0u; i < touchEvent.GetPointCount(); ++i)
   {
     touchEventImpl->AddPoint(touchEvent.GetPoint(i));
   }

@@ -59,8 +59,8 @@
 #include <dali/public-api/events/device.h>
 #include <dali/public-api/events/gesture-detector.h>
 #include <dali/public-api/events/gesture-device-selector.h>
-#include <dali/public-api/events/gesture-thresholds.h>
 #include <dali/public-api/events/gesture-enumerations.h>
+#include <dali/public-api/events/gesture-thresholds.h>
 #include <dali/public-api/events/gesture.h>
 #include <dali/public-api/events/hover-event.h>
 #include <dali/public-api/events/key-event.h>
@@ -105,7 +105,6 @@
 #include <dali/public-api/object/handle.h>
 #include <dali/public-api/object/indirect-value.h>
 #include <dali/public-api/object/invoke-method.h>
-#include <dali/public-api/object/object-registry.h>
 #include <dali/public-api/object/property-array.h>
 #include <dali/public-api/object/property-conditions.h>
 #include <dali/public-api/object/property-index-ranges.h>

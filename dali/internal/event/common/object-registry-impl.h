@@ -19,8 +19,8 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/object/object-registry.h>
 #include <dali/public-api/object/base-object.h>
-#include <dali/public-api/object/object-registry.h>
 #include <dali/public-api/object/ref-object.h>
 
 namespace DALI_NAMESPACE

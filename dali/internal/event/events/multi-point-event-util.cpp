@@ -80,7 +80,7 @@ void PrintChildren(Debug::Filter* logFilter, Dali::Actor actor, int level)
 
   if(logFilter)
   {
-    DALI_LOG_INFO(logFilter, HIERARCHY_DEBUG_LOG_LEVEL, output.str().c_str());
+    DALI_LOG_INFO(logFilter, HIERARCHY_DEBUG_LOG_LEVEL, "%s", output.str().c_str());
   }
 
   ++level;
