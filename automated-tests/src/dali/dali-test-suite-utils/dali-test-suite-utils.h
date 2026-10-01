@@ -24,14 +24,15 @@
 
 // EXTERNAL INCLUDES
 #include <cstdarg>
-#include <cstdlib>
 #include <cstdio>
+#include <cstdlib>
 #include <cstring>
 #include <iostream>
-#include <type_traits>
 #include <string>
+#include <type_traits>
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/object/object-registry.h>
 #include <dali/integration-api/stream-operators.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/dali-core.h>
@@ -83,7 +84,6 @@ constexpr int32_t basenameIndex(const char* const path, const int32_t index = 0,
 }
 
 #define __FILELINE__ (&(__FILE__ ":" STRINGIZE(__LINE__))[basenameIndex(__FILE__)])
-
 
 #define TEST_LOCATION __FILELINE__
 #define TEST_INNER_LOCATION(x) (std::string(x) + " (" + STRINGIZE(__LINE__) + ")").c_str()
