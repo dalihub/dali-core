@@ -64,16 +64,16 @@ Integration development package for DALi 3D Engine - headers for integrating wit
 ##############################
 %build
 PREFIX="/usr"
-CXXFLAGS+=" -Wall -g -Os -DNDEBUG -fPIC -fvisibility-inlines-hidden -fdata-sections -ffunction-sections "
-LDFLAGS+=" -Wl,--rpath=$PREFIX/lib -Wl,--as-needed -Wl,--gc-sections -lgcc_s -lgcc -Wl,-Bsymbolic-functions "
+CXXFLAGS="$CXXFLAGS -Wall -g -Os -DNDEBUG -fPIC -fvisibility-inlines-hidden -fdata-sections -ffunction-sections "
+LDFLAGS="$LDFLAGS -Wl,--rpath=$PREFIX/lib -Wl,--as-needed -Wl,--gc-sections -lgcc_s -lgcc -Wl,-Bsymbolic-functions "
 
 %ifarch %{arm}
-CXXFLAGS+=" -D_ARCH_ARM_ -mfpu=neon"
+CXXFLAGS="$CXXFLAGS -D_ARCH_ARM_ -mfpu=neon"
 %endif
 
 %if 0%{?enable_coverage}
-CXXFLAGS+=" --coverage "
-LDFLAGS+=" --coverage "
+CXXFLAGS="$CXXFLAGS --coverage "
+LDFLAGS="$LDFLAGS --coverage "
 %endif
 
 libtoolize --force
@@ -84,9 +84,9 @@ CXXFLAGS="${CXXFLAGS:-%optflags}" ;
 LDFLAGS="${LDFLAGS:-%optflags}" ;
 
 %if "%{vd_asan}" == "1" || "%{asan}" == "1"
-CFLAGS+=" -fsanitize=address"
-CXXFLAGS+=" -fsanitize=address -Wno-maybe-uninitialized"
-LDFLAGS+=" -fsanitize=address"
+CFLAGS="$CFLAGS -fsanitize=address"
+CXXFLAGS="$CXXFLAGS -fsanitize=address -Wno-maybe-uninitialized"
+LDFLAGS="$LDFLAGS -fsanitize=address"
 %endif
 export CFLAGS;
 export CXXFLAGS;
@@ -120,8 +120,10 @@ make %{?jobs:-j%jobs}
 rm -rf %{buildroot}
 cd build/tizen
 
-pushd %{_builddir}/%{name}-%{version}/build/tizen
+_saved_dir=$(pwd)
+cd %{_builddir}/%{name}-%{version}/build/tizen
 %make_install
+cd "$_saved_dir"
 
 ##############################
 # Post Install
