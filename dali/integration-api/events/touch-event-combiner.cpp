@@ -42,6 +42,11 @@ inline bool CheckEqualInputSource(const Point& lhs, const int deviceId, const Mo
          ((mouseButton == MouseButton::INVALID) || /// ...Check whether input point is not from mouse
           (mouseButton == lhs.GetMouseButton()));  /// ...or from same mouse button
 }
+
+inline bool IsAuxiliaryMouseButton(const MouseButton::Type mouseButton)
+{
+  return mouseButton == MouseButton::SECONDARY || mouseButton == MouseButton::TERTIARY;
+}
 } // unnamed namespace
 
 struct TouchEventCombiner::PointInfo
@@ -136,7 +141,7 @@ TouchEventCombiner::EventDispatchType TouchEventCombiner::GetNextTouchEvent(cons
         dispatchEvent = TouchEventCombiner::DISPATCH_TOUCH; // Only dispatch touch event if just added to container
 
         // Check whether hover event was dispatched previously
-        if(!mHoveredPoints.empty())
+        if(!mHoveredPoints.empty() && !IsAuxiliaryMouseButton(mouseButton))
         {
           hoverEvent.time = time;
 
@@ -198,22 +203,57 @@ TouchEventCombiner::EventDispatchType TouchEventCombiner::GetNextTouchEvent(cons
         mPressedPoints.erase(match);
         dispatchEvent = TouchEventCombiner::DISPATCH_TOUCH; // We should only dispatch touch events if the point was actually pressed in this window
 
-        // Iterate through already stored touch points for HoverEvent and delete them
-        for(PointInfoContainer::iterator iter = mHoveredPoints.begin(), endIter = mHoveredPoints.end(); iter != endIter; ++iter)
+        auto matchesDevice = [deviceId](const PointInfo& hovered)
         {
-          if(iter->point.GetDeviceId() == deviceId)
+          return hovered.point.GetDeviceId() == deviceId;
+        };
+
+        if(!IsAuxiliaryMouseButton(mouseButton))
+        {
+          mHoveredPoints.erase(std::remove_if(mHoveredPoints.begin(), mHoveredPoints.end(), matchesDevice), mHoveredPoints.end());
+
+          if(deviceType == Device::Class::Type::MOUSE)
           {
-            iter = mHoveredPoints.erase(iter);
+            hoverEvent.time = time;
+            Point hoverPoint(point);
+            hoverPoint.SetState(PointState::STARTED);
+            mHoveredPoints.push_back(PointInfo(hoverPoint, time));
+            hoverEvent.AddPoint(hoverPoint);
+            dispatchEvent = TouchEventCombiner::DISPATCH_BOTH;
           }
         }
-
-        if(deviceType == Device::Class::Type::MOUSE)
+        else if(deviceType == Device::Class::Type::MOUSE)
         {
+          // Re-evaluate hover at the release position, which may be outside
+          // the previously hovered actor.
           hoverEvent.time = time;
+          auto hoverMatch = std::find_if(mHoveredPoints.begin(), mHoveredPoints.end(), matchesDevice);
+
           Point hoverPoint(point);
-          hoverPoint.SetState(PointState::STARTED); // The first hover event received
-          mHoveredPoints.push_back(PointInfo(hoverPoint, time));
+          hoverPoint.SetState(hoverMatch == mHoveredPoints.end() ? PointState::STARTED : PointState::MOTION);
+
+          // Geometry hover uses the first point to select the target.
           hoverEvent.AddPoint(hoverPoint);
+          for(auto& hovered : mHoveredPoints)
+          {
+            if(hovered.point.GetDeviceId() != deviceId)
+            {
+              if(!isMultiTouchEvent)
+              {
+                hovered.point.SetState(PointState::STATIONARY);
+              }
+              hoverEvent.AddPoint(hovered.point);
+            }
+          }
+
+          if(hoverMatch == mHoveredPoints.end())
+          {
+            mHoveredPoints.push_back(PointInfo(hoverPoint, time));
+          }
+          else
+          {
+            *hoverMatch = PointInfo(hoverPoint, time);
+          }
           dispatchEvent = TouchEventCombiner::DISPATCH_BOTH;
         }
       }
