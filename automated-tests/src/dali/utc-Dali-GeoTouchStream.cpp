@@ -382,6 +382,90 @@ void PrepareScene(TestApplication& application)
   application.SendNotification();
   application.Render();
 }
+
+int TestPendingLongPressInterception(PointState::Type interceptionState, bool removeOwnerOnCancellation)
+{
+  TestApplication application;
+  TouchTrace      touchTrace;
+  LongPressTrace  longPressTrace;
+
+  Actor container = CreateTouchableActor("container");
+  Actor observer  = CreateTouchableActor("observer");
+  Actor card      = CreateTouchableActor("card");
+  observer.Add(card);
+  container.Add(observer);
+  application.GetScene().Add(container);
+
+  LongPressGestureDetector detector = LongPressGestureDetector::New();
+  LongPressTraceFunctor    longPressFunctor(longPressTrace);
+  detector.DetectedSignal().Connect(&application, longPressFunctor);
+  card.InterceptTouchEventSignal().Connect(&application, [&](Actor receiver, TouchEvent touch)
+  {
+    touchTrace.Record("card-intercept", CallbackKind::INTERCEPT, touch);
+    const bool consumed = detector.HandleEvent(receiver, touch);
+    if(removeOwnerOnCancellation && touch.GetState(0u) == PointState::INTERRUPTED)
+    {
+      container.Unparent();
+    }
+    return consumed;
+  });
+  observer.InterceptTouchEventSignal().Connect(&application, [&](Actor, TouchEvent touch)
+  {
+    touchTrace.Record("observer-intercept", CallbackKind::INTERCEPT, touch);
+    // One cancelled observer must not suppress cancellation of the next observer.
+    return touch.GetState(0u) == PointState::INTERRUPTED;
+  });
+  container.InterceptTouchEventSignal().Connect(&application, [&](Actor, TouchEvent touch)
+  {
+    return touch.GetState(0u) == interceptionState;
+  });
+  TouchTraceFunctor containerTouch(touchTrace, "container-touch", true);
+  container.TouchEventSignal().Connect(&application, [&](Actor receiver, TouchEvent touch)
+  {
+    if(touch.GetState(0u) == interceptionState)
+    {
+      DALI_TEST_EQUALS(1u, touchTrace.Count("card-intercept", CallbackKind::INTERCEPT, PointState::INTERRUPTED), TEST_LOCATION);
+    }
+    return containerTouch(receiver, touch);
+  });
+  PrepareScene(application);
+
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
+  DALI_TEST_EQUALS(0u, touchTrace.Count("card-intercept", CallbackKind::INTERCEPT, PointState::INTERRUPTED), TEST_LOCATION);
+  if(interceptionState == PointState::INTERRUPTED)
+  {
+    application.ProcessEvent(GenerateSingleTouch(PointState::INTERRUPTED, Vector2(11.0f, 11.0f)));
+  }
+  else
+  {
+    application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(11.0f, 11.0f)));
+    application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(11.0f, 11.0f)));
+  }
+
+  DALI_TEST_EQUALS(1u, touchTrace.Count("card-intercept", CallbackKind::INTERCEPT, PointState::DOWN), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, touchTrace.Count("observer-intercept", CallbackKind::INTERCEPT, PointState::INTERRUPTED), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, touchTrace.Count("card-intercept", CallbackKind::INTERCEPT, PointState::INTERRUPTED), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, touchTrace.Count("card-intercept", CallbackKind::INTERCEPT, PointState::UP), TEST_LOCATION);
+  const bool interruptedOwner = removeOwnerOnCancellation || interceptionState == PointState::INTERRUPTED;
+  DALI_TEST_EQUALS(interruptedOwner ? 1u : 0u, touchTrace.Count("container-touch", CallbackKind::TOUCH, PointState::INTERRUPTED), TEST_LOCATION);
+  DALI_TEST_EQUALS(interruptedOwner ? 0u : 1u, touchTrace.Count("container-touch", CallbackKind::TOUCH, PointState::UP), TEST_LOCATION);
+
+  const TraceEntry* cancellation = touchTrace.Find("card-intercept", CallbackKind::INTERCEPT, PointState::INTERRUPTED);
+  DALI_TEST_CHECK(cancellation);
+  DALI_TEST_EQUALS(card.GetProperty<int32_t>(Actor::Property::ID), cancellation->hitActorIds[0], TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(11.0f, 11.0f), cancellation->localPositions[0], TEST_LOCATION);
+  DALI_TEST_EQUALS(1, cancellation->deviceIds[0], TEST_LOCATION);
+  DALI_TEST_CHECK(cancellation->renderTask == application.GetScene().GetRenderTaskList().GetTask(0u));
+  application.GetPlatform().TriggerTimer();
+  DALI_TEST_EQUALS(0u, longPressTrace.Count(GestureState::STARTED), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, longPressTrace.Count(GestureState::FINISHED), TEST_LOCATION);
+
+  touchTrace.Clear();
+  application.ProcessEvent(GenerateSingleTouch(PointState::INTERRUPTED, Vector2(11.0f, 11.0f)));
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(11.0f, 11.0f)));
+  DALI_TEST_CHECK(touchTrace.entries.empty());
+  END_TEST;
+}
 } // namespace
 
 int UtcDaliGeoTouchStreamInterruptedConsumedCharacterization(void)
@@ -943,10 +1027,8 @@ int UtcDaliGeoTouchStreamOwnerRecognizesPanThroughIntercept(void)
 
 int UtcDaliGeoTouchStreamInterceptReachesHitViewBelowOwner(void)
 {
-  // A view feeding a gesture detector only through interception must receive a terminal
-  // INTERRUPTED intercept event when an ancestor consumed the touch and became the owner.
-  // Otherwise the detector sees the DOWN but never the UP, and a simple tap is
-  // reported as a long press once the recognition timeout elapses.
+  // A view feeding a detector through interception must keep receiving the stream even
+  // after its ancestor consumes DOWN, including UP to cancel a pending long press.
   TestApplication application;
   TouchTrace      touchTrace;
   LongPressTrace  longPressTrace;
@@ -976,14 +1058,10 @@ int UtcDaliGeoTouchStreamInterceptReachesHitViewBelowOwner(void)
   application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(11.0f, 11.0f)));
   application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(11.0f, 11.0f)));
 
-  // The hit view below the owner received the DOWN through interception but, because the
-  // owner consumed the touch, it does not receive continued MOTION/UP intercept events.
-  // Instead it receives a single INTERRUPTED intercept event so that gesture recognizers
-  // fed through interception cancel cleanly (Android-style ACTION_CANCEL to displaced children).
   DALI_TEST_EQUALS(1u, touchTrace.Count("card-intercept", CallbackKind::INTERCEPT, PointState::DOWN), TEST_LOCATION);
-  DALI_TEST_EQUALS(0u, touchTrace.Count("card-intercept", CallbackKind::INTERCEPT, PointState::MOTION), TEST_LOCATION);
-  DALI_TEST_EQUALS(0u, touchTrace.Count("card-intercept", CallbackKind::INTERCEPT, PointState::UP), TEST_LOCATION);
-  DALI_TEST_EQUALS(1u, touchTrace.Count("card-intercept", CallbackKind::INTERCEPT, PointState::INTERRUPTED), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, touchTrace.Count("card-intercept", CallbackKind::INTERCEPT, PointState::MOTION), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, touchTrace.Count("card-intercept", CallbackKind::INTERCEPT, PointState::UP), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, touchTrace.Count("card-intercept", CallbackKind::INTERCEPT, PointState::INTERRUPTED), TEST_LOCATION);
 
   // The owner still receives the complete touch stream.
   DALI_TEST_EQUALS(1u, touchTrace.Count("container-touch", CallbackKind::TOUCH, PointState::DOWN), TEST_LOCATION);
@@ -995,6 +1073,395 @@ int UtcDaliGeoTouchStreamInterceptReachesHitViewBelowOwner(void)
   DALI_TEST_EQUALS(0u, longPressTrace.Count(GestureState::STARTED), TEST_LOCATION);
   DALI_TEST_EQUALS(0u, longPressTrace.Count(GestureState::FINISHED), TEST_LOCATION);
 
+  END_TEST;
+}
+
+int UtcDaliGeoTouchStreamParentInterceptCancelsPendingLongPress(void)
+{
+  return TestPendingLongPressInterception(PointState::MOTION, false);
+}
+
+int UtcDaliGeoTouchStreamFinalUpInterceptCancelsPendingLongPress(void)
+{
+  return TestPendingLongPressInterception(PointState::UP, false);
+}
+
+int UtcDaliGeoTouchStreamRawInterruptionCancelsPendingLongPress(void)
+{
+  return TestPendingLongPressInterception(PointState::INTERRUPTED, false);
+}
+
+int UtcDaliGeoTouchStreamInterceptCancellationCallbackRemovesOwner(void)
+{
+  return TestPendingLongPressInterception(PointState::MOTION, true);
+}
+
+int UtcDaliGeoTouchStreamOwnerDisconnectionCancelsPendingLongPress(void)
+{
+  TestApplication application;
+  TouchTrace      touchTrace;
+  LongPressTrace  longPressTrace;
+  Actor           owner = CreateTouchableActor("owner");
+  Actor           card  = CreateTouchableActor("card");
+  application.GetScene().Add(owner);
+  application.GetScene().Add(card);
+
+  LongPressGestureDetector detector = LongPressGestureDetector::New();
+  LongPressTraceFunctor    longPressFunctor(longPressTrace);
+  detector.DetectedSignal().Connect(&application, longPressFunctor);
+  card.InterceptTouchEventSignal().Connect(&application, [&](Actor receiver, TouchEvent touch)
+  {
+    touchTrace.Record("card-intercept", CallbackKind::INTERCEPT, touch);
+    return detector.HandleEvent(receiver, touch);
+  });
+  TouchTraceFunctor ownerTouch(touchTrace, "owner-touch", true);
+  owner.TouchEventSignal().Connect(&application, ownerTouch);
+  PrepareScene(application);
+
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
+  // The initial hit is still connected when its overlapping touch owner disappears.
+  owner.Unparent();
+  DALI_TEST_CHECK(card.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE));
+  DALI_TEST_EQUALS(1u, touchTrace.Count("card-intercept", CallbackKind::INTERCEPT, PointState::INTERRUPTED), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, touchTrace.Count("owner-touch", CallbackKind::TOUCH, PointState::INTERRUPTED), TEST_LOCATION);
+  application.GetPlatform().TriggerTimer();
+  DALI_TEST_EQUALS(0u, longPressTrace.Count(GestureState::STARTED), TEST_LOCATION);
+
+  touchTrace.Clear();
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(10.0f, 10.0f)));
+  application.ProcessEvent(GenerateSingleTouch(PointState::INTERRUPTED, Vector2(10.0f, 10.0f)));
+  DALI_TEST_CHECK(touchTrace.entries.empty());
+  END_TEST;
+}
+
+int UtcDaliGeoTouchStreamRestartCancelsPreviousInterceptObservers(void)
+{
+  TestApplication application;
+  TouchTrace      trace;
+  Actor           owner = CreateTouchableActor("owner");
+  Actor           card  = CreateTouchableActor("card");
+  application.GetScene().Add(owner);
+  application.GetScene().Add(card);
+
+  TouchTraceFunctor ownerTouch(trace, "owner-touch", true);
+  TouchTraceFunctor cardIntercept(trace, "card-intercept", false, CallbackKind::INTERCEPT);
+  owner.TouchEventSignal().Connect(&application, ownerTouch);
+  card.InterceptTouchEventSignal().Connect(&application, cardIntercept);
+  PrepareScene(application);
+
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
+  owner.SetProperty(Actor::Property::SENSITIVE, false);
+  application.SendNotification();
+  application.Render();
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(11.0f, 11.0f)));
+  DALI_TEST_EQUALS(1u, trace.Count("owner-touch", CallbackKind::TOUCH, PointState::INTERRUPTED), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, trace.Count("card-intercept", CallbackKind::INTERCEPT, PointState::INTERRUPTED), TEST_LOCATION);
+  trace.Clear();
+
+  // Joining DOWN restarts a processor whose touch recipients have all terminated.
+  // Close the earlier observation before delivering DOWN for the new interval.
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(11.0f, 11.0f), 2));
+  DALI_TEST_EQUALS(1u, trace.Count("card-intercept", CallbackKind::INTERCEPT, PointState::INTERRUPTED), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, trace.Count("card-intercept", CallbackKind::INTERCEPT, PointState::DOWN), TEST_LOCATION);
+  DALI_TEST_CHECK(trace.FirstIndexOf("card-intercept", CallbackKind::INTERCEPT, PointState::INTERRUPTED) <
+                  trace.FirstIndexOf("card-intercept", CallbackKind::INTERCEPT, PointState::DOWN));
+  END_TEST;
+}
+
+int UtcDaliGeoTouchStreamTerminatedChildCanIntercept(void)
+{
+  TestApplication application;
+  TouchTrace      trace;
+  Actor           parent = CreateTouchableActor("parent");
+  Actor           child  = CreateTouchableActor("child");
+  parent.Add(child);
+  application.GetScene().Add(parent);
+
+  bool                     childConsumes = false;
+  MutableTouchTraceFunctor childTouch(trace, "child", childConsumes);
+  TouchTraceFunctor        parentTouch(trace, "parent", true);
+  child.TouchEventSignal().Connect(&application, childTouch);
+  parent.TouchEventSignal().Connect(&application, parentTouch);
+  child.InterceptTouchEventSignal().Connect(&application, [&](Actor, TouchEvent touch)
+  {
+    trace.Record("child-intercept", CallbackKind::INTERCEPT, touch);
+    return touch.GetState(0u) == PointState::MOTION;
+  });
+  PrepareScene(application);
+
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
+  DALI_TEST_EQUALS(1u, trace.Count("child", CallbackKind::TOUCH, PointState::INTERRUPTED), TEST_LOCATION);
+
+  childConsumes = true;
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 20.0f)));
+  DALI_TEST_EQUALS(1u, trace.Count("child", CallbackKind::TOUCH, PointState::MOTION), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, trace.Count("parent", CallbackKind::TOUCH, PointState::INTERRUPTED), TEST_LOCATION);
+  DALI_TEST_CHECK(trace.FirstIndexOf("parent", CallbackKind::TOUCH, PointState::INTERRUPTED) < trace.FirstIndexOf("child", CallbackKind::TOUCH, PointState::MOTION));
+  const TraceEntry* acquiredMotion = trace.Find("child", CallbackKind::TOUCH, PointState::MOTION);
+  DALI_TEST_CHECK(acquiredMotion);
+  DALI_TEST_EQUALS(child.GetProperty<int32_t>(Actor::Property::ID), acquiredMotion->hitActorIds[0], TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(20.0f, 20.0f), acquiredMotion->localPositions[0], TEST_LOCATION);
+  DALI_TEST_CHECK(acquiredMotion->renderTask == application.GetScene().GetRenderTaskList().GetTask(0u));
+
+  // Consumption may change after acquisition without releasing the established owner.
+  childConsumes = false;
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(200.0f, 200.0f)));
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(200.0f, 200.0f)));
+  DALI_TEST_EQUALS(2u, trace.Count("child", CallbackKind::TOUCH, PointState::MOTION), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, trace.Count("child", CallbackKind::TOUCH, PointState::UP), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, trace.Count("child", CallbackKind::TOUCH, PointState::INTERRUPTED), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, trace.Count("parent", CallbackKind::TOUCH, PointState::MOTION), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, trace.Count("parent", CallbackKind::TOUCH, PointState::UP), TEST_LOCATION);
+  // A successful interception remains latched for the rest of the stream.
+  DALI_TEST_EQUALS(1u, trace.Count("child-intercept", CallbackKind::INTERCEPT, PointState::MOTION), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, trace.Count("child-intercept", CallbackKind::INTERCEPT, PointState::INTERRUPTED), TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliGeoTouchStreamChildInterceptsFinalUp(void)
+{
+  TestApplication application;
+  TouchTrace      trace;
+  Actor           parent = CreateTouchableActor("parent");
+  Actor           child  = CreateTouchableActor("child");
+  parent.Add(child);
+  application.GetScene().Add(parent);
+
+  TouchTraceFunctor childTouch(trace, "child", false);
+  TouchTraceFunctor parentTouch(trace, "parent", true);
+  child.TouchEventSignal().Connect(&application, childTouch);
+  parent.TouchEventSignal().Connect(&application, parentTouch);
+  child.InterceptTouchEventSignal().Connect(&application, [&](Actor, TouchEvent touch)
+  {
+    trace.Record("child-intercept", CallbackKind::INTERCEPT, touch);
+    return touch.GetState(0u) == PointState::UP;
+  });
+  PrepareScene(application);
+
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(10.0f, 10.0f)));
+  DALI_TEST_EQUALS(1u, trace.Count("child", CallbackKind::TOUCH, PointState::UP), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, trace.Count("child", CallbackKind::TOUCH, PointState::INTERRUPTED), TEST_LOCATION);
+  // An unconsumed child event can still reach its parent in the new intercepted route.
+  DALI_TEST_EQUALS(1u, trace.Count("parent", CallbackKind::TOUCH, PointState::UP), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, trace.Count("parent", CallbackKind::TOUCH, PointState::INTERRUPTED), TEST_LOCATION);
+
+  trace.Clear();
+  application.ProcessEvent(GenerateSingleTouch(PointState::INTERRUPTED, Vector2(10.0f, 10.0f)));
+  DALI_TEST_CHECK(trace.entries.empty());
+  END_TEST;
+}
+
+int UtcDaliGeoTouchStreamInterceptTakeoverCanFallBackToParent(void)
+{
+  TestApplication application;
+  TouchTrace      trace;
+  Actor           parent = CreateTouchableActor("parent");
+  Actor           child  = CreateTouchableActor("child");
+  parent.Add(child);
+  application.GetScene().Add(parent);
+
+  TouchTraceFunctor childTouch(trace, "child", false);
+  TouchTraceFunctor parentTouch(trace, "parent", true);
+  child.TouchEventSignal().Connect(&application, childTouch);
+  parent.TouchEventSignal().Connect(&application, parentTouch);
+  child.InterceptTouchEventSignal().Connect(&application, [&](Actor, TouchEvent touch)
+  {
+    return touch.GetState(0u) == PointState::MOTION;
+  });
+  PrepareScene(application);
+
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 20.0f)));
+  DALI_TEST_EQUALS(1u, trace.Count("child", CallbackKind::TOUCH, PointState::MOTION), TEST_LOCATION);
+  DALI_TEST_EQUALS(2u, trace.Count("child", CallbackKind::TOUCH, PointState::INTERRUPTED), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, trace.Count("parent", CallbackKind::TOUCH, PointState::INTERRUPTED), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, trace.Count("parent", CallbackKind::TOUCH, PointState::MOTION), TEST_LOCATION);
+
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(200.0f, 200.0f)));
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(200.0f, 200.0f)));
+  DALI_TEST_EQUALS(1u, trace.Count("child", CallbackKind::TOUCH, PointState::MOTION), TEST_LOCATION);
+  DALI_TEST_EQUALS(2u, trace.Count("child", CallbackKind::TOUCH, PointState::INTERRUPTED), TEST_LOCATION);
+  DALI_TEST_EQUALS(2u, trace.Count("parent", CallbackKind::TOUCH, PointState::MOTION), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, trace.Count("parent", CallbackKind::TOUCH, PointState::UP), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, trace.Count("parent", CallbackKind::TOUCH, PointState::INTERRUPTED), TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliGeoTouchStreamInterceptTerminationCallbackRemovesTarget(void)
+{
+  TestApplication application;
+  TouchTrace      trace;
+  Actor           parent = CreateTouchableActor("parent");
+  Actor           child  = CreateTouchableActor("child");
+  parent.Add(child);
+  application.GetScene().Add(parent);
+
+  TouchTraceFunctor               childTouch(trace, "child", false);
+  RemoveActorOnInterruptedFunctor parentTouch(trace, "parent", child);
+  child.TouchEventSignal().Connect(&application, childTouch);
+  parent.TouchEventSignal().Connect(&application, [&](Actor receiver, TouchEvent touch)
+  {
+    parentTouch(receiver, touch);
+    return true;
+  });
+  child.InterceptTouchEventSignal().Connect(&application, [&](Actor, TouchEvent touch)
+  {
+    return touch.GetState(0u) == PointState::MOTION;
+  });
+  PrepareScene(application);
+
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 20.0f)));
+  DALI_TEST_EQUALS(1u, trace.Count("parent", CallbackKind::TOUCH, PointState::INTERRUPTED), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, trace.Count("child", CallbackKind::TOUCH, PointState::INTERRUPTED), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, trace.Count("child", CallbackKind::TOUCH, PointState::MOTION), TEST_LOCATION);
+
+  trace.Clear();
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 20.0f)));
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(20.0f, 20.0f)));
+  DALI_TEST_CHECK(trace.entries.empty());
+  END_TEST;
+}
+
+int UtcDaliGeoTouchStreamInterceptBindsBeforeOldOwnerRemoval(void)
+{
+  TestApplication application;
+  TouchTrace      trace;
+  Actor           oldOwner = CreateTouchableActor("old-owner");
+  Actor           newOwner = CreateTouchableActor("new-owner");
+  application.GetScene().Add(oldOwner);
+  application.GetScene().Add(newOwner);
+
+  bool                            newOwnerConsumes = false;
+  MutableTouchTraceFunctor        newOwnerTouch(trace, "new-owner", newOwnerConsumes);
+  RemoveActorOnInterruptedFunctor oldOwnerTouch(trace, "old-owner", oldOwner);
+  newOwner.TouchEventSignal().Connect(&application, newOwnerTouch);
+  oldOwner.TouchEventSignal().Connect(&application, [&](Actor receiver, TouchEvent touch)
+  {
+    oldOwnerTouch(receiver, touch);
+    return true;
+  });
+  newOwner.InterceptTouchEventSignal().Connect(&application, [&](Actor, TouchEvent touch)
+  {
+    return touch.GetState(0u) == PointState::MOTION;
+  });
+  PrepareScene(application);
+
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
+  newOwnerConsumes = true;
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 20.0f)));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(200.0f, 200.0f)));
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(200.0f, 200.0f)));
+  DALI_TEST_EQUALS(1u, trace.Count("old-owner", CallbackKind::TOUCH, PointState::INTERRUPTED), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, trace.Count("old-owner", CallbackKind::TOUCH, PointState::MOTION), TEST_LOCATION);
+  DALI_TEST_EQUALS(2u, trace.Count("new-owner", CallbackKind::TOUCH, PointState::MOTION), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, trace.Count("new-owner", CallbackKind::TOUCH, PointState::UP), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, trace.Count("new-owner", CallbackKind::TOUCH, PointState::INTERRUPTED), TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliGeoTouchStreamInterceptRouteSurvivesWithoutTouchConsumer(void)
+{
+  TestApplication application;
+  TouchTrace      trace;
+  Actor           oldOwner = CreateTouchableActor("old-owner");
+  Actor           target   = CreateTouchableActor("target");
+  application.GetScene().Add(oldOwner);
+  application.GetScene().Add(target);
+
+  TouchTraceFunctor               targetTouch(trace, "target", false);
+  RemoveActorOnInterruptedFunctor oldOwnerTouch(trace, "old-owner", oldOwner);
+  target.TouchEventSignal().Connect(&application, targetTouch);
+  oldOwner.TouchEventSignal().Connect(&application, [&](Actor receiver, TouchEvent touch)
+  {
+    oldOwnerTouch(receiver, touch);
+    return true;
+  });
+  target.InterceptTouchEventSignal().Connect(&application, [&](Actor, TouchEvent touch)
+  {
+    return touch.GetState(0u) == PointState::MOTION;
+  });
+  PrepareScene(application);
+
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 20.0f)));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(200.0f, 200.0f)));
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(200.0f, 200.0f)));
+  DALI_TEST_EQUALS(1u, trace.Count("old-owner", CallbackKind::TOUCH, PointState::INTERRUPTED), TEST_LOCATION);
+  DALI_TEST_EQUALS(2u, trace.Count("target", CallbackKind::TOUCH, PointState::MOTION), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, trace.Count("target", CallbackKind::TOUCH, PointState::UP), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, trace.Count("target", CallbackKind::TOUCH, PointState::INTERRUPTED), TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliGeoTouchStreamInterceptedChildRemovalStopsDispatch(void)
+{
+  TestApplication application;
+  TouchTrace      trace;
+  Actor           parent = CreateTouchableActor("parent");
+  Actor           child  = CreateTouchableActor("child");
+  parent.Add(child);
+  application.GetScene().Add(parent);
+
+  RemoveSelfOnMotionFunctor childTouch(trace, "child");
+  TouchTraceFunctor         parentTouch(trace, "parent", true);
+  child.TouchEventSignal().Connect(&application, [&](Actor receiver, TouchEvent touch)
+  {
+    childTouch(receiver, touch);
+    return false;
+  });
+  parent.TouchEventSignal().Connect(&application, parentTouch);
+  child.InterceptTouchEventSignal().Connect(&application, [&](Actor, TouchEvent touch)
+  {
+    return touch.GetState(0u) == PointState::MOTION;
+  });
+  PrepareScene(application);
+
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 20.0f)));
+  DALI_TEST_EQUALS(1u, trace.Count("child", CallbackKind::TOUCH, PointState::MOTION), TEST_LOCATION);
+  DALI_TEST_EQUALS(2u, trace.Count("child", CallbackKind::TOUCH, PointState::INTERRUPTED), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, trace.Count("parent", CallbackKind::TOUCH, PointState::INTERRUPTED), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, trace.Count("parent", CallbackKind::TOUCH, PointState::MOTION), TEST_LOCATION);
+
+  trace.Clear();
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(20.0f, 20.0f)));
+  DALI_TEST_CHECK(trace.entries.empty());
+  END_TEST;
+}
+
+int UtcDaliGeoTouchStreamChildInterruptedInterceptDoesNotReactivate(void)
+{
+  TestApplication application;
+  TouchTrace      trace;
+  Actor           parent = CreateTouchableActor("parent");
+  Actor           child  = CreateTouchableActor("child");
+  parent.Add(child);
+  application.GetScene().Add(parent);
+
+  TouchTraceFunctor childTouch(trace, "child", false);
+  TouchTraceFunctor parentTouch(trace, "parent", true);
+  child.TouchEventSignal().Connect(&application, childTouch);
+  parent.TouchEventSignal().Connect(&application, parentTouch);
+  child.InterceptTouchEventSignal().Connect(&application, [&](Actor, TouchEvent touch)
+  {
+    trace.Record("child-intercept", CallbackKind::INTERCEPT, touch);
+    return touch.GetState(0u) == PointState::INTERRUPTED;
+  });
+  PrepareScene(application);
+
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
+  DALI_TEST_EQUALS(0u, trace.Count("child-intercept", CallbackKind::INTERCEPT, PointState::INTERRUPTED), TEST_LOCATION);
+  application.ProcessEvent(GenerateSingleTouch(PointState::INTERRUPTED, Vector2(10.0f, 10.0f)));
+  DALI_TEST_EQUALS(1u, trace.Count("child-intercept", CallbackKind::INTERCEPT, PointState::INTERRUPTED), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, trace.Count("parent", CallbackKind::TOUCH, PointState::INTERRUPTED), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, trace.Count("child", CallbackKind::TOUCH, PointState::INTERRUPTED), TEST_LOCATION);
+  DALI_TEST_CHECK(trace.FirstIndexOf("child-intercept", CallbackKind::INTERCEPT, PointState::INTERRUPTED) < trace.FirstIndexOf("parent", CallbackKind::TOUCH, PointState::INTERRUPTED));
+
+  trace.Clear();
+  application.ProcessEvent(GenerateSingleTouch(PointState::INTERRUPTED, Vector2(10.0f, 10.0f)));
+  DALI_TEST_CHECK(trace.entries.empty());
   END_TEST;
 }
 
@@ -1307,7 +1774,7 @@ int UtcDaliGeoTouchStreamDifferentRoutesSameOwnerRemainIndependent(void)
   END_TEST;
 }
 
-int UtcDaliGeoTouchStreamInterceptUsesCurrentOwnerAncestry(void)
+int UtcDaliGeoTouchStreamInterceptUsesInitialHitAncestry(void)
 {
   TestApplication application;
   TouchTrace      trace;
@@ -1341,8 +1808,8 @@ int UtcDaliGeoTouchStreamInterceptUsesCurrentOwnerAncestry(void)
 
   application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 20.0f)));
 
-  DALI_TEST_EQUALS(1u, trace.Count("parent-a-intercept", CallbackKind::INTERCEPT, PointState::MOTION), TEST_LOCATION);
-  DALI_TEST_EQUALS(0u, trace.Count("parent-b-intercept", CallbackKind::INTERCEPT, PointState::MOTION), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, trace.Count("parent-a-intercept", CallbackKind::INTERCEPT, PointState::MOTION), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, trace.Count("parent-b-intercept", CallbackKind::INTERCEPT, PointState::MOTION), TEST_LOCATION);
   DALI_TEST_EQUALS(1u, trace.Count("actor-a", CallbackKind::TOUCH, PointState::MOTION), TEST_LOCATION);
   END_TEST;
 }
