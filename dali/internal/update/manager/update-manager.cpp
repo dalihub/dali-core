@@ -1464,8 +1464,16 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
 
         CompleteNotificationInterface::ParameterList notifyRequiredRenderTasks;
 
+        const bool sceneVisible = !scene->scene || scene->scene->IsVisible();
+
         for(auto&& renderTask : tasks)
         {
+          // Rendering of the invisible scene is skipped. Keep the render task state until it is actually rendered.
+          if(!sceneVisible && renderTask->IsRenderRequired())
+          {
+            continue;
+          }
+
           renderTask->UpdateState();
 
           if(renderTask->IsWaitingToRender() &&

@@ -4685,13 +4685,12 @@ int UtcDaliRenderTaskOffscreenSourceDoesNotInheritParentStencilClipping(void)
   FrameBuffer frameBuffer  = FrameBuffer::New(400u, 400u);
   frameBuffer.AttachColorTexture(colorTexture);
 
-  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
+  RenderTaskList taskList    = application.GetScene().GetRenderTaskList();
   RenderTask     captureTask = taskList.CreateTask();
   captureTask.SetSourceActor(captureSource);
   captureTask.SetBuiltinCameraActor(RenderTask::BuiltinCameraType::ATTACHED_TO_SCENE,
                                     Size(400.0f, 400.0f),
-                                    Property::Map().Add(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT)
-                                                   .Add(Actor::Property::PIVOT, Pivot::CENTER));
+                                    Property::Map().Add(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT).Add(Actor::Property::PIVOT, Pivot::CENTER));
 
   captureTask.SetExclusive(false);
   captureTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
@@ -4704,14 +4703,14 @@ int UtcDaliRenderTaskOffscreenSourceDoesNotInheritParentStencilClipping(void)
   application.Render();
 
   DALI_TEST_CHECK(!graphics.mSubmitStack.empty());
-  size_t   renderPassCount     = 0u;
-  size_t   drawCount           = 0u;
-  uint32_t stencilEnableCount  = 0u;
+  size_t   renderPassCount    = 0u;
+  size_t   drawCount          = 0u;
+  uint32_t stencilEnableCount = 0u;
   for(const auto& submission : graphics.mSubmitStack)
   {
     for(const auto* submittedCommandBuffer : submission.cmdBuffer)
     {
-      auto* commandBuffer = static_cast<const TestGraphicsCommandBuffer*>(submittedCommandBuffer);
+      auto* commandBuffer   = static_cast<const TestGraphicsCommandBuffer*>(submittedCommandBuffer);
       auto  stencilCommands = commandBuffer->GetChildCommandsByType(0 | CommandType::SET_STENCIL_TEST_ENABLE);
 
       renderPassCount += commandBuffer->GetChildCommandsByType(0 | CommandType::BEGIN_RENDER_PASS).size();
@@ -4767,7 +4766,7 @@ int UtcDaliRenderTaskReusedRenderItemsUpdateStencilClipping(void)
   {
     for(const auto* submittedCommandBuffer : submission.cmdBuffer)
     {
-      auto* commandBuffer = static_cast<const TestGraphicsCommandBuffer*>(submittedCommandBuffer);
+      auto* commandBuffer   = static_cast<const TestGraphicsCommandBuffer*>(submittedCommandBuffer);
       auto  stencilCommands = commandBuffer->GetChildCommandsByType(0 | CommandType::SET_STENCIL_TEST_ENABLE);
       for(const auto* command : stencilCommands)
       {
@@ -6112,6 +6111,116 @@ int UtcDaliRenderTaskExclusiveAddCacheRendererWithZeroOpacity(void)
   application.Render();
   const int offscreenDrawCount = drawTrace.CountMethod("DrawElements") + drawTrace.CountMethod("DrawArrays");
   DALI_TEST_GREATER(offscreenDrawCount, 0, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliRenderTaskOnceNoSyncInvisibleScene(void)
+{
+  TestApplication application;
+
+  tet_infoline("Testing RenderTask Render Once is not finished while the scene is invisible");
+
+  // SETUP AN OFFSCREEN RENDER TASK
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
+
+  Actor rootActor = Actor::New();
+  application.GetScene().Add(rootActor);
+
+  CameraActor offscreenCameraActor = CameraActor::New(Size(TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT));
+  application.GetScene().Add(offscreenCameraActor);
+  Actor secondRootActor = CreateRenderableActorSuccess(application, "aFile.jpg");
+  application.GetScene().Add(secondRootActor);
+
+  application.GetScene().Hide();
+
+  RenderTask         newTask  = CreateRenderTask(application, offscreenCameraActor, rootActor, secondRootActor, RenderTask::REFRESH_ONCE, false);
+  bool               finished = false;
+  RenderTaskFinished renderTaskFinished(finished);
+  newTask.FinishedSignal().Connect(&application, renderTaskFinished);
+
+  for(int i = 0; i < 3; ++i)
+  {
+    application.SendNotification();
+    application.Render(16);
+  }
+  application.SendNotification();
+
+  // The render task should wait until the scene becomes visible.
+  DALI_TEST_CHECK(!finished);
+
+  application.GetScene().Show();
+
+  for(int i = 0; i < 3; ++i)
+  {
+    application.SendNotification();
+    application.Render(16);
+  }
+  application.SendNotification();
+
+  DALI_TEST_CHECK(finished);
+
+  END_TEST;
+}
+
+int UtcDaliRenderTaskOnceSyncInvisibleScene(void)
+{
+  TestApplication application;
+
+  tet_infoline("Testing RenderTask Render Once GlSync is not finished while the scene is invisible");
+
+  // SETUP AN OFFSCREEN RENDER TASK
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
+  auto& sync = application.GetGraphicsSyncImpl();
+
+  Actor rootActor = Actor::New();
+  application.GetScene().Add(rootActor);
+
+  CameraActor offscreenCameraActor = CameraActor::New(Size(TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT));
+  application.GetScene().Add(offscreenCameraActor);
+  Actor secondRootActor = CreateRenderableActorSuccess(application, "aFile.jpg");
+  application.GetScene().Add(secondRootActor);
+
+  application.GetScene().Hide();
+
+  RenderTask         newTask  = CreateRenderTask(application, offscreenCameraActor, rootActor, secondRootActor, RenderTask::REFRESH_ONCE, true);
+  bool               finished = false;
+  RenderTaskFinished renderTaskFinished(finished);
+  newTask.FinishedSignal().Connect(&application, renderTaskFinished);
+
+  for(int i = 0; i < 3; ++i)
+  {
+    application.SendNotification();
+    application.Render(16);
+
+    // Should not keep updating to wait for the render sync while the scene is invisible.
+    DALI_TEST_EQUALS((Dali::Integration::KeepUpdating::Reasons)(application.GetUpdateStatus() & Dali::Integration::KeepUpdating::RENDER_TASK_SYNC), (Dali::Integration::KeepUpdating::Reasons)0, TEST_LOCATION);
+  }
+  application.SendNotification();
+
+  DALI_TEST_CHECK(!finished);
+
+  application.GetScene().Show();
+
+  application.SendNotification();
+  application.Render(16);
+  DALI_TEST_EQUALS((Dali::Integration::KeepUpdating::Reasons)(application.GetUpdateStatus() & Dali::Integration::KeepUpdating::RENDER_TASK_SYNC), Dali::Integration::KeepUpdating::RENDER_TASK_SYNC, TEST_LOCATION);
+  application.SendNotification();
+
+  DALI_TEST_CHECK(!finished);
+
+  Dali::Integration::GraphicsSyncAbstraction::SyncObject* lastSyncObj = sync.GetLastSyncObject();
+  DALI_TEST_CHECK(lastSyncObj != NULL);
+  sync.SetObjectSynced(lastSyncObj, true);
+
+  for(int i = 0; i < 3; ++i)
+  {
+    application.SendNotification();
+    application.Render(16);
+  }
+  application.SendNotification();
+
+  DALI_TEST_CHECK(finished);
 
   END_TEST;
 }
