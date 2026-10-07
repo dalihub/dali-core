@@ -149,6 +149,11 @@ public:
   bool BakeScale(uint32_t id, const Vector3& scale);
 
   /**
+   * @copydoc Dali::UpdateProxy::GetPivot()
+   */
+  bool GetPivot(uint32_t id, Vector3& pivot) const;
+
+  /**
    * @copydoc Dali::UpdateProxy::GetColorMultiplier()
    */
   bool GetColorMultiplier(uint32_t id, Vector4& multiplier) const;

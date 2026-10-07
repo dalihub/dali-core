@@ -43,6 +43,25 @@ class UpdateProxy;
  * An actor's data can be accessed using the Actor's Unique ID.
  * The unique ID should be passed to the callback using this class in a thread-safe manner
  * (as you cannot call Actor::GetId from the update-thread).
+ *
+ * Some properties can be changed by both a Set method (e.g. SetPosition()) and a Bake method (e.g. BakePosition()).
+ * Both take effect immediately, so the Get methods return the new value in the same frame.
+ * The difference is what happens in the next frame:
+ * - Set: The value is used for the current frame only. In the next frame, the property returns to the value
+ *   it would have without this call (the value set via Actor::SetProperty(), the animated value or a previously baked value),
+ *   so it has to be set again in every frame to keep it. This can also be used to override an animated value for the current frame.
+ * - Bake: The value is kept in the following frames, until it is baked again or changed via Actor::SetProperty().
+ *   Avoid baking a property while it is being animated. The animation calculates its value from the kept value in every frame,
+ *   so baking changes the result of the animation, and the baked value may be overwritten when the animation finishes.
+ *
+ * Use Set for a value which is calculated in every frame (e.g. following another actor),
+ * and Bake for a change which should remain after the frame callback is removed.
+ *
+ * Neither is reflected in the value returned by Actor::GetProperty(), which keeps the value set on the event side.
+ * Use Actor::GetCurrentProperty() to retrieve the value changed from the frame callback.
+ *
+ * Properties which only have a Set method (e.g. SetIgnored(), SetUpdateArea()) are not animatable,
+ * so the value is kept in the following frames, until it is set again or changed via Actor::SetProperty().
  * @SINCE_2_5.21
  */
 class DALI_CORE_API UpdateProxy
@@ -205,6 +224,15 @@ public:
   bool BakeScale(uint32_t id, const Vector3& scale);
 
   /**
+   * @brief Given the Actor ID, this retrieves that Actor's pivot.
+   * @param[in]   id     The Actor ID
+   * @param[out]  pivot  Set to the Actor's current pivot, if Actor ID is valid
+   * @return Whether the method call was successful or not.
+   * @SINCE_2_5.43
+   */
+  bool GetPivot(uint32_t id, Vector3& pivot) const;
+
+  /**
    * @brief Given the Actor ID, retrieves that Actor's local color multiplier.
    * @param[in]   id          The Actor ID
    * @param[out]  multiplier  Set to the Actor's current color multiplier, if Actor ID is valid
@@ -279,6 +307,9 @@ public:
    * @param[in]   id     The Actor ID
    * @param[in]   updateArea  Set to the Actor's current updated area, if Actor ID is valid
    * @return Whether the method call was successful or not.
+   * @note The value is kept in the following frames until it is set again.
+   *       If it is set more than once before the frame is rendered (including via Actor::Property::UPDATE_AREA_HINT),
+   *       the areas are merged.
    * @SINCE_2_5.21
    */
   bool SetUpdateArea(uint32_t id, const Vector4& updateArea);
