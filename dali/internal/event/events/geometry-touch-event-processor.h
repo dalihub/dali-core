@@ -58,8 +58,10 @@ struct GeometryTouchInitialHit
  * The GeometryTouchEventProcessor processes one geometry-routed touch stream.
  *
  * Coordinate candidates remain eligible until one consumes an event. The consumer then
- * becomes the stable owner. Intercept traversal follows the path from the root to the owner,
- * including the owner. Every previously active recipient displaced by a new owner receives one terminal event.
+ * becomes the stable owner. Until interception succeeds, intercept traversal follows the path
+ * from the root to the initial hit actor, including children below the owner. If the initial hit
+ * leaves the scene, traversal uses the owner's path. A later interception can reopen terminated
+ * recipients on the intercepted path. Every displaced active recipient receives one terminal event.
  * Recipient events retain the stream's initial hit actor while all point coordinates are
  * converted to the coordinate system of the actual recipient.
  *

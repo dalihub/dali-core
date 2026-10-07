@@ -90,10 +90,10 @@ GeometryTouchRecipient* FindRecipient(GeometryTouchStreamState& streamState, con
   return iter == streamState.recipientsInDispatchOrder.end() ? nullptr : &(*iter);
 }
 
-bool PrepareRecipientDispatch(GeometryTouchStreamState& streamState, Actor* actor, bool terminal)
+bool PrepareRecipientDispatch(GeometryTouchStreamState& streamState, Actor* actor, bool terminal, bool allowReactivation = false)
 {
   GeometryTouchRecipient* recipient = FindRecipient(streamState, actor);
-  if(recipient && recipient->state == GeometryTouchRecipientState::TERMINATED)
+  if(recipient && recipient->state == GeometryTouchRecipientState::TERMINATED && !allowReactivation)
   {
     return false;
   }
@@ -120,8 +120,7 @@ void BuildRootToTargetPath(Dali::Actor target, std::list<ActorPtr>& path)
 Dali::Actor EmitGeoInterceptTouchSignals(const std::list<ActorPtr>& rootToTargetPath,
                                          const Dali::TouchEvent&    touchEvent,
                                          RenderTask*                renderTask,
-                                         Actor*                     initialHitActor,
-                                         const Actor*               stopBoundary)
+                                         Actor*                     initialHitActor)
 {
   const std::list<ActorPtr> pathSnapshot(rootToTargetPath);
   for(const auto& actorPtr : pathSnapshot)
@@ -135,13 +134,6 @@ Dali::Actor EmitGeoInterceptTouchSignals(const std::list<ActorPtr>& rootToTarget
         return Dali::Actor(actor);
       }
     }
-
-    // The owner may consume DOWN before recognizing a gesture through interception.
-    // Include its intercept callback so subsequent motion can start that gesture.
-    if(actor == stopBoundary)
-    {
-      break;
-    }
   }
   return Dali::Actor();
 }
@@ -154,7 +146,9 @@ Dali::Actor EmitGeoTouchSignalsWithTracking(const std::list<ActorPtr>& actorList
                                             const Dali::TouchEvent&    touchEvent,
                                             RenderTask*                renderTask,
                                             Actor*                     initialHitActor,
-                                            bool                       streamEnding)
+                                            bool                       streamEnding,
+                                            bool                       allowReactivation,
+                                            const bool&                observedActorDisconnected)
 {
   Dali::Actor consumedActor;
 
@@ -172,7 +166,9 @@ Dali::Actor EmitGeoTouchSignalsWithTracking(const std::list<ActorPtr>& actorList
 
     if(TouchRecipientDispatcher::IsGeometryTouchDispatchable(*actorImpl, touchEvent))
     {
-      if(!PrepareRecipientDispatch(streamState, actorImpl, streamEnding))
+      // Only a newly intercepted route may reopen a terminated recipient. Ordinary
+      // candidate delivery must not resurrect actors displaced by an earlier owner.
+      if(!PrepareRecipientDispatch(streamState, actorImpl, streamEnding, allowReactivation))
       {
         continue;
       }
@@ -188,7 +184,8 @@ Dali::Actor EmitGeoTouchSignalsWithTracking(const std::list<ActorPtr>& actorList
         consumedActor = Dali::Actor(actorImpl);
         break;
       }
-      if(streamState.phase == GeometryTouchStreamPhase::FINISHING ||
+      if(observedActorDisconnected ||
+         streamState.phase == GeometryTouchStreamPhase::FINISHING ||
          streamState.phase == GeometryTouchStreamPhase::FINISHED)
       {
         break;
@@ -382,7 +379,7 @@ struct GeometryTouchEventProcessor::Impl
   static void SelectOwner(ProcessTouchEventVariables& localVars, Actor* newOwner)
   {
     GeometryTouchEventProcessor& processor = localVars.processor;
-    if(!newOwner ||
+    if(!newOwner || processor.mObservedActorDisconnected ||
        processor.mStreamState.phase == GeometryTouchStreamPhase::FINISHING ||
        processor.mStreamState.phase == GeometryTouchStreamPhase::FINISHED ||
        processor.mLastConsumedActor.GetActor() == newOwner)
@@ -404,12 +401,6 @@ struct GeometryTouchEventProcessor::Impl
 
     TerminateAllActive(processor, localVars.touchEventImpl, localVars.currentRenderTask.Get(), newOwner);
 
-    // Actors below the owner on the hit path that only received intercept events (never
-    // touch) are not active recipients, so TerminateAllActive skipped them. Deliver a single
-    // INTERRUPTED intercept event to them so gesture recognizers fed through interception
-    // cancel cleanly instead of starving on the missing UP.
-    DeliverInterruptedToInterceptPathBelowOwner(localVars, newOwner);
-
     if(!localVars.streamEnding && processor.mStreamState.phase == GeometryTouchStreamPhase::OWNED)
     {
       const auto                    activeCount                = std::count_if(processor.mStreamState.recipientsInDispatchOrder.begin(), processor.mStreamState.recipientsInDispatchOrder.end(), [](const GeometryTouchRecipient& recipient)
@@ -425,84 +416,25 @@ struct GeometryTouchEventProcessor::Impl
     }
   }
 
-  static const std::list<ActorPtr>& ResolveInterceptPath(GeometryTouchEventProcessor& processor, Actor*& owner, const Actor*& stopBoundary)
+  static const std::list<ActorPtr>& ResolveInterceptPath(GeometryTouchEventProcessor& processor)
   {
-    owner        = processor.mLastConsumedActor.GetActor();
-    stopBoundary = nullptr;
+    Actor* initialHitActor = processor.mStreamState.initialHitActor.Get();
+    if(initialHitActor && initialHitActor->OnScene())
+    {
+      // Touch ownership does not limit observation through interception. Keep the
+      // initial hit actor and its ancestors eligible to recognize and intercept later.
+      BuildRootToTargetPath(Dali::Actor(initialHitActor), processor.mStreamState.initialHitPathRootToTarget);
+      return processor.mStreamState.initialHitPathRootToTarget;
+    }
+
+    Actor* owner = processor.mLastConsumedActor.GetActor();
     if(owner)
     {
-      // The owner's ancestry defines the intercept path (root -> owner). The owner is the
-      // stop boundary so intercept traversal ends with the owner itself. Actors below the
-      // owner on the hit path do not receive continued intercept delivery; instead a single
-      // INTERRUPTED intercept event is delivered to them from SelectOwner so that gesture
-      // detectors fed through interception cancel cleanly (see SelectOwner).
+      // Preserve the established route when a virtualized initial hit actor disappears.
       BuildRootToTargetPath(Dali::Actor(owner), processor.mStreamState.ownerPathRootToOwner);
-      stopBoundary = owner;
       return processor.mStreamState.ownerPathRootToOwner;
     }
     return processor.mStreamState.initialHitPathRootToTarget;
-  }
-
-  /**
-   * @brief Delivers a single INTERRUPTED intercept event to the actors on the initial hit
-   * path that lie strictly below the newly selected owner.
-   *
-   * An intercept-only actor below the owner (e.g. the actually-hit view feeding a gesture
-   * detector solely from its intercept callback) received the DOWN through interception but
-   * is never registered as an active touch recipient, so TerminateAllActive does not deliver
-   * INTERRUPTED to it. Without a terminal signal its gesture recognizer starves on the
-   * missing UP and falsely fires after its timeout (e.g. LongPressGestureDetector). This
-   * delivers one INTERRUPTED intercept event so those recognizers cancel cleanly, mirroring
-   * how Android dispatches ACTION_CANCEL to displaced children.
-   */
-  static void DeliverInterruptedToInterceptPathBelowOwner(ProcessTouchEventVariables& localVars, const Actor* newOwner)
-  {
-    GeometryTouchEventProcessor& processor = localVars.processor;
-    if(!newOwner || !localVars.currentRenderTask || !localVars.touchEventImpl || localVars.touchEventImpl->GetPointCount() == 0)
-    {
-      return;
-    }
-
-    const auto& hitPath = processor.mStreamState.initialHitPathRootToTarget;
-    const bool  ownerOnHitPath = std::any_of(hitPath.begin(), hitPath.end(),
-        [newOwner](const ActorPtr& actorPtr) { return actorPtr.Get() == newOwner; });
-    if(!ownerOnHitPath)
-    {
-      return;
-    }
-
-    // Collect the hit-path segment strictly below the owner (owner excluded).
-    std::list<ActorPtr> belowOwnerPath;
-    bool                pastOwner = false;
-    for(const auto& actorPtr : hitPath)
-    {
-      if(pastOwner)
-      {
-        belowOwnerPath.push_back(actorPtr);
-      }
-      else if(actorPtr.Get() == newOwner)
-      {
-        pastOwner = true;
-      }
-    }
-    if(belowOwnerPath.empty())
-    {
-      return;
-    }
-
-    // Clone the current event and mark the primary point as INTERRUPTED so that gesture
-    // recognizers fed through interception receive a terminal signal and cancel cleanly.
-    TouchEventPtr   interruptedEvent = TouchEvent::Clone(*localVars.touchEventImpl);
-    Dali::TouchEvent interruptedHandle(interruptedEvent.Get());
-    if(interruptedEvent->GetPointCount() > 0)
-    {
-      interruptedEvent->GetPoint(0).SetState(PointState::INTERRUPTED);
-    }
-    EmitGeoInterceptTouchSignals(belowOwnerPath,
-                                 interruptedHandle,
-                                 localVars.currentRenderTask.Get(),
-                                 processor.mStreamState.initialHitActor.Get(),
-                                 nullptr);
   }
 
   static void DeliverInterruptedToInterceptPath(ProcessTouchEventVariables& localVars)
@@ -513,17 +445,14 @@ struct GeometryTouchEventProcessor::Impl
       return;
     }
 
-    Actor*       owner         = nullptr;
-    const Actor* stopBoundary  = nullptr;
-    const auto&  interceptPath = ResolveInterceptPath(processor, owner, stopBoundary);
+    const auto& interceptPath = ResolveInterceptPath(processor);
 
     // A raw interruption is observable on the intercept path before active touch recipients are terminated.
     // An intercept result only stops this hierarchy traversal; it cannot suppress terminal delivery or create a new owner.
     EmitGeoInterceptTouchSignals(interceptPath,
                                  localVars.touchEventHandle,
                                  localVars.currentRenderTask.Get(),
-                                 processor.mStreamState.initialHitActor.Get(),
-                                 stopBoundary);
+                                 processor.mStreamState.initialHitActor.Get());
   }
 
   static bool FinishInterrupted(ProcessTouchEventVariables& localVars)
@@ -592,15 +521,12 @@ struct GeometryTouchEventProcessor::Impl
 
       if(!interceptedTouchActor)
       {
-        Actor*       owner         = nullptr;
-        const Actor* stopBoundary  = nullptr;
-        const auto&  interceptPath = ResolveInterceptPath(processor, owner, stopBoundary);
+        const auto& interceptPath = ResolveInterceptPath(processor);
 
         interceptedActor = EmitGeoInterceptTouchSignals(interceptPath,
                                                         localVars.touchEventHandle,
                                                         localVars.currentRenderTask.Get(),
-                                                        processor.mStreamState.initialHitActor.Get(),
-                                                        stopBoundary);
+                                                        processor.mStreamState.initialHitActor.Get());
         if(interceptedActor)
         {
           interceptedTouchActor = &GetImplementation(interceptedActor);
@@ -616,9 +542,20 @@ struct GeometryTouchEventProcessor::Impl
             }
           }
 
-          TerminateAllActive(processor, localVars.touchEventImpl, localVars.currentRenderTask.Get(), interceptedTouchActor);
+          // Replace the old route before cancellation callbacks can remove the old owner.
+          // Touch consumption on the intercepted path will select the new stable owner.
           processor.mLastConsumedActor.SetActor(nullptr);
+          processor.mStreamState.phase = GeometryTouchStreamPhase::UNOWNED;
+          BindRouteToOwner(processor, interceptedTouchActor);
+          TerminateAllActive(processor, localVars.touchEventImpl, localVars.currentRenderTask.Get(), interceptedTouchActor);
         }
+      }
+
+      if(processor.mObservedActorDisconnected ||
+         processor.mStreamState.phase == GeometryTouchStreamPhase::FINISHING ||
+         processor.mStreamState.phase == GeometryTouchStreamPhase::FINISHED)
+      {
+        return false;
       }
 
       Actor* touchConsumedActor = processor.mLastConsumedActor.GetActor();
@@ -640,7 +577,9 @@ struct GeometryTouchEventProcessor::Impl
                                                                      localVars.touchEventHandle,
                                                                      localVars.currentRenderTask.Get(),
                                                                      processor.mStreamState.initialHitActor.Get(),
-                                                                     localVars.streamEnding);
+                                                                     localVars.streamEnding,
+                                                                     static_cast<bool>(interceptedActor),
+                                                                     processor.mObservedActorDisconnected);
         if(localVars.consumedActor)
         {
           SelectOwner(localVars, &GetImplementation(localVars.consumedActor));
@@ -765,8 +704,14 @@ struct GeometryTouchEventProcessor::Impl
     }
     else
     {
-      // The primaryHitActor may have been removed from the scene so ensure it is still on the scene before setting members.
-      if(localVars.primaryHitActor && GetImplementation(localVars.primaryHitActor).OnScene())
+      // Interception replaces the delivery route even if no touch callback consumes the
+      // event. The primary point was parsed before interception and can still name the old owner.
+      Actor* primaryRouteActor = processor.mInterceptedTouchActor.GetActor();
+      if(!primaryRouteActor && localVars.primaryHitActor)
+      {
+        primaryRouteActor = &GetImplementation(localVars.primaryHitActor);
+      }
+      if(primaryRouteActor && primaryRouteActor->OnScene())
       {
         // Only observe the consumed actor if we have a primaryHitActor (check if it is still on the scene).
         if(localVars.consumedActor && GetImplementation(localVars.consumedActor).OnScene())
@@ -782,13 +727,13 @@ struct GeometryTouchEventProcessor::Impl
 
         if(Actor* owner = GetEstablishedOwner(processor))
         {
-          // Ownership replaces the primary hit as the stable route. The initial hit remains in
-          // mStreamState solely as the public hit-actor identity for recipient events.
+          // Ownership binds the stable touch route. The initial hit remains available for
+          // interception and as the public hit-actor identity for recipient events.
           BindRouteToOwner(processor, owner);
         }
         else
         {
-          processor.mLastPrimaryHitActor.SetActor(&GetImplementation(localVars.primaryHitActor));
+          processor.mLastPrimaryHitActor.SetActor(primaryRouteActor);
         }
       }
       else if(Actor* owner = GetEstablishedOwner(processor))

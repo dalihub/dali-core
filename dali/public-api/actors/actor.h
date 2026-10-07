@@ -88,10 +88,12 @@ struct Vector4;
  *     A candidate that did not consume an earlier event can consume a later event.
  *   - The first consumer becomes the stable owner. Subsequent touch events are delivered to that owner
  *     until interception or stream termination.
- *   - Intercept signals follow the path from the root to the current owner, including the owner. Before
- *     an owner exists, the initial hit actor's ancestor path is used.
+ *   - Until interception succeeds, intercept signals follow the path from the root to the initial hit
+ *     actor, including children below the current owner. If the initial hit actor leaves the scene,
+ *     the current owner's ancestor path is used.
  *   - If a new owner displaces actors that previously received this stream, every displaced active
  *     recipient receives exactly one interrupted event.
+ *     A terminated recipient may receive touch events again when a later interception selects its path.
  *   - Every point's local position is expressed in the actual recipient's coordinate system. Every
  *     point's hit actor remains the stream's initial hit actor for the lifetime of that stream.
  *
@@ -2902,8 +2904,10 @@ public: // Signals
    * So the child actor will not be able to receive touch events.
    * Only the parentFunctor is called.
    *
-   * @note In GEOMETRY propagation, intercept callbacks traverse the path from the root to the current owner, including the owner.
-   * Before an owner has been selected, they traverse the initial hit actor's ancestor path.
+   * @note In GEOMETRY propagation, intercept callbacks traverse the path from the root to the initial hit actor,
+   * including children below the current owner. If the initial hit actor leaves the scene, the current owner's
+   * ancestor path is used. Once interception succeeds, subsequent touch events follow the intercepted route
+   * without further intercept callbacks.
    *
    * @SINCE_2_5.29
    * @return The signal to connect to
