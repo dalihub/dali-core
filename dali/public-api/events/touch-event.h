@@ -346,6 +346,24 @@ public:
    */
   void AddPoint(int32_t deviceId, PointState::Type state, const Vector2& screenPosition, Device::Class::Type deviceClass, Device::Subclass::Type deviceSubclass, const Dali::String& deviceName, MouseButton::Type mouseButton);
 
+  /**
+   * @brief Sets the local position of the point specified.
+   *
+   * Set this when the touch event is fed directly to a particular target,
+   * bypassing DALi's touch event processing. In this case, the local position
+   * should be the co-ordinates relative to the top-left of that target.
+   *
+   * When the touch event is fed to a window, this value is ignored as the
+   * hit-actor and the local position are filled in by DALi when the touch
+   * event is processed.
+   *
+   * @SINCE_2_5.44
+   * @param[in] point The point required
+   * @param[in] localPosition The co-ordinates relative to the top-left of the view the event is fed to
+   * @note If point is greater than GetPointCount() then this method does nothing.
+   */
+  void SetLocalPosition(uint32_t point, const Vector2& localPosition);
+
 public: // Not intended for application developers
   /// @cond internal
   /**
