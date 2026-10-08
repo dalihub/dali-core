@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -305,8 +305,9 @@ int UtcDaliFixedSizeMemoryPoolKeyFromPtrN01(void)
   uint32_t key = memoryPool.GetKeyFromPtr(nullptr);
   DALI_TEST_EQUALS(key, (uint32_t)-1, TEST_LOCATION);
 
-  testObject += 1500; // Ensure it's outside block
-  key = memoryPool.GetKeyFromPtr(testObject);
+  // A stack address can never be inside any of the pool's heap blocks
+  uint8_t outsidePool[sizeof(TestObject)];
+  key = memoryPool.GetKeyFromPtr(reinterpret_cast<TestObject*>(outsidePool));
   DALI_TEST_EQUALS(key, (uint32_t)-1, TEST_LOCATION);
 
   END_TEST;
@@ -403,26 +404,21 @@ int UtcDaliFixedSizeMemoryPoolKeyFromPtrN02(void)
   Dali::Vector<TestObject*> objects;
   objects.Reserve(numObjects);
 
-  TestObject* testObject;
-  TestObject* firstObject;
-
   for(unsigned int i = 0; i < numObjects; ++i)
   {
-    testObject = new(memoryPool.Allocate()) TestObject();
-    if(i == 0)
-    {
-      firstObject = testObject;
-    }
-
+    TestObject* testObject = new(memoryPool.Allocate()) TestObject();
     objects.PushBack(testObject);
   }
 
-  firstObject--;
-  uint32_t key = memoryPool.GetKeyFromPtr(firstObject);
+  // Stack addresses can never be inside any of the pool's heap blocks.
+  // (Pointer arithmetic past a block's bounds is not a safe way to get an
+  // out-of-pool address: the heap may place another block there.)
+  uint8_t  outsidePool1[sizeof(TestObject)];
+  uint8_t  outsidePool2[sizeof(TestObject)];
+  uint32_t key = memoryPool.GetKeyFromPtr(reinterpret_cast<TestObject*>(outsidePool1));
   DALI_TEST_EQUALS(key, (uint32_t)-1, TEST_LOCATION);
 
-  testObject += 1024; // Ensure it's outside the block
-  key = memoryPool.GetKeyFromPtr(testObject);
+  key = memoryPool.GetKeyFromPtr(reinterpret_cast<TestObject*>(outsidePool2));
   DALI_TEST_EQUALS(key, (uint32_t)-1, TEST_LOCATION);
 
   key = memoryPool.GetKeyFromPtr(nullptr);
