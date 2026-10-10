@@ -70,7 +70,7 @@ int UtcDaliSingletonServiceGet(void)
   END_TEST;
 }
 
-int UtcDaliSingletonServiceRegisterAndGetSingleton(void)
+int UtcDaliSingletonServiceRegisterAndGetSingletonLegacy(void)
 {
   TestApplication  application;
   SingletonService singletonService(SingletonService::Get());
@@ -84,6 +84,24 @@ int UtcDaliSingletonServiceRegisterAndGetSingleton(void)
   handle = TestHandle(new TestObject);
   singletonService.Register(typeid(handle), handle);
   DALI_TEST_CHECK(singletonService.GetSingleton(typeid(handle)));
+
+  END_TEST;
+}
+
+int UtcDaliSingletonServiceRegisterAndGetSingletonTypeInfoId(void)
+{
+  TestApplication  application;
+  SingletonService singletonService(SingletonService::Get());
+
+  // Attempt to register an empty handle
+  TestHandle handle;
+  singletonService.Register(DALI_TYPE_ID(handle), handle);
+  DALI_TEST_CHECK(!singletonService.GetSingleton(DALI_TYPE_ID(handle)));
+
+  // Create an actor instance and retrieve, should be valid this time
+  handle = TestHandle(new TestObject);
+  singletonService.Register(DALI_TYPE_ID(handle), handle);
+  DALI_TEST_CHECK(singletonService.GetSingleton(DALI_TYPE_ID(handle)));
 
   END_TEST;
 }
