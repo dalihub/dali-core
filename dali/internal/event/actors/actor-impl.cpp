@@ -175,6 +175,7 @@ static constexpr std::string_view SIGNAL_INTERCEPT_TOUCH_EVENT        = "interce
 static constexpr std::string_view SIGNAL_INTERCEPT_WHEEL_EVENT        = "interceptWheelEvent";
 static constexpr std::string_view SIGNAL_VISIBILITY_CHANGED           = "visibilityChanged";
 static constexpr std::string_view SIGNAL_EFFECTIVE_VISIBILITY_CHANGED = "effectiveVisibilityChanged";
+static constexpr std::string_view SIGNAL_ON_SCENE_VISIBILITY_CHANGED  = "onSceneVisibilityChanged";
 static constexpr std::string_view SIGNAL_LAYOUT_DIRECTION_CHANGED     = "layoutDirectionChanged";
 static constexpr std::string_view SIGNAL_CHILD_ADDED                  = "childAdded";
 static constexpr std::string_view SIGNAL_CHILD_REMOVED                = "childRemoved";
@@ -248,6 +249,10 @@ static bool DoConnectSignal(BaseObject*                 object,
   {
     actor->EffectiveVisibilityChangedSignal().Connect(tracker, functor);
   }
+  else if(name == SIGNAL_ON_SCENE_VISIBILITY_CHANGED)
+  {
+    actor->OnSceneVisibilityChangedSignal().Connect(tracker, functor);
+  }
   else if(name == SIGNAL_LAYOUT_DIRECTION_CHANGED)
   {
     actor->LayoutDirectionChangedSignal().Connect(tracker, functor);
@@ -316,6 +321,7 @@ SignalConnectorType signalConnector11(mType, SIGNAL_VISIBILITY_CHANGED.data(), &
 SignalConnectorType signalConnector12(mType, SIGNAL_EFFECTIVE_VISIBILITY_CHANGED.data(), &DoConnectSignal);
 SignalConnectorType signalConnector13(mType, SIGNAL_LAYOUT_DIRECTION_CHANGED.data(), &DoConnectSignal);
 SignalConnectorType signalConnector14(mType, SIGNAL_ON_RELAYOUT.data(), &DoConnectSignal);
+SignalConnectorType signalConnector15(mType, SIGNAL_ON_SCENE_VISIBILITY_CHANGED.data(), &DoConnectSignal);
 
 TypeAction a1(mType, ACTION_SHOW.data(), &DoAction);
 TypeAction a2(mType, ACTION_HIDE.data(), &DoAction);
