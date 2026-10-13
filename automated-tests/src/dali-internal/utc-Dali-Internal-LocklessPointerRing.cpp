@@ -57,7 +57,7 @@ public:
   : mStopFlag(stopFlag),
     mCancelled(false),
     mThread([this, timeout]()
-            {
+  {
       std::unique_lock<std::mutex> lock(mMutex);
       if(!mCondition.wait_for(lock, timeout, [this] { return mCancelled; }))
       {
@@ -194,6 +194,41 @@ bool ReserveAndFlushOne(Internal::Update::MessageQueue& queue, int id, std::vect
   new(slot) OrderedTestMessage(id, order, orderMutex);
   return queue.FlushQueue();
 }
+
+// Message which flushes further buffers into the same queue while it is being
+// processed. Reproduces the producer refilling the ring while the consumer is
+// still processing the buffers it drained, without a second thread.
+struct RefillingTestMessage : public MessageBase
+{
+  RefillingTestMessage(int id, Internal::Update::MessageQueue& queue, int refillCount, std::vector<int>* order, std::mutex* orderMutex)
+  : id(id),
+    queue(queue),
+    refillCount(refillCount),
+    order(order),
+    orderMutex(orderMutex)
+  {
+  }
+
+  void Process() override
+  {
+    {
+      std::lock_guard<std::mutex> lock(*orderMutex);
+      order->push_back(id);
+    }
+    for(int i = 1; i <= refillCount; ++i)
+    {
+      ReserveAndFlushOne(queue, id + i, order, orderMutex);
+    }
+  }
+
+  ~RefillingTestMessage() override = default;
+
+  int                             id;
+  Internal::Update::MessageQueue& queue;
+  int                             refillCount;
+  std::vector<int>*               order;
+  std::mutex*                     orderMutex;
+};
 } // namespace
 
 void utc_dali_internal_lockless_pointer_ring_startup(void)
@@ -436,7 +471,7 @@ int UtcDaliInternalLocklessPointerRingConcurrentSpsc(void)
   TestWatchdog watchdog(stop, std::chrono::seconds(30));
 
   std::thread producer([&]()
-                       {
+  {
     for(int i = 0; i < TARGET_COUNT && !stop; ++i)
     {
       // Retry until there is room - this is the ring-full backpressure path,
@@ -450,7 +485,7 @@ int UtcDaliInternalLocklessPointerRingConcurrentSpsc(void)
     } });
 
   std::thread consumer([&]()
-                       {
+  {
     while(static_cast<int>(consumedValues.size()) < TARGET_COUNT && !stop)
     {
       Payload*    out[CAPACITY] = {nullptr};
@@ -969,6 +1004,45 @@ int UtcDaliInternalLocklessRingMessageQueuePreservesOrderAcrossChannels(void)
   END_TEST;
 }
 
+int UtcDaliInternalLocklessRingMessageQueuePreservesOrderOnRefill(void)
+{
+  tet_infoline("Test global FIFO order is preserved when the ring refills and overflows while ProcessMessages() is still processing the buffers it drained");
+
+  TestApplication                application;
+  MyTestRenderController         renderController;
+  Internal::Update::MessageQueue messageQueue(renderController);
+
+  std::vector<int> processedOrder;
+  std::mutex       orderMutex;
+
+  // While id 0 is processed, ids 1 .. RING_CAPACITY refill the ring that has just
+  // been drained, and the next id finds the ring full and goes to overflow.
+  constexpr int REFILL_COUNT = TEST_LOCKLESS_RING_CAPACITY + 1;
+
+  uint32_t* slot = messageQueue.ReserveMessageSlot(static_cast<uint32_t>(sizeof(RefillingTestMessage)), /*updateScene*/ false);
+  DALI_TEST_CHECK(slot != nullptr);
+  new(slot) RefillingTestMessage(0, messageQueue, REFILL_COUNT, &processedOrder, &orderMutex);
+  DALI_TEST_CHECK(messageQueue.FlushQueue());
+
+  // Processing id 0 leaves ids 1 .. RING_CAPACITY in the ring and the last id in
+  // the overflow queue. The ring buffers are older, so the overflow one must not
+  // overtake them in either call.
+  messageQueue.ProcessMessages();
+  messageQueue.ProcessMessages();
+
+  const int total = REFILL_COUNT + 1;
+  DALI_TEST_EQUALS(static_cast<int>(processedOrder.size()), total, TEST_LOCATION);
+
+  std::vector<int> expected;
+  for(int i = 0; i < total; ++i)
+  {
+    expected.push_back(i);
+  }
+  DALI_TEST_CHECK(processedOrder == expected);
+
+  END_TEST;
+}
+
 int UtcDaliInternalLocklessRingMessageQueueBackpressureReleasedByProcess(void)
 {
   tet_infoline("Test a concurrent ProcessMessages() releases a FlushQueue() blocked on overflow backpressure, well before the timeout");
@@ -997,7 +1071,7 @@ int UtcDaliInternalLocklessRingMessageQueueBackpressureReleasedByProcess(void)
   constexpr int TOTAL_FLUSHES = TEST_LOCKLESS_RING_CAPACITY + TEST_MAX_MESSAGES_ALLOWED_IN_PROCESS_QUEUE + 16;
 
   std::thread producer([&]()
-                       {
+  {
     for(int i = 0; i < TOTAL_FLUSHES && !stop; ++i)
     {
       // FlushQueue() may block here (that is the backpressure mechanism under
@@ -1080,7 +1154,7 @@ int UtcDaliInternalLocklessRingMessageQueueConcurrentProducerConsumer(void)
 
   // Event thread: reserve a batch of messages, flush, repeat.
   std::thread producer([&]()
-                       {
+  {
     for(int b = 0; b < BATCHES && !stop; ++b)
     {
       for(int i = 0; i < MESSAGES_PER_BATCH; ++i)
