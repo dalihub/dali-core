@@ -173,6 +173,14 @@ void TouchEvent::SetTime(uint32_t time)
   mTime = time;
 }
 
+void TouchEvent::SetLocalPosition(uint32_t point, const Vector2& localPosition)
+{
+  if(point < mPoints.size())
+  {
+    mPoints[point].SetLocalPosition(localPosition);
+  }
+}
+
 } // namespace Internal
 
 } //namespace DALI_NAMESPACE

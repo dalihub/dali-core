@@ -76,6 +76,7 @@ public:
     updateProxy.GetOrientation(mActorId, mOrientation);
     updateProxy.GetColorMultiplier(mActorId, mColor);
     updateProxy.GetScale(mActorId, mScale);
+    updateProxy.GetPivot(mActorId, mPivot);
 
     updateProxy.GetWorldPositionScaleAndSize(mActorId, mWorldPosition, mWorldScale, mSizeGetWorldPositionAndSizeCall);
     updateProxy.GetWorldTransformAndSize(mActorId, mWorldTransformPosition, mWorldTransformScale, mWorldTransformOrientation, mSizeGetWorldTransform);
@@ -91,6 +92,7 @@ public:
   Vector3    mSizeGetPositionAndSizeCall;
   Vector4    mColor;
   Vector3    mScale;
+  Vector3    mPivot;
   Quaternion mOrientation;
 
   Vector3 mWorldPosition;
@@ -299,6 +301,7 @@ public:
     mBakePositionCallSuccess                 = updateProxy.BakePosition(mActorId, vec3);
     mBakeColorCallSuccess                    = updateProxy.BakeColor(mActorId, vec4);
     mBakeScaleCallSuccess                    = updateProxy.BakeScale(mActorId, vec3);
+    mGetPivotCallSuccess                     = updateProxy.GetPivot(mActorId, vec3);
 
     mGetOrientationCallSuccess    = updateProxy.GetOrientation(mActorId, quat);
     mSetOrientationCallSuccess    = updateProxy.SetOrientation(mActorId, quat);
@@ -329,6 +332,7 @@ public:
     mBakePositionCallSuccess                 = false;
     mBakeColorCallSuccess                    = false;
     mBakeScaleCallSuccess                    = false;
+    mGetPivotCallSuccess                     = false;
 
     mSetOrientationCallSuccess  = false;
     mGetOrientationCallSuccess  = false;
@@ -357,6 +361,7 @@ public:
   bool mBakePositionCallSuccess{false};
   bool mBakeColorCallSuccess{false};
   bool mBakeScaleCallSuccess{false};
+  bool mGetPivotCallSuccess{false};
   bool mBakeOrientationCallSuccess{false};
   bool mGetWorldTransformCallSuccess{false};
   bool mGetUpdateAreaCallSuccess{false};
@@ -895,6 +900,7 @@ int UtcDaliFrameCallbackGetters(void)
 
   DALI_TEST_EQUALS(frameCallback.mColor, color, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mScale, scale, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mPivot, Pivot::TOP_LEFT, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mOrientation, orientation, TEST_LOCATION);
 
   frameCallback.Reset();
@@ -1254,6 +1260,7 @@ int UtcDaliFrameCallbackInvalidActorId(void)
   DALI_TEST_EQUALS(frameCallback.mBakePositionCallSuccess, false, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mBakeColorCallSuccess, false, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mBakeScaleCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetPivotCallSuccess, false, TEST_LOCATION);
 
   DALI_TEST_EQUALS(frameCallback.mGetOrientationCallSuccess, false, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mSetOrientationCallSuccess, false, TEST_LOCATION);
@@ -1299,6 +1306,7 @@ int UtcDaliFrameCallbackActorRemovedAndAdded(void)
   DALI_TEST_EQUALS(frameCallback.mBakePositionCallSuccess, true, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mBakeColorCallSuccess, true, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mBakeScaleCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetPivotCallSuccess, true, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mGetOrientationCallSuccess, true, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mSetOrientationCallSuccess, true, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mBakeOrientationCallSuccess, true, TEST_LOCATION);
@@ -1330,6 +1338,7 @@ int UtcDaliFrameCallbackActorRemovedAndAdded(void)
   DALI_TEST_EQUALS(frameCallback.mBakePositionCallSuccess, false, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mBakeColorCallSuccess, false, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mBakeScaleCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetPivotCallSuccess, false, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mGetOrientationCallSuccess, false, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mSetOrientationCallSuccess, false, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mBakeOrientationCallSuccess, false, TEST_LOCATION);
@@ -1361,6 +1370,7 @@ int UtcDaliFrameCallbackActorRemovedAndAdded(void)
   DALI_TEST_EQUALS(frameCallback.mBakePositionCallSuccess, true, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mBakeColorCallSuccess, true, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mBakeScaleCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetPivotCallSuccess, true, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mGetOrientationCallSuccess, true, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mSetOrientationCallSuccess, true, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mBakeOrientationCallSuccess, true, TEST_LOCATION);
@@ -1676,6 +1686,7 @@ int UtcDaliFrameCallbackWithoutRootActor(void)
   DALI_TEST_EQUALS(frameCallback.mBakePositionCallSuccess, true, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mBakeColorCallSuccess, true, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mBakeScaleCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetPivotCallSuccess, true, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mGetOrientationCallSuccess, true, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mSetOrientationCallSuccess, true, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mBakeOrientationCallSuccess, true, TEST_LOCATION);
@@ -1707,6 +1718,7 @@ int UtcDaliFrameCallbackWithoutRootActor(void)
   DALI_TEST_EQUALS(frameCallback.mBakePositionCallSuccess, true, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mBakeColorCallSuccess, true, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mBakeScaleCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetPivotCallSuccess, true, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mGetOrientationCallSuccess, true, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mSetOrientationCallSuccess, true, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mBakeOrientationCallSuccess, true, TEST_LOCATION);
@@ -1737,6 +1749,7 @@ int UtcDaliFrameCallbackWithoutRootActor(void)
   DALI_TEST_EQUALS(frameCallback.mBakePositionCallSuccess, false, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mBakeColorCallSuccess, false, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mBakeScaleCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetPivotCallSuccess, false, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mGetOrientationCallSuccess, false, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mSetOrientationCallSuccess, false, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mBakeOrientationCallSuccess, false, TEST_LOCATION);
@@ -1768,6 +1781,7 @@ int UtcDaliFrameCallbackWithoutRootActor(void)
   DALI_TEST_EQUALS(frameCallback.mBakePositionCallSuccess, false, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mBakeColorCallSuccess, false, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mBakeScaleCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetPivotCallSuccess, false, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mGetOrientationCallSuccess, false, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mSetOrientationCallSuccess, false, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mBakeOrientationCallSuccess, false, TEST_LOCATION);

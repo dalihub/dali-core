@@ -44,7 +44,8 @@ Scene::Scene(const Graphics::RenderTargetCreateInfo& createInfo)
   mStencilBufferEnabled(false),
   mPartialUpdateEnabled(false),
   mHasRenderInstructionToScene(false),
-  mRenderPassDirty(false)
+  mRenderPassDirty(false),
+  mVisible(true)
 {
 }
 
@@ -214,6 +215,16 @@ void Scene::SetSkipRendering(bool skip)
 bool Scene::IsRenderingSkipped() const
 {
   return mSkipRendering;
+}
+
+void Scene::SetVisible(bool visible)
+{
+  mVisible = visible;
+}
+
+bool Scene::IsVisible() const
+{
+  return mVisible;
 }
 
 void Scene::SetSurfaceRect(const BoundsInteger& rect)

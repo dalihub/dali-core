@@ -206,6 +206,13 @@ public:
   bool IsVisible() const;
 
   /**
+   * @brief Returns whether the scene is visible or not. It gets the value from the scene object.
+   *
+   * @return True if the scene is visible, false otherwise.
+   */
+  bool IsCurrentlyVisible() const;
+
+  /**
    * @brief Informs the scene need full update.
    * @SINCE_2_4.42
    */

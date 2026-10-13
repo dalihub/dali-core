@@ -244,6 +244,18 @@ I   * @param[in] callback The function to call
   bool IsRenderingSkipped() const;
 
   /**
+   * @brief Sets whether the scene is visible or not.
+   * @param[in] visible true if the scene is visible.
+   */
+  void SetVisible(bool visible);
+
+  /**
+   * @brief Query whether the scene is visible or not.
+   * @return true if the scene is visible, false otherwise.
+   */
+  bool IsVisible() const;
+
+  /**
    * Set the surface rectangle when surface is resized.
    *
    * @param[in] scene The resized scene.
@@ -462,6 +474,7 @@ private:
   bool mPartialUpdateEnabled : 1;             ///< True if the partial update is enabled
   bool mHasRenderInstructionToScene : 1;      ///< True if has render instruction to the scene. Update at PreRender time.
   bool mRenderPassDirty : 1;                  ///< True if depth/stencil flags changed since last BuildRenderPasses
+  bool mVisible : 1;                          ///< True if the scene is visible
 };
 
 /// Messages
@@ -529,6 +542,17 @@ inline void SetSurfaceRenderTargetCreateInfoMessage(EventThreadServices& eventTh
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new(slot) LocalType(&scene, &Scene::SetSurfaceRenderTargetCreateInfo, renderTargetCreateInfo);
+}
+
+inline void SetVisibleMessage(EventThreadServices& eventThreadServices, const Scene& scene, bool visible)
+{
+  using LocalType = MessageValue1<Scene, bool>;
+
+  // Reserve some memory inside the message queue
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new(slot) LocalType(&scene, &Scene::SetVisible, visible);
 }
 
 inline void KeepRenderingMessage(EventThreadServices& eventThreadServices, const Scene& scene, float durationSeconds)

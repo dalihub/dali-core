@@ -85,6 +85,11 @@ bool Scene::IsVisible() const
   return GetImplementation(*this).IsVisible();
 }
 
+bool Scene::IsCurrentlyVisible() const
+{
+  return GetImplementation(*this).IsCurrentlyVisible();
+}
+
 void Scene::RequestFullUpdate()
 {
   GetImplementation(*this).RequestFullUpdate();

@@ -407,7 +407,7 @@ struct OnSceneVisibilityChangedFunctor
     data.actor             = actor;
     data.changedActor      = DevelActor::GetVisiblityChangedActor();
     data.visible           = visible;
-    data.calculatedVisible = DevelActor::IsOnSceneVisible(actor);
+    data.calculatedVisible = actor.IsOnSceneVisible();
     data.called            = true;
   }
 
@@ -10685,6 +10685,48 @@ int utcDaliActorVisibilityChangeSignalByName(void)
   END_TEST;
 }
 
+int UtcDaliActorOnSceneVisibilityChangeSignalByName(void)
+{
+  TestApplication application;
+  tet_infoline("Check that onSceneVisibilityChanged can be connected by name and tracks IsOnSceneVisible");
+
+  Actor actor        = Actor::New();
+  bool  signalCalled = false;
+  DALI_TEST_CHECK(actor.ConnectSignal(&application, "onSceneVisibilityChanged", VisibilityChangedVoidFunctor(signalCalled)));
+  DALI_TEST_CHECK(!actor.IsOnSceneVisible());
+
+  application.GetScene().Add(actor);
+  DALI_TEST_CHECK(signalCalled);
+  DALI_TEST_CHECK(actor.IsOnSceneVisible());
+
+  signalCalled = false;
+  actor.SetVisible(false);
+  DALI_TEST_CHECK(signalCalled);
+  DALI_TEST_CHECK(!actor.IsOnSceneVisible());
+
+  signalCalled = false;
+  actor.SetVisible(true);
+  DALI_TEST_CHECK(signalCalled);
+  DALI_TEST_CHECK(actor.IsOnSceneVisible());
+
+  signalCalled = false;
+  application.GetScene().Hide();
+  DALI_TEST_CHECK(signalCalled);
+  DALI_TEST_CHECK(!actor.IsOnSceneVisible());
+
+  signalCalled = false;
+  application.GetScene().Show();
+  DALI_TEST_CHECK(signalCalled);
+  DALI_TEST_CHECK(actor.IsOnSceneVisible());
+
+  signalCalled = false;
+  actor.Unparent();
+  DALI_TEST_CHECK(signalCalled);
+  DALI_TEST_CHECK(!actor.IsOnSceneVisible());
+
+  END_TEST;
+}
+
 int utcDaliActorOnSceneVisibilityChangeSignal1(void)
 {
   TestApplication application;
@@ -10696,7 +10738,7 @@ int utcDaliActorOnSceneVisibilityChangeSignal1(void)
   VisibilityChangedFunctorData        visibilityData;
   OnSceneVisibilityChangedFunctorData data;
   actor.VisibilityChangedSignal().Connect(&application, VisibilityChangedFunctor(visibilityData));
-  DevelActor::OnSceneVisibilityChangedSignal(actor).Connect(&application, OnSceneVisibilityChangedFunctor(data));
+  actor.OnSceneVisibilityChangedSignal().Connect(&application, OnSceneVisibilityChangedFunctor(data));
 
   parentActor.Add(actor);
   visibilityData.Check(false, TEST_LOCATION);
@@ -10747,8 +10789,8 @@ int utcDaliActorOnSceneVisibilityChangeSignal2(void)
   OnSceneVisibilityChangedFunctorData dataP, dataC;
   parentActor.VisibilityChangedSignal().Connect(&application, VisibilityChangedFunctor(visibilityDataP));
   childActor.VisibilityChangedSignal().Connect(&application, VisibilityChangedFunctor(visibilityDataC));
-  DevelActor::OnSceneVisibilityChangedSignal(parentActor).Connect(&application, OnSceneVisibilityChangedFunctor(dataP));
-  DevelActor::OnSceneVisibilityChangedSignal(childActor).Connect(&application, OnSceneVisibilityChangedFunctor(dataC));
+  parentActor.OnSceneVisibilityChangedSignal().Connect(&application, OnSceneVisibilityChangedFunctor(dataP));
+  childActor.OnSceneVisibilityChangedSignal().Connect(&application, OnSceneVisibilityChangedFunctor(dataC));
 
   visibilityDataP.Reset();
   visibilityDataC.Reset();
@@ -10875,7 +10917,7 @@ int utcDaliActorOnSceneVisibilityChangeSignal3(void)
   VisibilityChangedFunctorData        visibilityData;
   OnSceneVisibilityChangedFunctorData data;
   actor.VisibilityChangedSignal().Connect(&application, VisibilityChangedFunctor(visibilityData));
-  DevelActor::OnSceneVisibilityChangedSignal(actor).Connect(&application, OnSceneVisibilityChangedFunctor(data));
+  actor.OnSceneVisibilityChangedSignal().Connect(&application, OnSceneVisibilityChangedFunctor(data));
 
   application.GetScene().Add(parentActor);
   data.Check(true, parentActor, actor, true, TEST_LOCATION);
@@ -10997,11 +11039,11 @@ int utcDaliActorOnSceneVisibilityChangeSignal4(void)
   childB.VisibilityChangedSignal().Connect(&application, VisibilityChangedFunctor(dataVCB));
   childC.VisibilityChangedSignal().Connect(&application, VisibilityChangedFunctor(dataVCC));
 
-  DevelActor::OnSceneVisibilityChangedSignal(parentA).Connect(&application, OnSceneVisibilityChangedFunctor(dataPA));
-  DevelActor::OnSceneVisibilityChangedSignal(parentB).Connect(&application, OnSceneVisibilityChangedFunctor(dataPB));
-  DevelActor::OnSceneVisibilityChangedSignal(childA).Connect(&application, OnSceneVisibilityChangedFunctor(dataCA));
-  DevelActor::OnSceneVisibilityChangedSignal(childB).Connect(&application, OnSceneVisibilityChangedFunctor(dataCB));
-  DevelActor::OnSceneVisibilityChangedSignal(childC).Connect(&application, OnSceneVisibilityChangedFunctor(dataCC));
+  parentA.OnSceneVisibilityChangedSignal().Connect(&application, OnSceneVisibilityChangedFunctor(dataPA));
+  parentB.OnSceneVisibilityChangedSignal().Connect(&application, OnSceneVisibilityChangedFunctor(dataPB));
+  childA.OnSceneVisibilityChangedSignal().Connect(&application, OnSceneVisibilityChangedFunctor(dataCA));
+  childB.OnSceneVisibilityChangedSignal().Connect(&application, OnSceneVisibilityChangedFunctor(dataCB));
+  childC.OnSceneVisibilityChangedSignal().Connect(&application, OnSceneVisibilityChangedFunctor(dataCC));
 
   ResetOnSceneVisibilityChangedFunctorData();
   application.GetScene().Add(parentA);
@@ -11206,11 +11248,11 @@ int utcDaliActorVisibilityChangeSignalDurintVisibilityChanged(void)
   actorE.VisibilityChangedSignal().Connect(&application, VisibilityChangedLambdaFunctor([&](Actor actor, bool visible, VisibilityChangeType type)
   { dataVCC.Check(false, DevelActor::GetVisiblityChangedActor(), actor, visible, type, TEST_LOCATION); }));
 
-  DevelActor::OnSceneVisibilityChangedSignal(actorA).Connect(&application, OnSceneVisibilityChangedFunctor(dataPA));
-  DevelActor::OnSceneVisibilityChangedSignal(actorB).Connect(&application, OnSceneVisibilityChangedFunctor(dataPB));
-  DevelActor::OnSceneVisibilityChangedSignal(actorC).Connect(&application, OnSceneVisibilityChangedFunctor(dataCA));
-  DevelActor::OnSceneVisibilityChangedSignal(actorD).Connect(&application, OnSceneVisibilityChangedFunctor(dataCB));
-  DevelActor::OnSceneVisibilityChangedSignal(actorE).Connect(&application, OnSceneVisibilityChangedFunctor(dataCC));
+  actorA.OnSceneVisibilityChangedSignal().Connect(&application, OnSceneVisibilityChangedFunctor(dataPA));
+  actorB.OnSceneVisibilityChangedSignal().Connect(&application, OnSceneVisibilityChangedFunctor(dataPB));
+  actorC.OnSceneVisibilityChangedSignal().Connect(&application, OnSceneVisibilityChangedFunctor(dataCA));
+  actorD.OnSceneVisibilityChangedSignal().Connect(&application, OnSceneVisibilityChangedFunctor(dataCB));
+  actorE.OnSceneVisibilityChangedSignal().Connect(&application, OnSceneVisibilityChangedFunctor(dataCC));
 
   // Change C as invisible
   actorC.SetProperty(Actor::Property::VISIBLE, false);
@@ -11234,7 +11276,7 @@ int utcDaliActorOnSceneVisibilityChangeSignal5(void)
   Actor actor       = Actor::New();
 
   OnSceneVisibilityChangedFunctorData data;
-  DevelActor::OnSceneVisibilityChangedSignal(actor).Connect(&application, OnSceneVisibilityChangedFunctor(data));
+  actor.OnSceneVisibilityChangedSignal().Connect(&application, OnSceneVisibilityChangedFunctor(data));
 
   application.GetScene().Hide();
 
@@ -16423,7 +16465,7 @@ int UtcDaliActorIsOnSceneVisible01(void)
 {
   TestApplication application;
 
-  tet_infoline("Test DevelActor::IsOnSceneVisible: true only when connected to a visible scene and the whole ancestor VISIBLE chain is true");
+  tet_infoline("Test Actor::IsOnSceneVisible: true only when connected to a visible scene and the whole ancestor VISIBLE chain is true");
 
   Actor rootActor   = Actor::New();
   Actor branchActor = Actor::New();
@@ -16447,7 +16489,7 @@ int UtcDaliActorIsOnSceneVisible01(void)
   auto CheckOnSceneVisible = [&](Actor actor, bool expectVisible, bool expectOnSceneVisible, const char* location)
   {
     DALI_TEST_EQUALS(expectVisible, actor.GetProperty<bool>(Actor::Property::VISIBLE), location);
-    DALI_TEST_EQUALS(expectOnSceneVisible, DevelActor::IsOnSceneVisible(actor), location);
+    DALI_TEST_EQUALS(expectOnSceneVisible, actor.IsOnSceneVisible(), location);
   };
 
   CheckOnSceneVisible(rootActor, true, true, TEST_LOCATION);

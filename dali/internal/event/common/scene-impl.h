@@ -97,6 +97,11 @@ public:
   bool IsVisible() const;
 
   /**
+   * @copydoc Dali::Integration::Scene::IsCurrentlyVisible
+   */
+  bool IsCurrentlyVisible() const;
+
+  /**
    * @copydoc Dali::Integration::Scene::RequestFullUpdate
    */
   void RequestFullUpdate();

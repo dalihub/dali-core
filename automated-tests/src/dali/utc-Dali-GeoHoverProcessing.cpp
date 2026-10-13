@@ -18,6 +18,8 @@
 #include <dali-test-suite-utils.h>
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/integration-api/events/hover-event-integ.h>
+#include <dali/integration-api/events/touch-event-combiner.h>
+#include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/render-task-list-integ.h>
 #include <dali/public-api/dali-core.h>
 #include <stdlib.h>
@@ -1741,6 +1743,76 @@ int UtcDaliGeoHoverOverlappingCandidates(void)
   DALI_TEST_EQUALS(trace[1].state, PointState::FINISHED, TEST_LOCATION);
   DALI_TEST_EQUALS(trace[2].actor, parent, TEST_LOCATION);
   DALI_TEST_EQUALS(trace[2].state, PointState::FINISHED, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliGeoHoverLeaveOnSecondaryButtonUp(void)
+{
+  // A mouse release outside the actor must immediately emit LEAVE in geometry mode.
+  TestApplication application;
+  application.GetScene().SetGeometryHittestEnabled(true);
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(200.0f, 200.0f));
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+  application.Render();
+
+  std::vector<HoverTraceEntry> trace;
+  actor.HoverEventSignal().Connect(&application, [&](Actor actor, HoverEvent event)
+  {
+    trace.push_back({actor, event.GetState(0)});
+    return true;
+  });
+
+  Dali::Integration::TouchEventCombiner combiner;
+  unsigned long                         time = 0u;
+
+  auto feed = [&](PointState::Type state, const Vector2& pos, MouseButton::Type button)
+  {
+    Dali::Integration::Point point;
+    point.SetDeviceId(1);
+    point.SetState(state);
+    point.SetScreenPosition(pos);
+    point.SetDeviceClass(Device::Class::MOUSE);
+    point.SetDeviceSubclass(Device::Subclass::NONE);
+    point.SetMouseButton(button);
+
+    Dali::Integration::TouchEvent touchEvent;
+    Dali::Integration::HoverEvent hoverEvent;
+    Dali::Integration::TouchEventCombiner::EventDispatchType type =
+      combiner.GetNextTouchEvent(point, time, touchEvent, hoverEvent);
+
+    if(type == Dali::Integration::TouchEventCombiner::DISPATCH_HOVER ||
+       type == Dali::Integration::TouchEventCombiner::DISPATCH_BOTH)
+    {
+      application.ProcessEvent(hoverEvent);
+    }
+    ++time;
+  };
+
+  // Start hovering over the actor.
+  feed(PointState::MOTION, Vector2(10.0f, 10.0f), MouseButton::INVALID);
+  DALI_TEST_EQUALS(trace.size(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[0].state, PointState::STARTED, TEST_LOCATION);
+  trace.clear();
+
+  // Secondary button down on the actor: no hover.
+  feed(PointState::DOWN, Vector2(10.0f, 10.0f), MouseButton::SECONDARY);
+  DALI_TEST_EQUALS(trace.size(), 0u, TEST_LOCATION);
+
+  // Move outside the actor while button held: no hover.
+  feed(PointState::MOTION, Vector2(300.0f, 300.0f), MouseButton::INVALID);
+  DALI_TEST_EQUALS(trace.size(), 0u, TEST_LOCATION);
+
+  // Secondary button up outside the actor: hover re-evaluated at (300,300).
+  // The actor receives LEAVE because the pointer is no longer over it.
+  feed(PointState::UP, Vector2(300.0f, 300.0f), MouseButton::SECONDARY);
+  DALI_TEST_EQUALS(trace.size(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[0].state, PointState::LEAVE, TEST_LOCATION);
 
   END_TEST;
 }
