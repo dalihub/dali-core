@@ -4162,3 +4162,40 @@ int UtcDaliSceneWheelEventGeneratedSignalMultipleCallbacksGeometryOn(void)
 
   END_TEST;
 }
+
+int UtcDaliSceneIsCurrentlyVisible(void)
+{
+  tet_infoline("Ensure that IsCurrentlyVisible() returns the visibility after the update is processed");
+
+  TestApplication          application;
+  Dali::Integration::Scene scene = application.GetScene();
+
+  application.SendNotification();
+  application.Render(0);
+
+  DALI_TEST_EQUALS(scene.IsVisible(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(scene.IsCurrentlyVisible(), true, TEST_LOCATION);
+
+  scene.Hide();
+
+  // It should not be changed until the update is processed.
+  DALI_TEST_EQUALS(scene.IsVisible(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(scene.IsCurrentlyVisible(), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(0);
+
+  DALI_TEST_EQUALS(scene.IsCurrentlyVisible(), false, TEST_LOCATION);
+
+  scene.Show();
+
+  DALI_TEST_EQUALS(scene.IsVisible(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(scene.IsCurrentlyVisible(), false, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(0);
+
+  DALI_TEST_EQUALS(scene.IsCurrentlyVisible(), true, TEST_LOCATION);
+
+  END_TEST;
+}

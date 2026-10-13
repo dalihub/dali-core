@@ -58,6 +58,7 @@ struct GeometryTouchStreamState
   std::list<ActorPtr>                 interceptedRootToTarget;
   std::list<ActorPtr>                 candidatesRootToFront;
   std::vector<GeometryTouchRecipient> recipientsInDispatchOrder;
+  std::vector<GeometryTouchRecipient> interceptRecipientsInDispatchOrder;
 };
 
 } //namespace DALI_NAMESPACE::Internal

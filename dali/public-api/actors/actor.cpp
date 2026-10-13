@@ -452,6 +452,11 @@ bool Actor::IsEffectivelyVisible() const
   return GetImplementation(*this).IsEffectivelyVisible();
 }
 
+bool Actor::IsOnSceneVisible() const
+{
+  return GetImplementation(*this).IsOnSceneVisible();
+}
+
 void Actor::SetColorMultiplier(const Vector4& multiplier)
 {
   GetImplementation(*this).SetProperty(Actor::Property::COLOR_MULTIPLIER, multiplier);
@@ -1016,6 +1021,11 @@ Actor::VisibilityChangedSignalType& Actor::VisibilityChangedSignal()
 Actor::EffectiveVisibilityChangedSignalType& Actor::EffectiveVisibilityChangedSignal()
 {
   return GetImplementation(*this).EffectiveVisibilityChangedSignal();
+}
+
+Actor::OnSceneVisibilityChangedSignalType& Actor::OnSceneVisibilityChangedSignal()
+{
+  return GetImplementation(*this).OnSceneVisibilityChangedSignal();
 }
 
 Actor::LayoutDirectionChangedSignalType& Actor::LayoutDirectionChangedSignal()

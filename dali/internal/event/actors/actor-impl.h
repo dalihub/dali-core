@@ -828,7 +828,7 @@ public:
   }
 
   /**
-   * @copydoc Dali::DevelActor::IsOnSceneVisible()
+   * @copydoc Dali::Actor::IsOnSceneVisible()
    */
   bool IsOnSceneVisible() const;
 
@@ -1974,9 +1974,9 @@ public:
   }
 
   /**
-   * @copydoc DevelActor::OnSceneVisibilityChangedSignal
+   * @copydoc Dali::Actor::OnSceneVisibilityChangedSignal
    */
-  Dali::Actor::EffectiveVisibilityChangedSignalType& OnSceneVisibilityChangedSignal()
+  Dali::Actor::OnSceneVisibilityChangedSignalType& OnSceneVisibilityChangedSignal()
   {
     return mOnSceneVisibilityChangedSignal;
   }
@@ -2643,7 +2643,7 @@ protected:
   Dali::Actor::SceneDisconnectedSignalType          mSceneDisconnectedSignal;
   DevelActor::OnRelayoutSignalType                  mOnRelayoutSignal;
   Dali::Actor::VisibilityChangedSignalType          mVisibilityChangedSignal;
-  Dali::Actor::EffectiveVisibilityChangedSignalType mOnSceneVisibilityChangedSignal;
+  Dali::Actor::OnSceneVisibilityChangedSignalType   mOnSceneVisibilityChangedSignal;
   Dali::Actor::EffectiveVisibilityChangedSignalType mEffectiveVisibilityChangedSignal;
   Dali::Actor::LayoutDirectionChangedSignalType     mLayoutDirectionChangedSignal;
   Dali::Actor::TouchEventSignalType                 mHitTestResultSignal;

@@ -184,6 +184,11 @@ void Scene::Show()
   if(!mIsVisible)
   {
     mIsVisible = true;
+    if(DALI_LIKELY(EventThreadServices::IsCoreRunning() && mSceneObject))
+    {
+      ThreadLocalStorage* tls = ThreadLocalStorage::GetInternal();
+      SetVisibleMessage(tls->GetEventThreadServices(), *mSceneObject, true);
+    }
     mRootLayer->EmitOnSceneVisibilityChangedSignalRecursively(true);
   }
 }
@@ -193,6 +198,11 @@ void Scene::Hide()
   if(mIsVisible)
   {
     mIsVisible = false;
+    if(DALI_LIKELY(EventThreadServices::IsCoreRunning() && mSceneObject))
+    {
+      ThreadLocalStorage* tls = ThreadLocalStorage::GetInternal();
+      SetVisibleMessage(tls->GetEventThreadServices(), *mSceneObject, false);
+    }
     mRootLayer->EmitOnSceneVisibilityChangedSignalRecursively(false);
   }
 }
@@ -200,6 +210,11 @@ void Scene::Hide()
 bool Scene::IsVisible() const
 {
   return mIsVisible;
+}
+
+bool Scene::IsCurrentlyVisible() const
+{
+  return mSceneObject ? mSceneObject->IsVisible() : false;
 }
 
 void Scene::RequestFullUpdate()

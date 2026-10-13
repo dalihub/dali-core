@@ -217,6 +217,11 @@ public:
    */
   void SetTime(uint32_t time);
 
+  /**
+   * @copydoc Dali::TouchEvent::SetLocalPosition()
+   */
+  void SetLocalPosition(uint32_t point, const Vector2& localPosition);
+
 private:
   /**
    * @brief Virtual Destructor

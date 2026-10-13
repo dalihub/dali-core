@@ -152,6 +152,11 @@ void TouchEvent::AddPoint(int32_t deviceId, PointState::Type state, const Vector
   GetImplementation(*this).AddPoint(point);
 }
 
+void TouchEvent::SetLocalPosition(uint32_t point, const Vector2& localPosition)
+{
+  GetImplementation(*this).SetLocalPosition(point, localPosition);
+}
+
 TouchEvent::TouchEvent(Internal::TouchEvent* internal)
 : BaseHandle(internal)
 {

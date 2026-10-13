@@ -88,10 +88,15 @@ struct Vector4;
  *     A candidate that did not consume an earlier event can consume a later event.
  *   - The first consumer becomes the stable owner. Subsequent touch events are delivered to that owner
  *     until interception or stream termination.
- *   - Intercept signals follow the path from the root to the current owner, including the owner. Before
- *     an owner exists, the initial hit actor's ancestor path is used.
+ *   - Until interception succeeds, intercept signals follow the path from the root to the initial hit
+ *     actor, including children below the current owner. If the initial hit actor leaves the scene,
+ *     the current owner's ancestor path is used.
  *   - If a new owner displaces actors that previously received this stream, every displaced active
  *     recipient receives exactly one interrupted event.
+ *     A terminated recipient may receive touch events again when a later interception selects its path.
+ *   - An intercept observer that loses further delivery receives an interrupted intercept event.
+ *     After successful interception, observers that receive touch hand over subsequent delivery to
+ *     the touch signal. Stream interruption also terminates all remaining intercept observers.
  *   - Every point's local position is expressed in the actual recipient's coordinate system. Every
  *     point's hit actor remains the stream's initial hit actor for the lifetime of that stream.
  *
@@ -264,6 +269,7 @@ struct Vector4;
  * | childRemoved               | @ref ChildRemovedSignal()                   |
  * | visibilityChanged          | @ref VisibilityChangedSignal()              |
  * | effectiveVisibilityChanged | @ref EffectiveVisibilityChangedSignal()     |
+ * | onSceneVisibilityChanged   | @ref OnSceneVisibilityChangedSignal()       |
  * | layoutDirectionChanged     | @ref LayoutDirectionChangedSignal()         |
  * | interceptTouchEvent        | @ref InterceptTouchEventSignal()            |
  * | interceptWheelEvent        | @ref InterceptWheelEventSignal()            |
@@ -912,6 +918,7 @@ public:
   using ChildRemovedSignalType               = Signal<void(Actor, Actor)>;                      ///< Called when the actor has a child removed. @SINCE_2_5.29
   using VisibilityChangedSignalType          = Signal<void(Actor, bool, VisibilityChangeType)>; ///< Signal emitted when an actor's or a parent's visible property changes. @SINCE_2_5.29
   using EffectiveVisibilityChangedSignalType = Signal<void(Actor, bool)>;                       ///< Signal type of EffectiveVisibilityChangedSignalType. @SINCE_2_3.22
+  using OnSceneVisibilityChangedSignalType   = Signal<void(Actor, bool)>;                       ///< Called when the actor's on-scene visibility changes. @SINCE_2_5.44
   using LayoutDirectionChangedSignalType     = Signal<void(Actor, LayoutDirection::Type)>;      ///< Layout direction changes signal type. @SINCE_1_2.60
 
   // Creation
@@ -1744,9 +1751,30 @@ public:
    * @pre The actor has been initialized.
    * @see IsVisible()
    * @see EffectiveVisibilityChangedSignal()
+   * @see IsOnSceneVisible()
    * @SINCE_2_5.32
    */
   bool IsEffectivelyVisible() const;
+
+  /**
+   * @brief Returns the on-scene visibility of the actor.
+   *
+   * The on-scene visibility is true only when this actor and all of its parents (up to the root layer)
+   * have their Property::VISIBLE set to true, and the actor is connected to a visible scene.
+   * It does not consider opacity, on-screen position or culling, so a true result does not by itself
+   * guarantee that the actor is actually drawn.
+   *
+   * This is the value tracked by OnSceneVisibilityChangedSignal(). It is calculated from scratch
+   * using only event-side properties, so it does not rely on the update thread.
+   *
+   * @return True if the actor is connected to a visible scene and neither it nor any ancestor is hidden
+   * @pre The actor has been initialized.
+   * @see IsEffectivelyVisible()
+   * @see IsConnectedToScene()
+   * @see OnSceneVisibilityChangedSignal()
+   * @SINCE_2_5.44
+   */
+  bool IsOnSceneVisible() const;
 
   /**
    * @brief Sets the component-wise color multiplier for the actor's rendered content.
@@ -2902,8 +2930,12 @@ public: // Signals
    * So the child actor will not be able to receive touch events.
    * Only the parentFunctor is called.
    *
-   * @note In GEOMETRY propagation, intercept callbacks traverse the path from the root to the current owner, including the owner.
-   * Before an owner has been selected, they traverse the initial hit actor's ancestor path.
+   * @note In GEOMETRY propagation, intercept callbacks traverse the path from the root to the initial hit actor,
+   * including children below the current owner. If the initial hit actor leaves the scene, the current owner's
+   * ancestor path is used. Once interception succeeds, subsequent touch events follow the intercepted route
+   * without further intercept callbacks.
+   * Observers that do not continue through touch delivery receive an interrupted intercept event.
+   * Stream interruption terminates all pending observers regardless of their callbacks' return values.
    *
    * @SINCE_2_5.29
    * @return The signal to connect to
@@ -3087,6 +3119,31 @@ public: // Signals
    * @see Actor::IsEffectivelyVisible()
    */
   EffectiveVisibilityChangedSignalType& EffectiveVisibilityChangedSignal();
+
+  /**
+   * @brief This signal is emitted when the on-scene visibility of this actor changes.
+   *
+   * The on-scene visibility is true only when this actor and all of its parents (up to the root layer)
+   * have their Property::VISIBLE set to true, and the actor is connected to a visible scene.
+   * Like IsOnSceneVisible(), it does not consider opacity, on-screen position or culling.
+   *
+   * A callback of the following type may be connected:
+   * @code
+   *   void YourCallbackName( Actor actor, bool visible );
+   * @endcode
+   * actor: The actor whose on-scene visibility has changed.
+   * visible: Whether this actor's on-scene visibility has become true or false. This happens when
+   *          the VISIBLE property of this actor or one of its ancestors changes, when the actor is
+   *          connected to or disconnected from the scene, or when the scene is shown or hidden,
+   *          provided that the combined on-scene visibility changes.
+   *
+   * @return The signal to connect to
+   * @pre The actor has been initialized.
+   * @see IsOnSceneVisible()
+   * @see EffectiveVisibilityChangedSignal()
+   * @SINCE_2_5.44
+   */
+  OnSceneVisibilityChangedSignalType& OnSceneVisibilityChangedSignal();
 
   /**
    * @brief This signal is emitted when the layout direction property of this or a parent actor is changed.

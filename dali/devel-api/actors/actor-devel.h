@@ -288,7 +288,7 @@ using ChildOrderChangedSignalType = Signal<void(Actor, Actor)>; ///< Used when t
 
 using OnRelayoutSignalType = Signal<void(Actor)>; ///< Called when the actor is relaid out.
 
-using OnSceneVisibilityChangedSignalType = Signal<void(Actor, bool)>; ///< Called when the actor's on-scene visibility changes.
+using OnSceneVisibilityChangedSignalType = Actor::OnSceneVisibilityChangedSignalType; ///< Temporary compatibility alias.
 
 /**
  * @brief This signal is emitted when an actor's children change their sibling order
@@ -319,30 +319,7 @@ DALI_CORE_API ChildOrderChangedSignalType& ChildOrderChangedSignal(Actor actor);
 DALI_CORE_API OnRelayoutSignalType& OnRelayoutSignal(Actor actor);
 
 /**
- * @brief This signal is emitted when the on-scene visibility of this actor changes.
- *
- * The on-scene visibility is true only when this actor and all of its parents (up to the root layer)
- * have their VISIBLE property set to true, and the actor is connected to a visible scene. In other
- * words it reflects whether the actor is actually taking part in the scene (ignoring opacity, on-screen
- * position and culling).
- *
- * A callback of the following type may be connected:
- * @code
- *   void YourCallbackName( Actor actor, bool visible );
- * @endcode
- * actor: The actor whose on-scene visibility has changed.
- * visible: Whether this actor's on-scene visibility is true.
- * If true, it denotes one of two cases:
- * One is that the VISIBLE property of this actor or one of its parent actors was originally false and has become true.
- * Another is that this actor has been connected to the scene with the VISIBLE property of this actor and all of its parents set to true.
- * If false, it also denotes one of two cases:
- * One is that the VISIBLE property of this actor and all of its parent actors was originally true, but one of them has become false.
- * Another is that the VISIBLE property of this actor and all of its parent actors are true, but this actor has been disconnected from the scene.
- *
- * @return The signal to connect to
- * @pre The Actor has been initialized.
- * @note This signal is NOT emitted if the actor becomes transparent (or the reverse).
- * @note For a pure ancestor-chain visibility signal that ignores scene connection, use Actor::EffectiveVisibilityChangedSignal().
+ * @deprecated Use Actor::OnSceneVisibilityChangedSignal() instead.
  */
 DALI_CORE_API OnSceneVisibilityChangedSignalType& OnSceneVisibilityChangedSignal(Actor actor);
 
@@ -506,19 +483,7 @@ DALI_CORE_API Vector4 GetWorldColorMultiplier(Actor actor);
 DALI_CORE_API Vector4 GetWorldColor(Actor actor);
 
 /**
- * @brief Returns the on-scene visibility of the actor.
- *
- * The on-scene visibility is true only when this actor and all of its parents (up to the root layer)
- * have their VISIBLE property set to true, and the actor is connected to a visible scene. In other
- * words it reflects whether the actor is actually taking part in the scene (ignoring opacity, on-screen
- * position and culling).
- *
- * This is the value tracked by DevelActor::OnSceneVisibilityChangedSignal(). It is calculated from
- * scratch using only event-side properties, so it does not rely on the update thread.
- *
- * @param[in] actor The actor to query
- * @return True if the actor is connected to a visible scene and neither it nor any ancestor is hidden
- * @note For a pure ancestor-chain visibility query that ignores scene connection, use Actor::IsEffectivelyVisible().
+ * @deprecated Use Actor::IsOnSceneVisible() instead.
  */
 DALI_CORE_API bool IsOnSceneVisible(Actor actor);
 

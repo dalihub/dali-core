@@ -224,3 +224,27 @@ int UtcDaliTouchEventAddPoint(void)
 
   END_TEST;
 }
+
+int UtcDaliTouchEventSetLocalPosition(void)
+{
+  TestApplication application;
+
+  TouchEvent touchEvent = TouchEvent::New(123u);
+  DALI_TEST_CHECK(touchEvent);
+
+  touchEvent.AddPoint(1, PointState::DOWN, Vector2(10.0f, 20.0f));
+  DALI_TEST_EQUALS(Vector2::ZERO, touchEvent.GetLocalPosition(0), TEST_LOCATION);
+
+  touchEvent.SetLocalPosition(0, Vector2(5.0f, 15.0f));
+  DALI_TEST_EQUALS(Vector2(5.0f, 15.0f), touchEvent.GetLocalPosition(0), TEST_LOCATION);
+
+  // The screen position is not modified
+  DALI_TEST_EQUALS(Vector2(10.0f, 20.0f), touchEvent.GetScreenPosition(0), TEST_LOCATION);
+
+  // An out-of-range point is ignored
+  touchEvent.SetLocalPosition(1, Vector2(25.0f, 35.0f));
+  DALI_TEST_EQUALS(1u, touchEvent.GetPointCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(5.0f, 15.0f), touchEvent.GetLocalPosition(0), TEST_LOCATION);
+
+  END_TEST;
+}

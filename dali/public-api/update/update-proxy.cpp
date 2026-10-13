@@ -99,6 +99,11 @@ bool UpdateProxy::BakeScale(uint32_t id, const Vector3& scale)
   return mImpl.BakeScale(id, scale);
 }
 
+bool UpdateProxy::GetPivot(uint32_t id, Vector3& pivot) const
+{
+  return mImpl.GetPivot(id, pivot);
+}
+
 bool UpdateProxy::GetColorMultiplier(uint32_t id, Vector4& multiplier) const
 {
   return mImpl.GetColorMultiplier(id, multiplier);

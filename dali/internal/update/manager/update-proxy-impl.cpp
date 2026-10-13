@@ -236,6 +236,19 @@ bool UpdateProxy::BakeScale(uint32_t id, const Vector3& scale)
   return success;
 }
 
+bool UpdateProxy::GetPivot(uint32_t id, Vector3& pivot) const
+{
+  bool                    success = false;
+  const SceneGraph::Node* node    = GetNodeWithId(id);
+  if(node)
+  {
+    const SceneGraph::TransformManager& transformManager = mTransformManager; // To ensure we call the const getter
+    pivot                                                = transformManager.GetVector3PropertyValue(node->GetTransformId(), SceneGraph::TRANSFORM_PROPERTY_PIVOT);
+    success                                              = true;
+  }
+  return success;
+}
+
 bool UpdateProxy::GetColorMultiplier(uint32_t id, Vector4& multiplier) const
 {
   bool                    success = false;
