@@ -75,7 +75,7 @@ inline void SetProjectionDirectionMessage(EventThreadServices& eventThreadServic
 
 inline void BakeFieldOfViewMessage(EventThreadServices& eventThreadServices, const Camera& camera, float parameter)
 {
-  using LocalType = MessageDoubleBuffered1<Camera, float>;
+  using LocalType = MessageValue1<Camera, float>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
@@ -92,7 +92,7 @@ inline void BakeFieldOfViewMessage(EventThreadServices& eventThreadServices, con
 
 inline void BakeOrthographicSizeMessage(EventThreadServices& eventThreadServices, const Camera& camera, float parameter)
 {
-  using LocalType = MessageDoubleBuffered1<Camera, float>;
+  using LocalType = MessageValue1<Camera, float>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
@@ -109,7 +109,7 @@ inline void BakeOrthographicSizeMessage(EventThreadServices& eventThreadServices
 
 inline void BakeAspectRatioMessage(EventThreadServices& eventThreadServices, const Camera& camera, float parameter)
 {
-  using LocalType = MessageDoubleBuffered1<Camera, float>;
+  using LocalType = MessageValue1<Camera, float>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
@@ -126,7 +126,7 @@ inline void BakeAspectRatioMessage(EventThreadServices& eventThreadServices, con
 
 inline void BakeNearClippingPlaneMessage(EventThreadServices& eventThreadServices, const Camera& camera, float parameter)
 {
-  using LocalType = MessageDoubleBuffered1<Camera, float>;
+  using LocalType = MessageValue1<Camera, float>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
@@ -143,7 +143,7 @@ inline void BakeNearClippingPlaneMessage(EventThreadServices& eventThreadService
 
 inline void BakeFarClippingPlaneMessage(EventThreadServices& eventThreadServices, const Camera& camera, float parameter)
 {
-  using LocalType = MessageDoubleBuffered1<Camera, float>;
+  using LocalType = MessageValue1<Camera, float>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));

@@ -257,7 +257,7 @@ inline void SetStencilOperationOnZPassMessage(EventThreadServices& eventThreadSe
 
 inline void BakeMixColorMessage(EventThreadServices& eventThreadServices, const Renderer& renderer, Vector4 mixColor)
 {
-  using LocalType = MessageDoubleBuffered1<Renderer, Vector4>;
+  using LocalType = MessageValue1<Renderer, Vector4>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
@@ -273,7 +273,7 @@ inline void BakeMixColorMessage(EventThreadServices& eventThreadServices, const 
 
 inline void BakeMixColorComponentMessage(EventThreadServices& eventThreadServices, const Renderer& renderer, float componentValue, uint8_t componentIndex)
 {
-  using LocalType = MessageDoubleBuffered2<Renderer, float, uint8_t>;
+  using LocalType = MessageValue2<Renderer, float, uint8_t>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
