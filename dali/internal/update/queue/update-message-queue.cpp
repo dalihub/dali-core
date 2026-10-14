@@ -87,8 +87,6 @@ struct MessageQueue::Impl
   : renderController(controller),
     processingEvents(false),
     queueWasEmpty(true),
-    sceneUpdateFlag(false),
-    sceneUpdate(0),
     currentMessageBuffer(nullptr)
   {
   }
@@ -155,16 +153,6 @@ struct MessageQueue::Impl
 
   bool processingEvents; ///< Whether messages queued will be flushed by core
   bool queueWasEmpty;    ///< Flag whether the queue was empty during the Update()
-  bool sceneUpdateFlag;  ///< true when there is a new message that requires a scene-graph node tree update
-
-  /// Non zero when there is a message in the queue requiring a scene-graph node tree update.
-  /// Written by the Event thread (FlushQueue) and read/written by the Update thread
-  /// (ProcessMessages); must be atomic since there is no mutex between these threads
-  /// for this field on the fast path. Acquire/release ordering is used so that an
-  /// Update-thread read that observes an Event-thread write also observes everything
-  /// the Event thread published before that write (in particular, the corresponding
-  /// Push() to bufferRing).
-  std::atomic<int> sceneUpdate;
 
   /// Set (release) by the producer when a batch is pushed to the mutex-protected
   /// overflow processQueue; cleared (release) by the consumer once processQueue is
@@ -222,16 +210,11 @@ void MessageQueue::EventProcessingFinished()
 }
 
 // Called from event thread
-uint32_t* MessageQueue::ReserveMessageSlot(uint32_t requestedSize, bool updateScene)
+uint32_t* MessageQueue::ReserveMessageSlot(uint32_t requestedSize)
 {
   DALI_QB_SCOPE_TIMER(MQ_RESERVE_MESSAGE_SLOT);
 
   DALI_ASSERT_DEBUG(0 != requestedSize);
-
-  if(updateScene)
-  {
-    mImpl->sceneUpdateFlag = true;
-  }
 
   if(!mImpl->currentMessageBuffer)
   {
@@ -340,11 +323,6 @@ bool MessageQueue::FlushQueue()
 
   if(pushed)
   {
-    if(mImpl->sceneUpdateFlag)
-    {
-      mImpl->sceneUpdate.fetch_or(2, std::memory_order_release);
-      mImpl->sceneUpdateFlag = false;
-    }
     return true;
   }
 
@@ -419,11 +397,6 @@ bool MessageQueue::FlushQueue()
     }
   }
 
-  if(mImpl->sceneUpdateFlag)
-  {
-    mImpl->sceneUpdate.fetch_or(2, std::memory_order_release);
-    mImpl->sceneUpdateFlag = false;
-  }
   return true; // we have messages to process (in overflow)
 }
 
@@ -432,15 +405,6 @@ bool MessageQueue::ProcessMessages()
   DALI_QB_SCOPE_TIMER(MQ_PROCESS_MESSAGES);
 
   PERF_MONITOR_START(PerformanceMonitor::PROCESS_MESSAGES);
-
-  // Atomically read-and-clear the scene-update flag in one step. Both the
-  // lockless ring and the overflow queue are drained together in this same
-  // call, so a single shared flag is enough - we don't need to know which
-  // channel it came from. exchange() guarantees the flag can never get
-  // "stuck" set: if a concurrent FlushQueue() call sets it again via
-  // fetch_or(2) after this exchange, the atomic is simply non-zero again and
-  // that is correctly picked up by the *next* ProcessMessages() call.
-  bool sceneUpdated = (mImpl->sceneUpdate.exchange(0, std::memory_order_acq_rel) != 0);
 
   // Take everything to process before processing anything, in flush order.
   //
@@ -533,7 +497,12 @@ bool MessageQueue::ProcessMessages()
 
   PERF_MONITOR_END(PerformanceMonitor::PROCESS_MESSAGES);
 
-  return sceneUpdated;
+  // Every message requires a scene-graph node tree update, so "processed
+  // anything" and "scene updated" are the same fact. Deriving the answer from
+  // the drained buffers (rather than a separate flag set by the producer)
+  // guarantees the frame that processes the messages is the frame that
+  // reports the update - a separate flag could arrive one frame late.
+  return !mImpl->queueWasEmpty;
 }
 
 bool MessageQueue::WasEmpty() const
@@ -541,9 +510,15 @@ bool MessageQueue::WasEmpty() const
   return mImpl->queueWasEmpty;
 }
 
-bool MessageQueue::IsSceneUpdateRequired() const
+bool MessageQueue::HasMessagesToProcess() const
 {
-  return mImpl->sceneUpdate.load(std::memory_order_acquire) != 0;
+  // Pending flushed buffers in either channel mean a scene update is required.
+  // Called from the Update thread, which is the ring's consumer: the read index
+  // is exact from here and the write index can only lag behind a concurrent
+  // Push(), so a true return always has real buffers behind it, and a flush
+  // missed here is picked up by the ProcessMessages() call that follows.
+  return (mImpl->bufferRing.GetApproximateDepth() != 0u) ||
+         mImpl->overflowActive.load(std::memory_order_acquire);
 }
 
 std::size_t MessageQueue::GetCapacity() const

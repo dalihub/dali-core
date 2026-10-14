@@ -75,10 +75,9 @@ public:
   /**
    * Reserve space for a message
    * @param[in] size the message size with respect to the size of type 'char'
-   * @param[in] updateScene If set to true, denotes that the message will cause the scene graph node tree to require an update
    * @return A pointer to the first char allocated for the message
    */
-  [[nodiscard]] uint32_t* ReserveMessageSlot(uint32_t size, bool updateScene);
+  [[nodiscard]] uint32_t* ReserveMessageSlot(uint32_t size);
 
   /**
    * Flushes the message queue
@@ -90,7 +89,7 @@ public:
 
   /**
    * Called once per update; process the previously flushed messages.
-   * @return true if the scene graph node tree is updated
+   * @return true if any messages were processed, i.e. the scene graph node tree requires an update
    */
   bool ProcessMessages();
 
@@ -100,11 +99,14 @@ public:
   bool WasEmpty() const;
 
   /**
-   * Query whether the queue contains at least one message that requires that the scene-graph
-   * node tree be updated.
-   * @return A flag, true if the scene graph needs an update
+   * Query whether any flushed messages are pending. Every message requires that the
+   * scene-graph node tree be updated, so a true return means a scene update is required.
+   * This is a hint: a concurrent FlushQueue() may not be visible yet, so a false
+   * return does not guarantee ProcessMessages() would find nothing. The caller must
+   * treat ProcessMessages()'s return value as the authoritative answer.
+   * @return A flag, true if flushed messages are awaiting ProcessMessages()
    */
-  bool IsSceneUpdateRequired() const;
+  bool HasMessagesToProcess() const;
 
   /**
    * Query for the capacity of the current message queue

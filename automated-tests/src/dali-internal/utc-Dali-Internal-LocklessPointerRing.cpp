@@ -179,14 +179,14 @@ namespace
 constexpr int TEST_LOCKLESS_RING_CAPACITY                = 32; ///< LOCKLESS_RING_CAPACITY
 constexpr int TEST_MAX_MESSAGES_ALLOWED_IN_PROCESS_QUEUE = 24; ///< MAX_MESSAGES_ALLOWED_IN_PROCESS_QUEUE
 
-// Reserve one small message that requires no scene update, place it, and flush.
+// Reserve one small message, place it, and flush.
 // Returns FlushQueue()'s result. Each call produces exactly one buffer handed to
 // the queue (ring on the fast path, or overflow once the ring is full / overflow
 // is already active).
-bool ReserveAndFlushOne(Internal::Update::MessageQueue& queue, int id, std::vector<int>* order, std::mutex* orderMutex, bool updateScene = false)
+bool ReserveAndFlushOne(Internal::Update::MessageQueue& queue, int id, std::vector<int>* order, std::mutex* orderMutex)
 {
   constexpr uint32_t SMALL_SIZE = static_cast<uint32_t>(sizeof(OrderedTestMessage));
-  uint32_t*          slot       = queue.ReserveMessageSlot(SMALL_SIZE, updateScene);
+  uint32_t*          slot       = queue.ReserveMessageSlot(SMALL_SIZE);
   if(!slot)
   {
     return false;
@@ -800,7 +800,7 @@ int UtcDaliInternalLocklessRingMessageQueueRoundTrip(void)
   // process-on-idle at least once.
   for(int i = 0; i < MESSAGE_COUNT; ++i)
   {
-    uint32_t* slot = messageQueue.ReserveMessageSlot(MESSAGE_SIZE, /*updateScene*/ false);
+    uint32_t* slot = messageQueue.ReserveMessageSlot(MESSAGE_SIZE);
     DALI_TEST_CHECK(slot != nullptr);
     auto* message             = new(slot) QueueTestMessage(i);
     message->processedCounter = &processedCount;
@@ -808,8 +808,9 @@ int UtcDaliInternalLocklessRingMessageQueueRoundTrip(void)
   DALI_TEST_CHECK(renderController.processOnIdleRequestCount > 0);
 
   DALI_TEST_CHECK(messageQueue.FlushQueue());
-  bool sceneUpdated = messageQueue.ProcessMessages();
-  (void)sceneUpdated;
+
+  // Processing flushed messages IS the scene update - there is no separate flag.
+  DALI_TEST_CHECK(messageQueue.ProcessMessages());
 
   DALI_TEST_EQUALS(processedCount.load(), MESSAGE_COUNT, TEST_LOCATION);
 
@@ -834,9 +835,9 @@ int UtcDaliInternalLocklessRingMessageQueueFlushEmptyReturnsFalse(void)
   END_TEST;
 }
 
-int UtcDaliInternalLocklessRingMessageQueueSceneUpdateFlagFastPath(void)
+int UtcDaliInternalLocklessRingMessageQueueHasMessagesToProcessFastPath(void)
 {
-  tet_infoline("Test the scene-update flag is set after a scene-updating flush over the lockless ring and clears once processed");
+  tet_infoline("Test a flush over the lockless ring makes HasMessagesToProcess() report true, and it clears once processed");
 
   TestApplication                application;
   MyTestRenderController         renderController;
@@ -845,10 +846,10 @@ int UtcDaliInternalLocklessRingMessageQueueSceneUpdateFlagFastPath(void)
   std::atomic<int>   processedCount{0};
   constexpr uint32_t MESSAGE_SIZE = static_cast<uint32_t>(sizeof(QueueTestMessage));
 
-  DALI_TEST_CHECK(!messageQueue.IsSceneUpdateRequired());
+  DALI_TEST_CHECK(!messageQueue.HasMessagesToProcess());
 
   {
-    uint32_t* slot = messageQueue.ReserveMessageSlot(MESSAGE_SIZE, /*updateScene*/ true);
+    uint32_t* slot = messageQueue.ReserveMessageSlot(MESSAGE_SIZE);
     DALI_TEST_CHECK(slot != nullptr);
     auto* message             = new(slot) QueueTestMessage(0);
     message->processedCounter = &processedCount;
@@ -856,7 +857,7 @@ int UtcDaliInternalLocklessRingMessageQueueSceneUpdateFlagFastPath(void)
   DALI_TEST_CHECK(messageQueue.FlushQueue());
 
   // Visible before ProcessMessages() runs.
-  DALI_TEST_CHECK(messageQueue.IsSceneUpdateRequired());
+  DALI_TEST_CHECK(messageQueue.HasMessagesToProcess());
 
   bool sceneUpdated = messageQueue.ProcessMessages();
   DALI_TEST_CHECK(sceneUpdated);
@@ -866,36 +867,9 @@ int UtcDaliInternalLocklessRingMessageQueueSceneUpdateFlagFastPath(void)
   // a pending update.
   for(int i = 0; i < 10; ++i)
   {
-    DALI_TEST_CHECK(!messageQueue.IsSceneUpdateRequired());
+    DALI_TEST_CHECK(!messageQueue.HasMessagesToProcess());
     DALI_TEST_CHECK(!messageQueue.ProcessMessages());
   }
-
-  END_TEST;
-}
-
-int UtcDaliInternalLocklessRingMessageQueueSceneUpdateFlagNotRequested(void)
-{
-  tet_infoline("Test the scene-update flag stays clear when the flushed message did not request a scene update");
-
-  TestApplication                application;
-  MyTestRenderController         renderController;
-  Internal::Update::MessageQueue messageQueue(renderController);
-
-  std::atomic<int>   processedCount{0};
-  constexpr uint32_t MESSAGE_SIZE = static_cast<uint32_t>(sizeof(QueueTestMessage));
-
-  {
-    uint32_t* slot = messageQueue.ReserveMessageSlot(MESSAGE_SIZE, /*updateScene*/ false);
-    DALI_TEST_CHECK(slot != nullptr);
-    auto* message             = new(slot) QueueTestMessage(0);
-    message->processedCounter = &processedCount;
-  }
-  DALI_TEST_CHECK(messageQueue.FlushQueue());
-  DALI_TEST_CHECK(!messageQueue.IsSceneUpdateRequired());
-
-  bool sceneUpdated = messageQueue.ProcessMessages();
-  DALI_TEST_CHECK(!sceneUpdated);
-  DALI_TEST_EQUALS(processedCount.load(), 1, TEST_LOCATION);
 
   END_TEST;
 }
@@ -922,17 +896,13 @@ int UtcDaliInternalLocklessRingMessageQueueOverflowPath(void)
   constexpr int OVERFLOW_SPILL = 4;
   constexpr int TOTAL          = TEST_LOCKLESS_RING_CAPACITY + OVERFLOW_SPILL;
 
-  bool lastFlush = false;
   for(int i = 0; i < TOTAL; ++i)
   {
-    // The very last message requests a scene update, so we can assert the flag is
-    // set across whichever channel (ring or overflow) it landed in.
-    bool updateScene = (i == TOTAL - 1);
-    lastFlush        = ReserveAndFlushOne(messageQueue, i, &processedOrder, &orderMutex, updateScene);
-    DALI_TEST_CHECK(lastFlush);
+    DALI_TEST_CHECK(ReserveAndFlushOne(messageQueue, i, &processedOrder, &orderMutex));
   }
 
-  DALI_TEST_CHECK(messageQueue.IsSceneUpdateRequired());
+  // Pending buffers in either channel (ring or overflow) mean a scene update is required.
+  DALI_TEST_CHECK(messageQueue.HasMessagesToProcess());
 
   // A single ProcessMessages() drains the ring first, then the overflow queue -
   // every message must be processed exactly once, in order, regardless of channel.
@@ -952,7 +922,7 @@ int UtcDaliInternalLocklessRingMessageQueueOverflowPath(void)
   DALI_TEST_CHECK(ordered);
 
   // Flag clears once processed; capacity query works.
-  DALI_TEST_CHECK(!messageQueue.IsSceneUpdateRequired());
+  DALI_TEST_CHECK(!messageQueue.HasMessagesToProcess());
   (void)processedCount;
 
   END_TEST;
@@ -1019,7 +989,7 @@ int UtcDaliInternalLocklessRingMessageQueuePreservesOrderOnRefill(void)
   // been drained, and the next id finds the ring full and goes to overflow.
   constexpr int REFILL_COUNT = TEST_LOCKLESS_RING_CAPACITY + 1;
 
-  uint32_t* slot = messageQueue.ReserveMessageSlot(static_cast<uint32_t>(sizeof(RefillingTestMessage)), /*updateScene*/ false);
+  uint32_t* slot = messageQueue.ReserveMessageSlot(static_cast<uint32_t>(sizeof(RefillingTestMessage)));
   DALI_TEST_CHECK(slot != nullptr);
   new(slot) RefillingTestMessage(0, messageQueue, REFILL_COUNT, &processedOrder, &orderMutex);
   DALI_TEST_CHECK(messageQueue.FlushQueue());
@@ -1115,7 +1085,7 @@ int UtcDaliInternalLocklessRingMessageQueueMoveMessageQueue(void)
 
   // Queue and flush a message into `source`.
   {
-    uint32_t* slot = source.ReserveMessageSlot(MESSAGE_SIZE, false);
+    uint32_t* slot = source.ReserveMessageSlot(MESSAGE_SIZE);
     DALI_TEST_CHECK(slot != nullptr);
     auto* message             = new(slot) QueueTestMessage(0);
     message->processedCounter = &processedCount;
@@ -1126,8 +1096,9 @@ int UtcDaliInternalLocklessRingMessageQueueMoveMessageQueue(void)
   // and processing it there must run the queued message.
   Internal::Update::MessageQueue::MoveMessageQueue(destination, source);
 
-  bool sceneUpdated = destination.ProcessMessages();
-  (void)sceneUpdated;
+  // The moved-in pending buffer is processed by the destination, which also
+  // makes it report the scene update.
+  DALI_TEST_CHECK(destination.ProcessMessages());
   DALI_TEST_EQUALS(processedCount.load(), 1, TEST_LOCATION);
 
   END_TEST;
@@ -1159,7 +1130,7 @@ int UtcDaliInternalLocklessRingMessageQueueConcurrentProducerConsumer(void)
     {
       for(int i = 0; i < MESSAGES_PER_BATCH; ++i)
       {
-        uint32_t* slot = messageQueue.ReserveMessageSlot(MESSAGE_SIZE, false);
+        uint32_t* slot = messageQueue.ReserveMessageSlot(MESSAGE_SIZE);
         if(!slot)
         {
           continue;
@@ -1207,7 +1178,7 @@ int UtcDaliInternalLocklessRingMessageQueueRecyclesBuffers(void)
 
   auto runCycle = [&](int id)
   {
-    uint32_t* slot = messageQueue.ReserveMessageSlot(MESSAGE_SIZE, false);
+    uint32_t* slot = messageQueue.ReserveMessageSlot(MESSAGE_SIZE);
     DALI_TEST_CHECK(slot != nullptr);
     new(slot) QueueTestMessage(id);
     DALI_TEST_CHECK(messageQueue.FlushQueue());

@@ -288,7 +288,7 @@ public: // Implementation of EventThreadServices
   /**
    * @copydoc EventThreadServices::ReserveMessageSlot
    */
-  uint32_t* ReserveMessageSlot(uint32_t size, bool updateScene) override;
+  uint32_t* ReserveMessageSlot(uint32_t size) override;
 
   using SceneContainer = std::vector<ScenePtr>;
 
