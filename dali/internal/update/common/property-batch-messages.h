@@ -106,8 +106,8 @@ public:
    * No object-validity check here, matching the actual precedent: every existing
    * property-set message goes through MessageBakeReset, and its Process() calls
    * (object->*memberFunction)(param) directly with no IsValidObject() check -
-   * this is different from message.h's *generic* templates (Message<T>
-   * MessageValue1-3, MessageDoubleBuffered0-4), which do call IsValidObject().
+   * this is different from message.h's *generic* templates (Message<T>,
+   * MessageValue1-6), which do call IsValidObject().
    * PropertyBatchMessage is the direct analog of MessageBakeReset, not of
    * the generic templates, so it follows MessageBakeReset's precedent here.
    */

@@ -73,7 +73,7 @@ ThreadLocalStorage::~ThreadLocalStorage()
   {
     // Turn on this flag as true, and don't return to false agian.
     mSingletoneContainerChanging = true;
-    mSingletonContainer.clear();
+    mSingletonContainer.Clear();
   }
 }
 
@@ -231,14 +231,14 @@ Dali::UpdateProxy::NotifySyncPoint ThreadLocalStorage::NotifyFrameCallback(Frame
   return mCore->NotifyFrameCallback(frameCallback);
 }
 
-void ThreadLocalStorage::Register(const std::type_info& info, BaseHandle singleton)
+void ThreadLocalStorage::Register(const TypeInfoId& info, BaseHandle singleton)
 {
   if(singleton)
   {
     if(DALI_LIKELY(!mSingletoneContainerChanging))
     {
-      DALI_LOG_SINGLETON_SERVICE(Debug::General, "Singleton Added: %s\n", info.name());
-      mSingletonContainer.push_back(SingletonPair(info.name(), singleton));
+      DALI_LOG_SINGLETON_SERVICE(Debug::General, "Singleton Added: %s\n", info.GetName());
+      mSingletonContainer.Insert(info, singleton);
     }
   }
 }
@@ -248,25 +248,22 @@ void ThreadLocalStorage::UnregisterAll()
   if(DALI_LIKELY(!mSingletoneContainerChanging))
   {
     mSingletoneContainerChanging = true;
-    mSingletonContainer.clear();
+    mSingletonContainer.Clear();
     mSingletoneContainerChanging = false;
   }
 }
 
-BaseHandle ThreadLocalStorage::GetSingleton(const std::type_info& info) const
+BaseHandle ThreadLocalStorage::GetSingleton(const TypeInfoId& info) const
 {
   BaseHandle object;
 
   if(DALI_LIKELY(!mSingletoneContainerChanging))
   {
-    const SingletonContainer::const_iterator end = mSingletonContainer.end();
-    for(SingletonContainer::const_iterator iter = mSingletonContainer.begin(); iter != end; ++iter)
+    // comparing the addresses as these are allocated statically per library
+    const auto* objectPtr = mSingletonContainer.Find(info);
+    if(DALI_LIKELY(objectPtr != nullptr))
     {
-      // comparing the addresses as these are allocated statically per library
-      if((*iter).first == info.name())
-      {
-        object = (*iter).second;
-      }
+      object = *objectPtr;
     }
   }
 

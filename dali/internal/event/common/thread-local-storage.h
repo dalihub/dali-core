@@ -25,6 +25,8 @@
 #include <dali/devel-api/common/singleton-service.h>
 #include <dali/internal/event/common/scene-impl.h>
 #include <dali/internal/update/common/scene-graph-memory-pool-collection.h>
+#include <dali/public-api/common/open-hash-map-managed.h>
+#include <dali/public-api/object/type-info-id.h>
 #include <dali/public-api/rendering/renderer.h>
 #include <dali/public-api/update/update-proxy.h>
 
@@ -241,7 +243,7 @@ public:
   /**
    * @copydoc Dali::SingletonService::Register()
    */
-  void Register(const std::type_info& info, BaseHandle singleton);
+  void Register(const TypeInfoId& info, BaseHandle singleton);
 
   /**
    * @copydoc Dali::SingletonService::UnregisterAll()
@@ -251,7 +253,7 @@ public:
   /**
    * @copydoc Dali::SingletonService::GetSingleton()
    */
-  BaseHandle GetSingleton(const std::type_info& info) const;
+  BaseHandle GetSingleton(const TypeInfoId& info) const;
 
 private:
   /**
@@ -268,9 +270,14 @@ private:
 
   // using the address of the type name string as compiler will allocate these once per library
   // and we don't support un/re-loading of dali libraries while singleton service is alive
-  using SingletonPair      = std::pair<const char*, BaseHandle>;
-  using SingletonContainer = std::vector<SingletonPair>;
-  using SingletonConstIter = SingletonContainer::const_iterator;
+  struct TypeInfoIdHash
+  {
+    size_t operator()(const TypeInfoId& info) const noexcept
+    {
+      return info.GetId();
+    }
+  };
+  using SingletonContainer = ManagedOpenHashMap<TypeInfoId, BaseHandle, TypeInfoIdHash, std::equal_to<TypeInfoId>>;
 
   SingletonContainer mSingletonContainer; ///< The container to look up singleton by its type name
 

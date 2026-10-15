@@ -314,7 +314,7 @@ private:
   Device::Class::Type    mDeviceClass;        ///< The class of device the key event originated from
   Device::Subclass::Type mDeviceSubclass;     ///< The subclass of device the key event originated from
   bool                   mIsRepeat;           ///< Whether the key referenced by the event is a repeating key.
-  bool                   mInterceptProcessed; ///< Whether the key event has already been through the intercept stage.
+  bool                   mInterceptProcessed; ///< Whether the key event has already been processed by an interceptor.
 };
 
 } // namespace Internal

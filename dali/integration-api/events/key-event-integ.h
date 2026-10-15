@@ -160,11 +160,11 @@ struct DALI_CORE_API KeyEvent : public Event
   bool isRepeat;
 
   /**
-   * Whether the key event has already been through the intercept stage.
+   * Whether the key event has already been processed by an interceptor.
    *
-   * Set when accessibility feeds an unconsumed key event back to the window; it stops the
-   * intercept stage from running a second time and looping forever. Anything that rebuilds
-   * a KeyEvent on the way back into the core must carry this over.
+   * An interceptor can use this flag to recognize a re-injected event and avoid
+   * processing it again. The scene intercept signal is still emitted. Preserve this
+   * flag when rebuilding a KeyEvent so the interceptor can recognize it.
    */
   bool interceptProcessed;
 
