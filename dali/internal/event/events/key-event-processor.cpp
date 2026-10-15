@@ -83,12 +83,9 @@ void KeyEventProcessor::ProcessKeyEvent(const Integration::KeyEvent& event)
     mScene.EmitKeyEventDelayedSignal(keyEventHandle);
   }
 
-  // Emit the key event signal from the scene.
-  bool consumed = false;
-  if(!keyEvent->IsInterceptProcessed())
-  {
-    consumed = mScene.EmitInterceptKeyEventSignal(keyEventHandle);
-  }
+  // Interceptors can use interceptProcessed to recognize re-injected events.
+  // Always emit the scene intercept signal so other handlers can still process them.
+  bool consumed = mScene.EmitInterceptKeyEventSignal(keyEventHandle);
   if(!consumed)
   {
     consumed = mScene.EmitKeyEventGeneratedSignal(keyEventHandle);

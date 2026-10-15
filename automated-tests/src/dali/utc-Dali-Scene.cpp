@@ -3070,37 +3070,130 @@ int UtcDaliSceneSignalInterceptKeyEventP(void)
 
 int UtcDaliSceneSignalInterceptKeyEventAlreadyProcessed(void)
 {
-  TestApplication          application;
-  Dali::Integration::Scene scene = application.GetScene();
+  for(bool geometryHittestEnabled : {false, true})
+  {
+    for(bool consumed : {false, true})
+    {
+      TestApplication          application;
+      Dali::Integration::Scene scene = application.GetScene();
+      scene.SetGeometryHittestEnabled(geometryHittestEnabled);
 
-  KeyEventSignalData      data;
-  KeyEventReceivedFunctor functor(data);
-  scene.KeyEventSignal().Connect(&application, functor);
+      KeyEventSignalData      data;
+      KeyEventReceivedFunctor functor(data);
+      scene.KeyEventSignal().Connect(&application, functor);
 
-  KeyEventGeneratedSignalData      interceptData;
-  KeyEventGeneratedReceivedFunctor interceptFunctor(interceptData);
-  scene.InterceptKeyEventSignal().Connect(&application, interceptFunctor);
+      KeyEventGeneratedSignalData     interceptData;
+      KeyEventGeneratedConsumeFunctor interceptFunctor(interceptData, consumed);
+      scene.InterceptKeyEventSignal().Connect(&application, interceptFunctor);
 
-  // An event that has already been through the intercept stage must skip it and go
-  // straight on to the key event signal, otherwise accessibility re-injection loops forever.
-  Dali::Integration::KeyEvent event("i", "", "i", 0, 0, 0, Dali::Integration::KeyEvent::DOWN, "i", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
-  event.interceptProcessed = true;
-  application.ProcessEvent(event);
+      KeyEventGeneratedSignalData     generatedData;
+      KeyEventGeneratedConsumeFunctor generatedFunctor(generatedData, false);
+      scene.KeyEventGeneratedSignal().Connect(&application, generatedFunctor);
 
-  DALI_TEST_EQUALS(false, interceptData.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  // The flag must also be readable back off the handle the signal delivered.
-  DALI_TEST_EQUALS(true, DevelKeyEvent::IsInterceptProcessed(data.receivedKeyEvent), TEST_LOCATION);
+      for(bool interceptProcessed : {false, true})
+      {
+        for(auto state : {Dali::Integration::KeyEvent::DOWN, Dali::Integration::KeyEvent::UP})
+        {
+          data.Reset();
+          interceptData.Reset();
+          generatedData.Reset();
 
-  data.Reset();
-  interceptData.Reset();
+          // Accessibility re-injection must still reach application intercept handlers.
+          Dali::Integration::KeyEvent event("i", "", "i", 0, 0, 0, state, "i", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
+          event.interceptProcessed = interceptProcessed;
+          application.ProcessEvent(event);
 
-  // The same event without the flag is intercepted as usual.
-  Dali::Integration::KeyEvent event2("i", "", "i", 0, 0, 0, Dali::Integration::KeyEvent::DOWN, "i", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
-  application.ProcessEvent(event2);
+          DALI_TEST_EQUALS(true, interceptData.functorCalled, TEST_LOCATION);
+          DALI_TEST_EQUALS(interceptProcessed, DevelKeyEvent::IsInterceptProcessed(interceptData.receivedKeyEvent), TEST_LOCATION);
+          DALI_TEST_EQUALS(!consumed, generatedData.functorCalled, TEST_LOCATION);
+          DALI_TEST_EQUALS(!consumed, data.functorCalled, TEST_LOCATION);
+          if(!consumed)
+          {
+            DALI_TEST_EQUALS(interceptProcessed, DevelKeyEvent::IsInterceptProcessed(data.receivedKeyEvent), TEST_LOCATION);
+          }
+        }
+      }
+    }
+  }
 
-  DALI_TEST_EQUALS(true, interceptData.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliSceneSignalInterceptKeyEventReinjected(void)
+{
+  for(bool geometryHittestEnabled : {false, true})
+  {
+    TestApplication          application;
+    Dali::Integration::Scene scene = application.GetScene();
+    scene.SetGeometryHittestEnabled(geometryHittestEnabled);
+
+    KeyEvent               pendingEvent;
+    Signal<bool(KeyEvent)> applicationIntercept;
+    bool                   accessibilityEnabled = true;
+    bool                   reinjectedFlag       = false;
+    bool                   nestedFlag           = true;
+    int                    accessibilityCalls   = 0;
+    int                    reinjectedCalls      = 0;
+    int                    nestedCalls          = 0;
+    int                    unhandledCalls       = 0;
+
+    scene.InterceptKeyEventSignal().Connect(&application, [&](KeyEvent event)
+    {
+      if(accessibilityEnabled && !DevelKeyEvent::IsInterceptProcessed(event))
+      {
+        ++accessibilityCalls;
+        pendingEvent = event;
+        return true;
+      }
+      return applicationIntercept.EmitOr(event);
+    });
+
+    applicationIntercept.Connect(&application, [&](KeyEvent event)
+    {
+      if(event.GetKeyCode() == 183)
+      {
+        ++reinjectedCalls;
+        reinjectedFlag = DevelKeyEvent::IsInterceptProcessed(event);
+
+        // Feeding another key from an application handler must defer its dispatch
+        // until the current core processing finishes, avoiding a nested signal emission.
+        accessibilityEnabled = false;
+        Dali::Integration::KeyEvent nestedEvent("j", "", "j", 184, 0, 0, Dali::Integration::KeyEvent::DOWN, "j", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
+        application.ProcessEvent(nestedEvent);
+      }
+      else
+      {
+        ++nestedCalls;
+        nestedFlag = DevelKeyEvent::IsInterceptProcessed(event);
+      }
+      return true;
+    });
+
+    scene.KeyEventSignal().Connect(&application, [&](KeyEvent /*event*/)
+    {
+      ++unhandledCalls;
+    });
+
+    Dali::Integration::KeyEvent event("i", "", "i", 183, 0, 0, Dali::Integration::KeyEvent::DOWN, "i", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
+    application.ProcessEvent(event);
+
+    DALI_TEST_EQUALS(1, accessibilityCalls, TEST_LOCATION);
+    DALI_TEST_EQUALS(0, reinjectedCalls, TEST_LOCATION);
+    DALI_TEST_EQUALS(0, unhandledCalls, TEST_LOCATION);
+
+    // Simulate an unconsumed accessibility reply after the original dispatch returns.
+    DevelKeyEvent::SetInterceptProcessed(pendingEvent, true);
+    Dali::Integration::KeyEvent reinjectedEvent(pendingEvent);
+    application.ProcessEvent(reinjectedEvent);
+    application.SendNotification();
+
+    DALI_TEST_EQUALS(1, accessibilityCalls, TEST_LOCATION);
+    DALI_TEST_EQUALS(1, reinjectedCalls, TEST_LOCATION);
+    DALI_TEST_EQUALS(1, nestedCalls, TEST_LOCATION);
+    DALI_TEST_EQUALS(0, unhandledCalls, TEST_LOCATION);
+    DALI_TEST_EQUALS(true, reinjectedFlag, TEST_LOCATION);
+    DALI_TEST_EQUALS(false, nestedFlag, TEST_LOCATION);
+  }
 
   END_TEST;
 }
