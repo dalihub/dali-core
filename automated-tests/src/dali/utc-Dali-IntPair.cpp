@@ -386,3 +386,98 @@ int UtcDaliInt32PairNotEqualsP(void)
 
   END_TEST;
 }
+
+int UtcDaliInt32PairStartAliasesP(void)
+{
+  Int32Pair value(-5, 10);
+  DALI_TEST_EQUALS(value.GetStart(), -5, TEST_LOCATION);
+
+  value.SetStart(-20);
+  DALI_TEST_EQUALS(value.GetX(), -20, TEST_LOCATION);
+  DALI_TEST_EQUALS(value.GetWidth(), -20, TEST_LOCATION);
+  DALI_TEST_EQUALS(value.GetEnd(), 10, TEST_LOCATION);
+
+  value.SetX(65539);
+  DALI_TEST_EQUALS(value.GetStart(), 65539, TEST_LOCATION);
+  value.SetWidth(-7);
+  DALI_TEST_EQUALS(value.GetStart(), -7, TEST_LOCATION);
+
+  const Int32Pair copied(value);
+  DALI_TEST_EQUALS(copied.GetStart(), -7, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliInt32PairEndAliasesP(void)
+{
+  Int32Pair value(5, -10);
+  DALI_TEST_EQUALS(value.GetEnd(), -10, TEST_LOCATION);
+
+  value.SetEnd(-20);
+  DALI_TEST_EQUALS(value.GetY(), -20, TEST_LOCATION);
+  DALI_TEST_EQUALS(value.GetHeight(), -20, TEST_LOCATION);
+  DALI_TEST_EQUALS(value.GetStart(), 5, TEST_LOCATION);
+
+  value.SetY(65539);
+  DALI_TEST_EQUALS(value.GetEnd(), 65539, TEST_LOCATION);
+  value.SetHeight(-7);
+  DALI_TEST_EQUALS(value.GetEnd(), -7, TEST_LOCATION);
+
+  const Int32Pair copied(value);
+  DALI_TEST_EQUALS(copied.GetEnd(), -7, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliUint16PairRangeAliasesP(void)
+{
+  Uint16Pair value(5, 10);
+  value.SetStart(65535u);
+  DALI_TEST_EQUALS(value.GetX(), 65535u, TEST_LOCATION);
+  DALI_TEST_EQUALS(value.GetWidth(), 65535u, TEST_LOCATION);
+  DALI_TEST_EQUALS(value.GetEnd(), 10u, TEST_LOCATION);
+
+  value.SetEnd(32768u);
+  DALI_TEST_EQUALS(value.GetY(), 32768u, TEST_LOCATION);
+  DALI_TEST_EQUALS(value.GetHeight(), 32768u, TEST_LOCATION);
+  DALI_TEST_EQUALS(value.GetStart(), 65535u, TEST_LOCATION);
+
+  value.SetWidth(7u);
+  value.SetHeight(19u);
+  const Uint16Pair copied(value);
+  DALI_TEST_EQUALS(copied.GetStart(), 7u, TEST_LOCATION);
+  DALI_TEST_EQUALS(copied.GetEnd(), 19u, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliIntPairSigned16RangeAliasesP(void)
+{
+  IntPair<int16_t, uint16_t, uint32_t> value(5, 10);
+  value.SetStart(-32768);
+  value.SetEnd(32767);
+  DALI_TEST_EQUALS(static_cast<int32_t>(value.GetX()), -32768, TEST_LOCATION);
+  DALI_TEST_EQUALS(static_cast<int32_t>(value.GetWidth()), -32768, TEST_LOCATION);
+  DALI_TEST_EQUALS(static_cast<int32_t>(value.GetY()), 32767, TEST_LOCATION);
+  DALI_TEST_EQUALS(static_cast<int32_t>(value.GetHeight()), 32767, TEST_LOCATION);
+
+  value.SetX(-7);
+  value.SetY(-19);
+  DALI_TEST_EQUALS(static_cast<int32_t>(value.GetStart()), -7, TEST_LOCATION);
+  DALI_TEST_EQUALS(static_cast<int32_t>(value.GetEnd()), -19, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliIntPairUnsigned32RangeAliasesP(void)
+{
+  IntPair<uint32_t, uint32_t, uint64_t> value(5u, 10u);
+  value.SetStart(0xffffffffu);
+  value.SetEnd(0x80000000u);
+  DALI_TEST_EQUALS(value.GetX(), 0xffffffffu, TEST_LOCATION);
+  DALI_TEST_EQUALS(value.GetWidth(), 0xffffffffu, TEST_LOCATION);
+  DALI_TEST_EQUALS(value.GetY(), 0x80000000u, TEST_LOCATION);
+  DALI_TEST_EQUALS(value.GetHeight(), 0x80000000u, TEST_LOCATION);
+
+  value.SetWidth(7u);
+  value.SetHeight(19u);
+  DALI_TEST_EQUALS(value.GetStart(), 7u, TEST_LOCATION);
+  DALI_TEST_EQUALS(value.GetEnd(), 19u, TEST_LOCATION);
+  END_TEST;
+}
