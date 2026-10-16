@@ -65,18 +65,12 @@ enum Type
   INHERIT_SCALE                   = Dali::Actor::Property::INHERIT_SCALE,
   VISIBLE                         = Dali::Actor::Property::VISIBLE,
   COLOR_MULTIPLIER                = Dali::Actor::Property::COLOR_MULTIPLIER,
-  COLOR                           = COLOR_MULTIPLIER,
   COLOR_MULTIPLIER_RED            = Dali::Actor::Property::COLOR_MULTIPLIER_RED,
-  COLOR_RED                       = COLOR_MULTIPLIER_RED,
   COLOR_MULTIPLIER_GREEN          = Dali::Actor::Property::COLOR_MULTIPLIER_GREEN,
-  COLOR_GREEN                     = COLOR_MULTIPLIER_GREEN,
   COLOR_MULTIPLIER_BLUE           = Dali::Actor::Property::COLOR_MULTIPLIER_BLUE,
-  COLOR_BLUE                      = COLOR_MULTIPLIER_BLUE,
   COLOR_MULTIPLIER_ALPHA          = Dali::Actor::Property::COLOR_MULTIPLIER_ALPHA,
-  COLOR_ALPHA                     = COLOR_MULTIPLIER_ALPHA,
   OPACITY                         = Dali::Actor::Property::OPACITY,
   WORLD_COLOR_MULTIPLIER          = Dali::Actor::Property::WORLD_COLOR_MULTIPLIER,
-  WORLD_COLOR                     = WORLD_COLOR_MULTIPLIER,
   COLOR_MODE                      = Dali::Actor::Property::COLOR_MODE,
   WORLD_MATRIX                    = Dali::Actor::Property::WORLD_MATRIX,
   DRAW_MODE                       = Dali::Actor::Property::DRAW_MODE,
@@ -469,18 +463,8 @@ DALI_CORE_API Matrix GetWorldTransform(Actor actor);
  *
  * @param[in] actor The actor to calculate the world color multiplier for
  * @return The world color multiplier
- * @SINCE_2_5.38
  */
 DALI_CORE_API Vector4 GetWorldColorMultiplier(Actor actor);
-
-/**
- * Get the world color of the actor.
- * @deprecated Use GetWorldColorMultiplier() instead.
- *
- * @param[in] actor The actor to calculate the world color for
- * @return The world color
- */
-DALI_CORE_API Vector4 GetWorldColor(Actor actor);
 
 /**
  * @deprecated Use Actor::IsOnSceneVisible() instead.
