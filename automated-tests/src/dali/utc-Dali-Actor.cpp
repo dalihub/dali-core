@@ -16453,7 +16453,7 @@ int UtcDaliActorCalculateWorldColor04(void)
   application.SendNotification();
   application.Render(0);
 
-  Vector4 color = DevelActor::GetWorldColor(leafActor);
+  Vector4 color = DevelActor::GetWorldColorMultiplier(leafActor);
 
   Vector4 actualColor = leafActor.GetCurrentProperty<Vector4>(Actor::Property::WORLD_COLOR_MULTIPLIER);
   DALI_TEST_EQUALS(color, actualColor, 0.001f, TEST_LOCATION);
@@ -17554,14 +17554,9 @@ int UtcDaliActorSetGetColorP(void)
   Vector4 currentColor = actor.GetCurrentColorMultiplier();
   DALI_TEST_CHECK(currentColor != Vector4::ZERO);
 
-  // Verify the legacy API delegates to the color multiplier API.
-  const Vector4 legacyColor(0.2f, 0.4f, 0.6f, 0.8f);
-  actor.SetColor(legacyColor);
-  DALI_TEST_EQUALS(actor.GetColor(), legacyColor, TEST_LOCATION);
-
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS(actor.GetCurrentColor(), legacyColor, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentColorMultiplier(), color, TEST_LOCATION);
 
   actor.SetColorMultiplierRed(0.8f);
   DALI_TEST_EQUALS(actor.GetColorMultiplierRed(), 0.8f, TEST_LOCATION);
@@ -17577,17 +17572,6 @@ int UtcDaliActorSetGetColorP(void)
 
   Vector4 worldColorMultiplier = actor.GetWorldColorMultiplier();
   DALI_TEST_CHECK(worldColorMultiplier != Vector4::ZERO);
-
-  // Verify the legacy component and world APIs delegate to the multiplier APIs.
-  actor.SetColorRed(0.7f);
-  actor.SetColorGreen(0.5f);
-  actor.SetColorBlue(0.3f);
-  actor.SetColorAlpha(0.1f);
-  DALI_TEST_EQUALS(actor.GetColorRed(), actor.GetColorMultiplierRed(), TEST_LOCATION);
-  DALI_TEST_EQUALS(actor.GetColorGreen(), actor.GetColorMultiplierGreen(), TEST_LOCATION);
-  DALI_TEST_EQUALS(actor.GetColorBlue(), actor.GetColorMultiplierBlue(), TEST_LOCATION);
-  DALI_TEST_EQUALS(actor.GetColorAlpha(), actor.GetColorMultiplierAlpha(), TEST_LOCATION);
-  DALI_TEST_EQUALS(actor.GetWorldColor(), actor.GetWorldColorMultiplier(), TEST_LOCATION);
 
   END_TEST;
 }
