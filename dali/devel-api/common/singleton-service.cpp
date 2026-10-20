@@ -34,6 +34,11 @@ SingletonService::~SingletonService() = default;
 
 void SingletonService::Register(const std::type_info& info, BaseHandle singleton)
 {
+  GetImplementation(*this).Register(DALI_TYPE_ID(info), singleton);
+}
+
+void SingletonService::Register(const TypeInfoId& info, BaseHandle singleton)
+{
   GetImplementation(*this).Register(info, singleton);
 }
 
@@ -43,6 +48,11 @@ void SingletonService::UnregisterAll()
 }
 
 BaseHandle SingletonService::GetSingleton(const std::type_info& info) const
+{
+  return GetImplementation(*this).GetSingleton(DALI_TYPE_ID(info));
+}
+
+BaseHandle SingletonService::GetSingleton(const TypeInfoId& info) const
 {
   return GetImplementation(*this).GetSingleton(info);
 }

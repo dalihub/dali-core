@@ -427,11 +427,9 @@ public:
    * The message will be read from the update-thread after the next FlushMessages is called.
    * @post Calling this method may invalidate any previously returned slots.
    * @param[in] size The message size with respect to the size of type "char".
-   * @param[in] updateScene A flag, when true denotes that the message will cause the scene-graph node tree to require an update.
-   * @note the default value of updateScene should match that in EventThreadServices::ReserveMessageSlot.
    * @return A pointer to the first char allocated for the message.
    */
-  [[nodiscard]] uint32_t* ReserveMessageSlot(uint32_t size, bool updateScene = true);
+  [[nodiscard]] uint32_t* ReserveMessageSlot(uint32_t size);
 
   /**
    * Called by the event-thread to signal that FlushQueue will be called

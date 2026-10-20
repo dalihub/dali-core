@@ -1012,9 +1012,9 @@ Integration::RenderController& Core::GetRenderController()
   return mRenderController;
 }
 
-uint32_t* Core::ReserveMessageSlot(uint32_t size, bool updateScene)
+uint32_t* Core::ReserveMessageSlot(uint32_t size)
 {
-  return mUpdateManager->ReserveMessageSlot(size, updateScene);
+  return mUpdateManager->ReserveMessageSlot(size);
 }
 
 } // namespace Internal

@@ -219,6 +219,46 @@ public:
   IntPair& operator=(const IntPair&)     = default; ///< Default copy assignment operator
   IntPair& operator=(IntPair&&) noexcept = default; ///< Default move assignment operator
 
+  /**
+   * @brief Sets the start value (same as x and width).
+   * @SINCE_2_5.45
+   * @param[in] start The first value stored in this pair
+   */
+  void SetStart(tIntType start)
+  {
+    SetX(start);
+  }
+
+  /**
+   * @brief Returns the start value (same as x and width).
+   * @SINCE_2_5.45
+   * @return The first value stored in this pair
+   */
+  tIntType GetStart() const
+  {
+    return GetX();
+  }
+
+  /**
+   * @brief Sets the end value (same as y and height).
+   * @SINCE_2_5.45
+   * @param[in] end The second value stored in this pair
+   */
+  void SetEnd(tIntType end)
+  {
+    SetY(end);
+  }
+
+  /**
+   * @brief Returns the end value (same as y and height).
+   * @SINCE_2_5.45
+   * @return The second value stored in this pair
+   */
+  tIntType GetEnd() const
+  {
+    return GetY();
+  }
+
 private:
   union
   {

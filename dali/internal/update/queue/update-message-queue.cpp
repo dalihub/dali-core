@@ -87,8 +87,6 @@ struct MessageQueue::Impl
   : renderController(controller),
     processingEvents(false),
     queueWasEmpty(true),
-    sceneUpdateFlag(false),
-    sceneUpdate(0),
     currentMessageBuffer(nullptr)
   {
   }
@@ -155,16 +153,6 @@ struct MessageQueue::Impl
 
   bool processingEvents; ///< Whether messages queued will be flushed by core
   bool queueWasEmpty;    ///< Flag whether the queue was empty during the Update()
-  bool sceneUpdateFlag;  ///< true when there is a new message that requires a scene-graph node tree update
-
-  /// Non zero when there is a message in the queue requiring a scene-graph node tree update.
-  /// Written by the Event thread (FlushQueue) and read/written by the Update thread
-  /// (ProcessMessages); must be atomic since there is no mutex between these threads
-  /// for this field on the fast path. Acquire/release ordering is used so that an
-  /// Update-thread read that observes an Event-thread write also observes everything
-  /// the Event thread published before that write (in particular, the corresponding
-  /// Push() to bufferRing).
-  std::atomic<int> sceneUpdate;
 
   /// Set (release) by the producer when a batch is pushed to the mutex-protected
   /// overflow processQueue; cleared (release) by the consumer once processQueue is
@@ -222,16 +210,11 @@ void MessageQueue::EventProcessingFinished()
 }
 
 // Called from event thread
-uint32_t* MessageQueue::ReserveMessageSlot(uint32_t requestedSize, bool updateScene)
+uint32_t* MessageQueue::ReserveMessageSlot(uint32_t requestedSize)
 {
   DALI_QB_SCOPE_TIMER(MQ_RESERVE_MESSAGE_SLOT);
 
   DALI_ASSERT_DEBUG(0 != requestedSize);
-
-  if(updateScene)
-  {
-    mImpl->sceneUpdateFlag = true;
-  }
 
   if(!mImpl->currentMessageBuffer)
   {
@@ -316,10 +299,10 @@ bool MessageQueue::FlushQueue()
   // If the overflow queue still has content from an earlier flush that
   // ProcessMessages() hasn't drained yet, this (newer) batch must NOT take the
   // fast path even though the ring may currently have room - ProcessMessages()
-  // always drains the ring before touching the overflow queue, so skipping the
-  // ring here preserves global FIFO order across both channels. Read as a
-  // plain atomic instead of taking queueMutex, so the healthy fast path never
-  // touches the lock at all.
+  // drains the ring before taking the overflow queue and clears this flag only
+  // after both, so skipping the ring here preserves global FIFO order across
+  // both channels. Read as a plain atomic instead of taking queueMutex, so the
+  // healthy fast path never touches the lock at all.
   bool overflowPending = mImpl->overflowActive.load(std::memory_order_acquire);
 
   bool pushed = false;
@@ -340,11 +323,6 @@ bool MessageQueue::FlushQueue()
 
   if(pushed)
   {
-    if(mImpl->sceneUpdateFlag)
-    {
-      mImpl->sceneUpdate.fetch_or(2, std::memory_order_release);
-      mImpl->sceneUpdateFlag = false;
-    }
     return true;
   }
 
@@ -419,11 +397,6 @@ bool MessageQueue::FlushQueue()
     }
   }
 
-  if(mImpl->sceneUpdateFlag)
-  {
-    mImpl->sceneUpdate.fetch_or(2, std::memory_order_release);
-    mImpl->sceneUpdateFlag = false;
-  }
   return true; // we have messages to process (in overflow)
 }
 
@@ -433,80 +406,56 @@ bool MessageQueue::ProcessMessages()
 
   PERF_MONITOR_START(PerformanceMonitor::PROCESS_MESSAGES);
 
-  // Atomically read-and-clear the scene-update flag in one step. Both the
-  // lockless ring and the overflow queue are drained together in this same
-  // call, so a single shared flag is enough - we don't need to know which
-  // channel it came from. exchange() guarantees the flag can never get
-  // "stuck" set: if a concurrent FlushQueue() call sets it again via
-  // fetch_or(2) after this exchange, the atomic is simply non-zero again and
-  // that is correctly picked up by the *next* ProcessMessages() call.
-  bool sceneUpdated = (mImpl->sceneUpdate.exchange(0, std::memory_order_acq_rel) != 0);
+  // Take everything to process before processing anything, in flush order.
+  //
+  // The producer does not push to the ring while overflowActive is set, and
+  // only this function clears it. The steps below rely on that and must stay
+  // in this order:
+  //  1. Read overflowActive.
+  //  2. Drain the ring, without the lock.
+  //     - If the flag was set, nothing newer can reach the ring until step 3,
+  //       so every drained buffer is older than the overflow ones.
+  //     - If it was not set, only the ring is taken. A buffer moved to the
+  //       overflow queue meanwhile is newer than everything drained, and is
+  //       left for the next call.
+  //  3. If the flag was set, take the overflow queue, and only then clear the
+  //     flag.
+  // Reading the flag after the drain would miss a ring refill followed by an
+  // overflow, letting the overflow buffer overtake the refilled ring buffers.
+  // Clearing the flag before the drain would let newer buffers into the ring
+  // ahead of the overflow ones. Anything flushed after this point is left for
+  // the next call, however long the processing below takes.
+  const bool overflowPending = mImpl->overflowActive.load(std::memory_order_acquire); // Step 1
 
-  // Drain the lockless ring first - typically 1, occasionally a couple of
-  // buffers, never a per-message loop cost here beyond what's unavoidable
-  // (actually running each message's Process()).
-  MessageBuffer* drainedBuffers[LOCKLESS_RING_CAPACITY];
-  std::size_t    drainedCount = mImpl->bufferRing.Drain(drainedBuffers, LOCKLESS_RING_CAPACITY);
+  MessageBuffer*    ringBuffers[LOCKLESS_RING_CAPACITY];
+  const std::size_t ringCount = mImpl->bufferRing.Drain(ringBuffers, LOCKLESS_RING_CAPACITY); // Step 2
 
-  if(drainedCount > 0)
-  {
-    mImpl->queueWasEmpty = false;
-
-    for(std::size_t i = 0; i < drainedCount; ++i)
-    {
-      MessageBuffer* buffer = drainedBuffers[i];
-      for(MessageBuffer::Iterator bufferIter = buffer->Begin(); bufferIter.IsValid(); bufferIter.Next())
-      {
-        MessageBase* message = reinterpret_cast<MessageBase*>(bufferIter.Get());
-        message->Process();
-        message->~MessageBase();
-      }
-      buffer->Reset();
-    }
-
-    // Recycle drained buffers for reuse, one lock acquisition for the whole batch.
-    {
-      MessageQueueMutex::ScopedLock lock(mImpl->queueMutex);
-      for(std::size_t i = 0; i < drainedCount; ++i)
-      {
-        mImpl->recycleQueue.push_back(drainedBuffers[i]);
-      }
-    }
-  }
-  else
-  {
-    mImpl->queueWasEmpty = true; // may be overwritten below if the overflow queue has content
-  }
-
-  // Now process overflow queue (mutex-protected)
-  MessageBufferQueue copiedProcessQueue;
+  MessageBufferQueue overflowBuffers;
+  if(overflowPending)
   {
     DALI_QB_SCOPE_TIMER(MQ_MUTEX_OVERFLOW_SECTION);
 
     MessageQueueMutex::ScopedLock lock(mImpl->queueMutex);
 
-    // Sample before draining - this is the depth the consumer actually found
+    // Sample before taking it - this is the depth the consumer actually found
     // waiting for it, i.e. how far behind the backlog had grown by this point.
     DALI_QB_RECORD_VALUE(MQ_PROCESS_QUEUE_DEPTH_ON_DRAIN, mImpl->processQueue.size());
 
-    // If there are items in the overflow queue, move them out.
-    if(!mImpl->processQueue.empty())
-    {
-      copiedProcessQueue.swap(mImpl->processQueue);
-      // Swap leaves mImpl->processQueue empty, so the fast path is clear to
-      // resume immediately - matches overflowActive's contract exactly.
-      mImpl->overflowActive.store(false, std::memory_order_release);
-      // If we were waiting, signal that we have processed (or at least started processing)
-      // We'll signal after processing.
-    }
+    // Step 3
+    overflowBuffers.swap(mImpl->processQueue);
+    mImpl->overflowActive.store(false, std::memory_order_release);
+  }
+  else
+  {
+    // No overflow pending, so its depth is zero
+    DALI_QB_RECORD_VALUE(MQ_PROCESS_QUEUE_DEPTH_ON_DRAIN, 0);
   }
 
-  if(!copiedProcessQueue.empty())
-  {
-    mImpl->queueWasEmpty = false;
+  mImpl->queueWasEmpty = (0u == ringCount) && overflowBuffers.empty();
 
-    // Process each buffer in the overflow queue
-    for(auto&& buffer : copiedProcessQueue)
+  if(!mImpl->queueWasEmpty)
+  {
+    auto processBuffer = [](MessageBuffer* buffer)
     {
       for(MessageBuffer::Iterator bufferIter = buffer->Begin(); bufferIter.IsValid(); bufferIter.Next())
       {
@@ -515,19 +464,29 @@ bool MessageQueue::ProcessMessages()
         message->~MessageBase();
       }
       buffer->Reset();
+    };
+
+    // Ring buffers first, as they are older than the overflow ones
+    for(std::size_t i = 0; i < ringCount; ++i)
+    {
+      processBuffer(ringBuffers[i]);
+    }
+    for(auto* buffer : overflowBuffers)
+    {
+      processBuffer(buffer);
     }
 
-    // Recycle these buffers for later use
+    // Recycle the processed buffers for reuse, one lock acquisition for the whole batch.
     {
       MessageQueueMutex::ScopedLock lock(mImpl->queueMutex);
-      mImpl->recycleQueue.insert(mImpl->recycleQueue.end(),
-                                 std::make_move_iterator(copiedProcessQueue.begin()),
-                                 std::make_move_iterator(copiedProcessQueue.end()));
+      mImpl->recycleQueue.insert(mImpl->recycleQueue.end(), ringBuffers, ringBuffers + ringCount);
+      mImpl->recycleQueue.insert(mImpl->recycleQueue.end(), overflowBuffers.begin(), overflowBuffers.end());
+
       // Signal any waiting producer that overflow queue is now smaller.
       // waitingForDrain (guarded by the same lock) tells us whether a producer is
       // actually blocked on messagePromise right now - see the comment on
       // waitingForDrain in Impl for why we don't use a shared std::future for this.
-      if(mImpl->waitingForDrain)
+      if(!overflowBuffers.empty() && mImpl->waitingForDrain)
       {
         mImpl->messagePromise.set_value();
         mImpl->messagePromise  = std::promise<void>(); // reset for next use
@@ -538,7 +497,12 @@ bool MessageQueue::ProcessMessages()
 
   PERF_MONITOR_END(PerformanceMonitor::PROCESS_MESSAGES);
 
-  return sceneUpdated;
+  // Every message requires a scene-graph node tree update, so "processed
+  // anything" and "scene updated" are the same fact. Deriving the answer from
+  // the drained buffers (rather than a separate flag set by the producer)
+  // guarantees the frame that processes the messages is the frame that
+  // reports the update - a separate flag could arrive one frame late.
+  return !mImpl->queueWasEmpty;
 }
 
 bool MessageQueue::WasEmpty() const
@@ -546,9 +510,15 @@ bool MessageQueue::WasEmpty() const
   return mImpl->queueWasEmpty;
 }
 
-bool MessageQueue::IsSceneUpdateRequired() const
+bool MessageQueue::HasMessagesToProcess() const
 {
-  return mImpl->sceneUpdate.load(std::memory_order_acquire) != 0;
+  // Pending flushed buffers in either channel mean a scene update is required.
+  // Called from the Update thread, which is the ring's consumer: the read index
+  // is exact from here and the write index can only lag behind a concurrent
+  // Push(), so a true return always has real buffers behind it, and a flush
+  // missed here is picked up by the ProcessMessages() call that follows.
+  return (mImpl->bufferRing.GetApproximateDepth() != 0u) ||
+         mImpl->overflowActive.load(std::memory_order_acquire);
 }
 
 std::size_t MessageQueue::GetCapacity() const

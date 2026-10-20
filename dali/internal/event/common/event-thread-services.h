@@ -91,10 +91,9 @@ public:
    * The message will be read from the update-thread after the next FlushMessages is called.
    * @post Calling this method may invalidate any previously returned slots.
    * @param[in] size The message size with respect to the size of type "char".
-   * @param[in] updateScene A flag, when true denotes that the message will cause the scene-graph node tree to require an update.
    * @return A pointer to the first char allocated for the message.
    */
-  virtual uint32_t* ReserveMessageSlot(uint32_t size, bool updateScene = true) = 0;
+  virtual uint32_t* ReserveMessageSlot(uint32_t size) = 0;
 
   /**
    * @return true if core is still running and we can send messages

@@ -55,22 +55,21 @@ DALI_CORE_API KeyEvent New(const Dali::String&          keyName,
                            const Device::Subclass::Type deviceSubclass);
 
 /**
- * @brief Queries whether the key event has already been through the intercept stage.
+ * @brief Queries whether the key event has already been processed by an interceptor.
  *
  * @param[in] keyEvent The instance of KeyEvent
- * @return True if the key event has already been through the intercept stage
+ * @return True if the key event has already been processed by an interceptor
  */
 DALI_CORE_API bool IsInterceptProcessed(const KeyEvent& keyEvent);
 
 /**
- * @brief Marks the key event as having been through the intercept stage.
+ * @brief Sets whether the key event has already been processed by an interceptor.
  *
- * Accessibility hands a key event to its remote client and consumes it. If the client
- * does not consume it, the event is marked and fed back to the window; the mark stops
- * the intercept stage from running a second time and looping forever.
+ * An interceptor can use this flag to recognize a re-injected event and avoid
+ * processing it again. This flag does not suppress the scene intercept signal.
  *
  * @param[in] keyEvent The instance of KeyEvent
- * @param[in] interceptProcessed Whether the key event has been through the intercept stage
+ * @param[in] interceptProcessed Whether the key event has already been processed by an interceptor
  */
 DALI_CORE_API void SetInterceptProcessed(KeyEvent keyEvent, bool interceptProcessed);
 

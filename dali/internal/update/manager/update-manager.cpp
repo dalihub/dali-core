@@ -918,9 +918,9 @@ void UpdateManager::RemoveUniformBlock(Render::UniformBlock* uniformBlock)
 #endif
 }
 
-uint32_t* UpdateManager::ReserveMessageSlot(uint32_t size, bool updateScene)
+uint32_t* UpdateManager::ReserveMessageSlot(uint32_t size)
 {
-  return mImpl->messageQueue.ReserveMessageSlot(size, updateScene);
+  return mImpl->messageQueue.ReserveMessageSlot(size);
 }
 
 std::size_t UpdateManager::GetUpdateMessageQueueCapacity() const
@@ -1265,7 +1265,7 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
   bool updateScene =                                   // The scene-graph requires an update if..
     (mImpl->nodeDirtyFlags & RenderableUpdateFlags) || // ..nodes were dirty in previous frame OR
     isAnimationRunning ||                              // ..at least one animation is running OR
-    mImpl->messageQueue.IsSceneUpdateRequired() ||     // ..a message that modifies the scene graph node tree is queued OR
+    mImpl->messageQueue.HasMessagesToProcess() ||      // ..a message that modifies the scene graph node tree is queued OR
     mImpl->frameCallbackProcessor ||                   // ..a frame callback processor is existed OR
     mImpl->discardAnimationFinishedAge > 0u ||         // ..at least one animation with EndAction::DISCARD finished
     gestureUpdated;                                    // ..a gesture property was updated
@@ -1283,7 +1283,7 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
   }
 
   // Process the queued scene messages. Note, MessageQueue::FlushQueue may be called
-  // between calling IsSceneUpdateRequired() above and here, so updateScene should
+  // between calling HasMessagesToProcess() above and here, so updateScene should
   // be set again
   updateScene |= mImpl->messageQueue.ProcessMessages();
 
