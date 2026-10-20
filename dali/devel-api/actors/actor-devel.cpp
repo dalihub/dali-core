@@ -80,6 +80,11 @@ Vector4 GetWorldColorMultiplier(Actor actor)
   return CalculateActorWorldColorMultiplier(GetImplementation(actor));
 }
 
+Vector4 GetWorldColor(Actor actor)
+{
+  return GetWorldColorMultiplier(actor);
+}
+
 void LookAt(Actor actor, Vector3 target, Vector3 up, Vector3 localForward, Vector3 localUp)
 {
   auto orientation = CalculateActorLookAtOrientation(GetImplementation(actor), target, up, localForward, localUp);
