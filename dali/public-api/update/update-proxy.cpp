@@ -109,14 +109,29 @@ bool UpdateProxy::GetColorMultiplier(uint32_t id, Vector4& multiplier) const
   return mImpl.GetColorMultiplier(id, multiplier);
 }
 
+bool UpdateProxy::GetColor(uint32_t id, Vector4& color) const
+{
+  return GetColorMultiplier(id, color);
+}
+
 bool UpdateProxy::SetColorMultiplier(uint32_t id, const Vector4& multiplier)
 {
   return mImpl.SetColorMultiplier(id, multiplier);
 }
 
+bool UpdateProxy::SetColor(uint32_t id, const Vector4& color)
+{
+  return SetColorMultiplier(id, color);
+}
+
 bool UpdateProxy::BakeColorMultiplier(uint32_t id, const Vector4& multiplier)
 {
   return mImpl.BakeColorMultiplier(id, multiplier);
+}
+
+bool UpdateProxy::BakeColor(uint32_t id, const Vector4& color)
+{
+  return BakeColorMultiplier(id, color);
 }
 
 UpdateProxy::NotifySyncPoint UpdateProxy::PopSyncPoint()
