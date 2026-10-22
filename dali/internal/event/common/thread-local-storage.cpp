@@ -249,6 +249,7 @@ void ThreadLocalStorage::UnregisterAll()
   {
     mSingletoneContainerChanging = true;
     mSingletonContainer.Clear();
+    mSingletonContainer.Rehash(); // Clear() keeps the handles alive. Release them now.
     mSingletoneContainerChanging = false;
   }
 }
