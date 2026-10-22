@@ -43,6 +43,23 @@ class TestObject : public BaseObject
 {
 };
 
+class DestructionTrackingObject : public BaseObject
+{
+public:
+  DestructionTrackingObject(bool& destroyed)
+  : mDestroyed(destroyed)
+  {
+  }
+
+  ~DestructionTrackingObject() override
+  {
+    mDestroyed = true;
+  }
+
+private:
+  bool& mDestroyed;
+};
+
 } // unnamed namespace
 
 void utc_dali_singleton_service_startup(void)
@@ -102,6 +119,29 @@ int UtcDaliSingletonServiceRegisterAndGetSingletonTypeInfoId(void)
   handle = TestHandle(new TestObject);
   singletonService.Register(DALI_TYPE_ID(handle), handle);
   DALI_TEST_CHECK(singletonService.GetSingleton(DALI_TYPE_ID(handle)));
+
+  END_TEST;
+}
+
+int UtcDaliSingletonServiceUnregisterAllReleasesSingletons(void)
+{
+  TestApplication  application;
+  SingletonService singletonService(SingletonService::Get());
+
+  bool destroyed = false;
+  singletonService.Register(DALI_TYPE_ID(TestHandle), TestHandle(new DestructionTrackingObject(destroyed)));
+  DALI_TEST_CHECK(singletonService.GetSingleton(DALI_TYPE_ID(TestHandle)));
+  DALI_TEST_CHECK(!destroyed);
+
+  // The singleton must be destroyed here, not when the service is destroyed
+  singletonService.UnregisterAll();
+  DALI_TEST_CHECK(destroyed);
+  DALI_TEST_CHECK(!singletonService.GetSingleton(DALI_TYPE_ID(TestHandle)));
+
+  // Registering again after UnregisterAll() should work
+  TestHandle handle(new TestObject);
+  singletonService.Register(DALI_TYPE_ID(TestHandle), handle);
+  DALI_TEST_CHECK(singletonService.GetSingleton(DALI_TYPE_ID(TestHandle)) == handle);
 
   END_TEST;
 }
