@@ -32,8 +32,8 @@ KeyEvent New(const Dali::String&          keyName,
              const Dali::KeyEvent::State& keyState,
              const Dali::String&          compose,
              const Dali::String&          deviceName,
-             const Device::Class::Type    deviceClass,
-             const Device::Subclass::Type deviceSubclass)
+             Device::Class::Type          deviceClass,
+             Device::Subclass::Type       deviceSubclass)
 {
   Internal::KeyEventPtr internal = Internal::KeyEvent::New(keyName, logicalKey, keyString, keyCode, keyModifier, timeStamp, keyState, compose, deviceName, deviceClass, deviceSubclass);
 
