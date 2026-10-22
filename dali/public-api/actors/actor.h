@@ -1083,7 +1083,7 @@ public:
    * @return A handle to the actor if found, or an empty handle if not
    * @pre The Actor has been initialized.
    */
-  Actor FindChildById(const uint32_t id);
+  Actor FindChildById(uint32_t id);
 
   /**
    * @brief Retrieves the actor's parent.

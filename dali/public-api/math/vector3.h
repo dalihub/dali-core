@@ -382,7 +382,7 @@ struct DALI_CORE_API Vector3
    * @param[in] index Subscript index
    * @return The float at the given index
    */
-  const float& operator[](const uint32_t index) const
+  const float& operator[](uint32_t index) const
   {
     DALI_ASSERT_ALWAYS(index < 3 && "Vector element index out of bounds");
 
@@ -397,7 +397,7 @@ struct DALI_CORE_API Vector3
    * @param[in] index Subscript index
    * @return The float at the given index
    */
-  float& operator[](const uint32_t index)
+  float& operator[](uint32_t index)
   {
     DALI_ASSERT_ALWAYS(index < 3 && "Vector element index out of bounds");
 

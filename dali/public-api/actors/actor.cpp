@@ -118,7 +118,7 @@ Actor Actor::FindChildByName(Dali::StringView actorName)
   return Actor(child.Get());
 }
 
-Actor Actor::FindChildById(const uint32_t id)
+Actor Actor::FindChildById(uint32_t id)
 {
   Internal::ActorPtr child = GetImplementation(*this).FindChildById(id);
   return Actor(child.Get());
