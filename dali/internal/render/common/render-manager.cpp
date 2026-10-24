@@ -19,7 +19,11 @@
 #include <dali/internal/render/common/render-manager.h>
 
 // EXTERNAL INCLUDES
+#include <algorithm>
 #include <memory>
+#include <set>
+#include <unordered_map>
+#include <unordered_set>
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/common/vector-wrapper.h>
@@ -161,6 +165,68 @@ inline void AlignDamagedRect(BoundsInteger& rect)
   rect.height = ((bottom + 17) / 16) * 16 - rect.y;
 }
 
+struct FrameBufferRenderItemsPerScene
+{
+#if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
+  using DirtyRectKeys = std::set<DirtyRectKey, DirtyRectKey::DirtyRectKeyCompareLess>;
+#else
+  using DirtyRectKeys = std::unordered_set<DirtyRectKey, DirtyRectKey::DirtyRectKeyHash>;
+#endif
+
+  using RenderItemsDirtyRectKeys = std::unordered_map<Render::FrameBuffer*, DirtyRectKeys>;
+
+  RenderItemsDirtyRectKeys items{};
+  bool                     isUsed{false};
+};
+
+/**
+ * @brief Check whether the render instruction is updated or not.
+ * And remove the previous dirty rect keys which are not in the current render instruction.
+ *
+ * @todo Could we consider FBO viewport here in future?
+ *
+ * @param[in] instruction The render instruction to check.
+ * @param[out] currentDirtyRectKeys The current dirty rect keys to store.
+ * @param[in,out] previousDirtyRectKeys The previous dirty rect keys to check. Found key will be removed.
+ * @return True if the render instruction is updated, false otherwise.
+ */
+bool IsRenderInstructionUpdated(const RenderInstruction&                       instruction,
+                                FrameBufferRenderItemsPerScene::DirtyRectKeys& currentDirtyRectKeys,
+                                FrameBufferRenderItemsPerScene::DirtyRectKeys* previousDirtyRectKeys)
+{
+  bool isUpdated = false;
+
+  for(RenderListContainer::SizeType listIndex = 0u; listIndex < instruction.RenderListCount(); ++listIndex)
+  {
+    const RenderList* renderList = instruction.GetRenderList(listIndex);
+    if(!renderList || renderList->IsEmpty())
+    {
+      continue;
+    }
+
+    for(uint32_t itemIndex = 0u; itemIndex < renderList->Count(); ++itemIndex)
+    {
+      RenderItem& item = renderList->GetItem(itemIndex);
+      DALI_ASSERT_DEBUG(item.mNode && "RenderItem should have node!");
+
+      const DirtyRectKey dirtyRectKey(item.mNode, item.mRenderer);
+      const auto         inserted = currentDirtyRectKeys.insert(dirtyRectKey).second;
+      if(inserted && (!previousDirtyRectKeys || previousDirtyRectKeys->erase(dirtyRectKey) == 0u))
+      {
+        isUpdated = true;
+      }
+
+      if(item.mIsUpdated || item.mNode->Updated() || (item.mRenderer && item.mRenderer->Updated()))
+      {
+        item.mIsUpdated = false;
+        isUpdated       = true;
+      }
+    }
+  }
+
+  return isUpdated;
+}
+
 DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_RENDER_PROCESS, false);
 
 DALI_INIT_TIME_CHECKER_FILTER_WITH_DEFAULT_THRESHOLD(gTimeCheckerFilter, DALI_RENDER_PROCESS_THRESHOLD_TIME, 48);
@@ -290,8 +356,9 @@ struct RenderManager::Impl
   void ContextDestroyed()
   {
     sceneContainer.clear();
+    frameBufferRenderItems.clear();
 
-    renderedFrameBufferContainer.clear();
+    pixelReadFrameBufferContainer.clear();
     samplerContainer.Clear();
     frameBufferContainer.Clear();
     vertexBufferContainer.Clear();
@@ -302,7 +369,9 @@ struct RenderManager::Impl
     mRenderTrackers.Clear();
 
     updatedTextures.Clear();
+    updatedFrameBuffers.Clear();
     textureDiscardQueue.Clear();
+    frameBufferDiscardQueue.Clear();
 
     pipelineCache.reset(); // clear now before the program contoller is deleted
 
@@ -318,17 +387,20 @@ struct RenderManager::Impl
   std::vector<SceneGraph::Scene*> sceneContainer;   ///< List of pointers to the scene graph objects of the scenes
   Render::RenderAlgorithms        renderAlgorithms; ///< The RenderAlgorithms object is used to action the renders required by a RenderInstruction
 
-  std::vector<Render::FrameBuffer*>             renderedFrameBufferContainer; ///< List of rendered frame buffer
-  Integration::OrderedSet<Render::Sampler>      samplerContainer;             ///< List of owned samplers
-  Integration::OrderedSet<Render::FrameBuffer>  frameBufferContainer;         ///< List of owned framebuffers
-  Integration::OrderedSet<Render::VertexBuffer> vertexBufferContainer;        ///< List of owned vertex buffers
-  Integration::OrderedSet<Render::Geometry>     geometryContainer;            ///< List of owned Geometries
-  OwnerKeyContainer<Render::Renderer>           rendererContainer;            ///< List of owned renderers
-  OwnerKeyContainer<Render::Texture>            textureContainer;             ///< List of owned textures
+  std::unordered_map<SceneGraph::Scene*, FrameBufferRenderItemsPerScene> frameBufferRenderItems;
+
+  std::vector<Render::FrameBuffer*>             pixelReadFrameBufferContainer; ///< List of pixel read frame buffer
+  Integration::OrderedSet<Render::Sampler>      samplerContainer;              ///< List of owned samplers
+  Integration::OrderedSet<Render::FrameBuffer>  frameBufferContainer;          ///< List of owned framebuffers
+  Integration::OrderedSet<Render::VertexBuffer> vertexBufferContainer;         ///< List of owned vertex buffers
+  Integration::OrderedSet<Render::Geometry>     geometryContainer;             ///< List of owned Geometries
+  OwnerKeyContainer<Render::Renderer>           rendererContainer;             ///< List of owned renderers
+  OwnerKeyContainer<Render::Texture>            textureContainer;              ///< List of owned textures
 
   Integration::OrderedSet<Render::RenderTracker> mRenderTrackers; ///< List of owned render trackers
 
-  OwnerKeyContainer<Render::Texture> textureDiscardQueue; ///< Discarded textures
+  OwnerKeyContainer<Render::Texture>   textureDiscardQueue;     ///< Discarded textures
+  OwnerContainer<Render::FrameBuffer*> frameBufferDiscardQueue; ///< Discarded frame buffers
 
   ProgramController programController; ///< Owner of the programs
 
@@ -342,7 +414,8 @@ struct RenderManager::Impl
   ContainerRemovedFlags containerRemovedFlags; ///< cumulative container removed flags during current frame
 #endif
 
-  Vector<Render::TextureKey> updatedTextures{}; ///< The updated texture list
+  Vector<Render::TextureKey>   updatedTextures{};     ///< The updated texture list
+  Vector<Render::FrameBuffer*> updatedFrameBuffers{}; ///< The updated frame buffer list
 
   uint32_t frameCount{0u};                                                            ///< The current frame count
   uint32_t programCacheCleanRequiredThreshold{INITIAL_PROGRAM_CACHE_CLEAN_THRESHOLD}; ///< The threshold to request program cache clean up operation.
@@ -392,7 +465,7 @@ void RenderManager::CheckSceneCount()
 void RenderManager::ChangeGraphicsController(Graphics::Controller& graphicsController)
 {
   DALI_ASSERT_ALWAYS(mImpl->sceneContainer.empty() &&
-                     mImpl->renderedFrameBufferContainer.empty() &&
+                     mImpl->pixelReadFrameBufferContainer.empty() &&
                      mImpl->samplerContainer.Count() == 0u &&
                      mImpl->frameBufferContainer.Count() == 0u &&
                      mImpl->vertexBufferContainer.Count() == 0u &&
@@ -508,7 +581,8 @@ void RenderManager::AddFrameBuffer(OwnerPointer<Render::FrameBuffer>& frameBuffe
 {
   Render::FrameBuffer* frameBufferPtr = frameBuffer.Release();
   mImpl->frameBufferContainer.PushBack(frameBufferPtr);
-  frameBufferPtr->Initialize(mImpl->graphicsController);
+  mImpl->updatedFrameBuffers.PushBack(frameBufferPtr);
+  frameBufferPtr->Initialize(mImpl->graphicsController, *this);
 }
 
 void RenderManager::RemoveFrameBuffer(Render::FrameBuffer* frameBuffer)
@@ -520,15 +594,33 @@ void RenderManager::RemoveFrameBuffer(Render::FrameBuffer* frameBuffer)
 
   if(iter != mImpl->frameBufferContainer.End())
   {
+    for(auto& sceneRenderItems : mImpl->frameBufferRenderItems)
+    {
+      sceneRenderItems.second.items.erase(frameBuffer);
+    }
+
     frameBuffer->Destroy();
-    mImpl->frameBufferContainer.Erase(iter); // frameBuffer found; now destroy it
+
+    // Transfer ownership to the discard queue, this keeps the object alive, until the render-thread has finished with it
+    mImpl->frameBufferDiscardQueue.PushBack(mImpl->frameBufferContainer.Release(iter));
+  }
+}
+
+void RenderManager::SetFrameBufferUpdated(Render::FrameBuffer* frameBuffer)
+{
+  DALI_ASSERT_DEBUG(nullptr != frameBuffer);
+
+  if(!frameBuffer->Updated())
+  {
+    frameBuffer->SetUpdated(true);
+    mImpl->updatedFrameBuffers.PushBack(frameBuffer);
   }
 }
 
 void RenderManager::InitializeScene(SceneGraph::Scene* scene)
 {
   DALI_LOG_RELEASE_INFO("InitializeScene %p\n", scene);
-  scene->Initialize(mImpl->graphicsController);
+  scene->Initialize(mImpl->graphicsController, *this);
   mImpl->sceneContainer.push_back(scene);
   mImpl->uniformBufferManager->RegisterScene(scene);
 }
@@ -537,6 +629,7 @@ void RenderManager::UninitializeScene(SceneGraph::Scene* scene)
 {
   DALI_LOG_RELEASE_INFO("UninitializeScene %p\n", scene);
   mImpl->uniformBufferManager->UnregisterScene(scene);
+  mImpl->frameBufferRenderItems.erase(scene);
   auto iter = std::find(mImpl->sceneContainer.begin(), mImpl->sceneContainer.end(), scene);
   if(iter != mImpl->sceneContainer.end())
   {
@@ -546,7 +639,7 @@ void RenderManager::UninitializeScene(SceneGraph::Scene* scene)
 
 void RenderManager::SurfaceReplaced(SceneGraph::Scene* scene)
 {
-  scene->Initialize(mImpl->graphicsController);
+  scene->Initialize(mImpl->graphicsController, *this);
 }
 
 void RenderManager::AddVertexBuffer(OwnerPointer<Render::VertexBuffer>& vertexBuffer)
@@ -621,6 +714,11 @@ void RenderManager::PreRender(Integration::RenderStatus& status, bool forceClear
   mImpl->RequestProgramCacheCleanIfNeed();
 
   mImpl->commandBufferSubmitted = false;
+
+  for(auto&& renderItem : mImpl->frameBufferRenderItems)
+  {
+    renderItem.second.isUsed = false;
+  }
 }
 
 void RenderManager::PreRenderScene(Integration::Scene& scene, Integration::ScenePreRenderStatus& status, std::vector<BoundsInteger>& damagedRects)
@@ -638,15 +736,45 @@ void RenderManager::PreRenderScene(Integration::Scene& scene, Integration::Scene
   // Rebuild surface render passes if the app toggled depth/stencil since last frame.
   sceneObject->RebuildRenderPassesIfDirty(mImpl->graphicsController);
 
-  bool           renderToScene    = false;
-  const uint32_t instructionCount = sceneObject->GetRenderInstructions().Count();
-  for(uint32_t i = instructionCount; i > 0; --i)
+  bool                           renderToScene                  = false;
+  const uint32_t                 instructionCount               = sceneObject->GetRenderInstructions().Count();
+  auto&                          previousFrameBufferRenderItems = mImpl->frameBufferRenderItems[sceneObject];
+  FrameBufferRenderItemsPerScene currentFrameBufferRenderItems;
+  currentFrameBufferRenderItems.isUsed = true;
+
+  for(uint32_t i = 0; i < instructionCount; ++i)
   {
-    RenderInstruction& instruction = sceneObject->GetRenderInstructions().At(i - 1);
+    RenderInstruction& instruction = sceneObject->GetRenderInstructions().At(i);
     if(instruction.mFrameBuffer)
     {
-      // TODO : For now, let we just always dirty the target of FBO texture
-      instruction.mFrameBuffer->UpdateAttachedTextures(*this);
+      auto* currentFrameBuffer = instruction.mFrameBuffer;
+
+      auto                                           previousFrameBufferRenderItemsIter = previousFrameBufferRenderItems.items.find(currentFrameBuffer);
+      FrameBufferRenderItemsPerScene::DirtyRectKeys* previousDirtyRectKeysPtr =
+        previousFrameBufferRenderItemsIter != previousFrameBufferRenderItems.items.end() ? &(previousFrameBufferRenderItemsIter->second) : nullptr;
+
+      FrameBufferRenderItemsPerScene::DirtyRectKeys& currentDirtyRectKeys = currentFrameBufferRenderItems.items[instruction.mFrameBuffer];
+
+      const bool isUpdated = IsRenderInstructionUpdated(instruction, currentDirtyRectKeys, previousDirtyRectKeysPtr) ||
+                             (instruction.mRenderTracker != nullptr);
+      if(isUpdated)
+      {
+        SetFrameBufferUpdated(currentFrameBuffer);
+      }
+
+      if(!currentFrameBuffer->Updated())
+      {
+        // Check whether this frame buffer didn't exist before, or some render items are removed at this frame.
+        if(!previousDirtyRectKeysPtr || !(previousDirtyRectKeysPtr->empty()))
+        {
+          SetFrameBufferUpdated(currentFrameBuffer);
+        }
+      }
+
+      if(currentFrameBuffer->Updated())
+      {
+        currentFrameBuffer->UpdateAttachedTextures();
+      }
     }
     else
     {
@@ -656,6 +784,8 @@ void RenderManager::PreRenderScene(Integration::Scene& scene, Integration::Scene
       }
     }
   }
+
+  previousFrameBufferRenderItems = std::move(currentFrameBufferRenderItems);
 
   status.SetHadRenderInstructionToScene(sceneObject->HasRenderInstructionToScene());
   status.SetHasRenderInstructionToScene(renderToScene);
@@ -1270,7 +1400,8 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
     // When the surface is rotated, the input values already were set with the rotated angle.
     // So, re-calculation is needed.
     scissorArea = RecalculateScissorArea(scissorArea, surfaceOrientation, surfaceRect);
-    if(scissorArea.width > 0 && scissorArea.height > 0)
+
+    if(scissorArea.width > 0 && scissorArea.height > 0 && (!instruction.mFrameBuffer || instruction.mFrameBuffer->Updated()))
     {
       // Setup command buffer for this instruction.
       commandBuffers.emplace_back(currentCommandBuffer);
@@ -1316,7 +1447,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
         if(DALI_LIKELY(renderResultBuffer))
         {
           currentCommandBuffer->ReadPixels(renderResultBuffer);
-          mImpl->renderedFrameBufferContainer.push_back(instruction.mFrameBuffer);
+          mImpl->pixelReadFrameBufferContainer.push_back(instruction.mFrameBuffer);
         }
       }
     }
@@ -1464,11 +1595,32 @@ void RenderManager::PostRender()
 
   mImpl->ClearUnusedProgramCacheIfNeed();
 
-  for(auto& framebuffer : mImpl->renderedFrameBufferContainer)
+  for(auto& framebuffer : mImpl->pixelReadFrameBufferContainer)
   {
     framebuffer->StoreRenderResult();
   }
-  mImpl->renderedFrameBufferContainer.clear();
+  mImpl->pixelReadFrameBufferContainer.clear();
+
+  for(auto& framebuffer : mImpl->updatedFrameBuffers)
+  {
+    framebuffer->SetUpdated(false);
+  }
+  mImpl->updatedFrameBuffers.Clear();
+
+  // Remove discarded frame buffers after SetUpdated() and SetRenderResultDrawn() called.
+  mImpl->frameBufferDiscardQueue.Clear();
+
+  for(auto iter = mImpl->frameBufferRenderItems.begin(); iter != mImpl->frameBufferRenderItems.end();)
+  {
+    if((*iter).second.isUsed)
+    {
+      ++iter;
+    }
+    else
+    {
+      iter = mImpl->frameBufferRenderItems.erase(iter);
+    }
+  }
 
 #if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
   // Shrink relevant containers if required.
@@ -1481,12 +1633,16 @@ void RenderManager::PostRender()
     mImpl->textureContainer.ShrinkToFitIfNeeded();
   }
 
-  // Both containers always have empty slots, so we can shrink them.
+  // Some containers always have empty slots, so we can shrink them.
   // Note that we don't need to release it every frames. So just check every specific frames
   if((mImpl->frameCount & (SHRINK_TO_FIT_FRAME_COUNT - 1)) == 0)
   {
     mImpl->updatedTextures.ShrinkToFit();
+    mImpl->updatedFrameBuffers.ShrinkToFit();
     mImpl->textureDiscardQueue.ShrinkToFit();
+    mImpl->frameBufferDiscardQueue.ShrinkToFit();
+
+    mImpl->pixelReadFrameBufferContainer.shrink_to_fit();
   }
 
   // Reset flag

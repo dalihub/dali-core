@@ -21,7 +21,7 @@
 #include <dali/graphics-api/graphics-types.h>
 #include <dali/integration-api/debug.h>
 #include <dali/internal/event/images/pixel-buffer-impl.h>
-#include <dali/internal/render/common/render-manager.h> ///< TODO : Could we remove it?
+#include <dali/internal/render/common/render-manager.h>
 #include <dali/internal/render/renderers/render-texture.h>
 
 namespace DALI_NAMESPACE
@@ -31,13 +31,15 @@ namespace Internal
 namespace Render
 {
 FrameBuffer::FrameBuffer(uint32_t width, uint32_t height, Mask attachments)
-: mDepthTexture(),
+: mRenderManager(nullptr),
+  mDepthTexture(),
   mDepthStencilTexture(),
   mRenderResult(nullptr),
   mWidth(width),
   mHeight(height),
   mDepthBuffer((attachments & Dali::FrameBuffer::Attachment::DEPTH) || (attachments == Dali::FrameBuffer::Attachment::AUTO)),
   mStencilBuffer((attachments & Dali::FrameBuffer::Attachment::STENCIL) || (attachments == Dali::FrameBuffer::Attachment::AUTO)),
+  mUpdated(true),
   mIsBufferUsageChangeableAtRuntime(attachments == Dali::FrameBuffer::Attachment::AUTO),
   mRuntimeDepthEnabled(mDepthBuffer),
   mRuntimeStencilEnabled(mStencilBuffer)
@@ -61,11 +63,19 @@ FrameBuffer::~FrameBuffer()
 
 void FrameBuffer::Destroy()
 {
+  // TODO : protected data using here
+  mRenderPass.reset();
+  mRenderPassNoClear.reset();
+
+  NotifyRenderTargetDestroyed();
+  mRenderTarget.reset();
+
   mGraphicsObject.reset();
 }
 
-void FrameBuffer::OnInitialize()
+void FrameBuffer::OnInitialize(SceneGraph::RenderManager& renderManager)
 {
+  mRenderManager = &renderManager;
   if(!(mGraphicsController->GetDeviceLimitation(Graphics::DeviceCapability::SUPPORTED_GRAPHICS_FEATURE_FLAGS) & Graphics::GraphicsFeatureFlagBits::RUNTIME_RENDERBUFFER_ATTACHMENT_CHANGE_BIT))
   {
     mIsBufferUsageChangeableAtRuntime = false;
@@ -86,6 +96,7 @@ void FrameBuffer::AttachColorTexture(const Render::TextureKey& texture, uint32_t
     mCreateInfo.colorAttachments.push_back(colorAttachment);
 
     mColorTextures.push_back(texture);
+    NotifyFrameBufferUpdated();
   }
 }
 
@@ -103,6 +114,7 @@ void FrameBuffer::AttachDepthTexture(const Render::TextureKey& texture, uint32_t
     mCreateInfo.depthStencilAttachment.depthLevel   = mipmapLevel;
 
     mDepthTexture = texture;
+    NotifyFrameBufferUpdated();
   }
 }
 
@@ -119,17 +131,20 @@ void FrameBuffer::AttachDepthStencilTexture(const Render::TextureKey& texture, u
     mCreateInfo.depthStencilAttachment.stencilLevel   = mipmapLevel;
 
     mDepthStencilTexture = texture;
+    NotifyFrameBufferUpdated();
   }
 }
 
 void FrameBuffer::SetMultiSamplingLevel(uint8_t multiSamplingLevel)
 {
   mCreateInfo.multiSamplingLevel = multiSamplingLevel;
+  NotifyFrameBufferUpdated();
 }
 
 void FrameBuffer::KeepRenderResult()
 {
   mIsRenderResultRequested = true;
+  NotifyFrameBufferUpdated();
 }
 
 void FrameBuffer::ClearRenderResult()
@@ -177,26 +192,6 @@ void FrameBuffer::StoreRenderResult()
   mRenderedPixelBuffer                 = Dali::PixelBuffer(pixelBuffer.Get());
   mRenderResult                        = nullptr;
   mIsRenderResultRequested             = false;
-}
-
-void FrameBuffer::UpdateAttachedTextures(SceneGraph::RenderManager& renderManager)
-{
-  for(auto colorTexture : mColorTextures)
-  {
-    if(colorTexture)
-    {
-      renderManager.SetTextureUpdated(colorTexture);
-    }
-  }
-
-  if(mDepthTexture)
-  {
-    renderManager.SetTextureUpdated(mDepthTexture);
-  }
-  if(mDepthStencilTexture)
-  {
-    renderManager.SetTextureUpdated(mDepthStencilTexture);
-  }
 }
 
 // Called from Main thread.
@@ -369,6 +364,38 @@ void FrameBuffer::UpdateFramebufferRenderbufferUsage()
     runtimeChangedState.SetDepthTestEnable(mRuntimeDepthEnabled);
     runtimeChangedState.SetStencilTestEnable(mRuntimeStencilEnabled);
     mGraphicsController->UpdateFramebufferRenderbufferUsage(*mGraphicsObject, runtimeChangedState);
+  }
+}
+
+void FrameBuffer::UpdateAttachedTextures()
+{
+  if(DALI_LIKELY(mRenderManager))
+  {
+    auto& renderManager = *mRenderManager;
+    for(auto colorTexture : mColorTextures)
+    {
+      if(colorTexture)
+      {
+        renderManager.SetTextureUpdated(colorTexture);
+      }
+    }
+
+    if(mDepthTexture)
+    {
+      renderManager.SetTextureUpdated(mDepthTexture);
+    }
+    if(mDepthStencilTexture)
+    {
+      renderManager.SetTextureUpdated(mDepthStencilTexture);
+    }
+  }
+}
+
+void FrameBuffer::NotifyFrameBufferUpdated()
+{
+  if(DALI_LIKELY(mRenderManager))
+  {
+    mRenderManager->SetFrameBufferUpdated(this);
   }
 }
 

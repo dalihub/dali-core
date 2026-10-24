@@ -36,7 +36,6 @@ namespace Internal
 namespace SceneGraph
 {
 class RenderInstruction;
-class RenderManager;
 } //namespace SceneGraph
 
 namespace Render
@@ -195,10 +194,34 @@ public:
   void UpdateFramebufferRenderbufferUsage();
 
   /**
-   * @brief Mark all textures updated.
-   * @param[in] renderManager The render manager who will mark updated textures.
+   * @brief Notify to RenderManager that this frame buffer has been updated.
    */
-  void UpdateAttachedTextures(SceneGraph::RenderManager& renderManager);
+  void NotifyFrameBufferUpdated();
+
+  /**
+   * @brief Mark all textures updated.
+   * @note This API should be called only at RenderManager
+   */
+  void UpdateAttachedTextures();
+
+  /**
+   * @brief Mark whether this framebuffer requires rendering.
+   * @note This API should be called only at RenderManager
+   * @param[in] updated True if the framebuffer requires rendering.
+   */
+  void SetUpdated(bool updated)
+  {
+    mUpdated = updated;
+  }
+
+  /**
+   * @brief Check whether this framebuffer requires rendering.
+   * @return True if the framebuffer was marked updated.
+   */
+  bool Updated() const
+  {
+    return mUpdated;
+  }
 
   /**
    * @brief Get the number of textures bound to this frame buffer as color attachments.
@@ -228,12 +251,14 @@ protected:
   /**
    * @copydoc Dali::Internal::SceneGraph::RenderTargetGraphicsObjects::OnInitialize()
    */
-  void OnInitialize() override;
+  void OnInitialize(SceneGraph::RenderManager& renderManager) override;
 
 private:
   Graphics::UniquePtr<Graphics::Framebuffer> mGraphicsObject{nullptr};
 
   Graphics::FramebufferCreateInfo mCreateInfo;
+
+  SceneGraph::RenderManager* mRenderManager;
 
   // Attachments texutres (not owned)
   std::vector<Render::TextureKey> mColorTextures{};
@@ -250,6 +275,7 @@ private:
 
   bool mDepthBuffer : 1;
   bool mStencilBuffer : 1;
+  bool mUpdated : 1;
 
   bool mIsBufferUsageChangeableAtRuntime : 1;
   bool mRuntimeDepthEnabled : 1;

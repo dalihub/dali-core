@@ -183,6 +183,12 @@ public:
   void RemoveFrameBuffer(Render::FrameBuffer* frameBuffer);
 
   /**
+   * Sets the updated flag of a framebuffer
+   * @param[in] frameBuffer The updated framebuffer
+   */
+  void SetFrameBufferUpdated(Render::FrameBuffer* frameBuffer);
+
+  /**
    * Initializes a Scene to the render manager
    * @param[in] scene The Scene to initialize
    */

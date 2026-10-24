@@ -27,6 +27,7 @@
 
 namespace DALI_NAMESPACE::Internal::SceneGraph
 {
+class RenderManager;
 
 /**
  * An interface to hold Graphics::RenderTarget, Graphics::RenderPass (with and w.o. clear)
@@ -63,11 +64,11 @@ public:
   /**
    * Initialize and register graphics controller.
    */
-  void Initialize(Graphics::Controller& graphicsController)
+  void Initialize(Graphics::Controller& graphicsController, SceneGraph::RenderManager& renderManager)
   {
     mGraphicsController = &graphicsController;
 
-    OnInitialize();
+    OnInitialize(renderManager);
   }
 
   [[nodiscard]] Graphics::RenderTarget* GetGraphicsRenderTarget() const
@@ -144,11 +145,10 @@ protected:
 
   /**
    * @brief Second-phase intiailize
+   *
+   * @param[in] renderManager RenderManager
    */
-  virtual void OnInitialize()
-  {
-    // Do nothing.
-  }
+  virtual void OnInitialize(SceneGraph::RenderManager& renderManager) = 0;
 
   /**
    * Notify to observers and clear.

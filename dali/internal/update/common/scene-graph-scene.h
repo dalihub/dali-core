@@ -52,6 +52,7 @@ struct ParameterType<Dali::ScenePolicyFlagBits> : public BasicType<Dali::ScenePo
 namespace SceneGraph
 {
 class RenderInstructionContainer;
+class RenderManager;
 class Node;
 
 struct DirtyRectKey
@@ -147,16 +148,6 @@ public:
    * Destructor
    */
   virtual ~Scene();
-
-  /**
-   * Creates a scene object
-   * Note, this is run inside RenderManager Queue, not UpdateManagerQueue.
-   * So, other APIs must also run inside RenderManager Queue if they need
-   * to run afterwards.
-   *
-   * @param[in] graphicsController The graphics controller
-   */
-  void Initialize(Graphics::Controller& graphicsController);
 
   /**
    * Rebuild the surface render passes if scene policy flags changed since
@@ -418,6 +409,17 @@ I   * @param[in] callback The function to call
    */
   bool NeedsForceRendering();
 
+protected: // Inherit from RenderTargetGraphicsObjects
+  /**
+   * Creates a scene object
+   * Note, this is run inside RenderManager Queue, not UpdateManagerQueue.
+   * So, other APIs must also run inside RenderManager Queue if they need
+   * to run afterwards.
+   *
+   * @param[in] renderManager The render manager
+   */
+  void OnInitialize(SceneGraph::RenderManager& renderManager) override;
+
 public: // From RenderTargetGraphicsObjects
   /**
    * Get the render target created for the scene
@@ -445,6 +447,7 @@ private:
    */
   void BuildRenderPasses(Graphics::Controller& graphicsController);
 
+private:
   // Render instructions describe what should be rendered during RenderManager::RenderScene()
   // Update manager updates instructions for the next frame while we render the current one
 

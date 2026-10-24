@@ -70,14 +70,12 @@ void Scene::SetScenePolicyFlags(ScenePolicyFlagBits flags)
   mPartialUpdateEnabled = (flags & ScenePolicyFlagBits::PARTIAL_UPDATE_ENABLED);
 }
 
-void Scene::Initialize(Graphics::Controller& graphicsController)
+void Scene::OnInitialize(SceneGraph::RenderManager& /* not used */)
 {
-  RenderTargetGraphicsObjects::Initialize(graphicsController);
-
   // Create the render target for the surface. (This must happen in render thread).
-  RenderTargetGraphicsObjects::CreateRenderTarget(graphicsController, mRenderTargetCreateInfo);
+  RenderTargetGraphicsObjects::CreateRenderTarget(*mGraphicsController, mRenderTargetCreateInfo);
 
-  BuildRenderPasses(graphicsController);
+  BuildRenderPasses(*mGraphicsController);
   mRenderPassDirty = false;
 }
 

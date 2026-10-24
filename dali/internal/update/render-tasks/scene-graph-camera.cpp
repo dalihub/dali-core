@@ -603,6 +603,11 @@ bool Camera::ViewMatrixUpdated() const
   return NOT_UPDATED != mUpdateViewFlag;
 }
 
+bool Camera::ProjectionMatrixUpdated() const
+{
+  return NOT_UPDATED != mUpdateProjectionFlag;
+}
+
 bool Camera::IsProjectionMatrixAnimated() const
 {
   return !mFieldOfView.IsClean() ||
