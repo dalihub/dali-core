@@ -359,11 +359,25 @@ void TransformManager::ResetToBaseValue()
 }
 bool TransformManager::Update()
 {
+  const bool wasUpdated = mUpdated;
+
   mUpdated = false;
 
   if(mDirtyFlags == CLEAN_FLAG)
   {
     DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Transform value is not changed. Skip transform update.\n");
+    if(wasUpdated)
+    {
+      DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Just iterate for world matrix dirty flag clean.\n");
+      DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_TRANSFORM_UPDATE", [&](std::ostringstream& oss)
+      { oss << "[" << mComponentCount << ", i:" << (mComponentCount - mValidComponentCount) << ", just clear world matrix flag]"; });
+      for(uint32_t i = 0; i < mValidComponentCount; ++i)
+      {
+        TransformComponentBitField::SetWorldMatrixDirtyBitField(mTxComponentBitField[i], false);
+      }
+      DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_TRANSFORM_UPDATE", [&](std::ostringstream& oss)
+      { oss << "[componentsChanged:" << mUpdated << "]"; });
+    }
     return false;
   }
   if(mReorder)

@@ -401,11 +401,6 @@ public:
    */
   bool ViewMatrixUpdated() const;
 
-  /**
-   * @return true if the projection matrix projection matrix relative properties are animated this or the previous frame
-   */
-  bool IsProjectionMatrixAnimated() const;
-
 public:
   /**
    * @copydoc Dali::Internal::SceneGraph::PropertyOwner::AddInitializeResetter
@@ -423,6 +418,11 @@ private:
   Camera(Camera&&)                     = delete;
   Camera& operator=(const Camera& rhs) = delete;
   Camera& operator=(Camera&& rhs)      = delete;
+
+  /**
+   * @return true if the projection matrix projection matrix relative properties are animated this or the previous frame
+   */
+  bool IsProjectionMatrixAnimated() const;
 
   /**
    * Recalculates the view matrix.

@@ -38,6 +38,7 @@ namespace // unnamed namespace
 {
 const uint32_t UPDATE_COUNT         = 2u; // Update projection or view matrix this many frames after a change
 const uint32_t COPY_PREVIOUS_MATRIX = 1u; // Copy view or projection matrix from previous frame
+const uint32_t NOT_UPDATED          = 0u;
 
 // For reflection and clipping plane
 } // namespace
@@ -599,7 +600,7 @@ void Camera::Update()
 
 bool Camera::ViewMatrixUpdated() const
 {
-  return UPDATE_COUNT == mUpdateViewFlag;
+  return NOT_UPDATED != mUpdateViewFlag;
 }
 
 bool Camera::IsProjectionMatrixAnimated() const
