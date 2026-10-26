@@ -145,7 +145,7 @@ Vector2 CalculateScreenPosition(const SceneSizeType& sceneSize, const Matrix& wo
 }
 
 /**
- * @brief Helper function to calculate actor's screen extents in 2D space
+ * @brief Helper function to calculate actor's screen bounds in 2D space
  *
  * This function calculates the bounding box screen coordinates and size of an actor
  * in 2D space using the world transform matrix, actor size, and camera position.
@@ -169,10 +169,10 @@ Vector2 CalculateScreenPosition(const SceneSizeType& sceneSize, const Matrix& wo
  * @param[in] cameraPosition The camera's world space position.
  *                           For screen coordinate calculation, camera position is subtracted from all coordinates.
  *
- * @see CalculateCurrentActorScreenExtents, CalculateActorScreenExtents
+ * @see CalculateCurrentActorScreenBounds, CalculateActorScreenBounds
  */
 template<typename SceneSizeType>
-void CalculateScreenExtents(Vector2& position, Vector2& size, const SceneSizeType& sceneSize, const Matrix& worldTransformMatrix, const Vector3& actorSize, const Vector3& cameraPosition)
+void CalculateScreenBounds(Vector2& position, Vector2& size, const SceneSizeType& sceneSize, const Matrix& worldTransformMatrix, const Vector3& actorSize, const Vector3& cameraPosition)
 {
   Vector2 halfSize = Vector2(actorSize.x, actorSize.y) * 0.5f;
 
@@ -212,7 +212,7 @@ void CalculateScreenExtents(Vector2& position, Vector2& size, const SceneSizeTyp
 }
 
 /**
- * @brief Calculate screen extents top-left point position
+ * @brief Calculate screen bounds top-left point position
  *
  * @param[in] sceneSize The scene size
  * @param[in] actorSize The actor size
@@ -369,7 +369,7 @@ const Vector2 CalculateCurrentActorScreenPosition(const Actor& actor)
   return result;
 }
 
-Bounds CalculateActorScreenExtents(const Actor& actor)
+Bounds CalculateActorScreenBounds(const Actor& actor)
 {
   Vector2 position2;
   Vector2 size2;
@@ -382,12 +382,12 @@ Bounds CalculateActorScreenExtents(const Actor& actor)
     Vector3 cameraPosition = Dali::Internal::CalculateActorWorldTransform(scene.GetDefaultCameraActor()).GetTranslation3();
 
     const auto& sceneSize = scene.GetSize();
-    CalculateScreenExtents(position2, size2, sceneSize, worldTransformMatrix, actorSize, cameraPosition);
+    CalculateScreenBounds(position2, size2, sceneSize, worldTransformMatrix, actorSize, cameraPosition);
   }
   return {position2.x, position2.y, size2.x, size2.y};
 }
 
-Bounds CalculateCurrentActorScreenExtents(const Actor& actor)
+Bounds CalculateCurrentActorScreenBounds(const Actor& actor)
 {
   Vector2 position2;
   Vector2 size2;
@@ -401,7 +401,7 @@ Bounds CalculateCurrentActorScreenExtents(const Actor& actor)
     Vector3 cameraPosition = scene.GetDefaultCameraActor().GetNode().GetWorldPosition();
 
     const auto& sceneSize = scene.GetCurrentSurfaceRect();
-    CalculateScreenExtents(position2, size2, sceneSize, worldTransformMatrix, actorSize, cameraPosition);
+    CalculateScreenBounds(position2, size2, sceneSize, worldTransformMatrix, actorSize, cameraPosition);
   }
   return {position2.x, position2.y, size2.x, size2.y};
 }
@@ -537,7 +537,7 @@ bool ConvertLocalToScreenExtentRenderTask(
   const Actor&      actor,
   const Matrix&     worldMatrix,
   const Vector3&    currentSize,
-  Bounds&           screenExtent)
+  Bounds&           screenBounds)
 {
   bool         success     = false;
   const Actor* sourceActor = renderTask.GetSourceActor();
@@ -614,10 +614,10 @@ bool ConvertLocalToScreenExtentRenderTask(
       }
       if(success)
       {
-        screenExtent.x      = minScreenX;
-        screenExtent.y      = minScreenY;
-        screenExtent.width  = maxScreenX - minScreenX;
-        screenExtent.height = maxScreenY - minScreenY;
+        screenBounds.x      = minScreenX;
+        screenBounds.y      = minScreenY;
+        screenBounds.width  = maxScreenX - minScreenX;
+        screenBounds.height = maxScreenY - minScreenY;
       }
     }
   }
@@ -629,14 +629,14 @@ bool ConvertLocalToScreenExtentRenderTaskList(
   const Actor&          actor,
   const Matrix&         worldMatrix,
   const Vector3&        currentSize,
-  Bounds&               screenExtent)
+  Bounds&               screenBounds)
 {
   // do a reverse traversal of all lists (as the default onscreen one is typically the last one)
   uint32_t taskCount = renderTaskList.GetTaskCount();
   for(uint32_t i = taskCount; i > 0; --i)
   {
     RenderTaskPtr task = renderTaskList.GetTask(i - 1);
-    if(ConvertLocalToScreenExtentRenderTask(*task, actor, worldMatrix, currentSize, screenExtent))
+    if(ConvertLocalToScreenExtentRenderTask(*task, actor, worldMatrix, currentSize, screenBounds))
     {
       // found a task where this conversion was ok so return
       return true;
@@ -645,7 +645,7 @@ bool ConvertLocalToScreenExtentRenderTaskList(
   return false;
 }
 
-Bounds CalculateActorScreenExtentsRenderTaskList(const Actor& actor)
+Bounds CalculateActorScreenBoundsRenderTaskList(const Actor& actor)
 {
   Bounds result = {0.0f, 0.0f, 0.0f, 0.0f};
 
@@ -660,7 +660,7 @@ Bounds CalculateActorScreenExtentsRenderTaskList(const Actor& actor)
   return result;
 }
 
-Bounds CalculateCurrentActorScreenExtentsRenderTaskList(const Actor& actor)
+Bounds CalculateCurrentActorScreenBoundsRenderTaskList(const Actor& actor)
 {
   Bounds result = {0.0f, 0.0f, 0.0f, 0.0f};
 

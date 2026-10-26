@@ -90,6 +90,7 @@ enum Type
   LAYOUT_DIRECTION                = Dali::Actor::Property::LAYOUT_DIRECTION,
   CULLED                          = Dali::Actor::Property::CULLED,
   IGNORED                         = Dali::Actor::Property::IGNORED,
+  WORLD_IGNORED                   = Dali::Actor::Property::WORLD_IGNORED,
   ID                              = Dali::Actor::Property::ID,
   HIERARCHY_DEPTH                 = Dali::Actor::Property::HIERARCHY_DEPTH,
   IS_ROOT                         = Dali::Actor::Property::IS_ROOT,
@@ -127,13 +128,6 @@ enum Type
    * @note Only has effort under Behavior::LAYER_UI.
    */
   CHILDREN_DEPTH_INDEX_POLICY,
-
-  /**
-   * @brief The flag to identify whether the Actor is ignored or not at previous frame.
-   * @details Name "worldIgnored", type Property::BOOLEAN, read-only
-   * @note Disconnected actor from scene also be marks as ignored.
-   */
-  WORLD_IGNORED,
 
   /**
    * @brief The size mode factor of an actor.
@@ -252,29 +246,7 @@ enum Type
 DALI_CORE_API Actor GetVisiblityChangedActor();
 
 /**
- * Calculates screen position and size from current node values.
- *
- * This function calculates the bounding box screen coordinates and size of an actor
- * using the current state from the update thread (node). It automatically detects
- * whether to use 2D or 3D calculation based on the actor's context and ancestor layers.
- *
- * For 2D calculation (when no 3D layers in ancestors):
- * - Uses 2D-specific optimizations
- * - Assumes orthographic projection and no camera rotation
- * - Transforms 4 corner points in 2D space (Z=0) for bounding box calculation
- * - Uses current node state for the specified buffer index
- * - Faster calculation with 2D limitations
- *
- * For 3D calculation (when 3D layers exist in ancestors):
- * - Uses full 3D projection with view and projection matrices
- * - Supports perspective projection, camera rotation, and full 3D transforms
- * - Transforms all 8 corners of the 3D bounding box for accurate screen extents
- * - Accounts for perspective foreshortening and 3D rotation effects
- * - Uses current node state for the specified buffer index
- * - More accurate but computationally expensive
- *
- * @return Rect containing position of top-left corner on screen and size respectively.
- *         Returns (0,0,0,0) if actor is not on scene.
+ * @deprecated Use Actor::CalculateCurrentScreenBounds() instead.
  */
 DALI_CORE_API Bounds CalculateCurrentScreenExtents(Actor actor);
 
