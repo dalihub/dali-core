@@ -288,8 +288,6 @@ inline void AddRendererToRenderList(uint32_t                  renderPass,
         item.mRenderer = Render::RendererKey{};
       }
 
-      item.mIsUpdated = (viewMatrixChanged || isLayer3d);
-
       if(!nodePartialRenderingDataUpdateChecked)
       {
         node->UpdatePartialRenderingData(isLayer3d, false);
@@ -302,7 +300,7 @@ inline void AddRendererToRenderList(uint32_t                  renderPass,
 
       item.mModelViewMatrix = std::move(nodeModelViewMatrix);
 
-      item.mIsUpdated = item.mIsUpdated || nodePartialRenderingData.mUpdated;
+      item.mIsUpdated = viewMatrixChanged || nodePartialRenderingData.mUpdated;
     }
 
     node->SetCulled(false);
