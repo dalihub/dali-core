@@ -755,7 +755,7 @@ bool HitTestRenderTask(std::vector<std::shared_ptr<HitResult>>& hitResultList,
 
 bool ConvertScreenCoordinates(Vector2& convertedScreenCoordinates, const Vector2& screenCoordinates, const RenderTask& targetRenderTask)
 {
-  Viewport viewport;
+  BoundsInteger viewport;
   targetRenderTask.GetViewport(viewport);
 
   if(screenCoordinates.x < static_cast<float>(viewport.x) ||
@@ -822,7 +822,7 @@ bool HitTestRenderTaskList(const Vector2&                                 sceneS
 
     // Don't need to consider a RenderTask draws on window and its source actor is inside FBO.
     // Can't support it.
-    Viewport                                viewport;
+    BoundsInteger                           viewport;
     std::vector<std::shared_ptr<HitResult>> hitResults;
     Vector2                                 convertedScreenCoordinates;
     renderTask.GetViewport(viewport);

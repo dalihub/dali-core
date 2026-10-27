@@ -44,7 +44,7 @@ bool BuildPickingRay(RenderTask renderTask, const Vector2& screenCoordinates, Ve
     return false;
   }
 
-  Viewport viewport;
+  BoundsInteger viewport;
   renderTaskImpl.GetHittableViewport(viewport);
   if(convertedScreenCoordinates.x < static_cast<float>(viewport.x) ||
      convertedScreenCoordinates.x > static_cast<float>(viewport.x + viewport.width) ||

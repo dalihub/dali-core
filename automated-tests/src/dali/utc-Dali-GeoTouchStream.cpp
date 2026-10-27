@@ -700,7 +700,8 @@ int UtcDaliGeoTouchStreamOwnerRenderTaskRemainsStable(void)
   // A second input-enabled task renders the owner in a displaced viewport. Without a stable owner
   // route, a hit in this viewport replaces the task used to deliver the stream.
   RenderTask alternateRenderTask = application.GetScene().GetRenderTaskList().CreateTask();
-  alternateRenderTask.SetViewport(Viewport(200, 0, 100, 100));
+  alternateRenderTask.SetViewportPosition(Vector2(200, 0));
+  alternateRenderTask.SetViewportSize(Vector2(100, 100));
   alternateRenderTask.SetInputEnabled(true);
   application.SendNotification();
   application.Render();

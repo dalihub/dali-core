@@ -23,7 +23,7 @@
 #include <dali/internal/render/renderers/render-frame-buffer.h>
 #include <dali/internal/update/render-tasks/scene-graph-camera.h>
 #include <dali/public-api/math/matrix.h>
-#include <dali/public-api/math/viewport.h>
+#include <dali/public-api/math/rect.h>
 
 namespace DALI_NAMESPACE
 {
@@ -107,7 +107,7 @@ public:
    */
   void Reset(Camera*              camera,
              Render::FrameBuffer* frameBuffer,
-             const Viewport*      viewport,
+             const BoundsInteger* viewport,
              const Vector4*       clearColor,
              const Vector2        scaleFactor);
 
@@ -153,12 +153,12 @@ public:
 public:
   Render::RenderTracker* mRenderTracker; ///< Pointer to an optional tracker object (not owned)
 
-  Viewport mViewport;              ///< Optional viewport
-  Vector4  mClearColor;            ///< Optional color to clear with
-  Vector2  mRenderedScaleFactor;   ///< Optional scale factor between viewport and input scene
-  bool     mIsViewportSet : 1;     ///< Flag to determine whether the viewport is set
-  bool     mIsClearColorSet : 1;   ///< Flag to determine whether the clearColor is set
-  bool     mIgnoreRenderToFbo : 1; ///< Whether to ignore the render to FBO option (used to measure the performance above 60 fps)
+  BoundsInteger mViewport;              ///< Optional viewport
+  Vector4       mClearColor;            ///< Optional color to clear with
+  Vector2       mRenderedScaleFactor;   ///< Optional scale factor between viewport and input scene
+  bool          mIsViewportSet : 1;     ///< Flag to determine whether the viewport is set
+  bool          mIsClearColorSet : 1;   ///< Flag to determine whether the clearColor is set
+  bool          mIgnoreRenderToFbo : 1; ///< Whether to ignore the render to FBO option (used to measure the performance above 60 fps)
 
   Render::FrameBuffer* mFrameBuffer;
   uint32_t             mRenderPassTag{0u};

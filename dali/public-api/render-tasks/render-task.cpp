@@ -202,6 +202,11 @@ void RenderTask::SetViewportPosition(Vector2 position)
   GetImplementation(*this).SetViewportPosition(position);
 }
 
+Vector2 RenderTask::GetViewportPosition() const
+{
+  return GetImplementation(*this).GetViewportPosition();
+}
+
 Vector2 RenderTask::GetCurrentViewportPosition() const
 {
   return GetImplementation(*this).GetCurrentViewportPosition();
@@ -210,6 +215,11 @@ Vector2 RenderTask::GetCurrentViewportPosition() const
 void RenderTask::SetViewportSize(Vector2 size)
 {
   GetImplementation(*this).SetViewportSize(size);
+}
+
+Vector2 RenderTask::GetViewportSize() const
+{
+  return GetImplementation(*this).GetViewportSize();
 }
 
 Vector2 RenderTask::GetCurrentViewportSize() const

@@ -41,7 +41,7 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/events/gesture.h>
-#include <dali/public-api/math/viewport.h>
+#include <dali/public-api/math/rect.h>
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/render-tasks/render-task.h>
 #include <dali/public-api/rendering/renderer.h>
@@ -1449,13 +1449,13 @@ public:
    * @param[in] screenY The screen Y-coordinate.
    * @return True if the conversion succeeded.
    */
-  bool ScreenToLocal(const Matrix&   viewMatrix,
-                     const Matrix&   projectionMatrix,
-                     const Viewport& viewport,
-                     float&          localX,
-                     float&          localY,
-                     float           screenX,
-                     float           screenY) const;
+  bool ScreenToLocal(const Matrix&        viewMatrix,
+                     const Matrix&        projectionMatrix,
+                     const BoundsInteger& viewport,
+                     float&               localX,
+                     float&               localY,
+                     float                screenX,
+                     float                screenY) const;
 
   /**
    * Sets whether the actor should receive a notification when touch or hover motion events leave

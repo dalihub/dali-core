@@ -110,12 +110,12 @@ const RenderList* RenderInstruction::GetRenderList(RenderListContainer::SizeType
 
 void RenderInstruction::Reset(Camera*              camera,
                               Render::FrameBuffer* frameBuffer,
-                              const Viewport*      viewport,
+                              const BoundsInteger* viewport,
                               const Vector4*       clearColor,
                               const Vector2        scaleFactor)
 {
   mCamera              = camera;
-  mViewport            = viewport ? *viewport : Viewport();
+  mViewport            = viewport ? *viewport : BoundsInteger();
   mIsViewportSet       = nullptr != viewport;
   mClearColor          = clearColor ? *clearColor : Color::BLACK;
   mRenderedScaleFactor = scaleFactor;

@@ -182,7 +182,7 @@ public:
    * @param [in] isDrawnOnFramebuffer to notify this camera is currently used for Framebuffer or not.
    * @return true if the building was successful, false if its not possible (camera is not valid for hit testing)
    */
-  bool BuildPickingRay(const Vector2& screenCoordinates, const Viewport& viewport, Vector4& rayOrigin, Vector4& rayDirection, bool isDrawnOnFramebuffer = false);
+  bool BuildPickingRay(const Vector2& screenCoordinates, const BoundsInteger& viewport, Vector4& rayOrigin, Vector4& rayDirection, bool isDrawnOnFramebuffer = false);
 
   /**
    * Build a picking ray with this camera and given screen coordinates (Not considers viewport.)

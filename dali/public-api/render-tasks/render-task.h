@@ -50,18 +50,16 @@ class RenderTask;
 /**
  * @brief RenderTasks describe how the Dali scene should be rendered.
  *
- * The Scene provides access to an ordered list of render-tasks.
+ * The Scene provides access to an ordered list of RenderTasks.
  *
  * Each RenderTask must specify the source actors to be rendered, and a camera actor from
  * which the scene is viewed.
  *
- * RenderTasks may optionally target a frame-buffer, otherwise the default GL surface is used;
+ * RenderTasks may optionally target a frame-buffer, otherwise the default surface is used;
  * typically this is a window provided by the native system.
  *
  * By default Dali provides a single RenderTask, which renders the entire actor hierarchy using
- * a default camera actor and GL surface. If stereoscopic rendering is enabled, Dali will create
- * two additional render tasks, on for each eye. Each render task will have its own camera parented
- * to the default camera actor.
+ * a default camera actor and the default surface.
  *
  * The first RenderTask used for input handling will be the last one rendered, which also has input enabled,
  * and has a valid source & camera actor; see SetInputEnabled().
@@ -70,13 +68,13 @@ class RenderTask;
  * with the second last RenderTask rendered, and so on.
  *
  * All RenderTasks which target a frame-buffer (i.e. off screen) will be rendered before all RenderTasks
- * which target the default GL surface. This allows the user to render intermediate targets which are used
+ * which target the default surface. This allows the user to render intermediate targets which are used
  * later when targeting the screen.
  *
  * A RenderTask targeting a frame-buffer can still be hit-tested, provided that the
  * screen->frame-buffer coordinate conversion is successful; see SetScreenToFrameBufferFunction().
  *
- * If the refresh rate id REFRESH_ONCE and a "Finish" signal is connected, it will be emitted when the RenderTask is completed.
+ * If the refresh rate is REFRESH_ONCE and the finished signal is connected, it will be emitted when the RenderTask is completed.
  * Note that all connected signals must be disconnected before the object is destroyed. This is typically done in the
  * object destructor, and requires either the Dali::Connection object or Dali::RenderTask handle to be stored.
  *
@@ -102,34 +100,34 @@ public:
     enum
     {
       /**
-       * @brief name "viewportPosition", type Vector2
+       * @brief name "viewportPosition", type Property::VECTOR2
        * @SINCE_1_0.0
        */
       VIEWPORT_POSITION = DEFAULT_OBJECT_PROPERTY_START_INDEX,
       /**
-       * @brief name "viewportSize", type Vector2
+       * @brief name "viewportSize", type Property::VECTOR2
        * @SINCE_1_0.0
        */
       VIEWPORT_SIZE,
       /**
-       * @brief name "clearColor", type Vector4
+       * @brief name "clearColor", type Property::VECTOR4
        * @SINCE_1_0.0
        */
       CLEAR_COLOR,
       /**
-       * @brief name "requiresSync", type BOOLEAN
+       * @brief name "requiresSync", type Property::BOOLEAN
        * @details By default, the sync object is not created.
        *  When native image is used as render target, in order to track when the render to pixmap is completed, the GL sync should be enabled.
-       *  Thus the RENDER_ONCE finished signal can be emit at the correct timing.
+       *  Thus the RENDER_ONCE finished signal can be emitted at the correct timing.
        * @SINCE_1_1.29
-       * @note The use of GL sync might cause deadlock with multiple access to the single pixmap happening in the same time.
+       * @note The use of GL sync may cause a deadlock if a single pixmap is accessed by multiple parties at the same time.
        */
       REQUIRES_SYNC,
       /**
-       * @brief name "renderedScaleFactor", type Vector2 or FLOAT
+       * @brief name "renderedScaleFactor", type Property::VECTOR2 or Property::FLOAT
        * @details The scale factor between source scene and rendered target.
-       *  For example, if we render 200x200 scene into 50x400 FBO, rendered scale factor is Vector2(0.5f, 2.0f).
-       *  If property set as float type, value become assigned componentwise.
+       *  For example, if we render a 200x200 scene into a 50x400 FBO, the rendered scale factor is Vector2(0.5f, 2.0f).
+       *  If the property is set as a float, the value is applied to both components.
        * @SINCE_2_4.36
        */
       RENDERED_SCALE_FACTOR,
@@ -163,13 +161,15 @@ public:
    *
    * This effectively disables hit-testing for RenderTasks rendering to a frame buffer.
    * See also FULLSCREEN_FRAMEBUFFER_FUNCTION below.
+   * @SINCE_2_5.46
    */
   static ConstScreenToFrameBufferFunction DEFAULT_SCREEN_TO_FRAMEBUFFER_FUNCTION;
 
   /**
    * @brief This conversion function outputs the (unmodified) screen coordinates as frame-buffer coordinates.
    *
-   * Therefore the contents of an off-screen image is expected to be rendered "full screen".
+   * Therefore the contents of an off-screen image are expected to be rendered "full screen".
+   * @SINCE_2_5.46
    */
   static ConstScreenToFrameBufferFunction FULLSCREEN_FRAMEBUFFER_FUNCTION;
 
@@ -183,6 +183,11 @@ public:
     REFRESH_ALWAYS = 1  ///< Process every frame. @SINCE_1_0.0
   };
 
+  /**
+   * @brief Enumeration for the type of built-in camera actor.
+   * @SINCE_2_5.21
+   * @see SetBuiltinCameraActor()
+   */
   enum class BuiltinCameraType
   {
     ATTACHED_TO_SCENE,         ///< Builtin camera attached to scene. @SINCE_2_5.21
@@ -190,6 +195,11 @@ public:
     ATTACHED_TO_STOPPER_ACTOR, ///< Builtin camera attached to stopper actor, or source actor if stopper node not applied. @SINCE_2_5.21
   };
 
+  /**
+   * @brief Enumeration for the type of camera actor used by the RenderTask.
+   * @SINCE_2_5.21
+   * @see GetCameraActorType()
+   */
   enum class CameraActorType
   {
     DEFAULT,               ///< Default camera from RenderTaskList. @SINCE_2_5.21
@@ -199,17 +209,17 @@ public:
     BUILTIN_STOPPER_ACTOR, ///< CameraActor set by SetBuiltinCameraActor with BuiltinCameraType::ATTACHED_TO_STOPPER_ACTOR. @SINCE_2_5.21
   };
 
-  static const bool     DEFAULT_EXCLUSIVE;     ///< false
-  static const bool     DEFAULT_INPUT_ENABLED; ///< true
-  static const Vector4  DEFAULT_CLEAR_COLOR;   ///< Color::BLACK
-  static const bool     DEFAULT_CLEAR_ENABLED; ///< false
-  static const bool     DEFAULT_CULL_MODE;     ///< true
-  static const uint32_t DEFAULT_REFRESH_RATE;  ///< REFRESH_ALWAYS
+  static const bool     DEFAULT_EXCLUSIVE;     ///< Default exclusive setting, false. @SINCE_2_5.46
+  static const bool     DEFAULT_INPUT_ENABLED; ///< Default input enabled setting, true. @SINCE_2_5.46
+  static const Vector4  DEFAULT_CLEAR_COLOR;   ///< Default clear color, Color::BLACK. @SINCE_2_5.46
+  static const bool     DEFAULT_CLEAR_ENABLED; ///< Default clear enabled setting, false. @SINCE_2_5.46
+  static const bool     DEFAULT_CULL_MODE;     ///< Default cull mode, true. @SINCE_2_5.46
+  static const uint32_t DEFAULT_REFRESH_RATE;  ///< Default refresh rate, REFRESH_ALWAYS. @SINCE_2_5.46
 
   /**
    * @brief Creates an empty RenderTask handle.
    *
-   * This can be initialised with RenderTaskList::CreateRenderTask().
+   * This can be initialised with RenderTaskList::CreateTask().
    * @SINCE_1_0.0
    */
   RenderTask();
@@ -218,7 +228,7 @@ public:
    * @brief Downcasts a handle to RenderTask handle.
    *
    * If handle points to a RenderTask, the
-   * downcast produces valid handle. If not, the returned handle is left uninitialized.
+   * downcast produces a valid handle. If not, the returned handle is left uninitialized.
    * @SINCE_1_0.0
    * @param[in] handle A handle to an object
    * @return A handle to a RenderTask or an uninitialized handle
@@ -283,7 +293,7 @@ public:
   Actor GetSourceActor() const;
 
   /**
-   * @brief Retrives stopper actor.
+   * @brief Retrieves the stopper actor.
    * @SINCE_2_3.23
    * @return The actor that marks where to stop rendering.
    */
@@ -292,40 +302,40 @@ public:
   /**
    * @brief Sets whether the RenderTask has exclusive access to the source actors; the default is false.
    * @SINCE_1_0.0
-   * @param[in] exclusive True if the source actors will only be rendered by this render-task
+   * @param[in] exclusive True if the source actors will only be rendered by this RenderTask
    */
   void SetExclusive(bool exclusive);
 
   /**
    * @brief Queries whether the RenderTask has exclusive access to the source actors.
    * @SINCE_1_0.0
-   * @return True if the source actors will only be rendered by this render-task
+   * @return True if the source actors will only be rendered by this RenderTask
    */
   bool IsExclusive() const;
 
   /**
-   * @brief Sets whether the render-task should be considered for input handling; the default is true.
+   * @brief Sets whether the RenderTask should be considered for input handling; the default is true.
    *
-   * The task used for input handling will be last task in the RenderTaskList which has input enabled,
+   * The task used for input handling will be the last task in the RenderTaskList which has input enabled,
    * and has a valid source & camera actor.
-   * A RenderTask targetting a frame-buffer can still be hit-tested, provided that the screen->frame-buffer
+   * A RenderTask targeting a frame-buffer can still be hit-tested, provided that the screen->frame-buffer
    * coordinate conversion is successful; see also SetScreenToFrameBufferFunction().
    * @SINCE_1_0.0
-   * @param[in] enabled True if the render-task should be considered for input handling
+   * @param[in] enabled True if the RenderTask should be considered for input handling
    */
   void SetInputEnabled(bool enabled);
 
   /**
-   * @brief Queries whether the render-task should be considered for input handling.
+   * @brief Queries whether the RenderTask should be considered for input handling.
    * @SINCE_1_0.0
-   * @return True if the render-task should be considered for input handling
+   * @return True if the RenderTask should be considered for input handling
    */
   bool GetInputEnabled() const;
 
   /**
    * @brief Sets the actor from which the scene is viewed.
    *
-   * It will make CameraActorType::USER
+   * This sets the camera actor type to CameraActorType::USER.
    * This is exclusive with SetBuiltinCameraActor - calling this will clear any built-in camera actor.
    *
    * @SINCE_1_0.0
@@ -336,19 +346,19 @@ public:
   /**
    * @brief Sets an internal built-in camera actor.
    *
-   * This method creates an internal camera actor, looks at the center of it's parent.
+   * This method creates an internal camera actor that looks at the center of its parent.
    * The camera uses the provided size for perspective projection via SetPerspectiveProjection.
    *
-   * BuiltinCameraType decide where to be attached the camera actor.
+   * BuiltinCameraType decides where the camera actor is attached:
    * - BuiltinCameraType::ATTACHED_TO_SCENE attached to the root layer of the source actor.
    * - BuiltinCameraType::ATTACHED_TO_SOURCE_ACTOR attached to the source actor.
    * - BuiltinCameraType::ATTACHED_TO_STOPPER_ACTOR attached to the stopper actor.
    *
-   * It will make CameraActorType::BUILTIN_SCENE, CameraActorType::BUILTIN_SOURCE_ACTOR, and CameraActorType::BUILTIN_STOPPER_ACTOR
+   * This sets the camera actor type to CameraActorType::BUILTIN_SCENE, CameraActorType::BUILTIN_SOURCE_ACTOR or CameraActorType::BUILTIN_STOPPER_ACTOR accordingly.
    * This is exclusive with SetCameraActor - calling this will clear any user-set camera actor.
    *
    * @SINCE_2_5.21
-   * @param[in] builtinCameraType The type of built-in camera actor. It will decide where will the camera be attached.
+   * @param[in] builtinCameraType The type of built-in camera actor. It decides where the camera is attached.
    * @param[in] screenSize The size used for SetPerspectiveProjection of the internal camera.
    * @param[in] cameraPropertyMap The extra properties for the internal camera. For example, InvertY, or offset from center of parent.
    */
@@ -365,7 +375,7 @@ public:
    * @brief Retrieves the type of camera actor.
    *
    * @SINCE_2_5.21
-   * @return The type of camera actor for the render task.
+   * @return The type of camera actor for the RenderTask.
    */
   CameraActorType GetCameraActorType() const;
 
@@ -406,10 +416,10 @@ public:
    * This is useful for hit-testing actors which are rendered off-screen.
    * @SINCE_1_0.0
    * @param[in] mappingActor The actor used for conversion
-   * @note The mapping actor needs to be rendered by the default render task to make the mapping work properly.
+   * @note The mapping actor needs to be rendered by the default RenderTask to make the mapping work properly.
    * @note An Actor can be MappingActor for only one RenderTask.
-   * @note If input mappingActor is null, then this RenderTask become to do not use mapping Actor.
-   * @note The mapping actor cannot be used as a Source Actor of any RenderTask.
+   * @note If mappingActor is an empty handle, this RenderTask does not use a mapping actor.
+   * @note The mapping actor cannot be used as a source actor of any RenderTask.
    */
   void SetScreenToFrameBufferMappingActor(Actor mappingActor);
 
@@ -421,94 +431,117 @@ public:
   Actor GetScreenToFrameBufferMappingActor() const;
 
   /**
-   * @brief Sets the actor to compute viewport of this render task.
-   * Actor should be added on Scene.
+   * @brief Sets the actor used to compute the viewport of this RenderTask.
+   * The actor should be on the scene.
    * @SINCE_2_1.36
-   * @param[in] actor This actor is used to compute viewport of the render task.
-   * @note If window default camera is rotated and the actor is no longer a rectangle on the screen, Viewport may be computed incorrectly.
-   * The Viewport properties VIEWPORT_POSITION and VIEWPORT_SIZE is kept during using ViewportGuideActor, but only current value is changed.
+   * @param[in] actor This actor is used to compute the viewport of the RenderTask.
+   * @note If the default camera of the window is rotated and the actor is no longer a rectangle on the screen, the viewport may be computed incorrectly.
+   * The values of VIEWPORT_POSITION and VIEWPORT_SIZE are kept while the viewport guide actor is used; only their current values change.
    */
   void SetViewportGuideActor(Actor actor);
 
   /**
-   * @brief Retrieves the actor to compute viewport of this render task.
+   * @brief Retrieves the actor used to compute the viewport of this RenderTask.
    * @SINCE_2_1.36
-   * @return This actor is used to compute viewport of the render task.
+   * @return The actor used to compute the viewport of the RenderTask.
    */
   Actor GetViewportGuideActor() const;
 
   /**
-   * @brief Resets the actor to compute viewport of this render task.
+   * @brief Resets the actor used to compute the viewport of this RenderTask.
    * @SINCE_2_1.36
-   * @note The Viewport properties VIEWPORT_POSITION and VIEWPORT_SIZE is still kept.
+   * @note The viewport returns to the values of VIEWPORT_POSITION and VIEWPORT_SIZE that were last set.
    */
   void ResetViewportGuideActor();
 
   /**
    * @brief Sets the scale factor for rendered output.
    * @details The scale factor between source scene and rendered target.
-   *  For example, if we render 200x200 scene into 50x400 FBO, rendered scale factor is Vector2(0.5f, 2.0f).
+   *  For example, if we render a 200x200 scene into a 50x400 FBO, the rendered scale factor is Vector2(0.5f, 2.0f).
    * @SINCE_2_4.36
    * @param[in] scaleFactor The scaling factor to apply to the rendered content
    */
   void SetRenderedScaleFactor(const Vector2& scaleFactor);
 
   /**
-   * @brief Gets the current rendered output scale factor.
+   * @brief Gets the rendered output scale factor.
    * @SINCE_2_4.36
-   * @return The current scaling factor being applied to rendered content
+   * @return The scale factor that was last set
    */
   Vector2 GetRenderedScaleFactor() const;
 
   /**
-   * @brief Sets the GL viewport position used when rendering.
+   * @brief Sets the viewport position used when rendering.
    *
    * This specifies the transformation between normalized device coordinates and target window (or frame-buffer) coordinates.
-   * By default this will match the target window or frame-buffer size.
+   * By default, the viewport covers the whole target window or frame-buffer.
    * @SINCE_1_0.0
-   * @param[in] position The viewports position (x,y)
+   * @param[in] position The viewport's position (x,y)
    * @note Unlike the glViewport method, the x & y coordinates refer to the top-left of the viewport rectangle.
    */
   void SetViewportPosition(Vector2 position);
 
   /**
-   * @brief Retrieves the GL viewport position used when rendering.
+   * @brief Retrieves the viewport position.
+   * @SINCE_2_5.46
+   * @return The viewport position that was last set (the target of any ongoing animation), which may differ from the position currently used for rendering
+   * @note While a viewport guide actor is set, this returns the position that was last set, not the one computed from the guide actor.
+   * @see Property::VIEWPORT_POSITION
+   */
+  Vector2 GetViewportPosition() const;
+
+  /**
+   * @brief Retrieves the viewport position used when rendering.
    * @SINCE_1_0.0
+   * @DEPRECATED_2_5.46 Use GetViewportPosition() instead. For the value used for rendering, use GetCurrentProperty() with Property::VIEWPORT_POSITION.
    * @return The viewport
    */
   Vector2 GetCurrentViewportPosition() const;
 
   /**
-   * @brief Sets the GL viewport size used when rendering.
+   * @brief Sets the viewport size used when rendering.
    *
    * This specifies the transformation between normalized device coordinates and target window (or frame-buffer) coordinates.
-   * By default this will match the target window or frame-buffer size.
+   * By default, the viewport covers the whole target window or frame-buffer.
    * @SINCE_1_0.0
-   * @param[in] size The viewports size (width,height)
+   * @param[in] size The viewport's size (width,height)
    */
   void SetViewportSize(Vector2 size);
 
   /**
-   * @brief Retrieves the GL viewport size used when rendering.
+   * @brief Retrieves the viewport size.
+   * @SINCE_2_5.46
+   * @return The viewport size that was last set (the target of any ongoing animation), which may differ from the size currently used for rendering
+   * @note While a viewport guide actor is set, this returns the size that was last set, not the one computed from the guide actor.
+   * @note Returns Vector2::ZERO if the viewport has not been set; the target window or frame-buffer size is then used for rendering.
+   * @see Property::VIEWPORT_SIZE
+   */
+  Vector2 GetViewportSize() const;
+
+  /**
+   * @brief Retrieves the viewport size used when rendering.
    * @SINCE_1_0.0
+   * @DEPRECATED_2_5.46 Use GetViewportSize() instead. For the value used for rendering, use GetCurrentProperty() with Property::VIEWPORT_SIZE.
    * @return The viewport
    */
   Vector2 GetCurrentViewportSize() const;
 
   /**
-   * @brief Sets the GL viewport used when rendering.
+   * @brief Sets the viewport used when rendering.
    *
    * This specifies the transformation between normalized device coordinates and target window (or frame-buffer) coordinates.
    * By default this will match the target window or frame-buffer size.
    * @SINCE_1_0.0
+   * @DEPRECATED_2_5.46 Use SetViewportPosition and SetViewportSize instead.
    * @param[in] viewport The new viewport
    * @note Unlike the glViewport method, the x & y coordinates refer to the top-left of the viewport rectangle.
    */
   void SetViewport(Viewport viewport);
 
   /**
-   * @brief Retrieves the GL viewport used when rendering.
+   * @brief Retrieves the viewport used when rendering.
    * @SINCE_1_0.0
+   * @DEPRECATED_2_5.46 Use GetViewportPosition and GetViewportSize instead.
    * @return The viewport
    */
   Viewport GetViewport() const;
@@ -523,35 +556,34 @@ public:
   /**
    * @brief Retrieves the clear color used when SetClearEnabled(true) is used.
    * @SINCE_1_0.0
-   * @return The clear color
-   * @note This property can be animated; the return value may not match the value written with SetClearColor().
+   * @return The clear color that was last set (the target of any ongoing animation), which may differ from the color currently used for rendering
    */
   Vector4 GetClearColor() const;
 
   /**
-   * @brief Sets whether the render-task will clear the results of previous render-tasks.
+   * @brief Sets whether the RenderTask will clear the results of previous RenderTasks.
    *
    * The default is false.
    *
    * @SINCE_1_0.0
-   * @param[in] enabled True if the render-task should clear
-   * @note The default GL surface is cleared automatically at the
+   * @param[in] enabled True if the RenderTask should clear
+   * @note The default surface is cleared automatically at the
    * beginning of each frame; this setting is only useful when 2+
-   * render-tasks are used, and the result of the first task needs to
+   * RenderTasks are used, and the result of the first task needs to
    * be (partially) cleared before rendering the second.
    *
    */
   void SetClearEnabled(bool enabled);
 
   /**
-   * @brief Queries whether the render-task will clear the results of previous render-tasks.
+   * @brief Queries whether the RenderTask will clear the results of previous RenderTasks.
    * @SINCE_1_0.0
-   * @return True if the render-task should clear
+   * @return True if the RenderTask should clear
    */
   bool GetClearEnabled() const;
 
   /**
-   * @brief Sets whether the render task will cull the actors to the camera's view frustum.
+   * @brief Sets whether the RenderTask will cull the actors to the camera's view frustum.
    *
    * @SINCE_1_0.0
    * @param[in] cullMode True if the renderers should be culled
@@ -565,7 +597,7 @@ public:
    * @brief Gets the cull mode.
    *
    * @SINCE_1_0.0
-   * @return True if the render task should cull the actors to the camera's view frustum
+   * @return True if the RenderTask should cull the actors to the camera's view frustum
    */
   bool GetCullMode() const;
 
@@ -577,7 +609,7 @@ public:
    * may be desirable to process less frequently. For example,
    * SetRefreshRate(3) will process once every 3 frames if the scene
    * graph is changing. If the scene graph is not changing, then the
-   * render task will not be rendered, regardless of this value.
+   * RenderTask will not be rendered, regardless of this value.
    *
    * The REFRESH_ONCE value means that the RenderTask will be
    * processed once only, to take a snap-shot of the scene.
@@ -603,7 +635,7 @@ public:
    * @param[in] position The world position
    * @param[out] viewportX The viewport x position
    * @param[out] viewportY The viewport y position
-   * @return true if the position has a screen coordinate
+   * @return True if the position has a screen coordinate
    */
   bool WorldToViewport(const Vector3& position, float& viewportX, float& viewportY) const;
 
@@ -616,48 +648,54 @@ public:
    * @param[in] viewportY The viewport y position
    * @param[out] localX The local x position
    * @param[out] localY The local y position
-   * @return true if the screen position has a local coordinate
+   * @return True if the screen position has a local coordinate
    */
   bool ViewportToLocal(Actor actor, float viewportX, float viewportY, float& localX, float& localY) const;
 
   /**
-   * Sets Render Pass key for this RenderTask.
-   * Shader code that matches this render pass is used for rendering.
-   * If no matching shader is found, the code with a render pass of 0 is used.
+   * @brief Sets the render pass tag for this RenderTask.
+   *
+   * Shader code that matches this render pass tag is used for rendering.
+   * If no matching shader is found, the code with a render pass tag of 0 is used.
    * In other cases, operation is not guaranteed.
-   * @param[in] renderPassTag RenderPassTag value for this render task.
-   * @note RenderPassTag of default RenderTask is 0u.
+   * @SINCE_2_5.46
+   * @param[in] renderPassTag RenderPassTag value for this RenderTask.
+   * @note The RenderPassTag of the default RenderTask is 0u.
    */
   void SetRenderPassTag(uint32_t renderPassTag);
 
   /**
-   * Gets Render Pass key for this RenderTask.
-   * @return RenderPassTag value for this render task.
+   * @brief Gets the render pass tag for this RenderTask.
+   * @SINCE_2_5.46
+   * @return RenderPassTag value for this RenderTask.
    */
   uint32_t GetRenderPassTag() const;
 
   /**
-   * Sets Order Index to define rendering order for this RenderTask.
-   * In the DALi, offscreen renderTasks are rendered earlier than onscreen renderTask.
-   * In each category of OffScreen RenderTask and OnScreen RenderTask,
-   * a RenderTask with a smaller orderIndex is rendered first.
-   * The RenderTasks in RenderTaskList is always sorted as acending order of the OrderIndex.
-   * The OrderIndex value is needed to be set between [-1000, 1000].
-   * Default orderIndex is 0.
-   * @param[in] orderIndex the order index for this render task.
-   * @note The order among RenderTasks whose OrderIndex has not changed follows the order in which they were created.
-   * @note Rendering order among RenderTasks those have same OrderIndex cannot be guaranteed after the OrderIndex is changed
+   * @brief Sets the order index to define the rendering order of this RenderTask.
+   *
+   * In DALi, off-screen RenderTasks are rendered earlier than on-screen RenderTasks.
+   * Within each category of off-screen and on-screen RenderTasks,
+   * a RenderTask with a smaller order index is rendered first.
+   * The RenderTasks in the RenderTaskList are always sorted in ascending order of the order index.
+   * The order index must be in the range [-1000, 1000].
+   * The default order index is 0.
+   * @SINCE_2_5.46
+   * @param[in] orderIndex The order index for this RenderTask.
+   * @note The order among RenderTasks whose order index has not changed follows the order in which they were created.
+   * @note The rendering order among RenderTasks that have the same order index cannot be guaranteed after the order index is changed.
    */
   void SetOrderIndex(int32_t orderIndex);
 
   /**
-   * Gets Order Index for this RenderTask.
-   * @return OrderIndex value for this render task.
+   * @brief Gets the order index of this RenderTask.
+   * @SINCE_2_5.46
+   * @return The order index of this RenderTask.
    */
   int32_t GetOrderIndex() const;
 
   /**
-   * @brief Get the unique id of RenderTask. It could be 0 given render task is invalid.
+   * @brief Gets the unique id of the RenderTask. It is 0 if the RenderTask is invalid.
    *
    * @SINCE_2_3.10
    * @return The unique id of RenderTask, or 0 if invalid.
@@ -665,23 +703,23 @@ public:
   uint32_t GetRenderTaskId() const;
 
   /**
-   * @brief Stop rendering from given actor. The actor is not included.
+   * @brief Stops rendering at the given actor. The actor is not included.
    * @SINCE_2_3.23
    * @param[in] stopperActor A marker to stop rendering.
-   * If actor is an empty handle, or stopperActor is not a child of sourceActor, then full scene will be rendered
+   * If stopperActor is an empty handle, or is not a child of the source actor, then the whole source actor tree is rendered
    */
   void RenderUntil(Actor stopperActor);
 
   /**
-   * @brief Requests to Keep rendering result of this frame.
+   * @brief Requests to keep the rendering result of this frame.
    * @SINCE_2_3.51
-   * @note This mothod is only available when the refresh rate is REFRESH_ONCE.
+   * @note This method is only available when the refresh rate is REFRESH_ONCE.
    * @note The result can be used after the FinishedSignal is emitted.
    */
   void KeepRenderResult();
 
   /**
-   * @brief Requests to Clear the rendered result.
+   * @brief Requests to clear the rendered result.
    * @SINCE_2_3.51
    * @note Since the rendered result is kept in the render thread resource, this method asynchronously clears the result.
    */
@@ -692,7 +730,7 @@ public:
    * @SINCE_2_3.51
    * @return Dali::PixelData that contains rendered result.
    * @note This method is only available after the FinishedSignal is emitted.
-   * If this method is called before the Finishedsignal is emitted, empty handle is returned.
+   * If this method is called before the FinishedSignal is emitted, an empty handle is returned.
    */
   Dali::PixelData GetRenderResult();
 
@@ -709,7 +747,7 @@ public: // Not intended for application developers
   /**
    * @brief This constructor is used by Dali New() methods.
    * @SINCE_1_0.0
-   * @param[in] renderTask A pointer to a newly allocated render-task
+   * @param[in] renderTask A pointer to a newly allocated RenderTask
    */
   explicit DALI_INTERNAL RenderTask(Internal::RenderTask* renderTask);
   /// @endcond

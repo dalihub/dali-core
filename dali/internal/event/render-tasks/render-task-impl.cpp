@@ -531,6 +531,11 @@ void RenderTask::SetViewportPosition(const Vector2& value)
   }
 }
 
+Vector2 RenderTask::GetViewportPosition() const
+{
+  return mViewportPosition;
+}
+
 Vector2 RenderTask::GetCurrentViewportPosition() const
 {
   return GetRenderTaskSceneObject() ? GetRenderTaskSceneObject()->GetViewportPosition() : Vector2::ZERO;
@@ -549,18 +554,41 @@ void RenderTask::SetViewportSize(const Vector2& value)
   }
 }
 
-Vector2 RenderTask::GetCurrentViewportSize() const
+Vector2 RenderTask::GetViewportSize() const
 {
-  return GetRenderTaskSceneObject() ? GetRenderTaskSceneObject()->GetViewportSize() : Vector2::ZERO;
+  return mViewportSize;
 }
 
-void RenderTask::SetViewport(const Viewport& viewport)
+Vector2 RenderTask::GetCurrentViewportSize() const
+{
+  Vector2 size(0.0f, 0.0f);
+  if(GetRenderTaskSceneObject())
+  {
+    if(!GetRenderTaskSceneObject()->GetViewportEnabled())
+    {
+      Actor* sourceActor = mSourceActor.GetActor();
+      if(sourceActor && sourceActor->OnScene())
+      {
+        Scene& scene = sourceActor->GetScene();
+        size         = scene.GetSize();
+      }
+    }
+    else
+    {
+      size = GetRenderTaskSceneObject()->GetViewportSize();
+    }
+  }
+
+  return size;
+}
+
+void RenderTask::SetViewport(const BoundsInteger& viewport)
 {
   SetViewportPosition(Vector2(static_cast<float>(viewport.x), static_cast<float>(viewport.y)));
   SetViewportSize(Vector2(static_cast<float>(viewport.width), static_cast<float>(viewport.height)));
 }
 
-void RenderTask::GetViewport(Viewport& viewPort) const
+void RenderTask::GetViewport(BoundsInteger& viewPort) const
 {
   if(GetRenderTaskSceneObject())
   {
@@ -609,7 +637,7 @@ void RenderTask::SetClearColor(const Vector4& color)
 
 const Vector4& RenderTask::GetClearColor() const
 {
-  return GetRenderTaskSceneObject() ? GetRenderTaskSceneObject()->GetClearColor() : Vector4::ZERO;
+  return mClearColor;
 }
 
 void RenderTask::SetSyncRequired(bool requiresSync)
@@ -756,7 +784,7 @@ bool RenderTask::TranslateCoordinates(Vector2& screenCoords) const
 
     if(localCamera && defaultCamera)
     {
-      Viewport viewport;
+      BoundsInteger viewport;
       viewport.x = viewport.y = 0;
       viewport.width          = static_cast<int32_t>(size.width);  // truncated
       viewport.height         = static_cast<int32_t>(size.height); // truncated
@@ -786,7 +814,7 @@ bool RenderTask::TranslateCoordinates(Vector2& screenCoords) const
   return inside;
 }
 
-void RenderTask::GetHittableViewport(Viewport& viewPort) const
+void RenderTask::GetHittableViewport(BoundsInteger& viewPort) const
 {
   if(GetRenderTaskSceneObject())
   {
@@ -828,7 +856,7 @@ bool RenderTask::WorldToViewport(const Vector3& position, float& viewportX, floa
 
   Vector4 viewportPosition;
 
-  Viewport viewport;
+  BoundsInteger viewport;
   GetViewport(viewport);
 
   bool ok = ProjectFull(pos,
@@ -1097,7 +1125,7 @@ Property::Value RenderTask::GetDefaultPropertyCurrentValue(Property::Index index
     }
     case Dali::RenderTask::Property::CLEAR_COLOR:
     {
-      value = GetClearColor();
+      value = GetRenderTaskSceneObject() ? GetRenderTaskSceneObject()->GetClearColor() : Vector4::ZERO;
       break;
     }
     case Dali::RenderTask::Property::REQUIRES_SYNC:
