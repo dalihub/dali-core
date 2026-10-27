@@ -130,7 +130,7 @@ const Vector2 CalculateActorScreenPosition(const Actor& actor);
 const Vector2 CalculateCurrentActorScreenPosition(const Actor& actor);
 
 /**
- * Calculate the screen extents of the actor from its transform, pivot and size
+ * Calculate the screen bounds of the actor from its transform, pivot and size
  *
  * This function calculates the bounding box screen coordinates and size of an actor
  * in 2D space using the actor's target (goal) state properties. It transforms the
@@ -145,13 +145,13 @@ const Vector2 CalculateCurrentActorScreenPosition(const Actor& actor);
  *       - Uses actor's target size and target transform properties
  *       - Accurate bounding box calculation considering actor rotation
  *
- * @param[in] actor The actor to calculate the screen extents for
- * @return Bounds The calculated screen extents (x, y, width, height). Returns (0,0,0,0) if actor is not on scene
+ * @param[in] actor The actor to calculate the screen bounds for
+ * @return Bounds The calculated screen bounds (x, y, width, height). Returns (0,0,0,0) if actor is not on scene
  */
-Bounds CalculateActorScreenExtents(const Actor& actor);
+Bounds CalculateActorScreenBounds(const Actor& actor);
 
 /**
- * Calculate the current screen extents of the actor from its node transform, pivot and size
+ * Calculate the current screen bounds of the actor from its node transform, pivot and size
  *
  * This function calculates the bounding box screen coordinates and size of an actor
  * in 2D space using the actor's current state from the node. It transforms the
@@ -165,10 +165,10 @@ Bounds CalculateActorScreenExtents(const Actor& actor);
  *       - Uses actor's current node state
  *       - Accurate bounding box calculation considering actor rotation
  *
- * @param[in] actor The actor to calculate the screen extents for
- * @return Bounds The calculated screen extents (x, y, width, height). Returns (0,0,0,0) if actor is not on scene
+ * @param[in] actor The actor to calculate the screen bounds for
+ * @return Bounds The calculated screen bounds (x, y, width, height). Returns (0,0,0,0) if actor is not on scene
  */
-Bounds CalculateCurrentActorScreenExtents(const Actor& actor);
+Bounds CalculateCurrentActorScreenBounds(const Actor& actor);
 
 /**
  * Convert local coordinates to screen coordinates
@@ -254,7 +254,7 @@ const Vector2 CalculateCurrentActorScreenPositionRenderTaskList(const Actor& act
  * @param[in] actor The actor of this entity
  * @param[in] worldMatrix The world matrix of this entity
  * @param[in] localPosition The local position
- * @param[out] screenExtent The screen Extent
+ * @param[out] screenBounds The screen Extent
  * @return true if the conversion was successful
  */
 bool ConvertLocalToScreenExtentRenderTask(
@@ -262,7 +262,7 @@ bool ConvertLocalToScreenExtentRenderTask(
   const Actor&      actor,
   const Matrix&     worldMatrix,
   const Vector3&    currentSize,
-  Bounds&           screenExtent);
+  Bounds&           screenBounds);
 
 /**
  * Convert local coordinates to screen coordinates extent
@@ -272,7 +272,7 @@ bool ConvertLocalToScreenExtentRenderTask(
  * @param[in] actor The actor of this entity
  * @param[in] worldMatrix The world matrix of this entity
  * @param[in] localPosition The local position
- * @param[out] screenExtent The screen Extent
+ * @param[out] screenBounds The screen Extent
  * @return true if the conversion was successful
  */
 bool ConvertLocalToScreenExtentRenderTaskList(
@@ -280,25 +280,25 @@ bool ConvertLocalToScreenExtentRenderTaskList(
   const Actor&          actor,
   const Matrix&         worldMatrix,
   const Vector3&        currentSize,
-  Bounds&               screenExtent);
+  Bounds&               screenBounds);
 
 /**
- * Calculate the screen extents of the actor from it's transform, pivot and size.
+ * Calculate the screen bounds of the actor from it's transform, pivot and size.
  * It will consider rendertasklist.
  *
  * @param[in] actor The actor
- * @return the screen extents of the actor consider camera.
+ * @return the screen bounds of the actor consider camera.
  */
-Bounds CalculateActorScreenExtentsRenderTaskList(const Actor& actor);
+Bounds CalculateActorScreenBoundsRenderTaskList(const Actor& actor);
 
 /**
- * Calculate the screen extents of the actor from it's node transform, pivot and size.
+ * Calculate the screen bounds of the actor from it's node transform, pivot and size.
  * It will consider rendertasklist.
  *
  * @param[in] actor The actor
- * @return the screen extents of the actor consider camera.
+ * @return the screen bounds of the actor consider camera.
  */
-Bounds CalculateCurrentActorScreenExtentsRenderTaskList(const Actor& actor);
+Bounds CalculateCurrentActorScreenBoundsRenderTaskList(const Actor& actor);
 
 /**
  * Get the world transform of the actor.

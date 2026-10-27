@@ -51,8 +51,8 @@ DALI_CORE_API KeyEvent New(const Dali::String&          keyName,
                            const Dali::KeyEvent::State& keyState,
                            const Dali::String&          compose,
                            const Dali::String&          deviceName,
-                           const Device::Class::Type    deviceClass,
-                           const Device::Subclass::Type deviceSubclass);
+                           Device::Class::Type          deviceClass,
+                           Device::Subclass::Type       deviceSubclass);
 
 /**
  * @brief Queries whether the key event has already been processed by an interceptor.

@@ -45,17 +45,17 @@ KeyEvent::KeyEvent()
 {
 }
 
-KeyEvent::KeyEvent(const Dali::String&          keyName,
-                   const Dali::String&          logicalKey,
-                   const Dali::String&          keyString,
-                   int32_t                      keyCode,
-                   int32_t                      keyModifier,
-                   uint32_t                     timeStamp,
-                   const State&                 keyState,
-                   const Dali::String&          compose,
-                   const Dali::String&          deviceName,
-                   const Device::Class::Type    deviceClass,
-                   const Device::Subclass::Type deviceSubclass)
+KeyEvent::KeyEvent(const Dali::String&    keyName,
+                   const Dali::String&    logicalKey,
+                   const Dali::String&    keyString,
+                   int32_t                keyCode,
+                   int32_t                keyModifier,
+                   uint32_t               timeStamp,
+                   const State&           keyState,
+                   const Dali::String&    compose,
+                   const Dali::String&    deviceName,
+                   Device::Class::Type    deviceClass,
+                   Device::Subclass::Type deviceSubclass)
 : Event(Key),
   keyName(keyName),
   logicalKey(logicalKey),

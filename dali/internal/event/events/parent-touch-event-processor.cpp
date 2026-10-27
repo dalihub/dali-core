@@ -180,7 +180,7 @@ struct ParentTouchEventProcessor::Impl
     Actor* lastConsumedActor = state.processor.mLastConsumedActor.GetActor();
     if(lastConsumedActor &&
        lastConsumedActor != lastPrimaryHitActor &&
-       lastConsumedActor != eventConsumer)
+       static_cast<Dali::RefObject*>(lastConsumedActor) != eventConsumer.GetObjectPtr())
     {
       Dali::Actor lastConsumedActorHandle(lastConsumedActor);
       currentPoint.SetHitActor(lastConsumedActorHandle);
@@ -191,7 +191,7 @@ struct ParentTouchEventProcessor::Impl
     if(touchDownConsumedActor &&
        touchDownConsumedActor != lastPrimaryHitActor &&
        touchDownConsumedActor != lastConsumedActor &&
-       touchDownConsumedActor != eventConsumer)
+       static_cast<Dali::RefObject*>(touchDownConsumedActor) != eventConsumer.GetObjectPtr())
     {
       Dali::Actor touchDownConsumedActorHandle(touchDownConsumedActor);
       currentPoint.SetHitActor(touchDownConsumedActorHandle);
@@ -227,7 +227,7 @@ struct ParentTouchEventProcessor::Impl
       {
         state.processor.mInterceptedTouchActor.SetActor(&GetImplementation(interceptedActor));
         if(state.processor.mLastPrimaryHitActor.GetActor() &&
-           state.processor.mLastPrimaryHitActor.GetActor() != interceptedActor &&
+           static_cast<Dali::RefObject*>(state.processor.mLastPrimaryHitActor.GetActor()) != interceptedActor.GetObjectPtr() &&
            state.processor.mLastRenderTask &&
            state.processor.mLastPrimaryPointState != PointState::FINISHED)
         {
@@ -268,8 +268,8 @@ struct ParentTouchEventProcessor::Impl
     Dali::Actor leaveEventConsumer;
     RenderTask& lastRenderTask = *state.processor.mLastRenderTask;
     if(state.lastPrimaryHitActor &&
-       state.lastPrimaryHitActor != state.primaryHitActor &&
-       state.lastPrimaryHitActor != state.consumedActor)
+       static_cast<Dali::RefObject*>(state.lastPrimaryHitActor) != state.primaryHitActor.GetObjectPtr() &&
+       static_cast<Dali::RefObject*>(state.lastPrimaryHitActor) != state.consumedActor.GetObjectPtr())
     {
       if(state.lastPrimaryHitActor->IsHittable() && IsActuallySensitive(state.lastPrimaryHitActor))
       {
@@ -285,10 +285,10 @@ struct ParentTouchEventProcessor::Impl
     }
 
     if(state.lastConsumedActor &&
-       state.lastConsumedActor != state.consumedActor &&
+       static_cast<Dali::RefObject*>(state.lastConsumedActor) != state.consumedActor.GetObjectPtr() &&
        state.lastConsumedActor != state.lastPrimaryHitActor &&
-       state.lastConsumedActor != state.primaryHitActor &&
-       state.lastConsumedActor != leaveEventConsumer)
+       static_cast<Dali::RefObject*>(state.lastConsumedActor) != state.primaryHitActor.GetObjectPtr() &&
+       static_cast<Dali::RefObject*>(state.lastConsumedActor) != leaveEventConsumer.GetObjectPtr())
     {
       if(state.lastConsumedActor->IsHittable() && IsActuallySensitive(state.lastConsumedActor))
       {
@@ -350,7 +350,7 @@ struct ParentTouchEventProcessor::Impl
     {
       Actor* touchDownConsumedActor = state.processor.mTouchDownConsumedActor.GetActor();
       if(touchDownConsumedActor &&
-         touchDownConsumedActor != state.consumedActor &&
+         static_cast<Dali::RefObject*>(touchDownConsumedActor) != state.consumedActor.GetObjectPtr() &&
          touchDownConsumedActor != state.lastPrimaryHitActor &&
          touchDownConsumedActor != state.lastConsumedActor)
       {
@@ -463,7 +463,7 @@ void ParentTouchEventProcessor::OnObservedActorDisconnected(Actor* actor)
   Dali::TouchEvent touchEventHandle(touchEvent.Get());
 
   Dali::Actor eventConsumer = DispatchTouchToHierarchy(Dali::Actor(actor), touchEventHandle);
-  if(mLastConsumedActor.GetActor() != eventConsumer)
+  if(static_cast<Dali::RefObject*>(mLastConsumedActor.GetActor()) != eventConsumer.GetObjectPtr())
   {
     DispatchTouchToHierarchy(Dali::Actor(mLastConsumedActor.GetActor()), touchEventHandle);
   }

@@ -173,7 +173,7 @@ public:
    * @param[in] isSubImage Boolian value for the whether the image is subimage or not
    * @return Whether the texture will be convert or not.
    */
-  virtual bool TextureRequiresConverting(const GLenum imageGlFormat, const GLenum textureGlFormat, const bool isSubImage) const = 0;
+  virtual bool TextureRequiresConverting(GLenum imageGlFormat, GLenum textureGlFormat, bool isSubImage) const = 0;
 
   /**
    * The number of texture units an implementation supports is implementation dependent, but must be at least 8.

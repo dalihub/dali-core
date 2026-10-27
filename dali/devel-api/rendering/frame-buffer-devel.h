@@ -102,7 +102,7 @@ DALI_CORE_API uint8_t GetMultiSamplingLevel(FrameBuffer frameBuffer);
  *
  * @return the number of attached color textures.
  */
-DALI_CORE_API uint8_t GetColorAttachmentCount(const FrameBuffer frameBuffer);
+DALI_CORE_API uint8_t GetColorAttachmentCount(FrameBuffer frameBuffer);
 
 /**
  * @brief Gets the color texture at the given @a index used as output in the frame buffer.
@@ -115,7 +115,7 @@ DALI_CORE_API uint8_t GetColorAttachmentCount(const FrameBuffer frameBuffer);
  * @note A maximum of 8 color attachments are supported. Passing an invalid index will return
  * an uninitialized handle.
  */
-DALI_CORE_API Texture GetColorTexture(const FrameBuffer frameBuffer, uint8_t index);
+DALI_CORE_API Texture GetColorTexture(FrameBuffer frameBuffer, uint8_t index);
 
 /**
  * @brief Gets the depth texture used as output in the frame buffer.

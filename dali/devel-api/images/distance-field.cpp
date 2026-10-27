@@ -168,7 +168,7 @@ void GenerateDistanceFieldMap(const uint8_t* const imagePixels, const Size& imag
   GenerateDistanceFieldMap(imagePixels, imageSize, distanceMap, distanceMapSize, fieldBorder, imageSize, highQuality);
 }
 
-void GenerateDistanceFieldMap(const uint8_t* const imagePixels, const Size& imageSize, uint8_t* const distanceMap, const Size& distanceMapSize, const uint32_t fieldBorder, const Vector2& maxSize, bool highQuality)
+void GenerateDistanceFieldMap(const uint8_t* const imagePixels, const Size& imageSize, uint8_t* const distanceMap, const Size& distanceMapSize, uint32_t fieldBorder, const Vector2& maxSize, bool highQuality)
 {
   // constants to reduce redundant calculations
   const uint32_t originalWidth(static_cast<int32_t>(imageSize.width));

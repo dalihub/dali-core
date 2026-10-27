@@ -297,7 +297,7 @@ public:
    * @param[in] targetType Target type of the conversion.
    * @return True if convert is successful, false otherwise. If the conversion fails, the original value is not modified.
    */
-  bool ConvertType(const Property::Type targetType);
+  bool ConvertType(Property::Type targetType);
 
   /**
    * @brief Retrieves a specific value.

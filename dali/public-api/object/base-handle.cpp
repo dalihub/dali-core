@@ -96,6 +96,11 @@ bool BaseHandle::operator!=(const BaseHandle& rhs) const
   return this->mObjectHandle != rhs.mObjectHandle;
 }
 
+bool BaseHandle::operator<(const BaseHandle& rhs) const
+{
+  return this->mObjectHandle.Get() < rhs.mObjectHandle.Get();
+}
+
 Dali::RefObject* BaseHandle::GetObjectPtr() const
 {
   return mObjectHandle.Get();

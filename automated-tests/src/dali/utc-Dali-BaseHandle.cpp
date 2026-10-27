@@ -324,6 +324,8 @@ int UtcDaliBaseHandleInequalityWithNullptr(void)
   DALI_TEST_CHECK(nullptr == object);
   DALI_TEST_CHECK(!(object != nullptr));
   DALI_TEST_CHECK(!(nullptr != object));
+  DALI_TEST_CHECK(!(object < nullptr));
+  DALI_TEST_CHECK(!(nullptr < object));
 
   object = Actor::New();
 
@@ -332,6 +334,8 @@ int UtcDaliBaseHandleInequalityWithNullptr(void)
   DALI_TEST_CHECK(!(nullptr == object));
   DALI_TEST_CHECK(object != nullptr);
   DALI_TEST_CHECK(nullptr != object);
+  DALI_TEST_CHECK(!(object < nullptr));
+  DALI_TEST_CHECK(nullptr < object);
 
   END_TEST;
 }

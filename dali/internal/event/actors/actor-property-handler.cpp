@@ -1120,7 +1120,7 @@ const PropertyInputImpl* Actor::PropertyHandler::GetSceneObjectInputProperty(Pro
       property = &node.mIgnored;
       break;
     }
-    case Dali::DevelActor::Property::WORLD_IGNORED:
+    case Dali::Actor::Property::WORLD_IGNORED:
     {
       property = &node.mWorldIgnored;
       break;
@@ -1837,7 +1837,7 @@ bool Actor::PropertyHandler::GetCurrentPropertyValue(const Internal::Actor& acto
       break;
     }
 
-    case Dali::DevelActor::Property::WORLD_IGNORED:
+    case Dali::Actor::Property::WORLD_IGNORED:
     {
       value = actor.IsWorldIgnored();
       break;

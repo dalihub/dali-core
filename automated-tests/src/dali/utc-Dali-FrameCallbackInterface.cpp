@@ -636,8 +636,8 @@ int UtcDaliFrameCallbackSetIgnored(void)
     DALI_TEST_EQUALS(actor.IsIgnored(), false, TEST_LOCATION); // Need to be true since we don't touch event thread.
     DALI_TEST_EQUALS(actor.GetProperty<bool>(Actor::Property::IGNORED), false, TEST_LOCATION);
     DALI_TEST_EQUALS(actor.GetCurrentProperty<bool>(Actor::Property::IGNORED), true, TEST_LOCATION);
-    DALI_TEST_EQUALS(actor.GetProperty<bool>(DevelActor::Property::WORLD_IGNORED), true, TEST_LOCATION);
-    DALI_TEST_EQUALS(actor.GetCurrentProperty<bool>(DevelActor::Property::WORLD_IGNORED), true, TEST_LOCATION);
+    DALI_TEST_EQUALS(actor.GetProperty<bool>(Actor::Property::WORLD_IGNORED), true, TEST_LOCATION);
+    DALI_TEST_EQUALS(actor.GetCurrentProperty<bool>(Actor::Property::WORLD_IGNORED), true, TEST_LOCATION);
 
     // Duplicated flag need to send message to render thread.
     actor.SetIgnored(false);
@@ -648,8 +648,8 @@ int UtcDaliFrameCallbackSetIgnored(void)
     DALI_TEST_EQUALS(actor.IsIgnored(), false, TEST_LOCATION);
     DALI_TEST_EQUALS(actor.GetProperty<bool>(Actor::Property::IGNORED), false, TEST_LOCATION);
     DALI_TEST_EQUALS(actor.GetCurrentProperty<bool>(Actor::Property::IGNORED), false, TEST_LOCATION);
-    DALI_TEST_EQUALS(actor.GetProperty<bool>(DevelActor::Property::WORLD_IGNORED), false, TEST_LOCATION);
-    DALI_TEST_EQUALS(actor.GetCurrentProperty<bool>(DevelActor::Property::WORLD_IGNORED), false, TEST_LOCATION);
+    DALI_TEST_EQUALS(actor.GetProperty<bool>(Actor::Property::WORLD_IGNORED), false, TEST_LOCATION);
+    DALI_TEST_EQUALS(actor.GetCurrentProperty<bool>(Actor::Property::WORLD_IGNORED), false, TEST_LOCATION);
   }
 
   // Test setting ignored to false
@@ -673,8 +673,8 @@ int UtcDaliFrameCallbackSetIgnored(void)
     DALI_TEST_EQUALS(actor.IsIgnored(), true, TEST_LOCATION); // Need to be true since we don't touch event thread.
     DALI_TEST_EQUALS(actor.GetProperty<bool>(Actor::Property::IGNORED), true, TEST_LOCATION);
     DALI_TEST_EQUALS(actor.GetCurrentProperty<bool>(Actor::Property::IGNORED), false, TEST_LOCATION);
-    DALI_TEST_EQUALS(actor.GetProperty<bool>(DevelActor::Property::WORLD_IGNORED), false, TEST_LOCATION);
-    DALI_TEST_EQUALS(actor.GetCurrentProperty<bool>(DevelActor::Property::WORLD_IGNORED), false, TEST_LOCATION);
+    DALI_TEST_EQUALS(actor.GetProperty<bool>(Actor::Property::WORLD_IGNORED), false, TEST_LOCATION);
+    DALI_TEST_EQUALS(actor.GetCurrentProperty<bool>(Actor::Property::WORLD_IGNORED), false, TEST_LOCATION);
 
     // Duplicated flag need to send message to render thread.
     actor.SetIgnored(true);
@@ -685,8 +685,8 @@ int UtcDaliFrameCallbackSetIgnored(void)
     DALI_TEST_EQUALS(actor.IsIgnored(), true, TEST_LOCATION);
     DALI_TEST_EQUALS(actor.GetProperty<bool>(Actor::Property::IGNORED), true, TEST_LOCATION);
     DALI_TEST_EQUALS(actor.GetCurrentProperty<bool>(Actor::Property::IGNORED), true, TEST_LOCATION);
-    DALI_TEST_EQUALS(actor.GetProperty<bool>(DevelActor::Property::WORLD_IGNORED), true, TEST_LOCATION);
-    DALI_TEST_EQUALS(actor.GetCurrentProperty<bool>(DevelActor::Property::WORLD_IGNORED), true, TEST_LOCATION);
+    DALI_TEST_EQUALS(actor.GetProperty<bool>(Actor::Property::WORLD_IGNORED), true, TEST_LOCATION);
+    DALI_TEST_EQUALS(actor.GetCurrentProperty<bool>(Actor::Property::WORLD_IGNORED), true, TEST_LOCATION);
   }
 
   END_TEST;
@@ -712,8 +712,8 @@ int UtcDaliFrameCallbackGetIgnored(void)
     DALI_TEST_EQUALS(actor.IsIgnored(), false, TEST_LOCATION);
     DALI_TEST_EQUALS(actor.GetProperty<bool>(Actor::Property::IGNORED), false, TEST_LOCATION);
     DALI_TEST_EQUALS(actor.GetCurrentProperty<bool>(Actor::Property::IGNORED), false, TEST_LOCATION);
-    DALI_TEST_EQUALS(actor.GetProperty<bool>(DevelActor::Property::WORLD_IGNORED), false, TEST_LOCATION);
-    DALI_TEST_EQUALS(actor.GetCurrentProperty<bool>(DevelActor::Property::WORLD_IGNORED), false, TEST_LOCATION);
+    DALI_TEST_EQUALS(actor.GetProperty<bool>(Actor::Property::WORLD_IGNORED), false, TEST_LOCATION);
+    DALI_TEST_EQUALS(actor.GetCurrentProperty<bool>(Actor::Property::WORLD_IGNORED), false, TEST_LOCATION);
 
     class FrameCallbackGetIgnored : public FrameCallbackBasic
     {
@@ -755,8 +755,8 @@ int UtcDaliFrameCallbackGetIgnored(void)
     DALI_TEST_EQUALS(actor.IsIgnored(), false, TEST_LOCATION);
     DALI_TEST_EQUALS(actor.GetProperty<bool>(Actor::Property::IGNORED), false, TEST_LOCATION);
     DALI_TEST_EQUALS(actor.GetCurrentProperty<bool>(Actor::Property::IGNORED), false, TEST_LOCATION);
-    DALI_TEST_EQUALS(actor.GetProperty<bool>(DevelActor::Property::WORLD_IGNORED), false, TEST_LOCATION);
-    DALI_TEST_EQUALS(actor.GetCurrentProperty<bool>(DevelActor::Property::WORLD_IGNORED), false, TEST_LOCATION);
+    DALI_TEST_EQUALS(actor.GetProperty<bool>(Actor::Property::WORLD_IGNORED), false, TEST_LOCATION);
+    DALI_TEST_EQUALS(actor.GetCurrentProperty<bool>(Actor::Property::WORLD_IGNORED), false, TEST_LOCATION);
 
     application.GetCore().RemoveFrameCallback(frameCallback);
   }
@@ -770,8 +770,8 @@ int UtcDaliFrameCallbackGetIgnored(void)
     DALI_TEST_EQUALS(actor.IsIgnored(), true, TEST_LOCATION);
     DALI_TEST_EQUALS(actor.GetProperty<bool>(Actor::Property::IGNORED), true, TEST_LOCATION);
     DALI_TEST_EQUALS(actor.GetCurrentProperty<bool>(Actor::Property::IGNORED), true, TEST_LOCATION);
-    DALI_TEST_EQUALS(actor.GetProperty<bool>(DevelActor::Property::WORLD_IGNORED), true, TEST_LOCATION);
-    DALI_TEST_EQUALS(actor.GetCurrentProperty<bool>(DevelActor::Property::WORLD_IGNORED), true, TEST_LOCATION);
+    DALI_TEST_EQUALS(actor.GetProperty<bool>(Actor::Property::WORLD_IGNORED), true, TEST_LOCATION);
+    DALI_TEST_EQUALS(actor.GetCurrentProperty<bool>(Actor::Property::WORLD_IGNORED), true, TEST_LOCATION);
 
     class FrameCallbackGetIgnoredTrue : public FrameCallbackBasic
     {
@@ -812,8 +812,8 @@ int UtcDaliFrameCallbackGetIgnored(void)
     DALI_TEST_EQUALS(actor.IsIgnored(), true, TEST_LOCATION);
     DALI_TEST_EQUALS(actor.GetProperty<bool>(Actor::Property::IGNORED), true, TEST_LOCATION);
     DALI_TEST_EQUALS(actor.GetCurrentProperty<bool>(Actor::Property::IGNORED), true, TEST_LOCATION);
-    DALI_TEST_EQUALS(actor.GetProperty<bool>(DevelActor::Property::WORLD_IGNORED), true, TEST_LOCATION);
-    DALI_TEST_EQUALS(actor.GetCurrentProperty<bool>(DevelActor::Property::WORLD_IGNORED), true, TEST_LOCATION);
+    DALI_TEST_EQUALS(actor.GetProperty<bool>(Actor::Property::WORLD_IGNORED), true, TEST_LOCATION);
+    DALI_TEST_EQUALS(actor.GetCurrentProperty<bool>(Actor::Property::WORLD_IGNORED), true, TEST_LOCATION);
 
     application.GetCore().RemoveFrameCallback(frameCallback);
   }

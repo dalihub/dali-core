@@ -259,6 +259,113 @@ int UtcDaliCallbackReleaseP(void)
   END_TEST;
 }
 
+int UtcDaliCallbackNewFunctorP(void)
+{
+  TestApplication application;
+
+  int  callCount = 0;
+  auto callback  = Callback<void()>::New([&callCount]()
+  { ++callCount; });
+  DALI_TEST_CHECK(callback);
+
+  callback.Invoke();
+  DALI_TEST_EQUALS(callCount, 1, TEST_LOCATION);
+
+  callback.Invoke();
+  DALI_TEST_EQUALS(callCount, 2, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliCallbackNewFunctorArgsP(void)
+{
+  TestApplication application;
+
+  int         intReceived = 0;
+  std::string textReceived;
+  float       floatReceived = 0.0f;
+  bool        boolReceived  = false;
+
+  auto oneArg = Callback<void(int)>::New([&intReceived](int value)
+  { intReceived = value; });
+  oneArg.Invoke(42);
+  DALI_TEST_EQUALS(intReceived, 42, TEST_LOCATION);
+
+  auto twoArgs = Callback<void(int, const std::string&)>::New([&intReceived, &textReceived](int value, const std::string& text)
+  {
+    intReceived  = value;
+    textReceived = text;
+  });
+  twoArgs.Invoke(7, "hello");
+  DALI_TEST_EQUALS(intReceived, 7, TEST_LOCATION);
+  DALI_TEST_EQUALS(textReceived, std::string("hello"), TEST_LOCATION);
+
+  auto threeArgs = Callback<void(int, float, bool)>::New([&](int a, float b, bool c)
+  {
+    intReceived   = a;
+    floatReceived = b;
+    boolReceived  = c;
+  });
+  threeArgs.Invoke(5, 1.5f, true);
+  DALI_TEST_EQUALS(intReceived, 5, TEST_LOCATION);
+  DALI_TEST_EQUALS(floatReceived, 1.5f, 0.001f, TEST_LOCATION);
+  DALI_TEST_CHECK(boolReceived);
+
+  END_TEST;
+}
+
+int UtcDaliCallbackNewFunctorReturnP(void)
+{
+  TestApplication application;
+
+  auto noArgs = Callback<int()>::New([]()
+  { return 21; });
+  DALI_TEST_EQUALS(noArgs.Invoke(), 21, TEST_LOCATION);
+
+  auto oneArg = Callback<int(int)>::New([](int value)
+  { return value * 2; });
+  DALI_TEST_EQUALS(oneArg.Invoke(21), 42, TEST_LOCATION);
+
+  auto twoArgs = Callback<bool(int, int)>::New([](int a, int b)
+  { return a < b; });
+  DALI_TEST_CHECK(twoArgs.Invoke(1, 2));
+  DALI_TEST_CHECK(!twoArgs.Invoke(2, 1));
+
+  auto threeArgs = Callback<int(int, float, bool)>::New([](int a, float b, bool c)
+  { return c ? a : static_cast<int>(b); });
+  DALI_TEST_EQUALS(threeArgs.Invoke(5, 9.0f, true), 5, TEST_LOCATION);
+  DALI_TEST_EQUALS(threeArgs.Invoke(5, 9.0f, false), 9, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliCallbackNewFunctorCopiesObjectP(void)
+{
+  TestApplication application;
+
+  // The callback must hold its own copy of the function object
+  struct Counter
+  {
+    void operator()()
+    {
+      ++mCount;
+    }
+    int mCount{0};
+  };
+
+  Counter counter;
+  auto    callback = Callback<void()>::New(counter);
+  callback.Invoke();
+  callback.Invoke();
+  DALI_TEST_EQUALS(counter.mCount, 0, TEST_LOCATION);
+
+  // An rvalue function object works too
+  auto fromRvalue = Callback<void()>::New(Counter{});
+  fromRvalue.Invoke();
+
+  END_TEST;
+}
+
 int UtcDaliCallbackMemberDestroysObjectCopyP(void)
 {
   TestApplication application;

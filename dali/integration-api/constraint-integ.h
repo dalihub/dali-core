@@ -34,7 +34,7 @@ namespace DALI_NAMESPACE::Integration
  * @param[in] constraint The constraint that want to set tag.
  * @param[in] tag The tag number.
  */
-DALI_CORE_API void ConstraintSetInternalTag(Dali::Constraint& constraint, const uint32_t tag);
+DALI_CORE_API void ConstraintSetInternalTag(Dali::Constraint& constraint, uint32_t tag);
 
 /**
  * @brief Removes all the constraint from the Object include custom and internal.
