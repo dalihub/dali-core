@@ -45,7 +45,7 @@ DALI_CORE_API void GenerateDistanceFieldMap(
   const Vector2&       imageSize,
   uint8_t* const       distanceMap,
   const Vector2&       distanceMapSize,
-  const uint32_t       fieldBorder,
+  uint32_t             fieldBorder,
   const Vector2&       maxSize,
   bool                 highQuality = true);
 

@@ -757,7 +757,7 @@ struct GeometryTouchEventProcessor::Impl
           // Further checks here to ensure we do not signal the same actor twice for the same event.
           if(localVars.lastConsumedActor &&
              localVars.lastConsumedActor != localVars.lastPrimaryHitActor &&
-             localVars.lastConsumedActor != leaveEventConsumer)
+             static_cast<Dali::RefObject*>(localVars.lastConsumedActor) != leaveEventConsumer.GetObjectPtr())
           {
             if(!localVars.lastConsumedActor->IsHittable() || !IsActuallySensitive(localVars.lastConsumedActor))
             {

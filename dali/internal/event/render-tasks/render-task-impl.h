@@ -178,6 +178,11 @@ public:
   void SetViewportPosition(const Vector2& value);
 
   /**
+   * @copydoc Dali::RenderTask::GetViewportPosition
+   */
+  Vector2 GetViewportPosition() const;
+
+  /**
    * @copydoc Dali::RenderTask::GetCurrentViewportPosition
    */
   Vector2 GetCurrentViewportPosition() const;
@@ -188,6 +193,11 @@ public:
   void SetViewportSize(const Vector2& value);
 
   /**
+   * @copydoc Dali::RenderTask::GetViewportSize
+   */
+  Vector2 GetViewportSize() const;
+
+  /**
    * @copydoc Dali::RenderTask::GetCurrentViewportSize
    */
   Vector2 GetCurrentViewportSize() const;
@@ -195,12 +205,12 @@ public:
   /**
    * @copydoc Dali::RenderTask::SetViewport()
    */
-  void SetViewport(const Viewport& viewport);
+  void SetViewport(const BoundsInteger& viewport);
 
   /**
    * @param[out] viewPort instance to copy the values into
    */
-  void GetViewport(Viewport& viewPort) const;
+  void GetViewport(BoundsInteger& viewPort) const;
 
   /**
    * @copydoc Dali::RenderTask::SetClearColor()
@@ -279,7 +289,7 @@ public:
    * It will be used when we hit-test.
    * @param[out] viewPort instance to copy the values into
    */
-  void GetHittableViewport(Viewport& viewPort) const;
+  void GetHittableViewport(BoundsInteger& viewPort) const;
 
   /**
    * @copydoc Dali::RenderTask::WorldToViewport()

@@ -204,7 +204,7 @@ constexpr void ClampInPlace(T& value, const T& min, const T& max)
  * @return A value between low and high.
  */
 template<typename T>
-constexpr const T Lerp(const float offset, const T& low, const T& high)
+constexpr const T Lerp(float offset, const T& low, const T& high)
 {
   return low + ((high - low) * Clamp(offset, 0.0f, 1.0f));
 }

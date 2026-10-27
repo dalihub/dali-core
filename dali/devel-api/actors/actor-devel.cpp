@@ -27,7 +27,7 @@ namespace DevelActor
 {
 Bounds CalculateCurrentScreenExtents(Actor actor)
 {
-  return GetImplementation(actor).CalculateCurrentScreenExtents();
+  return GetImplementation(actor).CalculateCurrentScreenBounds();
 }
 
 Actor GetVisiblityChangedActor()

@@ -41,7 +41,7 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/events/gesture.h>
-#include <dali/public-api/math/viewport.h>
+#include <dali/public-api/math/rect.h>
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/render-tasks/render-task.h>
 #include <dali/public-api/rendering/renderer.h>
@@ -270,78 +270,19 @@ public:
   }
 
   /**
-   * @brief Calculate the current position of the actor in screen coordinates using event-side properties.
-   *
-   * This function calculates the screen coordinates of an actor by automatically detecting
-   * whether to use 2D or 3D calculation based on the actor's context and ancestor layers.
-   *
-   * For 2D calculation (when no 3D layers in ancestors):
-   * - Uses 2D-specific optimizations
-   * - Assumes orthographic projection and no camera rotation
-   * - Z coordinates are treated as 0 for screen position calculation
-   * - Faster calculation with 2D limitations
-   *
-   * For 3D calculation (when 3D layers exist in ancestors):
-   * - Uses full 3D projection with view and projection matrices
-   * - Supports perspective projection, camera rotation, and full 3D transforms
-   * - Considers Z depth for proper screen coordinate projection
-   * - More accurate but computationally expensive
-   *
-   * @return Returns the screen position of actor. Returns (0,0) if actor is not on scene.
+   * @copydoc Dali::Actor::CalculateScreenPosition()
    */
   Vector2 CalculateScreenPosition() const;
 
   /**
-   * Calculates screen position and size using event-side properties.
-   *
-   * This function calculates the bounding box screen coordinates and size of an actor
-   * by automatically detecting whether to use 2D or 3D calculation based on the
-   * actor's context and ancestor layers.
-   *
-   * For 2D calculation (when no 3D layers in ancestors):
-   * - Uses 2D-specific optimizations
-   * - Assumes orthographic projection and no camera rotation
-   * - Transforms 4 corner points in 2D space (Z=0) for bounding box calculation
-   * - Faster calculation with 2D limitations
-   *
-   * For 3D calculation (when 3D layers exist in ancestors):
-   * - Uses full 3D projection with view and projection matrices
-   * - Supports perspective projection, camera rotation, and full 3D transforms
-   * - Transforms all 8 corners of the 3D bounding box for accurate screen extents
-   * - Accounts for perspective foreshortening and 3D rotation effects
-   * - More accurate but computationally expensive
-   *
-   * @return Rect containing position of top-left corner on screen and size respectively.
-   *         Returns (0,0,0,0) if actor is not on scene.
+   * @copydoc Dali::Actor::CalculateScreenBounds()
    */
-  Bounds CalculateScreenExtents() const;
+  Bounds CalculateScreenBounds() const;
 
   /**
-   * Calculates screen position and size from current node values.
-   *
-   * This function calculates the bounding box screen coordinates and size of an actor
-   * using the current state from the update thread (node). It automatically detects
-   * whether to use 2D or 3D calculation based on the actor's context and ancestor layers.
-   *
-   * For 2D calculation (when no 3D layers in ancestors):
-   * - Uses 2D-specific optimizations
-   * - Assumes orthographic projection and no camera rotation
-   * - Transforms 4 corner points in 2D space (Z=0) for bounding box calculation
-   * - Uses current node state for the specified buffer index
-   * - Faster calculation with 2D limitations
-   *
-   * For 3D calculation (when 3D layers exist in ancestors):
-   * - Uses full 3D projection with view and projection matrices
-   * - Supports perspective projection, camera rotation, and full 3D transforms
-   * - Transforms all 8 corners of the 3D bounding box for accurate screen extents
-   * - Accounts for perspective foreshortening and 3D rotation effects
-   * - Uses current node state for the specified buffer index
-   * - More accurate but computationally expensive
-   *
-   * @return Rect containing position of top-left corner on screen and size respectively.
-   *         Returns (0,0,0,0) if actor is not on scene.
+   * @copydoc Dali::Actor::CalculateCurrentScreenBounds()
    */
-  Bounds CalculateCurrentScreenExtents() const;
+  Bounds CalculateCurrentScreenBounds() const;
 
   /**
    * @copydoc DevelActor::SetNeedGesturePropagation.
@@ -1423,7 +1364,7 @@ public:
   bool IsIgnored() const;
 
   /**
-   * @copydoc Dali::Actor::IsWorldIgnored
+   * @copydoc Dali::Actor::IsWorldIgnored()
    */
   bool IsWorldIgnored() const;
 
@@ -1508,13 +1449,13 @@ public:
    * @param[in] screenY The screen Y-coordinate.
    * @return True if the conversion succeeded.
    */
-  bool ScreenToLocal(const Matrix&   viewMatrix,
-                     const Matrix&   projectionMatrix,
-                     const Viewport& viewport,
-                     float&          localX,
-                     float&          localY,
-                     float           screenX,
-                     float           screenY) const;
+  bool ScreenToLocal(const Matrix&        viewMatrix,
+                     const Matrix&        projectionMatrix,
+                     const BoundsInteger& viewport,
+                     float&               localX,
+                     float&               localY,
+                     float                screenX,
+                     float                screenY) const;
 
   /**
    * Sets whether the actor should receive a notification when touch or hover motion events leave
@@ -2546,27 +2487,7 @@ private:
   }
 
   /**
-   * @brief Get the current position of the actor in screen coordinates from node values.
-   *
-   * This function calculates the screen coordinates of an actor using the current
-   * state from the update thread (node). It automatically detects whether to use
-   * 2D or 3D calculation based on the actor's context and ancestor layers.
-   *
-   * For 2D calculation (when no 3D layers in ancestors):
-   * - Uses 2D-specific optimizations
-   * - Assumes orthographic projection and no camera rotation
-   * - Z coordinates are treated as 0 for screen position calculation
-   * - Uses current node state for the specified buffer index
-   * - Faster calculation with 2D limitations
-   *
-   * For 3D calculation (when 3D layers exist in ancestors):
-   * - Uses full 3D projection with view and projection matrices
-   * - Supports perspective projection, camera rotation, and full 3D transforms
-   * - Considers Z depth for proper screen coordinate projection
-   * - Uses current node state for the specified buffer index
-   * - More accurate but computationally expensive
-   *
-   * @return Returns the screen position of actor. Returns (0,0) if actor is not on scene.
+   * @copydoc Dali::Actor::GetScreenPosition()
    */
   const Vector2 GetCurrentScreenPosition() const;
 

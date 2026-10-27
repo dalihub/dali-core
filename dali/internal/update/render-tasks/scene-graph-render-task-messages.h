@@ -26,7 +26,6 @@
 #include <dali/internal/update/common/animatable-property.h>
 #include <dali/internal/update/common/property-owner.h>
 #include <dali/internal/update/manager/update-manager.h>
-#include <dali/public-api/math/viewport.h>
 #include <dali/public-api/render-tasks/render-task.h>
 
 namespace DALI_NAMESPACE::Internal::SceneGraph

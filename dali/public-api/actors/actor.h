@@ -813,6 +813,20 @@ public:
       IGNORED,
 
       /**
+       * @brief Whether the actor was ignored at the previous frame.
+       * @details Name "worldIgnored", type Property::BOOLEAN. Read-only
+       * @note True means that this actor or one of its ancestors had Property::IGNORED set, so the
+       *       actor was excluded from rendering and render thread computation.
+       * @note The value is computed during the update of each frame, so it reflects the previous frame
+       *       and may not match a flag just set.
+       * @note An actor which is disconnected from the scene is also reported as ignored.
+       * @SINCE_2_5.46
+       * @see Actor::Property::IGNORED
+       * @see Actor::IsWorldIgnored()
+       */
+      WORLD_IGNORED,
+
+      /**
        * @brief The unique ID of the actor.
        * @details Name "id", type Property::INTEGER. Read-only
        * @SINCE_1_9.17
@@ -1083,7 +1097,7 @@ public:
    * @return A handle to the actor if found, or an empty handle if not
    * @pre The Actor has been initialized.
    */
-  Actor FindChildById(const uint32_t id);
+  Actor FindChildById(uint32_t id);
 
   /**
    * @brief Retrieves the actor's parent.
@@ -2494,7 +2508,7 @@ public:
    * This function calculates the screen coordinates of the actor by automatically detecting
    * whether to use 2D or 3D calculation based on the actor's context and ancestor layers.
    *
-   * For 2D calculation (when no 3D layers in ancestors):
+   * For 2D calculation (when no 3D layers exist in ancestors):
    * - Uses 2D-specific optimizations
    * - Assumes orthographic projection and no camera rotation
    * - Z coordinates are treated as 0 for screen position calculation
@@ -2521,7 +2535,7 @@ public:
    * by automatically detecting whether to use 2D or 3D calculation based on the
    * actor's context and ancestor layers.
    *
-   * For 2D calculation (when no 3D layers in ancestors):
+   * For 2D calculation (when no 3D layers exist in ancestors):
    * - Uses 2D-specific optimizations
    * - Assumes orthographic projection and no camera rotation
    * - Transforms 4 corner points in 2D space (Z=0) for bounding box calculation
@@ -2530,12 +2544,59 @@ public:
    * For 3D calculation (when 3D layers exist in ancestors):
    * - Uses full 3D projection with view and projection matrices
    * - Supports perspective projection, camera rotation, and full 3D transforms
-   * - Transforms all 8 corners of the 3D bounding box for accurate screen extents
+   * - Transforms all 8 corners of the 3D bounding box for accurate screen bounds
    * - Accounts for perspective foreshortening and 3D rotation effects
    * - More accurate but computationally expensive
    *
+   * @SINCE_2_5.46
+   * @return The Rect containing the position of the top-left corner on screen and the size,
+   *         or (0, 0, 0, 0) if the actor is not on the scene
+   * @pre The Actor has been initialized.
+   * @note This composes the world transform of the actor from the current event-side property values,
+   *       walking up the ancestor chain; for the state last calculated by the update thread, use
+   *       CalculateCurrentScreenBounds().
+   * @see CalculateCurrentScreenBounds()
+   */
+  Bounds CalculateScreenBounds() const;
+
+  /**
+   * @brief Calculates the screen position and size of the actor from the last update.
+   *
+   * This function calculates the bounding box screen coordinates and size of the actor
+   * using the state last calculated by the update thread, automatically detecting
+   * whether to use 2D or 3D calculation based on the actor's context and ancestor layers.
+   *
+   * For 2D calculation (when no 3D layers exist in ancestors):
+   * - Uses 2D-specific optimizations
+   * - Assumes orthographic projection and no camera rotation
+   * - Transforms 4 corner points in 2D space (Z=0) for bounding box calculation
+   * - Faster calculation with 2D limitations
+   *
+   * For 3D calculation (when 3D layers exist in ancestors):
+   * - Uses full 3D projection with view and projection matrices
+   * - Supports perspective projection, camera rotation, and full 3D transforms
+   * - Transforms all 8 corners of the 3D bounding box for accurate screen bounds
+   * - Accounts for perspective foreshortening and 3D rotation effects
+   * - More accurate but computationally expensive
+   *
+   * @SINCE_2_5.46
+   * @return The Rect containing the position of the top-left corner on screen and the size,
+   *         or (0, 0, 0, 0) if the actor is not on the scene
+   * @pre The Actor has been initialized.
+   * @note Like Actor::Property::SCREEN_POSITION, this is based on the last known frame and may not
+   *       match a value just set; for a value computed from the current event-side properties, use
+   *       CalculateScreenBounds().
+   * @see CalculateScreenBounds()
+   * @see GetScreenPosition()
+   */
+  Bounds CalculateCurrentScreenBounds() const;
+
+  /**
+   * @brief Calculates the screen position and size of the actor using event-side properties.
+   *
    * @SINCE_2_5.29
-   * @return The Rect containing the position of the top-left corner on screen and the size, respectively,
+   * @deprecated Use CalculateScreenBounds() instead.
+   * @return The Rect containing the position of the top-left corner on screen and the size,
    *         or (0, 0, 0, 0) if the actor is not on the scene
    * @pre The Actor has been initialized.
    */
@@ -2604,11 +2665,12 @@ public:
   /**
    * @brief Sets a flag to identify whether the Actor is ignored or not.
    * If the actor is marked as ignored, it will not be rendered and will be excluded from render thread computation.
-   * So, the current properties like WorldPosition and WorldColor become inaccurate.
+   * Consequently, current properties such as WorldPosition and WorldColor become inaccurate.
    *
    * @SINCE_2_4.21
-   * @param[in] ignored True to make the actor be ignored.
+   * @param[in] ignored True to make the actor ignored.
    * @see Actor::Property::IGNORED
+   * @see IsWorldIgnored()
    */
   void SetIgnored(bool ignored);
 
@@ -2616,10 +2678,31 @@ public:
    * @brief Returns whether the Actor is ignored or not.
    *
    * @SINCE_2_4.21
-   * @return Return True if the Actor is ignored.
+   * @return True if the Actor is ignored.
+   * @note This returns the actor's own flag; the actor can be excluded from rendering while this
+   *       returns false, because an ancestor is ignored.
    * @see Actor::Property::IGNORED
+   * @see IsWorldIgnored()
    */
   bool IsIgnored() const;
+
+  /**
+   * @brief Returns whether the actor was ignored at the previous frame.
+   *
+   * Unlike IsIgnored(), which only reflects the actor's own Property::IGNORED value,
+   * this returns true if the actor was excluded from rendering and render thread
+   * computation because it or one of its ancestors was ignored.
+   *
+   * @note The value is computed during the update of each frame, so it reflects the previous frame
+   *       and may not match a flag just set.
+   * @note An actor which is disconnected from the scene is also reported as ignored.
+   * @return True if the actor was ignored at the previous frame
+   * @pre The Actor has been initialized.
+   * @see IsIgnored()
+   * @see Actor::Property::WORLD_IGNORED
+   * @SINCE_2_5.46
+   */
+  bool IsWorldIgnored() const;
 
 public: // Renderer
   /**

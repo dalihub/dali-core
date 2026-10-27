@@ -34,6 +34,7 @@ namespace DALI_NAMESPACE
 /**
  * @brief Typedef for a viewport ( a rectangle representing a screen area ).
  * @SINCE_1_0.0
+ * @DEPRECATED_2_5.46 Use BoundsInteger instead.
  */
 using Viewport = Rect<int32_t>;
 

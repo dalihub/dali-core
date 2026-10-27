@@ -113,7 +113,7 @@ uint32_t Constraint::GetApplyRate() const
   return GetImplementation(*this).GetApplyRate();
 }
 
-void Constraint::SetTag(const uint32_t tag)
+void Constraint::SetTag(uint32_t tag)
 {
   DALI_ASSERT_ALWAYS(tag <= ConstraintTagRanges::CUSTOM_CONSTRAINT_TAG_MAX && "Out of tag range!");
   GetImplementation(*this).SetTag(tag);

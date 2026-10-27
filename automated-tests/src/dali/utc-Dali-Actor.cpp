@@ -1933,7 +1933,7 @@ int UtcDaliActorGetCurrentSizeImmediate(void)
   END_TEST;
 }
 
-int UtcDaliActorCalculateScreenExtents(void)
+int UtcDaliActorCalculateScreenBounds(void)
 {
   TestApplication application;
 
@@ -1948,17 +1948,21 @@ int UtcDaliActorCalculateScreenExtents(void)
   application.Render();
 
   auto expectedExtent = Bounds{1.5f, 1.5f, 1.0f, 1.0f};
-  auto actualExtent   = actor.CalculateScreenExtents();
+  auto actualExtent   = actor.CalculateScreenBounds();
   DALI_TEST_EQUALS(expectedExtent.x, actualExtent.x, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
   DALI_TEST_EQUALS(expectedExtent.y, actualExtent.y, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
   DALI_TEST_EQUALS(expectedExtent.width, actualExtent.width, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
   DALI_TEST_EQUALS(expectedExtent.height, actualExtent.height, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
 
+  // Deprecated names forward to the renamed APIs.
+  DALI_TEST_EQUALS(actor.CalculateScreenExtents(), actor.CalculateScreenBounds(), TEST_LOCATION);
+  DALI_TEST_EQUALS(DevelActor::CalculateCurrentScreenExtents(actor), actor.CalculateCurrentScreenBounds(), TEST_LOCATION);
+
   application.GetScene().Remove(actor);
   END_TEST;
 }
 
-int UtcDaliActorCalculateScreenExtentsWithRotation(void)
+int UtcDaliActorCalculateScreenBoundsWithRotation(void)
 {
   TestApplication application;
 
@@ -1975,7 +1979,7 @@ int UtcDaliActorCalculateScreenExtentsWithRotation(void)
   application.Render();
 
   auto expectedExtent = Bounds{1.0f, 1.5f, 2.0f, 1.0f};
-  auto actualExtent   = actor.CalculateScreenExtents();
+  auto actualExtent   = actor.CalculateScreenBounds();
   DALI_TEST_EQUALS(expectedExtent.x, actualExtent.x, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
   DALI_TEST_EQUALS(expectedExtent.y, actualExtent.y, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
   DALI_TEST_EQUALS(expectedExtent.width, actualExtent.width, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
@@ -1987,7 +1991,7 @@ int UtcDaliActorCalculateScreenExtentsWithRotation(void)
   application.Render();
 
   expectedExtent = Bounds{1.5f, 1.0f, 1.0f, 2.0f};
-  actualExtent   = actor.CalculateScreenExtents();
+  actualExtent   = actor.CalculateScreenBounds();
   DALI_TEST_EQUALS(expectedExtent.x, actualExtent.x, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
   DALI_TEST_EQUALS(expectedExtent.y, actualExtent.y, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
   DALI_TEST_EQUALS(expectedExtent.width, actualExtent.width, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
@@ -1997,7 +2001,7 @@ int UtcDaliActorCalculateScreenExtentsWithRotation(void)
   END_TEST;
 }
 
-int UtcDaliActorCalculateCurrentScreenExtentsWithRotation(void)
+int UtcDaliActorCalculateCurrentScreenBoundsWithRotation(void)
 {
   TestApplication application;
 
@@ -2014,7 +2018,7 @@ int UtcDaliActorCalculateCurrentScreenExtentsWithRotation(void)
   application.Render();
 
   auto expectedExtent = Bounds{1.0f, 1.5f, 2.0f, 1.0f};
-  auto actualExtent   = DevelActor::CalculateCurrentScreenExtents(actor);
+  auto actualExtent   = actor.CalculateCurrentScreenBounds();
   DALI_TEST_EQUALS(expectedExtent.x, actualExtent.x, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
   DALI_TEST_EQUALS(expectedExtent.y, actualExtent.y, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
   DALI_TEST_EQUALS(expectedExtent.width, actualExtent.width, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
@@ -2026,7 +2030,7 @@ int UtcDaliActorCalculateCurrentScreenExtentsWithRotation(void)
   application.Render();
 
   expectedExtent = Bounds{1.5f, 1.0f, 1.0f, 2.0f};
-  actualExtent   = DevelActor::CalculateCurrentScreenExtents(actor);
+  actualExtent   = actor.CalculateCurrentScreenBounds();
   DALI_TEST_EQUALS(expectedExtent.x, actualExtent.x, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
   DALI_TEST_EQUALS(expectedExtent.y, actualExtent.y, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
   DALI_TEST_EQUALS(expectedExtent.width, actualExtent.width, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
@@ -2106,7 +2110,7 @@ int UtcDaliActorCalculateCurrentScreenPositionWithRotation(void)
   END_TEST;
 }
 
-int UtcDaliActorCalculateCurrentScreenExtents(void)
+int UtcDaliActorCalculateCurrentScreenBounds(void)
 {
   TestApplication application;
 
@@ -2126,7 +2130,7 @@ int UtcDaliActorCalculateCurrentScreenExtents(void)
   DALI_TEST_EQUALS(expectedPosition.y, actualPosition.y, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
 
   auto expectedExtent = Bounds{1.5f, 1.5f, 1.0f, 1.0f};
-  auto actualExtent   = actor.CalculateScreenExtents();
+  auto actualExtent   = actor.CalculateScreenBounds();
   DALI_TEST_EQUALS(expectedExtent.x, actualExtent.x, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
   DALI_TEST_EQUALS(expectedExtent.y, actualExtent.y, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
   DALI_TEST_EQUALS(expectedExtent.width, actualExtent.width, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
@@ -2147,7 +2151,7 @@ int UtcDaliActorCalculateCurrentScreenExtents(void)
   DALI_TEST_EQUALS(expectedPosition.y, actualPosition.y, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
 
   expectedExtent = Bounds(4.5f, 0.5f, 3.0f, 7.0f);
-  actualExtent   = actor.CalculateScreenExtents();
+  actualExtent   = actor.CalculateScreenBounds();
   DALI_TEST_EQUALS(expectedExtent.x, actualExtent.x, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
   DALI_TEST_EQUALS(expectedExtent.y, actualExtent.y, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
   DALI_TEST_EQUALS(expectedExtent.width, actualExtent.width, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
@@ -2159,7 +2163,7 @@ int UtcDaliActorCalculateCurrentScreenExtents(void)
   DALI_TEST_EQUALS(expectedPosition.y, actualPosition.y, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
 
   expectedExtent = Bounds(3.0f, 1.0f, 2.0f, 4.0f);
-  actualExtent   = DevelActor::CalculateCurrentScreenExtents(actor);
+  actualExtent   = actor.CalculateCurrentScreenBounds();
   DALI_TEST_EQUALS(expectedExtent.x, actualExtent.x, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
   DALI_TEST_EQUALS(expectedExtent.y, actualExtent.y, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
   DALI_TEST_EQUALS(expectedExtent.width, actualExtent.width, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
@@ -2169,7 +2173,7 @@ int UtcDaliActorCalculateCurrentScreenExtents(void)
   END_TEST;
 }
 
-int UtcDaliActorCalculateScreenExtentsInCustomCameraAndLayer3D(void)
+int UtcDaliActorCalculateScreenBoundsInCustomCameraAndLayer3D(void)
 {
   TestApplication          application;
   Dali::Integration::Scene scene = application.GetScene();
@@ -2225,7 +2229,7 @@ int UtcDaliActorCalculateScreenExtentsInCustomCameraAndLayer3D(void)
   Vector2 sceneSize = scene.GetSize();
 
   auto expectedExtent = Bounds{sceneSize.x * 0.5f + 1.5f, sceneSize.y * 0.5f + 14.5f, 1.0f, 3.0f};
-  auto actualExtent   = actor.CalculateScreenExtents();
+  auto actualExtent   = actor.CalculateScreenBounds();
   auto actualPosition = actor.CalculateScreenPosition();
   {
     std::ostringstream oss;
@@ -2340,7 +2344,7 @@ int UtcDaliActorCalculateScreenInCustomCameraAndOffscreenLayer3D(void)
                                sceneSize.y * 0.5f + sourcePosition.z - sourceSize.z * 0.5f,
                                sourceSize.x,
                                sourceSize.z};
-  auto actualExtent   = DevelActor::CalculateCurrentScreenExtents(sourceActor);
+  auto actualExtent   = sourceActor.CalculateCurrentScreenBounds();
   {
     std::ostringstream oss;
     oss << expectedExtent << "\n";
@@ -2380,7 +2384,7 @@ int UtcDaliActorCalculateScreenInCustomCameraAndOffscreenLayer3D(void)
                           sceneSize.y * 0.5f + rootPosition.y + (sourcePosition.z - sourceSize.z * 0.5f) * rootSize.y / sceneSize.y,
                           sourceSize.x * rootSize.x / sceneSize.x,
                           sourceSize.z * rootSize.y / sceneSize.y};
-  actualExtent   = DevelActor::CalculateCurrentScreenExtents(sourceActor);
+  actualExtent   = sourceActor.CalculateCurrentScreenBounds();
   {
     std::ostringstream oss;
     oss << expectedExtent << "\n";
@@ -16907,19 +16911,19 @@ int UtcDaliActorWorldIgnoredPropertyP(void)
   actor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   application.GetScene().Add(actor);
 
-  DALI_TEST_EQUALS(actor.GetProperty(DevelActor::Property::WORLD_IGNORED).Get<bool>(), true, TEST_LOCATION);
-  DALI_TEST_EQUALS(actor.GetCurrentProperty(DevelActor::Property::WORLD_IGNORED).Get<bool>(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetProperty(Actor::Property::WORLD_IGNORED).Get<bool>(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::WORLD_IGNORED).Get<bool>(), true, TEST_LOCATION);
 
   application.SendNotification();
   application.Render(0);
 
-  DALI_TEST_EQUALS(actor.GetProperty(DevelActor::Property::WORLD_IGNORED).Get<bool>(), false, TEST_LOCATION);
-  DALI_TEST_EQUALS(actor.GetCurrentProperty(DevelActor::Property::WORLD_IGNORED).Get<bool>(), false, TEST_LOCATION);
-  DALI_TEST_EQUALS(actor.GetPropertyType(DevelActor::Property::WORLD_IGNORED), Property::BOOLEAN, TEST_LOCATION);
-  DALI_TEST_EQUALS(actor.IsPropertyWritable(DevelActor::Property::WORLD_IGNORED), false, TEST_LOCATION);
-  DALI_TEST_EQUALS(actor.IsPropertyAnimatable(DevelActor::Property::WORLD_IGNORED), false, TEST_LOCATION);
-  DALI_TEST_EQUALS(actor.IsPropertyAConstraintInput(DevelActor::Property::WORLD_IGNORED), true, TEST_LOCATION);
-  DALI_TEST_EQUALS(actor.GetPropertyName(DevelActor::Property::WORLD_IGNORED), "worldIgnored", TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetProperty(Actor::Property::WORLD_IGNORED).Get<bool>(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::WORLD_IGNORED).Get<bool>(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetPropertyType(Actor::Property::WORLD_IGNORED), Property::BOOLEAN, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.IsPropertyWritable(Actor::Property::WORLD_IGNORED), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.IsPropertyAnimatable(Actor::Property::WORLD_IGNORED), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.IsPropertyAConstraintInput(Actor::Property::WORLD_IGNORED), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetPropertyName(Actor::Property::WORLD_IGNORED), "worldIgnored", TEST_LOCATION);
   END_TEST;
 }
 
@@ -16956,8 +16960,8 @@ int UtcDaliActorIgnored01(void)
     DALI_TEST_EQUALS(actor.IsIgnored(), event, testLocation);
     DALI_TEST_EQUALS(actor.GetProperty<bool>(Actor::Property::IGNORED), event, testLocation);
     DALI_TEST_EQUALS(actor.GetCurrentProperty<bool>(Actor::Property::IGNORED), current, testLocation);
-    DALI_TEST_EQUALS(actor.GetProperty<bool>(DevelActor::Property::WORLD_IGNORED), world, testLocation);
-    DALI_TEST_EQUALS(actor.GetCurrentProperty<bool>(DevelActor::Property::WORLD_IGNORED), world, testLocation);
+    DALI_TEST_EQUALS(actor.GetProperty<bool>(Actor::Property::WORLD_IGNORED), world, testLocation);
+    DALI_TEST_EQUALS(actor.GetCurrentProperty<bool>(Actor::Property::WORLD_IGNORED), world, testLocation);
   };
 
   TestIgnoredProperties(parent, false, false, true, TEST_LOCATION); // Since scene-off case mark as world-ignored.
@@ -17049,6 +17053,57 @@ int UtcDaliActorIgnored01(void)
   END_TEST;
 }
 
+int UtcDaliActorIsWorldIgnored(void)
+{
+  TestApplication application;
+
+  Actor parent     = Actor::New();
+  Actor child      = Actor::New();
+  Actor grandChild = Actor::New();
+  parent.Add(child);
+  child.Add(grandChild);
+  application.GetScene().Add(parent);
+
+  // An actor which is not connected to the scene is reported as ignored.
+  Actor orphan = Actor::New();
+  DALI_TEST_EQUALS(orphan.IsWorldIgnored(), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(0);
+
+  DALI_TEST_EQUALS(parent.IsWorldIgnored(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(child.IsWorldIgnored(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(grandChild.IsWorldIgnored(), false, TEST_LOCATION);
+
+  // Reflects the previous frame, so a flag just set is not visible yet.
+  parent.SetIgnored(true);
+  DALI_TEST_EQUALS(parent.IsWorldIgnored(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(grandChild.IsWorldIgnored(), false, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(0);
+
+  // An ignored ancestor makes the whole subtree world-ignored.
+  DALI_TEST_EQUALS(parent.IsWorldIgnored(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(child.IsWorldIgnored(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(grandChild.IsWorldIgnored(), true, TEST_LOCATION);
+
+  parent.SetIgnored(false);
+  grandChild.SetIgnored(true);
+  application.SendNotification();
+  application.Render(0);
+
+  DALI_TEST_EQUALS(parent.IsWorldIgnored(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(child.IsWorldIgnored(), false, TEST_LOCATION); // An ignored descendant does not affect it.
+  DALI_TEST_EQUALS(grandChild.IsWorldIgnored(), true, TEST_LOCATION);
+
+  // The method matches the read-only WORLD_IGNORED property.
+  DALI_TEST_EQUALS(child.GetProperty<bool>(Actor::Property::WORLD_IGNORED), child.IsWorldIgnored(), TEST_LOCATION);
+  DALI_TEST_EQUALS(grandChild.GetProperty<bool>(Actor::Property::WORLD_IGNORED), grandChild.IsWorldIgnored(), TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliActorIgnoredConstraintInput(void)
 {
   TestApplication application;
@@ -17070,7 +17125,7 @@ int UtcDaliActorIgnoredConstraintInput(void)
 
   Constraint constraint = Constraint::New<Vector4>(parent, Actor::Property::COLOR_MULTIPLIER, TestConstraintIgnored(ignored, worldIgnored));
   constraint.AddSource(Source(child, Actor::Property::IGNORED));
-  constraint.AddSource(Source(child, DevelActor::Property::WORLD_IGNORED));
+  constraint.AddSource(Source(child, Actor::Property::WORLD_IGNORED));
   constraint.ApplyPost();
 
   DALI_TEST_EQUALS(gTestConstraintCalled, false, TEST_LOCATION);

@@ -24,7 +24,7 @@
 
 namespace DALI_NAMESPACE::Integration
 {
-void ConstraintSetInternalTag(Dali::Constraint& constraint, const uint32_t tag)
+void ConstraintSetInternalTag(Dali::Constraint& constraint, uint32_t tag)
 {
   DALI_ASSERT_ALWAYS(ConstraintTagRanges::INTERNAL_CONSTRAINT_TAG_START <= tag && tag <= ConstraintTagRanges::INTERNAL_CONSTRAINT_TAG_MAX && "Out of tag range!");
   GetImplementation(constraint).SetTag(tag);

@@ -544,7 +544,7 @@ struct Property::Value::Impl
     mData.mMetadata.hash[0] = mData.mMetadata.hash[1] = mData.mMetadata.hash[2] = 0u; ///< Reset hash value when changing type.
   }
 
-  bool ConvertType(const Property::Type targetType)
+  bool ConvertType(Property::Type targetType)
   {
     bool                 converted = false;
     const Property::Type inputType = mData.mMetadata.type;
@@ -1192,7 +1192,7 @@ Property::Type Property::Value::GetType() const
   return Read().GetType();
 }
 
-bool Property::Value::ConvertType(const Property::Type targetType)
+bool Property::Value::ConvertType(Property::Type targetType)
 {
   return Write().ConvertType(targetType);
 }

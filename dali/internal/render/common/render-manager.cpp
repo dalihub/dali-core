@@ -1236,7 +1236,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
     bool clearFullFrameRect = (surfaceRect == viewportRect);
     if(instruction.mFrameBuffer != nullptr)
     {
-      Viewport frameRect(0, 0, instruction.mFrameBuffer->GetWidth(), instruction.mFrameBuffer->GetHeight());
+      BoundsInteger frameRect(0, 0, instruction.mFrameBuffer->GetWidth(), instruction.mFrameBuffer->GetHeight());
       clearFullFrameRect = (frameRect == viewportRect);
     }
 

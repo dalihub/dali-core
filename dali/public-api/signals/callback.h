@@ -20,6 +20,9 @@
 
 // EXTERNAL INCLUDES
 #include <cstddef>
+// Compile-time utilities only (type traits and std::forward); nothing crosses the ABI
+#include <type_traits>
+#include <utility>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
@@ -42,6 +45,15 @@ class CallbackBase;
 class DALI_CORE_API CallbackBase
 {
 public:
+  // ============================================================
+  // ABI-frozen class layout.
+  // The inline Execute()/dispatcher templates compile the data
+  // members and the single virtual destructor into application
+  // binaries.
+  // WARNING: Do NOT add, reorder, or remove data members or
+  // virtual functions.
+  // ============================================================
+
   /**
    * @brief Default constructor.
    * @SINCE_1_0.0
@@ -1506,8 +1518,9 @@ inline CallbackBase* MakeCallback(T& object, void (Base::*function)(void))
  * The primary template is not defined; only function-type specialisations
  * are valid.
  *
- * @note Free functions may take any number of parameters. Member functions are
- * limited to three, which is the arity of the underlying dispatchers.
+ * @note Free functions may take any number of parameters. Member functions and
+ * function objects are limited to three, which is the arity of the underlying
+ * dispatchers.
  *
  * @SINCE_2_5.38
  * @tparam Signature The function type of the callback
@@ -1586,6 +1599,42 @@ public:
   }
 
   /**
+   * @brief Creates a callback from a function object.
+   *
+   * A copy of the function object is held and destroyed with the callback.
+   *
+   * @SINCE_2_5.46
+   * @tparam F The type of the function object
+   * @param[in] functor The function object to call
+   * @return The newly created callback
+   * @note Function objects are limited to three parameters.
+   */
+  template<typename F>
+  static Callback New(F&& functor)
+  {
+    using Functor = std::decay_t<F>;
+    static_assert(sizeof...(Args) <= 3, "Dali::Callback supports at most three parameters for function objects");
+    static_assert(std::is_invocable_r_v<void, Functor&, Args...>, "The function object cannot be called with this callback's signature");
+    static_assert(std::is_copy_constructible_v<Functor>, "The function object must be copy constructible");
+    if constexpr(sizeof...(Args) == 0)
+    {
+      return Callback(new CallbackFunctor0<Functor>(std::forward<F>(functor)));
+    }
+    else if constexpr(sizeof...(Args) == 1)
+    {
+      return Callback(new CallbackFunctor1<Functor, Args...>(std::forward<F>(functor)));
+    }
+    else if constexpr(sizeof...(Args) == 2)
+    {
+      return Callback(new CallbackFunctor2<Functor, Args...>(std::forward<F>(functor)));
+    }
+    else
+    {
+      return Callback(new CallbackFunctor3<Functor, Args...>(std::forward<F>(functor)));
+    }
+  }
+
+  /**
    * @brief Calls the held function.
    *
    * Does nothing if this callback is empty.
@@ -1619,6 +1668,8 @@ private:
   {
   }
 
+  // ABI-frozen layout: exactly this one member. Callback crosses exported
+  // API boundaries by value.
   UniquePtr<CallbackBase> mCallback;
 };
 
@@ -1694,6 +1745,42 @@ public:
   }
 
   /**
+   * @brief Creates a callback from a function object.
+   *
+   * A copy of the function object is held and destroyed with the callback.
+   *
+   * @SINCE_2_5.46
+   * @tparam F The type of the function object
+   * @param[in] functor The function object to call
+   * @return The newly created callback
+   * @note Function objects are limited to three parameters.
+   */
+  template<typename F>
+  static Callback New(F&& functor)
+  {
+    using Functor = std::decay_t<F>;
+    static_assert(sizeof...(Args) <= 3, "Dali::Callback supports at most three parameters for function objects");
+    static_assert(std::is_invocable_r_v<Ret, Functor&, Args...>, "The function object cannot be called with this callback's signature");
+    static_assert(std::is_copy_constructible_v<Functor>, "The function object must be copy constructible");
+    if constexpr(sizeof...(Args) == 0)
+    {
+      return Callback(new CallbackFunctorReturn0<Functor, Ret>(std::forward<F>(functor)));
+    }
+    else if constexpr(sizeof...(Args) == 1)
+    {
+      return Callback(new CallbackFunctorReturn1<Functor, Args..., Ret>(std::forward<F>(functor)));
+    }
+    else if constexpr(sizeof...(Args) == 2)
+    {
+      return Callback(new CallbackFunctorReturn2<Functor, Args..., Ret>(std::forward<F>(functor)));
+    }
+    else
+    {
+      return Callback(new CallbackFunctorReturn3<Functor, Args..., Ret>(std::forward<F>(functor)));
+    }
+  }
+
+  /**
    * @brief Calls the held function.
    *
    * @SINCE_2_5.38
@@ -1725,6 +1812,8 @@ private:
   {
   }
 
+  // ABI-frozen layout: exactly this one member. Callback crosses exported
+  // API boundaries by value.
   UniquePtr<CallbackBase> mCallback;
 };
 

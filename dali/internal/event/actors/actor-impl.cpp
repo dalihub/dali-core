@@ -139,6 +139,7 @@ DALI_PROPERTY("enabled", BOOLEAN, true, false, false, Dali::Actor::Property::ENA
 DALI_PROPERTY("layoutDirection", STRING, true, false, false, Dali::Actor::Property::LAYOUT_DIRECTION)
 DALI_PROPERTY("culled", BOOLEAN, false, false, true, Dali::Actor::Property::CULLED)
 DALI_PROPERTY("ignored", BOOLEAN, true, false, true, Dali::Actor::Property::IGNORED)
+DALI_PROPERTY("worldIgnored", BOOLEAN, false, false, true, Dali::Actor::Property::WORLD_IGNORED)
 DALI_PROPERTY("id", INTEGER, false, false, false, Dali::Actor::Property::ID)
 DALI_PROPERTY("hierarchyDepth", INTEGER, false, false, false, Dali::Actor::Property::HIERARCHY_DEPTH)
 DALI_PROPERTY("isRoot", BOOLEAN, false, false, false, Dali::Actor::Property::IS_ROOT)
@@ -149,7 +150,6 @@ DALI_PROPERTY("siblingOrder", INTEGER, true, false, false, Dali::DevelActor::Pro
 DALI_PROPERTY("captureAllTouchAfterStart", BOOLEAN, true, false, false, Dali::DevelActor::Property::CAPTURE_ALL_TOUCH_AFTER_START)
 DALI_PROPERTY("useTextureUpdateArea", BOOLEAN, true, false, false, Dali::DevelActor::Property::USE_TEXTURE_UPDATE_AREA)
 DALI_PROPERTY("childrenDepthIndexPolicy", INTEGER, true, false, false, Dali::DevelActor::Property::CHILDREN_DEPTH_INDEX_POLICY)
-DALI_PROPERTY("worldIgnored", BOOLEAN, false, false, true, Dali::DevelActor::Property::WORLD_IGNORED)
 DALI_PROPERTY("sizeModeFactor", VECTOR3, true, false, false, Dali::DevelActor::Property::SIZE_MODE_FACTOR)
 DALI_PROPERTY("widthResizePolicy", STRING, true, false, false, Dali::DevelActor::Property::WIDTH_RESIZE_POLICY)
 DALI_PROPERTY("heightResizePolicy", STRING, true, false, false, Dali::DevelActor::Property::HEIGHT_RESIZE_POLICY)
@@ -1292,7 +1292,7 @@ bool Actor::ScreenToLocal(const RenderTask& renderTask, float& localX, float& lo
   return OnScene() && ConvertScreenToLocalRenderTask(renderTask, GetNode().GetWorldMatrix(), GetCurrentSize(), localX, localY, screenX, screenY);
 }
 
-bool Actor::ScreenToLocal(const Matrix& viewMatrix, const Matrix& projectionMatrix, const Viewport& viewport, float& localX, float& localY, float screenX, float screenY) const
+bool Actor::ScreenToLocal(const Matrix& viewMatrix, const Matrix& projectionMatrix, const BoundsInteger& viewport, float& localX, float& localY, float screenX, float screenY) const
 {
   return OnScene() && ConvertScreenToLocal(viewMatrix, projectionMatrix, GetNode().GetWorldMatrix(), GetCurrentSize(), viewport, localX, localY, screenX, screenY);
 }
@@ -2145,29 +2145,29 @@ void Actor::SetParent(ActorParent* parent, bool notify)
   }
 }
 
-Bounds Actor::CalculateScreenExtents() const
+Bounds Actor::CalculateScreenBounds() const
 {
   if(mLayer3DParentsCount == 0)
   {
     // We can assume that this actor is under 2d layer. Use faster, but imprecise algorithm
-    return CalculateActorScreenExtents(*this);
+    return CalculateActorScreenBounds(*this);
   }
   else
   {
-    return CalculateActorScreenExtentsRenderTaskList(*this);
+    return CalculateActorScreenBoundsRenderTaskList(*this);
   }
 }
 
-Bounds Actor::CalculateCurrentScreenExtents() const
+Bounds Actor::CalculateCurrentScreenBounds() const
 {
   if(mLayer3DParentsCount == 0)
   {
     // We can assume that this actor is under 2d layer. Use faster, but imprecise algorithm
-    return CalculateCurrentActorScreenExtents(*this);
+    return CalculateCurrentActorScreenBounds(*this);
   }
   else
   {
-    return CalculateCurrentActorScreenExtentsRenderTaskList(*this);
+    return CalculateCurrentActorScreenBoundsRenderTaskList(*this);
   }
 }
 

@@ -295,6 +295,15 @@ public:
   bool operator!=(const BaseHandle& rhs) const;
 
   /**
+   * @brief Less than operator overload.
+   *
+   * @SINCE_1_0.0
+   * @param[in] rhs A reference to the compared handle
+   * @return True if the handle handles point to the different Dali resources
+   */
+  bool operator<(const BaseHandle& rhs) const;
+
+  /**
    * @brief Gets the reference counted object pointer.
    *
    * @SINCE_1_0.0
@@ -333,41 +342,75 @@ inline T DownCast(BaseHandle handle)
 }
 
 /**
- * @brief Equality operator.
- * @SINCE_1_0.0
- * @param[in] lhs A reference to compare
- * @param[in] rhs A reference to compare to
- * @return True if the handle handles point to the same Dali resource, or if both are NULL
+ * @brief Equality operators for comparing a handle with nullptr.
+ * @SINCE_2_5.45
+ * @param[in] lhs A handle to compare
+ * @param[in] rhs nullptr
+ * @return True if the handle is empty
  */
-template<typename T>
-inline bool operator==(const BaseHandle& lhs, const T& rhs)
+inline bool operator==(const BaseHandle& lhs, decltype(nullptr) rhs)
 {
-  return lhs == static_cast<const BaseHandle&>(rhs);
+  return lhs.GetObjectPtr() == nullptr;
 }
 
 /**
- * @brief Equality operator.
- * @SINCE_1_0.0
- * @param[in] lhs A reference to compare
- * @param[in] rhs A reference to compare to
- * @return True if the handle handles point to the different Dali resources
+ * @brief Equality operators for comparing nullptr with a handle.
+ * @SINCE_2_5.45
+ * @param[in] lhs nullptr
+ * @param[in] rhs A handle to compare
+ * @return True if the handle is empty
  */
-template<typename T>
-inline bool operator!=(const BaseHandle& lhs, const T& rhs)
+inline bool operator==(decltype(nullptr) lhs, const BaseHandle& rhs)
 {
-  return lhs != static_cast<const BaseHandle&>(rhs);
+  return rhs.GetObjectPtr() == nullptr;
 }
 
 /**
- * @brief Less than operator.
- * @SINCE_1_0.0
- * @param[in] lhs A reference to compare
- * @param[in] rhs A reference to compare to
- * @return True if lhs less than rhs
+ * @brief Inequality operators for comparing a handle with nullptr.
+ * @SINCE_2_5.45
+ * @param[in] lhs A handle to compare
+ * @param[in] rhs nullptr
+ * @return True if the handle is not empty
  */
-inline bool operator<(const BaseHandle& lhs, const BaseHandle& rhs)
+inline bool operator!=(const BaseHandle& lhs, decltype(nullptr) rhs)
 {
-  return lhs.GetObjectPtr() < rhs.GetObjectPtr();
+  return lhs.GetObjectPtr() != nullptr;
+}
+
+/**
+ * @brief Inequality operators for comparing nullptr with a handle.
+ * @SINCE_2_5.45
+ * @param[in] lhs nullptr
+ * @param[in] rhs A handle to compare
+ * @return True if the handle is not empty
+ */
+inline bool operator!=(decltype(nullptr) lhs, const BaseHandle& rhs)
+{
+  return rhs.GetObjectPtr() != nullptr;
+}
+
+/**
+ * @brief Less-than operators for comparing a handle with nullptr.
+ * @SINCE_2_5.45
+ * @param[in] lhs A handle to compare
+ * @param[in] rhs nullptr
+ * @return False
+ */
+inline bool operator<(const BaseHandle& lhs, decltype(nullptr) rhs)
+{
+  return false;
+}
+
+/**
+ * @brief Less-than operators for comparing nullptr with a handle.
+ * @SINCE_2_5.45
+ * @param[in] lhs nullptr
+ * @param[in] rhs A handle to compare
+ * @return True if the handle is not empty
+ */
+inline bool operator<(decltype(nullptr) lhs, const BaseHandle& rhs)
+{
+  return rhs.GetObjectPtr() != nullptr;
 }
 
 /**

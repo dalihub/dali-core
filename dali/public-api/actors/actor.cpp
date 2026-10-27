@@ -118,7 +118,7 @@ Actor Actor::FindChildByName(Dali::StringView actorName)
   return Actor(child.Get());
 }
 
-Actor Actor::FindChildById(const uint32_t id)
+Actor Actor::FindChildById(uint32_t id)
 {
   Internal::ActorPtr child = GetImplementation(*this).FindChildById(id);
   return Actor(child.Get());
@@ -822,9 +822,19 @@ Vector2 Actor::CalculateScreenPosition() const
   return GetImplementation(*this).CalculateScreenPosition();
 }
 
+Bounds Actor::CalculateScreenBounds() const
+{
+  return GetImplementation(*this).CalculateScreenBounds();
+}
+
+Bounds Actor::CalculateCurrentScreenBounds() const
+{
+  return GetImplementation(*this).CalculateCurrentScreenBounds();
+}
+
 Bounds Actor::CalculateScreenExtents() const
 {
-  return GetImplementation(*this).CalculateScreenExtents();
+  return CalculateScreenBounds();
 }
 
 void Actor::Raise()
@@ -865,6 +875,11 @@ void Actor::SetIgnored(bool ignored)
 bool Actor::IsIgnored() const
 {
   return GetImplementation(*this).IsIgnored();
+}
+
+bool Actor::IsWorldIgnored() const
+{
+  return GetImplementation(*this).IsWorldIgnored();
 }
 
 uint32_t Actor::AddRenderer(Renderer& renderer)

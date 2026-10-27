@@ -177,7 +177,7 @@ Render::FrameBuffer* RenderTask::GetFrameBuffer()
   return mFrameBuffer;
 }
 
-bool RenderTask::QueryViewport(Viewport& viewport) const
+bool RenderTask::QueryViewport(BoundsInteger& viewport) const
 {
   if(!GetViewportEnabled())
   {
@@ -396,8 +396,8 @@ RenderInstruction& RenderTask::PrepareRenderInstruction()
 
   TASK_LOG(Debug::General);
 
-  Viewport viewport;
-  bool     viewportSet = QueryViewport(viewport);
+  BoundsInteger viewport;
+  bool          viewportSet = QueryViewport(viewport);
 
   auto& renderInstruction = GetRenderInstruction();
   renderInstruction.Reset(mCameraNode,

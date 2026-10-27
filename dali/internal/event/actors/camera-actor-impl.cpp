@@ -91,14 +91,14 @@ TypeRegistration mType(typeid(Dali::CameraActor), typeid(Dali::Actor), Create, C
  * plane at the camera origin. The ray direction is the direction the camera is facing
  * (i.e. Z=-1 in view space).
  */
-void BuildOrthoPickingRay(const Matrix&   viewMatrix,
-                          const Matrix&   projectionMatrix,
-                          const Viewport& viewport,
-                          float           screenX,
-                          float           screenY,
-                          Vector4&        rayOrigin,
-                          Vector4&        rayDir,
-                          float           nearPlaneDistance)
+void BuildOrthoPickingRay(const Matrix&        viewMatrix,
+                          const Matrix&        projectionMatrix,
+                          const BoundsInteger& viewport,
+                          float                screenX,
+                          float                screenY,
+                          Vector4&             rayOrigin,
+                          Vector4&             rayDir,
+                          float                nearPlaneDistance)
 {
   //          inv( modelMatrix )          inv( viewMatrix )    inv( projectionMatrix )           normalize
   //          <-----------------         <-----------------         <--------------           <-------------
@@ -562,11 +562,11 @@ void CameraActor::ApplyDefaultProjection()
   SetZ(cameraZ);
 }
 
-bool CameraActor::BuildPickingRay(const Vector2&  screenCoordinates,
-                                  const Viewport& viewport,
-                                  Vector4&        rayOrigin,
-                                  Vector4&        rayDirection,
-                                  bool            isDrawnOnFramebuffer)
+bool CameraActor::BuildPickingRay(const Vector2&       screenCoordinates,
+                                  const BoundsInteger& viewport,
+                                  Vector4&             rayOrigin,
+                                  Vector4&             rayDirection,
+                                  bool                 isDrawnOnFramebuffer)
 {
   bool success = true;
   if(mProjectionMode == Dali::Camera::PERSPECTIVE_PROJECTION)
@@ -614,7 +614,7 @@ bool CameraActor::BuildPickingRay(const Vector2& screenCoordinates,
                                   Vector4&       rayDirection,
                                   bool           isDrawnOnFramebuffer)
 {
-  Viewport viewport(0, 0, static_cast<int32_t>(screenSize.x), static_cast<int32_t>(screenSize.y));
+  BoundsInteger viewport(0, 0, static_cast<int32_t>(screenSize.x), static_cast<int32_t>(screenSize.y));
   return BuildPickingRay(screenCoordinates, viewport, rayOrigin, rayDirection, isDrawnOnFramebuffer);
 }
 

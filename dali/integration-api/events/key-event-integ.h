@@ -64,17 +64,17 @@ struct DALI_CORE_API KeyEvent : public Event
    * @param[in]  deviceClass     The class of device KeyEvent originated from
    * @param[in]  deviceSubclass  The subclass of device KeyEvent originated from
    */
-  KeyEvent(const Dali::String&          keyName,
-           const Dali::String&          logicalKey,
-           const Dali::String&          keyString,
-           int32_t                      keyCode,
-           int32_t                      keyModifier,
-           uint32_t                     timeStamp,
-           const State&                 keyState,
-           const Dali::String&          compose,
-           const Dali::String&          deviceName,
-           const Device::Class::Type    deviceClass,
-           const Device::Subclass::Type deviceSubclass);
+  KeyEvent(const Dali::String&    keyName,
+           const Dali::String&    logicalKey,
+           const Dali::String&    keyString,
+           int32_t                keyCode,
+           int32_t                keyModifier,
+           uint32_t               timeStamp,
+           const State&           keyState,
+           const Dali::String&    compose,
+           const Dali::String&    deviceName,
+           Device::Class::Type    deviceClass,
+           Device::Subclass::Type deviceSubclass);
 
   /**
    * @brief Constructor which creates a KeyEvent instance from a Dali::KeyEvent.

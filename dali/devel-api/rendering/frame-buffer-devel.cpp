@@ -62,7 +62,7 @@ uint8_t GetMultiSamplingLevel(FrameBuffer frameBuffer)
   return GetImplementation(frameBuffer).GetMultiSamplingLevel();
 }
 
-Texture GetColorTexture(const FrameBuffer frameBuffer, uint8_t index)
+Texture GetColorTexture(FrameBuffer frameBuffer, uint8_t index)
 {
   Internal::Texture* texturePtr = GetImplementation(frameBuffer).GetColorTexture(index);
   return Dali::Texture(texturePtr);
@@ -80,7 +80,7 @@ Texture GetDepthStencilTexture(FrameBuffer frameBuffer)
   return Dali::Texture(texturePtr);
 }
 
-uint8_t GetColorAttachmentCount(const FrameBuffer frameBuffer)
+uint8_t GetColorAttachmentCount(FrameBuffer frameBuffer)
 {
   return GetImplementation(frameBuffer).GetColorAttachmentCount();
 }

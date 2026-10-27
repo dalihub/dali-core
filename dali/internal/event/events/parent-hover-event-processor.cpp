@@ -156,7 +156,7 @@ struct ParentHoverEventProcessor::Impl
     Actor* lastConsumedActor(processor.mLastConsumedActor.GetActor());
     if(lastConsumedActor &&
        lastConsumedActor != lastPrimaryHitActor &&
-       lastConsumedActor != consumingActor)
+       static_cast<Dali::RefObject*>(lastConsumedActor) != consumingActor.GetObjectPtr())
     {
       Dali::Actor lastConsumedActorHandle(lastConsumedActor);
       currentPoint.SetHitActor(lastConsumedActorHandle);
@@ -167,7 +167,7 @@ struct ParentHoverEventProcessor::Impl
     if(hoverStartConsumedActor &&
        hoverStartConsumedActor != lastPrimaryHitActor &&
        hoverStartConsumedActor != lastConsumedActor &&
-       hoverStartConsumedActor != consumingActor)
+       static_cast<Dali::RefObject*>(hoverStartConsumedActor) != consumingActor.GetObjectPtr())
     {
       Dali::Actor hoverStartConsumedActorHandle(hoverStartConsumedActor);
       currentPoint.SetHitActor(hoverStartConsumedActorHandle);
@@ -218,7 +218,7 @@ struct ParentHoverEventProcessor::Impl
     {
       Dali::Actor hitActor = localVars.hoverEvent->GetHitActor(0);
 
-      if(hitActor && processor.mLastPrimaryHitActor.GetActor() != hitActor &&
+      if(hitActor && static_cast<Dali::RefObject*>(processor.mLastPrimaryHitActor.GetActor()) != hitActor.GetObjectPtr() &&
          localVars.primaryPointState == PointState::MOTION && GetImplementation(hitActor).GetLeaveRequired())
       {
         localVars.lastPrimaryHitActor = processor.mLastPrimaryHitActor.GetActor();
@@ -276,8 +276,8 @@ struct ParentHoverEventProcessor::Impl
         RenderTask& lastRenderTaskImpl = *processor.mLastRenderTask.Get();
 
         if(localVars.lastPrimaryHitActor &&
-           localVars.lastPrimaryHitActor != localVars.primaryHitActor &&
-           localVars.lastPrimaryHitActor != localVars.consumedActor)
+           static_cast<Dali::RefObject*>(localVars.lastPrimaryHitActor) != localVars.primaryHitActor.GetObjectPtr() &&
+           static_cast<Dali::RefObject*>(localVars.lastPrimaryHitActor) != localVars.consumedActor.GetObjectPtr())
         {
           if(localVars.lastPrimaryHitActor->IsHittable() && IsActuallySensitive(localVars.lastPrimaryHitActor))
           {
@@ -297,10 +297,10 @@ struct ParentHoverEventProcessor::Impl
         }
 
         if(localVars.lastConsumedActor &&
-           localVars.lastConsumedActor != localVars.consumedActor &&
+           static_cast<Dali::RefObject*>(localVars.lastConsumedActor) != localVars.consumedActor.GetObjectPtr() &&
            localVars.lastConsumedActor != localVars.lastPrimaryHitActor &&
-           localVars.lastConsumedActor != localVars.primaryHitActor &&
-           localVars.lastConsumedActor != leaveEventConsumer)
+           static_cast<Dali::RefObject*>(localVars.lastConsumedActor) != localVars.primaryHitActor.GetObjectPtr() &&
+           static_cast<Dali::RefObject*>(localVars.lastConsumedActor) != leaveEventConsumer.GetObjectPtr())
         {
           if(localVars.lastConsumedActor->IsHittable() && IsActuallySensitive(localVars.lastConsumedActor))
           {
@@ -356,7 +356,7 @@ struct ParentHoverEventProcessor::Impl
     {
       Actor* hoverStartConsumedActor(processor.mHoverStartConsumedActor.GetActor());
       if(hoverStartConsumedActor &&
-         hoverStartConsumedActor != localVars.consumedActor &&
+         static_cast<Dali::RefObject*>(hoverStartConsumedActor) != localVars.consumedActor.GetObjectPtr() &&
          hoverStartConsumedActor != localVars.lastPrimaryHitActor &&
          hoverStartConsumedActor != localVars.lastConsumedActor)
       {
