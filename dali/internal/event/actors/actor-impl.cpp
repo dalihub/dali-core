@@ -1292,7 +1292,7 @@ bool Actor::ScreenToLocal(const RenderTask& renderTask, float& localX, float& lo
   return OnScene() && ConvertScreenToLocalRenderTask(renderTask, GetNode().GetWorldMatrix(), GetCurrentSize(), localX, localY, screenX, screenY);
 }
 
-bool Actor::ScreenToLocal(const Matrix& viewMatrix, const Matrix& projectionMatrix, const Viewport& viewport, float& localX, float& localY, float screenX, float screenY) const
+bool Actor::ScreenToLocal(const Matrix& viewMatrix, const Matrix& projectionMatrix, const BoundsInteger& viewport, float& localX, float& localY, float screenX, float screenY) const
 {
   return OnScene() && ConvertScreenToLocal(viewMatrix, projectionMatrix, GetNode().GetWorldMatrix(), GetCurrentSize(), viewport, localX, localY, screenX, screenY);
 }

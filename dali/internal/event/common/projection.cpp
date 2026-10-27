@@ -26,7 +26,6 @@
 #include <dali/public-api/math/rect.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector4.h>
-#include <dali/public-api/math/viewport.h>
 
 namespace DALI_NAMESPACE
 {

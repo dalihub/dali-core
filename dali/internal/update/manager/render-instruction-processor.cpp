@@ -162,7 +162,7 @@ inline void AddRendererToRenderList(uint32_t                  renderPass,
                                     const SceneGraph::Camera& camera,
                                     bool                      isLayer3d,
                                     bool                      viewportSet,
-                                    const Viewport&           viewport,
+                                    const BoundsInteger&      viewport,
                                     bool                      cullingEnabled,
                                     bool                      hasFrameBuffer,
                                     Node*                     stopperNode)
@@ -336,7 +336,7 @@ inline void AddRenderersToRenderList(uint32_t                  renderPass,
                                      const SceneGraph::Camera& camera,
                                      bool                      isLayer3d,
                                      bool                      viewportSet,
-                                     const Viewport&           viewport,
+                                     const BoundsInteger&      viewport,
                                      bool                      cullingEnabled,
                                      bool                      hasFrameBuffer,
                                      Node*                     stopperNode)
@@ -615,8 +615,8 @@ void RenderInstructionProcessor::Prepare(SortedLayerPointers&        sortedLayer
   const SceneGraph::Camera& camera               = renderTask.GetCamera();
   const bool                isOrthographicCamera = camera.mProjectionMode.Get() == Dali::Camera::ProjectionMode::ORTHOGRAPHIC_PROJECTION;
 
-  Viewport viewport;
-  bool     viewportSet = renderTask.QueryViewport(viewport);
+  BoundsInteger viewport;
+  bool          viewportSet = renderTask.QueryViewport(viewport);
 
   Node* stopperNode = renderTask.GetStopperNode();
 
