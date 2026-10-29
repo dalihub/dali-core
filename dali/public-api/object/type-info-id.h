@@ -164,7 +164,7 @@ public:
    * @note Returns "void" for both the default-constructed (empty) state and
    * for an explicitly void-typed value. Use IsValid() to distinguish the two.
    */
-  const char* GetName() const
+  constexpr const char* GetName() const
   {
     return mName ? mName : "void";
   }
@@ -175,7 +175,7 @@ public:
    * @SINCE_2_5.21
    * @return The FNV-1a hash of the type name
    */
-  IdType GetId() const
+  constexpr IdType GetId() const
   {
     return mId;
   }
@@ -189,7 +189,7 @@ public:
    * @SINCE_2_5.21
    * @return true if a type is set, false if default-constructed (void/empty)
    */
-  bool IsValid() const
+  constexpr bool IsValid() const
   {
     return mName != nullptr;
   }

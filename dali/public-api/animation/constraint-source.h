@@ -54,7 +54,10 @@ struct DALI_CORE_API LocalSource
    * @SINCE_1_0.0
    * @param[in] index The index of a property provided by the constrained object
    */
-  LocalSource(Property::Index index);
+  constexpr LocalSource(Property::Index index)
+  : propertyIndex(index)
+  {
+  }
 
   Property::Index propertyIndex; ///< The index of a property provided by the constrained object.
 };
@@ -71,7 +74,10 @@ struct DALI_CORE_API ParentSource
    * @SINCE_1_0.0
    * @param[in] index The index of a property, provided by the parent of the constrained object
    */
-  ParentSource(Property::Index index);
+  constexpr ParentSource(Property::Index index)
+  : propertyIndex(index)
+  {
+  }
 
   Property::Index propertyIndex; ///< The index of a property provided by the parent of the constrained object.
 };

@@ -1579,10 +1579,6 @@ void TestGraphicsController::UpdateFramebufferRenderbufferUsage(Graphics::Frameb
 
 const Matrix& TestGraphicsController::GetClipMatrix(const Graphics::RenderTarget* renderTarget) const
 {
-  // This matrix transforms from GL -> Vulkan clip space
-  constexpr float VULKAN_CLIP_MATRIX_DATA[] = {
-    1.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, -0.5f, 0.0f, 0.0f, 0.0f, 0.5f, 1.0f};
-  static const Matrix VULKAN_CLIP_MATRIX(VULKAN_CLIP_MATRIX_DATA);
   static const Matrix IDENTITY = Matrix::IDENTITY;
 
   // For Vulkan, If render target is not surface, invert Y scale.

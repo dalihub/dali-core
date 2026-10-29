@@ -24,6 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/type-traits.h>
+#include <dali/public-api/math/scalar-math.h>
 
 namespace DALI_NAMESPACE
 {
@@ -52,7 +53,7 @@ struct DALI_CORE_API Vector3
   // (x width r), (y height g), (z depth b) must be consecutive in memory.
   // No other data must be added before (x width r) member.
   // No virtual methods must be added to this struct.
-  Vector3()
+  constexpr Vector3()
   : x(0.0f),
     y(0.0f),
     z(0.0f)
@@ -80,7 +81,7 @@ struct DALI_CORE_API Vector3
    * @SINCE_1_0.0
    * @param[in] array Array of xyz
    */
-  explicit Vector3(const float* array)
+  explicit constexpr Vector3(const float* array)
   : x(array[0]),
     y(array[1]),
     z(array[2])
@@ -123,7 +124,7 @@ struct DALI_CORE_API Vector3
    * @param[in] array Array of floats
    * @return Itself
    */
-  Vector3& operator=(const float* array)
+  constexpr Vector3& operator=(const float* array)
   {
     x = array[0];
     y = array[1];
@@ -157,7 +158,7 @@ struct DALI_CORE_API Vector3
    * @param[in] rhs Vector to add
    * @return A vector containing the result of the addition
    */
-  Vector3 operator+(const Vector3& rhs) const
+  constexpr Vector3 operator+(const Vector3& rhs) const
   {
     Vector3 temp(*this);
 
@@ -171,7 +172,7 @@ struct DALI_CORE_API Vector3
    * @param[in] rhs Vector to add
    * @return Itself
    */
-  Vector3& operator+=(const Vector3& rhs)
+  constexpr Vector3& operator+=(const Vector3& rhs)
   {
     x += rhs.x;
     y += rhs.y;
@@ -187,7 +188,7 @@ struct DALI_CORE_API Vector3
    * @param[in] rhs The vector to subtract
    * @return A vector containing the result of the subtraction
    */
-  Vector3 operator-(const Vector3& rhs) const
+  constexpr Vector3 operator-(const Vector3& rhs) const
   {
     Vector3 temp(*this);
 
@@ -201,7 +202,7 @@ struct DALI_CORE_API Vector3
    * @param[in] rhs The vector to subtract
    * @return Itself
    */
-  Vector3& operator-=(const Vector3& rhs)
+  constexpr Vector3& operator-=(const Vector3& rhs)
   {
     x -= rhs.x;
     y -= rhs.y;
@@ -217,7 +218,7 @@ struct DALI_CORE_API Vector3
    * @param[in] rhs The vector to multiply
    * @return A vector containing the result of the multiplication
    */
-  Vector3 operator*(const Vector3& rhs) const
+  constexpr Vector3 operator*(const Vector3& rhs) const
   {
     Vector3 temp(*this);
 
@@ -231,7 +232,7 @@ struct DALI_CORE_API Vector3
    * @param[in] rhs The float value to scale the vector
    * @return A vector containing the result of the scaling
    */
-  Vector3 operator*(float rhs) const
+  constexpr Vector3 operator*(float rhs) const
   {
     return Vector3(x * rhs, y * rhs, z * rhs);
   }
@@ -243,7 +244,7 @@ struct DALI_CORE_API Vector3
    * @param[in] rhs The vector to multiply
    * @return Itself
    */
-  Vector3& operator*=(const Vector3& rhs)
+  constexpr Vector3& operator*=(const Vector3& rhs)
   {
     x *= rhs.x;
     y *= rhs.y;
@@ -259,7 +260,7 @@ struct DALI_CORE_API Vector3
    * @param[in] rhs The float value to scale the vector
    * @return Itself
    */
-  Vector3& operator*=(float rhs)
+  constexpr Vector3& operator*=(float rhs)
   {
     x *= rhs;
     y *= rhs;
@@ -284,7 +285,7 @@ struct DALI_CORE_API Vector3
    * @param[in] rhs The vector to divide
    * @return A vector containing the result of the division
    */
-  Vector3 operator/(const Vector3& rhs) const
+  constexpr Vector3 operator/(const Vector3& rhs) const
   {
     Vector3 temp(*this);
 
@@ -298,7 +299,7 @@ struct DALI_CORE_API Vector3
    * @param[in] rhs The float value to scale the vector by
    * @return A vector containing the result of the scaling
    */
-  Vector3 operator/(float rhs) const
+  constexpr Vector3 operator/(float rhs) const
   {
     return Vector3(x / rhs, y / rhs, z / rhs);
   }
@@ -310,7 +311,7 @@ struct DALI_CORE_API Vector3
    * @param[in] rhs The vector to divide
    * @return Itself
    */
-  Vector3& operator/=(const Vector3& rhs)
+  constexpr Vector3& operator/=(const Vector3& rhs)
   {
     x /= rhs.x;
     y /= rhs.y;
@@ -326,7 +327,7 @@ struct DALI_CORE_API Vector3
    * @param[in] rhs The float value to scale the vector by
    * @return Itself
    */
-  Vector3& operator/=(float rhs)
+  constexpr Vector3& operator/=(float rhs)
   {
     float oneOverRhs = 1.0f / rhs;
     x *= oneOverRhs;
@@ -342,7 +343,7 @@ struct DALI_CORE_API Vector3
    * @SINCE_1_0.0
    * @return A vector containing the negation
    */
-  Vector3 operator-() const
+  constexpr Vector3 operator-() const
   {
     Vector3 temp(-x, -y, -z);
 
@@ -358,7 +359,23 @@ struct DALI_CORE_API Vector3
    * @param[in] rhs The vector to test against
    * @return True if the vectors are equal
    */
-  bool operator==(const Vector3& rhs) const;
+  constexpr bool operator==(const Vector3& rhs) const
+  {
+    if(Internal::MathUtils::Abs(x - rhs.x) > GetRangedEpsilon(x, rhs.x))
+    {
+      return false;
+    }
+    if(Internal::MathUtils::Abs(y - rhs.y) > GetRangedEpsilon(y, rhs.y))
+    {
+      return false;
+    }
+    if(Internal::MathUtils::Abs(z - rhs.z) > GetRangedEpsilon(z, rhs.z))
+    {
+      return false;
+    }
+
+    return true;
+  }
 
   /**
    * @brief Inequality operator.
@@ -369,7 +386,7 @@ struct DALI_CORE_API Vector3
    * @param[in] rhs The vector to test against
    * @return True if the vectors are not equal
    */
-  bool operator!=(const Vector3& rhs) const
+  constexpr bool operator!=(const Vector3& rhs) const
   {
     return !(*this == rhs);
   }
@@ -382,11 +399,12 @@ struct DALI_CORE_API Vector3
    * @param[in] index Subscript index
    * @return The float at the given index
    */
-  const float& operator[](uint32_t index) const
+  constexpr const float& operator[](uint32_t index) const
   {
     DALI_ASSERT_ALWAYS(index < 3 && "Vector element index out of bounds");
 
-    return AsFloat()[index];
+    return index == 0 ? x : index == 1 ? y
+                                       : z;
   }
 
   /**
@@ -397,11 +415,12 @@ struct DALI_CORE_API Vector3
    * @param[in] index Subscript index
    * @return The float at the given index
    */
-  float& operator[](uint32_t index)
+  constexpr float& operator[](uint32_t index)
   {
     DALI_ASSERT_ALWAYS(index < 3 && "Vector element index out of bounds");
 
-    return AsFloat()[index];
+    return index == 0 ? x : index == 1 ? y
+                                       : z;
   }
 
   /**
@@ -583,7 +602,7 @@ public:
  * @param[in] b A vector
  * @return A vector containing the minimum of each component from a and b
  */
-inline Vector3 Min(const Vector3& a, const Vector3& b)
+inline constexpr Vector3 Min(const Vector3& a, const Vector3& b)
 {
   return Vector3(a.x < b.x ? a.x : b.x,
                  a.y < b.y ? a.y : b.y,
@@ -599,7 +618,7 @@ inline Vector3 Min(const Vector3& a, const Vector3& b)
  * @param[in] b A vector
  * @return A vector containing the maximum of each component from a and b
  */
-inline Vector3 Max(const Vector3& a, const Vector3& b)
+inline constexpr Vector3 Max(const Vector3& a, const Vector3& b)
 {
   return Vector3(a.x > b.x ? a.x : b.x,
                  a.y > b.y ? a.y : b.y,

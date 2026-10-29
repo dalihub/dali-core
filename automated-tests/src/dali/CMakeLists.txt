@@ -17,6 +17,7 @@ SET(TC_SOURCES
         utc-Dali-Callback.cpp
         utc-Dali-CameraActor.cpp
         utc-Dali-CircularQueue.cpp
+        utc-Dali-Constexpr.cpp
         utc-Dali-Common.cpp
         utc-Dali-ConditionalWait.cpp
         utc-Dali-ConnectionTracker.cpp

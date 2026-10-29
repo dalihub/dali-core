@@ -20,7 +20,6 @@
 
 // EXTERNAL INCLUDES
 #include <cstdint>
-#include <type_traits>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
@@ -92,7 +91,7 @@ public:
    * @SINCE_2_1.45
    * @param[in] width The x dimension to be stored in this 2-tuple
    */
-  void SetWidth(tIntType width)
+  constexpr void SetWidth(tIntType width)
   {
     mComponents[0] = width;
   }
@@ -102,7 +101,7 @@ public:
    * @SINCE_2_1.45
    * @return the x dimension stored in this 2-tuple
    */
-  tIntType GetWidth() const
+  constexpr tIntType GetWidth() const
   {
     return mComponents[0];
   }
@@ -112,7 +111,7 @@ public:
    * @SINCE_2_1.45
    * @param[in] height The y dimension to be stored in this 2-tuple
    */
-  void SetHeight(tIntType height)
+  constexpr void SetHeight(tIntType height)
   {
     mComponents[1] = height;
   }
@@ -122,7 +121,7 @@ public:
    * @SINCE_2_1.45
    * @return Height
    */
-  tIntType GetHeight() const
+  constexpr tIntType GetHeight() const
   {
     return mComponents[1];
   }
@@ -132,7 +131,7 @@ public:
    * @SINCE_2_1.45
    * @param[in] x The x dimension to be stored in this 2-tuple
    */
-  void SetX(tIntType x)
+  constexpr void SetX(tIntType x)
   {
     mComponents[0] = x;
   }
@@ -142,7 +141,7 @@ public:
    * @SINCE_2_1.45
    * @return X
    */
-  tIntType GetX() const
+  constexpr tIntType GetX() const
   {
     return mComponents[0];
   }
@@ -152,7 +151,7 @@ public:
    * @SINCE_2_1.45
    * @param[in] y The y dimension to be stored in this 2-tuple
    */
-  void SetY(tIntType y)
+  constexpr void SetY(tIntType y)
   {
     mComponents[1] = y;
   }
@@ -162,9 +161,49 @@ public:
    * @SINCE_2_1.45
    * @return Y
    */
-  tIntType GetY() const
+  constexpr tIntType GetY() const
   {
     return mComponents[1];
+  }
+
+  /**
+   * @brief Sets the start value (same as x and width).
+   * @SINCE_2_5.45
+   * @param[in] start The first value stored in this pair
+   */
+  constexpr void SetStart(tIntType start)
+  {
+    SetX(start);
+  }
+
+  /**
+   * @brief Returns the start value (same as x and width).
+   * @SINCE_2_5.45
+   * @return The first value stored in this pair
+   */
+  constexpr tIntType GetStart() const
+  {
+    return GetX();
+  }
+
+  /**
+   * @brief Sets the end value (same as y and height).
+   * @SINCE_2_5.45
+   * @param[in] end The second value stored in this pair
+   */
+  constexpr void SetEnd(tIntType end)
+  {
+    SetY(end);
+  }
+
+  /**
+   * @brief Returns the end value (same as y and height).
+   * @SINCE_2_5.45
+   * @return The second value stored in this pair
+   */
+  constexpr tIntType GetEnd() const
+  {
+    return GetY();
   }
 
   /**
@@ -173,7 +212,7 @@ public:
    * @param[in] rhs A reference for comparison
    * @return True if same
    */
-  bool operator==(const IntPair& rhs) const
+  constexpr bool operator==(const IntPair& rhs) const
   {
     return mData == rhs.mData;
   }
@@ -184,7 +223,7 @@ public:
    * @param[in] rhs A reference for comparison
    * @return True if different
    */
-  bool operator!=(const IntPair& rhs) const
+  constexpr bool operator!=(const IntPair& rhs) const
   {
     return mData != rhs.mData;
   }
@@ -196,7 +235,7 @@ public:
    * @param[in] rhs A reference for comparison
    * @return True if less
    */
-  bool operator<(const IntPair& rhs) const
+  constexpr bool operator<(const IntPair& rhs) const
   {
     return mData < rhs.mData;
   }
@@ -208,7 +247,7 @@ public:
    * @param[in] rhs A reference for comparison
    * @return True if greater
    */
-  bool operator>(const IntPair& rhs) const
+  constexpr bool operator>(const IntPair& rhs) const
   {
     return mData > rhs.mData;
   }
@@ -218,46 +257,6 @@ public:
   IntPair(IntPair&&) noexcept            = default; ///< Default move constructor
   IntPair& operator=(const IntPair&)     = default; ///< Default copy assignment operator
   IntPair& operator=(IntPair&&) noexcept = default; ///< Default move assignment operator
-
-  /**
-   * @brief Sets the start value (same as x and width).
-   * @SINCE_2_5.45
-   * @param[in] start The first value stored in this pair
-   */
-  void SetStart(tIntType start)
-  {
-    SetX(start);
-  }
-
-  /**
-   * @brief Returns the start value (same as x and width).
-   * @SINCE_2_5.45
-   * @return The first value stored in this pair
-   */
-  tIntType GetStart() const
-  {
-    return GetX();
-  }
-
-  /**
-   * @brief Sets the end value (same as y and height).
-   * @SINCE_2_5.45
-   * @param[in] end The second value stored in this pair
-   */
-  void SetEnd(tIntType end)
-  {
-    SetY(end);
-  }
-
-  /**
-   * @brief Returns the end value (same as y and height).
-   * @SINCE_2_5.45
-   * @return The second value stored in this pair
-   */
-  tIntType GetEnd() const
-  {
-    return GetY();
-  }
 
 private:
   union

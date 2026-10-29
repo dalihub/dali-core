@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -625,7 +625,6 @@ int UtcDaliMatrixOperatorMultiplyAssign01P(void)
   const float rr[16] = {1.0f, 5.0f, 9.0f, 10.0f, 2.0f, 6.0f, 11.0f, 12.0f, 3.0f, 7.0f, 0.0f, 0.0f, 4.0f, 8.0f, 0.0f, 0.0f};
   Matrix      left(ll);
   Matrix      right(rr);
-  Matrix      copyedLeft(ll);
 
   const float els[16] = {217.0f, 242.0f, 38.0f, 44.0f, 263.0f, 294.0f, 48.0f, 56.0f, 38.0f, 48.0f, 58.0f, 68.0f, 44.0f, 56.0f, 68.0f, 80.0f};
   Matrix      result(els);

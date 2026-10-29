@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -361,7 +361,6 @@ int UtcDaliMatrix3OperatorMultiplyAssign01P(void)
     1.0f, 2.0f, 3.0f, 5.0f, 6.0f, 7.0f, 9.0f, 10.0f, 0.0f);
   Matrix3 right(
     1.0f, 5.0f, 9.0f, 2.0f, 6.0f, 11.0f, 3.0f, 7.0f, 0.0f);
-  Matrix3 copiedLeft(left);
 
   Matrix3 result(
     107.0f, 122.0f, 38.0f, 131.0f, 150.0f, 48.0f, 38.0f, 48.0f, 58.0f);

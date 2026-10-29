@@ -43,7 +43,7 @@ struct Radian
    * @brief Default constructor, initializes to 0.
    * @SINCE_1_0.0
    */
-  Radian()
+  constexpr Radian()
   : radian(0.f)
   {
   }
@@ -65,7 +65,7 @@ struct Radian
    * @SINCE_1_0.0
    * @param[in] degree The initial value in degrees
    */
-  Radian(Degree degree)
+  constexpr Radian(Degree degree)
   : radian(degree.degree * Math::PI_OVER_180)
   {
   }
@@ -77,7 +77,7 @@ struct Radian
    * @param[in] value Float value in radians
    * @return A reference to this
    */
-  Radian& operator=(float value)
+  constexpr Radian& operator=(float value)
   {
     radian = value;
     return *this;
@@ -90,7 +90,7 @@ struct Radian
    * @param[in] degree The value in degrees
    * @return A reference to this
    */
-  Radian& operator=(Degree degree)
+  constexpr Radian& operator=(Degree degree)
   {
     radian = degree.degree * Math::PI_OVER_180;
     return *this;
@@ -101,7 +101,7 @@ struct Radian
    * @SINCE_1_0.0
    * @return The float value of this Radian
    */
-  operator float() const
+  constexpr operator float() const
   {
     return radian;
   }
@@ -117,6 +117,11 @@ public:
   float radian; ///< The value in radians
 };
 
+constexpr Degree::Degree(Radian value)
+: degree(value.radian * Math::ONE80_OVER_PI)
+{
+}
+
 // compiler generated destructor, copy constructor and assignment operators are ok as this class is POD
 
 /**
@@ -127,9 +132,9 @@ public:
  * @param[in] rhs Radian to compare to
  * @return True if the values are identical
  */
-inline bool operator==(Radian lhs, Radian rhs)
+inline constexpr bool operator==(Radian lhs, Radian rhs)
 {
-  return fabsf(lhs.radian - rhs.radian) < Math::MACHINE_EPSILON_10; // expect Radian angles to be between 0 and 10 (multiplies of Math::PI)
+  return Internal::MathUtils::Abs(lhs.radian - rhs.radian) < Math::MACHINE_EPSILON_10; // expect Radian angles to be between 0 and 10 (multiplies of Math::PI)
 }
 
 /**
@@ -140,7 +145,7 @@ inline bool operator==(Radian lhs, Radian rhs)
  * @param[in] rhs Radian to compare to
  * @return True if the values are not identical
  */
-inline bool operator!=(Radian lhs, Radian rhs)
+inline constexpr bool operator!=(Radian lhs, Radian rhs)
 {
   return !(operator==(lhs, rhs));
 }
@@ -153,9 +158,9 @@ inline bool operator!=(Radian lhs, Radian rhs)
  * @param[in] rhs Degree to compare to
  * @return True if the values are identical
  */
-inline bool operator==(Radian lhs, Degree rhs)
+inline constexpr bool operator==(Radian lhs, Degree rhs)
 {
-  return fabsf(lhs.radian - Radian(rhs).radian) < Math::MACHINE_EPSILON_100; // expect Degree angles to be between 0 and 999
+  return Internal::MathUtils::Abs(lhs.radian - Radian(rhs).radian) < Math::MACHINE_EPSILON_100; // expect Degree angles to be between 0 and 999
 }
 
 /**
@@ -166,7 +171,7 @@ inline bool operator==(Radian lhs, Degree rhs)
  * @param[in] rhs Degree to compare to
  * @return True if the values are not identical
  */
-inline bool operator!=(Radian lhs, Degree rhs)
+inline constexpr bool operator!=(Radian lhs, Degree rhs)
 {
   return !(operator==(lhs, rhs));
 }
@@ -179,9 +184,9 @@ inline bool operator!=(Radian lhs, Degree rhs)
  * @param[in] rhs Radian to compare to
  * @return True if the values are identical
  */
-inline bool operator==(Degree lhs, Radian rhs)
+inline constexpr bool operator==(Degree lhs, Radian rhs)
 {
-  return fabsf(Radian(lhs).radian - rhs.radian) < Math::MACHINE_EPSILON_100; // expect Degree angles to be between 0 and 999
+  return Internal::MathUtils::Abs(Radian(lhs).radian - rhs.radian) < Math::MACHINE_EPSILON_100; // expect Degree angles to be between 0 and 999
 }
 
 /**
@@ -192,7 +197,7 @@ inline bool operator==(Degree lhs, Radian rhs)
  * @param[in] rhs Radian to compare to
  * @return True if the values are not identical
  */
-inline bool operator!=(Degree lhs, Radian rhs)
+inline constexpr bool operator!=(Degree lhs, Radian rhs)
 {
   return !(operator==(lhs, rhs));
 }
@@ -205,7 +210,7 @@ inline bool operator!=(Degree lhs, Radian rhs)
  * @param[in] rhs Radian to compare to
  * @return True if lhs is greater than rhs
  */
-inline bool operator>(Radian lhs, Radian rhs)
+inline constexpr bool operator>(Radian lhs, Radian rhs)
 {
   return lhs.radian > rhs.radian;
 }
@@ -218,7 +223,7 @@ inline bool operator>(Radian lhs, Radian rhs)
  * @param[in] rhs Degree to compare to
  * @return True if lhs is greater than rhs
  */
-inline bool operator>(Radian lhs, Degree rhs)
+inline constexpr bool operator>(Radian lhs, Degree rhs)
 {
   return lhs.radian > Radian(rhs).radian;
 }
@@ -231,7 +236,7 @@ inline bool operator>(Radian lhs, Degree rhs)
  * @param[in] rhs Degree to compare to
  * @return True if lhs is greater than rhs
  */
-inline bool operator>(Degree lhs, Radian rhs)
+inline constexpr bool operator>(Degree lhs, Radian rhs)
 {
   return Radian(lhs).radian > rhs.radian;
 }
@@ -244,7 +249,7 @@ inline bool operator>(Degree lhs, Radian rhs)
  * @param[in] rhs Radian to compare to
  * @return True if lhs is less than rhs
  */
-inline bool operator<(Radian lhs, Radian rhs)
+inline constexpr bool operator<(Radian lhs, Radian rhs)
 {
   return lhs.radian < rhs.radian;
 }
@@ -257,7 +262,7 @@ inline bool operator<(Radian lhs, Radian rhs)
  * @param[in] rhs Degree to compare to
  * @return True if lhs is less than rhs
  */
-inline bool operator<(Radian lhs, Degree rhs)
+inline constexpr bool operator<(Radian lhs, Degree rhs)
 {
   return lhs.radian < Radian(rhs).radian;
 }
@@ -270,7 +275,7 @@ inline bool operator<(Radian lhs, Degree rhs)
  * @param[in] rhs Radian to compare to
  * @return True if lhs is less than rhs
  */
-inline bool operator<(Degree lhs, Radian rhs)
+inline constexpr bool operator<(Degree lhs, Radian rhs)
 {
   return Radian(lhs).radian < rhs.radian;
 }
@@ -283,7 +288,7 @@ inline bool operator<(Degree lhs, Radian rhs)
  * @param[in] rhs float to multiply
  * @return Result of the multiplication
  */
-inline Radian operator*(Radian lhs, float rhs)
+inline constexpr Radian operator*(Radian lhs, float rhs)
 {
   return Radian(lhs.radian * rhs);
 }
@@ -294,7 +299,7 @@ inline Radian operator*(Radian lhs, float rhs)
  * @param[in] in Radian to negate
  * @return The negative angle
  */
-inline Radian operator-(Radian in)
+inline constexpr Radian operator-(Radian in)
 {
   return Radian(-in.radian);
 }
@@ -307,7 +312,7 @@ inline Radian operator-(Radian in)
  * @param max value
  * @return The resulting radian
  */
-inline Radian Clamp(Radian angle, float min, float max)
+inline constexpr Radian Clamp(Radian angle, float min, float max)
 {
   return Radian(Clamp<float>(angle.radian, min, max));
 }

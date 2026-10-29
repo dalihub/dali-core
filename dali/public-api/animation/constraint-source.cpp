@@ -20,15 +20,6 @@
 
 namespace DALI_NAMESPACE
 {
-LocalSource::LocalSource(Property::Index index)
-: propertyIndex(index)
-{
-}
-
-ParentSource::ParentSource(Property::Index index)
-: propertyIndex(index)
-{
-}
 
 Source::Source(Handle& obj, Property::Index index)
 : propertyIndex(index),
