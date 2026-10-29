@@ -1,4 +1,4 @@
 /doc
 /linker-test
-/dali*-core-config.cmake
+/dali2-core-config.cmake
 /*.dylib
