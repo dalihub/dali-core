@@ -31,6 +31,7 @@
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/actors/layer-impl.h>
 #include <dali/internal/event/common/scene-impl.h>
+#include <dali/internal/event/events/geometry-touch-propagation.h>
 #include <dali/internal/event/events/hit-test-algorithm-impl.h>
 #include <dali/internal/event/events/multi-point-event-util.h>
 #include <dali/internal/event/events/touch-event-impl.h>
@@ -177,8 +178,9 @@ Dali::Actor EmitGeoTouchSignalsWithTracking(const std::list<ActorPtr>& actorList
 {
   Dali::Actor consumedActor;
 
-  const std::list<ActorPtr> candidateSnapshot(actorLists);
-  std::vector<Actor*>       dispatchedCandidates;
+  std::list<ActorPtr> candidateSnapshot(actorLists);
+  const ActorPtr      propagationBoundary = LimitTouchPropagation(candidateSnapshot, streamState.touchPropagationBoundaries, &streamState.candidatesRootToFront);
+  std::vector<Actor*> dispatchedCandidates;
   for(auto rIter = candidateSnapshot.rbegin(); rIter != candidateSnapshot.rend(); ++rIter)
   {
     ActorPtr actorPtr  = *rIter;
@@ -218,6 +220,35 @@ Dali::Actor EmitGeoTouchSignalsWithTracking(const std::list<ActorPtr>& actorList
          streamState.phase == GeometryTouchStreamPhase::FINISHED)
       {
         break;
+      }
+    }
+  }
+  if(propagationBoundary && !consumedActor && !observedActorDisconnected &&
+     streamState.phase != GeometryTouchStreamPhase::FINISHING &&
+     streamState.phase != GeometryTouchStreamPhase::FINISHED)
+  {
+    // Classify each changed point: a stationary primary must not expose motion logs,
+    // and a moving primary must not hide another point's DOWN or UP.
+    const uint32_t pointCount = touchEvent.GetPointCount();
+    for(uint32_t index = 0u; index < pointCount; ++index)
+    {
+      const PointState::Type state = touchEvent.GetState(index);
+      if(state == PointState::STATIONARY)
+      {
+        continue;
+      }
+      if(state == PointState::MOTION)
+      {
+        DALI_LOG_INFO(gLogFilter, Debug::Concise,
+                      "Touch propagation stopped by SetTouchPropagationBlocked(true): boundaryId(%u), name(%.*s), deviceId(%d), state(%s)\n",
+                      propagationBoundary->GetId(), static_cast<int>(propagationBoundary->GetName().size()), propagationBoundary->GetName().data(),
+                      touchEvent.GetDeviceId(index), TOUCH_POINT_STATE[state]);
+      }
+      else
+      {
+        DALI_LOG_RELEASE_INFO("Touch propagation stopped by SetTouchPropagationBlocked(true): boundaryId(%u), name(%.*s), deviceId(%d), state(%s)\n",
+                              propagationBoundary->GetId(), static_cast<int>(propagationBoundary->GetName().size()), propagationBoundary->GetName().data(),
+                              touchEvent.GetDeviceId(index), TOUCH_POINT_STATE[state]);
       }
     }
   }
@@ -265,7 +296,10 @@ Dali::Actor EmitTouchSignals(Actor*                    actor,
  * @param[in] lastRenderTask The last render task member
  * @param[in] currentPoint The current point information
  * @param[in] scene The scene that this touch is related to
- * @param[in] actorLists The list of actors that can be touched, from leaf actor to root.
+ * @param[in,out] actorLists The touch candidates, ordered from back to front
+ * @param[in,out] touchPropagationBoundaries The boundaries captured when this router stream began
+ * @param[in] preserveBoundarySnapshot Whether this is a restart inside the same router stream
+ * @param[in] initialHit Optional initial hit supplied by the router
  */
 void ParsePrimaryTouchPoint(
   HitTestAlgorithm::Results&     hitTestResults,
@@ -275,6 +309,8 @@ void ParsePrimaryTouchPoint(
   const Integration::Point&      currentPoint,
   const Internal::Scene&         scene,
   std::list<ActorPtr>&           actorLists,
+  std::vector<ActorPtr>&         touchPropagationBoundaries,
+  bool                           preserveBoundarySnapshot,
   const GeometryTouchInitialHit* initialHit)
 {
   Actor* capturingTouchActor = capturingTouchActorObserver.GetActor();
@@ -286,6 +322,7 @@ void ParsePrimaryTouchPoint(
     hitTestResults.renderTask       = initialHit->renderTask;
     hitTestResults.actorCoordinates = initialHit->actorCoordinates;
     actorLists                      = initialHit->candidatesRootToFront;
+    touchPropagationBoundaries      = initialHit->touchPropagationBoundaries;
     capturingTouchActorObserver.SetActor(hitActor);
     ownTouchActorObserver.SetActor(hitActor);
   }
@@ -310,12 +347,21 @@ void ParsePrimaryTouchPoint(
       capturingTouchActorObserver.SetActor(hitActor);
       ownTouchActorObserver.SetActor(hitActor);
 
-      // Convert raw actor pointers to ActorPtr
-      actorLists.clear();
-      for(auto* rawActor : hitTestResults.actorLists)
+      // A restart inside the same router stream must not reopen a captured boundary.
+      // Unbounded streams retain the existing re-hit behavior without adopting new boundaries.
+      if(!preserveBoundarySnapshot || touchPropagationBoundaries.empty())
       {
-        actorLists.push_back(ActorPtr(rawActor));
+        actorLists.clear();
+        for(auto* rawActor : hitTestResults.actorLists)
+        {
+          actorLists.push_back(ActorPtr(rawActor));
+        }
       }
+      if(!preserveBoundarySnapshot)
+      {
+        touchPropagationBoundaries = CaptureTouchPropagationBoundaries(actorLists);
+      }
+      LimitTouchPropagation(actorLists, touchPropagationBoundaries);
     }
   }
 }
@@ -893,12 +939,15 @@ bool GeometryTouchEventProcessor::ProcessTouchEvent(const Integration::TouchEven
 
   DALI_TRACE_SCOPE(gTraceFilter, "DALI_PROCESS_TOUCH_EVENT");
 
+  bool preserveBoundarySnapshot = false;
   if(event.points[0].GetState() == PointState::DOWN)
   {
     const bool hasActiveRecipient = std::any_of(mStreamState.recipientsInDispatchOrder.begin(), mStreamState.recipientsInDispatchOrder.end(), [](const GeometryTouchRecipient& recipient)
     { return recipient.state == GeometryTouchRecipientState::ACTIVE; });
     if(!hasActiveRecipient && !mStreamState.recipientsInDispatchOrder.empty())
     {
+      const auto    initialCandidates = mStreamState.candidatesRootToFront;
+      const auto    initialBoundaries = mStreamState.touchPropagationBoundaries;
       TouchEventPtr restartEvent(new TouchEvent(event.time));
       for(const auto& point : event.points)
       {
@@ -907,7 +956,10 @@ bool GeometryTouchEventProcessor::ProcessTouchEvent(const Integration::TouchEven
       restartEvent->SetRenderTask(Dali::RenderTask(mLastRenderTask.Get()));
       Impl::TerminateInterceptRecipients(*this, restartEvent, mLastRenderTask.Get());
       Clear();
-      mStreamState.phase = GeometryTouchStreamPhase::UNOWNED;
+      mStreamState.phase                      = GeometryTouchStreamPhase::UNOWNED;
+      mStreamState.candidatesRootToFront      = initialCandidates;
+      mStreamState.touchPropagationBoundaries = initialBoundaries;
+      preserveBoundarySnapshot                = true;
     }
   }
 
@@ -929,7 +981,7 @@ bool GeometryTouchEventProcessor::ProcessTouchEvent(const Integration::TouchEven
     if(!firstPointParsed)
     {
       firstPointParsed = true;
-      ParsePrimaryTouchPoint(hitTestResults, mCapturingTouchActor, mOwnTouchActor, mLastRenderTask, currentPoint, mScene, mStreamState.candidatesRootToFront, initialHit);
+      ParsePrimaryTouchPoint(hitTestResults, mCapturingTouchActor, mOwnTouchActor, mLastRenderTask, currentPoint, mScene, mStreamState.candidatesRootToFront, mStreamState.touchPropagationBoundaries, preserveBoundarySnapshot, initialHit);
 
       // The router's pending initial hit starts this processor. A processor whose recipients were
       // all terminated can also be cleared and restarted within the same router stream. Otherwise,
@@ -1080,6 +1132,7 @@ void GeometryTouchEventProcessor::Clear(bool keepLastPrimaryObserver)
   mStreamState.ownerPathRootToOwner.clear();
   mStreamState.interceptedRootToTarget.clear();
   mStreamState.candidatesRootToFront.clear();
+  mStreamState.touchPropagationBoundaries.clear();
   mStreamState.recipientsInDispatchOrder.clear();
   mStreamState.interceptRecipientsInDispatchOrder.clear();
   mObservedActorDisconnected = false;

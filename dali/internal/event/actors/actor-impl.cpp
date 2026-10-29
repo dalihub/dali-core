@@ -1603,6 +1603,7 @@ Actor::Actor(DerivedType derivedType, const SceneGraph::Node& node)
   mNeedGesturePropagation(false),
   mEnabled(true),
   mAllowSelfInitiatedTouchOnly(false),
+  mTouchPropagationBlocked(false),
   mUseTextureUpdateArea(false),
   mDispatchTouchMotion(true),
   mDispatchHoverMotion(true),

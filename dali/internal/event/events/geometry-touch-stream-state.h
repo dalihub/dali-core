@@ -57,6 +57,7 @@ struct GeometryTouchStreamState
   std::list<ActorPtr>                 ownerPathRootToOwner;
   std::list<ActorPtr>                 interceptedRootToTarget;
   std::list<ActorPtr>                 candidatesRootToFront;
+  std::vector<ActorPtr>               touchPropagationBoundaries;
   std::vector<GeometryTouchRecipient> recipientsInDispatchOrder;
   std::vector<GeometryTouchRecipient> interceptRecipientsInDispatchOrder;
 };

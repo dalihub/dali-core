@@ -16,8 +16,10 @@
  */
 
 #include <dali-test-suite-utils.h>
+#include <dali/integration-api/events/hover-event-integ.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/events/touch-integ.h>
+#include <dali/integration-api/events/wheel-event-integ.h>
 #include <dali/integration-api/scene.h>
 #include <dali/public-api/dali-core.h>
 
@@ -541,6 +543,631 @@ int UtcDaliGeoTouchStreamInterruptedInterceptPrecedesRecipientTermination(void)
   application.ProcessEvent(GenerateSingleTouch(PointState::INTERRUPTED, Vector2(200.0f, 200.0f)));
   DALI_TEST_EQUALS(0u, trace.Count("root-intercept", CallbackKind::INTERCEPT, PointState::INTERRUPTED), TEST_LOCATION);
   DALI_TEST_EQUALS(0u, trace.Count("actor", CallbackKind::TOUCH, PointState::INTERRUPTED), TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliGeoTouchStreamBoundaryKeepsRecipientsWithoutConsuming(void)
+{
+  TestApplication application;
+  TouchTrace      trace;
+  Actor           background = CreateTouchableActor("background");
+  Actor           boundary   = CreateTouchableActor("boundary");
+  Actor           child      = CreateTouchableActor("child");
+  DALI_TEST_CHECK(!boundary.IsTouchPropagationBlocked());
+  boundary.SetTouchPropagationBlocked(true);
+  Actor sharedBoundary = boundary;
+  DALI_TEST_CHECK(sharedBoundary.IsTouchPropagationBlocked());
+  boundary.Add(child);
+  application.GetScene().Add(background);
+  application.GetScene().Add(boundary);
+  background.TouchEventSignal().Connect(&application, TouchTraceFunctor(trace, "background", false));
+  boundary.TouchEventSignal().Connect(&application, TouchTraceFunctor(trace, "boundary", false));
+  child.TouchEventSignal().Connect(&application, TouchTraceFunctor(trace, "child", false));
+  application.GetScene().GetRootLayer().TouchEventSignal().Connect(&application, TouchTraceFunctor(trace, "root", false));
+  PrepareScene(application);
+
+  for(PointState::Type state : {PointState::DOWN, PointState::MOTION, PointState::UP})
+  {
+    application.ProcessEvent(GenerateSingleTouch(state, Vector2(10.0f, 10.0f)));
+    DALI_TEST_EQUALS(1u, trace.Count("child", CallbackKind::TOUCH, state), TEST_LOCATION);
+    DALI_TEST_EQUALS(1u, trace.Count("boundary", CallbackKind::TOUCH, state), TEST_LOCATION);
+    DALI_TEST_EQUALS(0u, trace.Count("background", CallbackKind::TOUCH, state), TEST_LOCATION);
+    DALI_TEST_EQUALS(0u, trace.Count("root", CallbackKind::TOUCH, state), TEST_LOCATION);
+  }
+  DALI_TEST_EQUALS(0u, trace.Count("child", CallbackKind::TOUCH, PointState::INTERRUPTED), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, trace.Count("boundary", CallbackKind::TOUCH, PointState::INTERRUPTED), TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliGeoTouchStreamBoundaryWithoutCallback(void)
+{
+  TestApplication application;
+  TouchTrace      trace;
+  Actor           background = CreateTouchableActor("background");
+  Actor           boundary   = CreateTouchableActor("boundary");
+  boundary.SetTouchPropagationBlocked(true);
+  application.GetScene().Add(background);
+  application.GetScene().Add(boundary);
+  background.TouchEventSignal().Connect(&application, TouchTraceFunctor(trace, "background", false));
+  application.GetScene().TouchEventSignal().Connect(&application, SceneTraceFunctor(trace, "scene"));
+  PrepareScene(application);
+
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
+  const TraceEntry* down = trace.Find("scene", CallbackKind::SCENE, PointState::DOWN);
+  DALI_TEST_CHECK(down);
+  DALI_TEST_EQUALS(boundary.GetProperty<int32_t>(Actor::Property::ID), down->hitActorIds[0], TEST_LOCATION);
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(200.0f, 200.0f)));
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(200.0f, 200.0f)));
+  DALI_TEST_EQUALS(0u, trace.Count("background", CallbackKind::TOUCH, PointState::DOWN), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, trace.Count("background", CallbackKind::TOUCH, PointState::MOTION), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, trace.Count("background", CallbackKind::TOUCH, PointState::UP), TEST_LOCATION);
+
+  boundary.SetTouchPropagationBlocked(false);
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
+  DALI_TEST_EQUALS(1u, trace.Count("background", CallbackKind::TOUCH, PointState::DOWN), TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliGeoTouchStreamBoundaryRespectsHitAreaAndVisibility(void)
+{
+  TestApplication application;
+  TouchTrace      trace;
+  Actor           background = CreateTouchableActor("background");
+  Actor           boundary   = CreateTouchableActor("boundary");
+  boundary.SetProperty(Actor::Property::SIZE, Vector2(50.0f, 50.0f));
+  boundary.SetTouchPropagationBlocked(true);
+  application.GetScene().Add(background);
+  application.GetScene().Add(boundary);
+  background.TouchEventSignal().Connect(&application, TouchTraceFunctor(trace, "background", false));
+  PrepareScene(application);
+
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(75.0f, 25.0f)));
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(75.0f, 25.0f)));
+  DALI_TEST_EQUALS(1u, trace.Count("background", CallbackKind::TOUCH, PointState::DOWN), TEST_LOCATION);
+  trace.Clear();
+  boundary.SetProperty(Actor::Property::VISIBLE, false);
+  application.SendNotification();
+  application.Render();
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(25.0f, 25.0f)));
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(25.0f, 25.0f)));
+  DALI_TEST_EQUALS(1u, trace.Count("background", CallbackKind::TOUCH, PointState::DOWN), TEST_LOCATION);
+  trace.Clear();
+  boundary.SetProperty(Actor::Property::VISIBLE, true);
+  boundary.SetSensitive(false);
+  application.SendNotification();
+  application.Render();
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(25.0f, 25.0f)));
+  DALI_TEST_EQUALS(1u, trace.Count("background", CallbackKind::TOUCH, PointState::DOWN), TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliGeoTouchStreamBoundaryConsumerStillInterrupts(void)
+{
+  TestApplication application;
+  TouchTrace      trace;
+  Actor           background = CreateTouchableActor("background");
+  Actor           boundary   = CreateTouchableActor("boundary");
+  Actor           child      = CreateTouchableActor("child");
+  boundary.SetTouchPropagationBlocked(true);
+  boundary.Add(child);
+  application.GetScene().Add(background);
+  application.GetScene().Add(boundary);
+  background.TouchEventSignal().Connect(&application, TouchTraceFunctor(trace, "background", false));
+  boundary.TouchEventSignal().Connect(&application, TouchTraceFunctor(trace, "boundary", true));
+  child.TouchEventSignal().Connect(&application, TouchTraceFunctor(trace, "child", false));
+  PrepareScene(application);
+
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 20.0f)));
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(20.0f, 20.0f)));
+  DALI_TEST_EQUALS(1u, trace.Count("child", CallbackKind::TOUCH, PointState::INTERRUPTED), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, trace.Count("child", CallbackKind::TOUCH, PointState::MOTION), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, trace.Count("boundary", CallbackKind::TOUCH, PointState::UP), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, trace.Count("background", CallbackKind::TOUCH, PointState::INTERRUPTED), TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliGeoTouchStreamBoundaryReceivesLateConsumerInterruption(void)
+{
+  TestApplication application;
+  TouchTrace      trace;
+  Actor           boundary = CreateTouchableActor("boundary");
+  Actor           child    = CreateTouchableActor("child");
+  boundary.SetTouchPropagationBlocked(true);
+  boundary.Add(child);
+  application.GetScene().Add(boundary);
+  bool consume = false;
+  child.TouchEventSignal().Connect(&application, MutableTouchTraceFunctor(trace, "child", consume));
+  boundary.TouchEventSignal().Connect(&application, TouchTraceFunctor(trace, "boundary", false));
+  PrepareScene(application);
+
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
+  consume = true;
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 20.0f)));
+  consume = false;
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(200.0f, 200.0f)));
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(200.0f, 200.0f)));
+  DALI_TEST_EQUALS(1u, trace.Count("boundary", CallbackKind::TOUCH, PointState::DOWN), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, trace.Count("boundary", CallbackKind::TOUCH, PointState::INTERRUPTED), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, trace.Count("boundary", CallbackKind::TOUCH, PointState::UP), TEST_LOCATION);
+  DALI_TEST_EQUALS(2u, trace.Count("child", CallbackKind::TOUCH, PointState::MOTION), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, trace.Count("child", CallbackKind::TOUCH, PointState::UP), TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliGeoTouchStreamBoundaryChangesWaitForNewStream(void)
+{
+  TestApplication application;
+  TouchTrace      trace;
+  Actor           background = CreateTouchableActor("background");
+  Actor           boundary   = CreateTouchableActor("boundary");
+  boundary.SetTouchPropagationBlocked(true);
+  application.GetScene().Add(background);
+  application.GetScene().Add(boundary);
+  background.TouchEventSignal().Connect(&application, TouchTraceFunctor(trace, "background", false));
+  boundary.TouchEventSignal().Connect(&application, [](Actor actor, TouchEvent touch)
+  {
+    if(touch.GetState(0u) == PointState::DOWN)
+    {
+      actor.SetTouchPropagationBlocked(!actor.IsTouchPropagationBlocked());
+    }
+    return false;
+  });
+  PrepareScene(application);
+
+  for(uint32_t stream = 0u; stream < 3u; ++stream)
+  {
+    trace.Clear();
+    for(PointState::Type state : {PointState::DOWN, PointState::MOTION, PointState::UP})
+    {
+      application.ProcessEvent(GenerateSingleTouch(state, Vector2(10.0f, 10.0f)));
+      DALI_TEST_EQUALS(stream == 1u ? 1u : 0u, trace.Count("background", CallbackKind::TOUCH, state), TEST_LOCATION);
+    }
+  }
+  END_TEST;
+}
+
+int UtcDaliGeoTouchStreamBoundaryCallbackRemovalDoesNotOpenBackground(void)
+{
+  for(bool remove : {false, true})
+  {
+    TestApplication application;
+    TouchTrace      trace;
+    Actor           background = CreateTouchableActor("background");
+    Actor           boundary   = CreateTouchableActor("boundary");
+    Actor           child      = CreateTouchableActor("child");
+    boundary.SetTouchPropagationBlocked(true);
+    boundary.Add(child);
+    application.GetScene().Add(background);
+    application.GetScene().Add(boundary);
+    background.TouchEventSignal().Connect(&application, TouchTraceFunctor(trace, "background", false));
+    child.TouchEventSignal().Connect(&application, TouchTraceFunctor(trace, "child", false));
+    boundary.TouchEventSignal().Connect(&application, [remove](Actor actor, TouchEvent touch)
+    {
+      if(touch.GetState(0u) == PointState::DOWN)
+      {
+        if(remove)
+        {
+          actor.Unparent();
+        }
+        else
+        {
+          actor.SetProperty(Actor::Property::VISIBLE, false);
+        }
+      }
+      return false;
+    });
+    PrepareScene(application);
+    application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
+    application.SendNotification();
+    application.Render();
+    application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 20.0f)));
+    application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(20.0f, 20.0f)));
+    DALI_TEST_EQUALS(0u, trace.Count("background", CallbackKind::TOUCH, PointState::DOWN), TEST_LOCATION);
+    DALI_TEST_EQUALS(0u, trace.Count("background", CallbackKind::TOUCH, PointState::MOTION), TEST_LOCATION);
+    DALI_TEST_EQUALS(0u, trace.Count("background", CallbackKind::TOUCH, PointState::UP), TEST_LOCATION);
+    application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
+    DALI_TEST_EQUALS(1u, trace.Count("background", CallbackKind::TOUCH, PointState::DOWN), TEST_LOCATION);
+  }
+  END_TEST;
+}
+
+int UtcDaliGeoTouchStreamBoundaryNestedPanDirections(void)
+{
+  for(bool horizontal : {false, true})
+  {
+    TestApplication application;
+    TouchTrace      trace;
+    PanTrace        outerPan;
+    PanTrace        innerPan;
+    Actor           boundary = CreateTouchableActor("boundary");
+    Actor           outer    = CreateTouchableActor("outer");
+    Actor           inner    = CreateTouchableActor("inner");
+    boundary.SetTouchPropagationBlocked(true);
+    boundary.Add(outer);
+    outer.Add(inner);
+    application.GetScene().Add(boundary);
+    PanGestureDetector outerDetector = PanGestureDetector::New();
+    PanGestureDetector innerDetector = PanGestureDetector::New();
+    outerDetector.AddDirection(PanGestureDetector::DIRECTION_VERTICAL);
+    innerDetector.AddDirection(PanGestureDetector::DIRECTION_HORIZONTAL);
+    outerDetector.DetectedSignal().Connect(&application, PanTraceFunctor(outerPan));
+    innerDetector.DetectedSignal().Connect(&application, PanTraceFunctor(innerPan));
+    outer.TouchEventSignal().Connect(&application, [&](Actor actor, TouchEvent touch)
+    {
+      return outerDetector.HandleEvent(actor, touch);
+    });
+    inner.TouchEventSignal().Connect(&application, [&](Actor actor, TouchEvent touch)
+    {
+      return innerDetector.HandleEvent(actor, touch);
+    });
+    boundary.TouchEventSignal().Connect(&application, TouchTraceFunctor(trace, "boundary", false));
+    PrepareScene(application);
+    uint32_t time = 100u;
+    TestStartPan(application, Vector2(10.0f, 10.0f), horizontal ? Vector2(40.0f, 10.0f) : Vector2(10.0f, 40.0f), time);
+    TestMovePan(application, horizontal ? Vector2(60.0f, 10.0f) : Vector2(10.0f, 60.0f), time);
+    time += TestGetFrameInterval();
+    TestEndPan(application, horizontal ? Vector2(80.0f, 10.0f) : Vector2(10.0f, 80.0f), time);
+    DALI_TEST_EQUALS(horizontal ? 1u : 0u, innerPan.Count(GestureState::STARTED), TEST_LOCATION);
+    DALI_TEST_EQUALS(horizontal ? 0u : 1u, outerPan.Count(GestureState::STARTED), TEST_LOCATION);
+    DALI_TEST_EQUALS(1u, trace.Count("boundary", CallbackKind::TOUCH, PointState::INTERRUPTED), TEST_LOCATION);
+    DALI_TEST_EQUALS(1u, (horizontal ? innerPan : outerPan).Count(GestureState::FINISHED), TEST_LOCATION);
+  }
+  END_TEST;
+}
+
+int UtcDaliGeoTouchStreamBoundaryNearestBoundaryWins(void)
+{
+  TestApplication application;
+  TouchTrace      trace;
+  Actor           outer = CreateTouchableActor("outer");
+  Actor           inner = CreateTouchableActor("inner");
+  outer.SetTouchPropagationBlocked(true);
+  inner.SetTouchPropagationBlocked(true);
+  outer.Add(inner);
+  application.GetScene().Add(outer);
+  outer.TouchEventSignal().Connect(&application, TouchTraceFunctor(trace, "outer", false));
+  inner.TouchEventSignal().Connect(&application, TouchTraceFunctor(trace, "inner", false));
+  application.GetScene().GetRootLayer().TouchEventSignal().Connect(&application, TouchTraceFunctor(trace, "root", false));
+  PrepareScene(application);
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(10.0f, 10.0f)));
+  DALI_TEST_EQUALS(1u, trace.Count("inner", CallbackKind::TOUCH, PointState::DOWN), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, trace.Count("outer", CallbackKind::TOUCH, PointState::DOWN), TEST_LOCATION);
+  inner.SetTouchPropagationBlocked(false);
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
+  DALI_TEST_EQUALS(1u, trace.Count("outer", CallbackKind::TOUCH, PointState::DOWN), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, trace.Count("root", CallbackKind::TOUCH, PointState::DOWN), TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliGeoTouchStreamBoundaryAllowsOutsideIntercept(void)
+{
+  TestApplication application;
+  TouchTrace      trace;
+  Actor           parent   = CreateTouchableActor("parent");
+  Actor           boundary = CreateTouchableActor("boundary");
+  Actor           child    = CreateTouchableActor("child");
+  parent.Add(boundary);
+  boundary.Add(child);
+  boundary.SetTouchPropagationBlocked(true);
+  application.GetScene().Add(parent);
+  bool intercept = false;
+  parent.InterceptTouchEventSignal().Connect(&application, [&](Actor, TouchEvent touch)
+  {
+    trace.Record("parent-intercept", CallbackKind::INTERCEPT, touch);
+    return intercept;
+  });
+  parent.TouchEventSignal().Connect(&application, TouchTraceFunctor(trace, "parent", true));
+  boundary.TouchEventSignal().Connect(&application, TouchTraceFunctor(trace, "boundary", false));
+  child.TouchEventSignal().Connect(&application, TouchTraceFunctor(trace, "child", false));
+  PrepareScene(application);
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
+  DALI_TEST_EQUALS(1u, trace.Count("parent-intercept", CallbackKind::INTERCEPT, PointState::DOWN), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, trace.Count("parent", CallbackKind::TOUCH, PointState::DOWN), TEST_LOCATION);
+  intercept = true;
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 20.0f)));
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(20.0f, 20.0f)));
+  DALI_TEST_EQUALS(1u, trace.Count("parent", CallbackKind::TOUCH, PointState::MOTION), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, trace.Count("child", CallbackKind::TOUCH, PointState::INTERRUPTED), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, trace.Count("boundary", CallbackKind::TOUCH, PointState::INTERRUPTED), TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliGeoTouchStreamBoundaryLimitsInterceptedTouchRoute(void)
+{
+  TestApplication application;
+  TouchTrace      trace;
+  Actor           parent   = CreateTouchableActor("parent");
+  Actor           boundary = CreateTouchableActor("boundary");
+  Actor           child    = CreateTouchableActor("child");
+  parent.Add(boundary);
+  boundary.Add(child);
+  boundary.SetTouchPropagationBlocked(true);
+  application.GetScene().Add(parent);
+  bool intercept = false;
+  child.InterceptTouchEventSignal().Connect(&application, [&](Actor, TouchEvent)
+  {
+    return intercept;
+  });
+  parent.TouchEventSignal().Connect(&application, TouchTraceFunctor(trace, "parent", true));
+  boundary.TouchEventSignal().Connect(&application, TouchTraceFunctor(trace, "boundary", false));
+  child.TouchEventSignal().Connect(&application, TouchTraceFunctor(trace, "child", false));
+  PrepareScene(application);
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
+  boundary.SetTouchPropagationBlocked(false);
+  intercept = true;
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 20.0f)));
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(20.0f, 20.0f)));
+  DALI_TEST_EQUALS(1u, trace.Count("boundary", CallbackKind::TOUCH, PointState::MOTION), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, trace.Count("boundary", CallbackKind::TOUCH, PointState::UP), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, trace.Count("parent", CallbackKind::TOUCH, PointState::MOTION), TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliGeoTouchStreamBoundaryKeepsTwoPansIndependentOfBackgroundGestures(void)
+{
+  TestApplication application;
+  TouchTrace      trace;
+  PanTrace        leftPan;
+  PanTrace        rightPan;
+  Actor           background = CreateTouchableActor("background");
+  Actor           boundary   = CreateTouchableActor("boundary");
+  Actor           left       = CreateTouchableActor("left");
+  Actor           right      = CreateTouchableActor("right");
+  background.SetProperty(Actor::Property::SIZE, Vector2(200.0f, 100.0f));
+  boundary.SetProperty(Actor::Property::SIZE, Vector2(200.0f, 100.0f));
+  right.SetProperty(Actor::Property::POSITION, Vector2(100.0f, 0.0f));
+  boundary.SetTouchPropagationBlocked(true);
+  boundary.Add(left);
+  boundary.Add(right);
+  application.GetScene().Add(background);
+  application.GetScene().Add(boundary);
+  PinchGestureDetector    pinch    = PinchGestureDetector::New();
+  RotationGestureDetector rotation = RotationGestureDetector::New();
+  pinch.Attach(background);
+  rotation.Attach(background);
+  PanGestureDetector leftDetector  = PanGestureDetector::New();
+  PanGestureDetector rightDetector = PanGestureDetector::New();
+  leftDetector.DetectedSignal().Connect(&application, PanTraceFunctor(leftPan));
+  rightDetector.DetectedSignal().Connect(&application, PanTraceFunctor(rightPan));
+  left.TouchEventSignal().Connect(&application, [&](Actor actor, TouchEvent touch)
+  {
+    trace.Record("left", CallbackKind::TOUCH, touch);
+    return leftDetector.HandleEvent(actor, touch);
+  });
+  right.TouchEventSignal().Connect(&application, [&](Actor actor, TouchEvent touch)
+  {
+    trace.Record("right", CallbackKind::TOUCH, touch);
+    return rightDetector.HandleEvent(actor, touch);
+  });
+  background.TouchEventSignal().Connect(&application, TouchTraceFunctor(trace, "background", false));
+  PrepareScene(application);
+
+  for(uint32_t step = 0u; step < 5u; ++step)
+  {
+    PointState::Type        state = step == 0u ? PointState::DOWN : (step == 4u ? PointState::UP : PointState::MOTION);
+    Integration::TouchEvent event = GenerateTwoTouches(state, Vector2(80.0f - step * 10.0f, 50.0f), 4,
+                                                       state, Vector2(120.0f + step * 10.0f, 50.0f), 7);
+    event.time                    = 100u + step * TestGetFrameInterval();
+    application.ProcessEvent(event);
+    application.SendNotification();
+    application.Render();
+  }
+  DALI_TEST_EQUALS(1u, leftPan.Count(GestureState::STARTED), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, rightPan.Count(GestureState::STARTED), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, leftPan.Count(GestureState::FINISHED), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, rightPan.Count(GestureState::FINISHED), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, trace.CountDevice("left", CallbackKind::TOUCH, PointState::DOWN, 7), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, trace.CountDevice("right", CallbackKind::TOUCH, PointState::DOWN, 4), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, trace.Count("background", CallbackKind::TOUCH, PointState::DOWN), TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliGeoTouchStreamBoundaryFrontSiblingInterceptKeepsScope(void)
+{
+  TestApplication application;
+  TouchTrace      trace;
+  Actor           boundary = CreateTouchableActor("boundary");
+  Actor           front    = CreateTouchableActor("front");
+  boundary.SetTouchPropagationBlocked(true);
+  application.GetScene().Add(boundary);
+  application.GetScene().Add(front);
+  bool intercept = false;
+  front.InterceptTouchEventSignal().Connect(&application, [&](Actor, TouchEvent)
+  {
+    return intercept;
+  });
+  front.TouchEventSignal().Connect(&application, TouchTraceFunctor(trace, "front", false));
+  boundary.TouchEventSignal().Connect(&application, TouchTraceFunctor(trace, "boundary", false));
+  application.GetScene().GetRootLayer().TouchEventSignal().Connect(&application, TouchTraceFunctor(trace, "root", false));
+  PrepareScene(application);
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
+  intercept = true;
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 20.0f)));
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(20.0f, 20.0f)));
+  DALI_TEST_EQUALS(1u, trace.Count("front", CallbackKind::TOUCH, PointState::MOTION), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, trace.Count("boundary", CallbackKind::TOUCH, PointState::INTERRUPTED), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, trace.Count("root", CallbackKind::TOUCH, PointState::MOTION), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, trace.Count("root", CallbackKind::TOUCH, PointState::UP), TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliGeoTouchStreamBoundarySiblingInterceptDoesNotOpenOuterBoundary(void)
+{
+  TestApplication application;
+  TouchTrace      trace;
+  Actor           outer    = CreateTouchableActor("outer");
+  Actor           boundary = CreateTouchableActor("boundary");
+  Actor           front    = CreateTouchableActor("front");
+  outer.SetTouchPropagationBlocked(true);
+  boundary.SetTouchPropagationBlocked(true);
+  outer.Add(boundary);
+  outer.Add(front);
+  application.GetScene().Add(outer);
+  bool intercept = false;
+  front.InterceptTouchEventSignal().Connect(&application, [&](Actor, TouchEvent)
+  {
+    return intercept;
+  });
+  front.TouchEventSignal().Connect(&application, TouchTraceFunctor(trace, "front", false));
+  boundary.TouchEventSignal().Connect(&application, TouchTraceFunctor(trace, "boundary", false));
+  outer.TouchEventSignal().Connect(&application, TouchTraceFunctor(trace, "outer", false));
+  PrepareScene(application);
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
+  intercept = true;
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 20.0f)));
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(20.0f, 20.0f)));
+  DALI_TEST_EQUALS(1u, trace.Count("front", CallbackKind::TOUCH, PointState::MOTION), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, trace.Count("boundary", CallbackKind::TOUCH, PointState::INTERRUPTED), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, trace.Count("outer", CallbackKind::TOUCH, PointState::DOWN), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, trace.Count("outer", CallbackKind::TOUCH, PointState::MOTION), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, trace.Count("outer", CallbackKind::TOUCH, PointState::UP), TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliGeoTouchStreamBoundaryRestartKeepsInitialScope(void)
+{
+  TestApplication application;
+  TouchTrace      trace;
+  Actor           background = CreateTouchableActor("background");
+  Actor           boundary   = CreateTouchableActor("boundary");
+  Actor           child      = CreateTouchableActor("child");
+  boundary.SetTouchPropagationBlocked(true);
+  boundary.Add(child);
+  application.GetScene().Add(background);
+  application.GetScene().Add(boundary);
+  background.TouchEventSignal().Connect(&application, TouchTraceFunctor(trace, "background", false));
+  child.TouchEventSignal().Connect(&application, TouchTraceFunctor(trace, "child", false));
+  PrepareScene(application);
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f), 1));
+  child.SetSensitive(false);
+  application.SendNotification();
+  application.Render();
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 20.0f), 1));
+  DALI_TEST_EQUALS(1u, trace.Count("child", CallbackKind::TOUCH, PointState::INTERRUPTED), TEST_LOCATION);
+  child.SetSensitive(true);
+  boundary.SetTouchPropagationBlocked(false);
+  application.SendNotification();
+  application.Render();
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f), 2));
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(10.0f, 10.0f), 2));
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(20.0f, 20.0f), 1));
+  DALI_TEST_EQUALS(0u, trace.Count("background", CallbackKind::TOUCH, PointState::DOWN), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, trace.Count("background", CallbackKind::TOUCH, PointState::UP), TEST_LOCATION);
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f), 3));
+  DALI_TEST_EQUALS(1u, trace.Count("background", CallbackKind::TOUCH, PointState::DOWN), TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliGeoTouchStreamBoundaryRestartDoesNotAdoptNewBoundary(void)
+{
+  TestApplication application;
+  TouchTrace      trace;
+  Actor           background = CreateTouchableActor("background");
+  Actor           boundary   = CreateTouchableActor("boundary");
+  Actor           child      = CreateTouchableActor("child");
+  boundary.Add(child);
+  application.GetScene().Add(background);
+  application.GetScene().Add(boundary);
+  // A consuming background is the sole active recipient; making it insensitive
+  // terminates all ordinary recipients and exercises the in-stream restart.
+  background.TouchEventSignal().Connect(&application, TouchTraceFunctor(trace, "background", true));
+  child.TouchEventSignal().Connect(&application, TouchTraceFunctor(trace, "child", false));
+  PrepareScene(application);
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f), 1));
+  child.SetSensitive(false);
+  background.SetSensitive(false);
+  application.SendNotification();
+  application.Render();
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 20.0f), 1));
+  DALI_TEST_EQUALS(1u, trace.Count("child", CallbackKind::TOUCH, PointState::INTERRUPTED), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, trace.Count("background", CallbackKind::TOUCH, PointState::INTERRUPTED), TEST_LOCATION);
+  child.SetSensitive(true);
+  background.SetSensitive(true);
+  boundary.SetTouchPropagationBlocked(true);
+  application.SendNotification();
+  application.Render();
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f), 2));
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(10.0f, 10.0f), 2));
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(20.0f, 20.0f), 1));
+  DALI_TEST_EQUALS(2u, trace.Count("background", CallbackKind::TOUCH, PointState::DOWN), TEST_LOCATION);
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f), 3));
+  DALI_TEST_EQUALS(2u, trace.Count("background", CallbackKind::TOUCH, PointState::DOWN), TEST_LOCATION);
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(10.0f, 10.0f), 3));
+  END_TEST;
+}
+
+int UtcDaliGeoTouchStreamBoundaryDoesNotAffectParentPropagation(void)
+{
+  TestApplication application;
+  TouchTrace      trace;
+  Actor           parent   = CreateTouchableActor("parent");
+  Actor           boundary = CreateTouchableActor("boundary");
+  Actor           child    = CreateTouchableActor("child");
+  boundary.SetTouchPropagationBlocked(true);
+  parent.Add(boundary);
+  boundary.Add(child);
+  application.GetScene().Add(parent);
+  parent.TouchEventSignal().Connect(&application, TouchTraceFunctor(trace, "parent", false));
+  boundary.TouchEventSignal().Connect(&application, TouchTraceFunctor(trace, "boundary", false));
+  child.TouchEventSignal().Connect(&application, TouchTraceFunctor(trace, "child", false));
+  application.GetScene().SetGeometryHittestEnabled(false);
+  application.SendNotification();
+  application.Render();
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
+  DALI_TEST_EQUALS(1u, trace.Count("parent", CallbackKind::TOUCH, PointState::DOWN), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, trace.Count("boundary", CallbackKind::TOUCH, PointState::DOWN), TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliGeoTouchStreamBoundaryDoesNotAffectOtherInputModes(void)
+{
+  TestApplication application;
+  TouchTrace      trace;
+  Actor           background = CreateTouchableActor("background");
+  Actor           boundary   = CreateTouchableActor("boundary");
+  boundary.SetTouchPropagationBlocked(true);
+  application.GetScene().Add(background);
+  application.GetScene().Add(boundary);
+  unsigned int hoverCount = 0u;
+  unsigned int wheelCount = 0u;
+  background.TouchEventSignal().Connect(&application, TouchTraceFunctor(trace, "background", false));
+  background.HoverEventSignal().Connect(&application, [&](Actor, const HoverEvent&)
+  {
+    ++hoverCount;
+    return false;
+  });
+  background.WheelEventSignal().Connect(&application, [&](Actor, const WheelEvent&)
+  {
+    ++wheelCount;
+    return false;
+  });
+  PrepareScene(application);
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(10.0f, 10.0f)));
+  DALI_TEST_EQUALS(0u, trace.Count("background", CallbackKind::TOUCH, PointState::DOWN), TEST_LOCATION);
+
+  Integration::HoverEvent hover;
+  Integration::Point      point;
+  point.SetState(PointState::STARTED);
+  point.SetScreenPosition(Vector2(10.0f, 10.0f));
+  point.SetDeviceClass(Device::Class::MOUSE);
+  point.SetDeviceSubclass(Device::Subclass::NONE);
+  hover.points.push_back(point);
+  application.ProcessEvent(hover);
+  Integration::WheelEvent wheel(Integration::WheelEvent::MOUSE_WHEEL, 0, 0u, Vector2(10.0f, 10.0f), 1, 1000u);
+  application.ProcessEvent(wheel);
+  DALI_TEST_EQUALS(1u, hoverCount, TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, wheelCount, TEST_LOCATION);
+
+  // A callback-free boundary must not become a new hit target in parent mode.
+  application.GetScene().SetGeometryHittestEnabled(false);
+  application.SendNotification();
+  application.Render();
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(10.0f, 10.0f)));
+  DALI_TEST_EQUALS(1u, trace.Count("background", CallbackKind::TOUCH, PointState::DOWN), TEST_LOCATION);
   END_TEST;
 }
 
