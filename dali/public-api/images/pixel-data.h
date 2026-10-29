@@ -38,9 +38,13 @@ class PixelData;
 }
 
 /**
- * @brief The PixelData object holds a pixel buffer .
+ * @brief The PixelData object holds an immutable pixel buffer.
  * The PixelData takes over the ownership of the pixel buffer.
  * The buffer memory must NOT be released outside of this class, instead, the PixelData object will release it automatically when the reference count falls to zero.
+ *
+ * The pixels cannot be read or written through this class. To fill or edit pixels, use
+ * PixelBuffer, and hand the result over with PixelBuffer::Convert() once it is ready
+ * to be used as a texture.
  *
  * @SINCE_1_1.43
  */

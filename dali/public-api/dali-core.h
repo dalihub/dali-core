@@ -80,6 +80,7 @@
 #include <dali/public-api/events/wheel-event.h>
 
 #include <dali/public-api/images/native-image-interface.h>
+#include <dali/public-api/images/pixel-buffer.h>
 #include <dali/public-api/images/pixel-data.h>
 #include <dali/public-api/images/pixel.h>
 

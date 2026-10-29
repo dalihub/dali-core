@@ -73,6 +73,7 @@ SET(TC_SOURCES
         utc-Dali-PinchGestureDetector.cpp
         utc-Dali-PinchGestureRecognizer.cpp
         utc-Dali-Pixel.cpp
+        utc-Dali-PixelBuffer.cpp
         utc-Dali-PixelData.cpp
         utc-Dali-Processors.cpp
         utc-Dali-PropertyArray.cpp
