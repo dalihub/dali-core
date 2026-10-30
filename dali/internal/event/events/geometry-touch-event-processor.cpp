@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <algorithm>
+#include <utility>
 #if defined(DEBUG_ENABLED)
 #include <sstream>
 #endif
@@ -946,8 +947,8 @@ bool GeometryTouchEventProcessor::ProcessTouchEvent(const Integration::TouchEven
     { return recipient.state == GeometryTouchRecipientState::ACTIVE; });
     if(!hasActiveRecipient && !mStreamState.recipientsInDispatchOrder.empty())
     {
-      const auto    initialCandidates = mStreamState.candidatesRootToFront;
-      const auto    initialBoundaries = mStreamState.touchPropagationBoundaries;
+      auto          initialCandidates = std::move(mStreamState.candidatesRootToFront);
+      auto          initialBoundaries = std::move(mStreamState.touchPropagationBoundaries);
       TouchEventPtr restartEvent(new TouchEvent(event.time));
       for(const auto& point : event.points)
       {
@@ -957,8 +958,8 @@ bool GeometryTouchEventProcessor::ProcessTouchEvent(const Integration::TouchEven
       Impl::TerminateInterceptRecipients(*this, restartEvent, mLastRenderTask.Get());
       Clear();
       mStreamState.phase                      = GeometryTouchStreamPhase::UNOWNED;
-      mStreamState.candidatesRootToFront      = initialCandidates;
-      mStreamState.touchPropagationBoundaries = initialBoundaries;
+      mStreamState.candidatesRootToFront      = std::move(initialCandidates);
+      mStreamState.touchPropagationBoundaries = std::move(initialBoundaries);
       preserveBoundarySnapshot                = true;
     }
   }
