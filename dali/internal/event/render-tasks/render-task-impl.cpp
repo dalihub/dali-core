@@ -978,6 +978,16 @@ Dali::PixelData RenderTask::GetRenderResult()
   return pixelData;
 }
 
+Dali::PixelBuffer RenderTask::GetRenderResultBuffer()
+{
+  Dali::PixelBuffer pixelBuffer;
+  if(mFrameBuffer)
+  {
+    pixelBuffer = mFrameBuffer->GetRenderResultBuffer();
+  }
+  return pixelBuffer;
+}
+
 void RenderTask::ClearInternalCameraActor()
 {
   if(mInternalCameraContext && mInternalCameraContext->mInternalCameraActor)

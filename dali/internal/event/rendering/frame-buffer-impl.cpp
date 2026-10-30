@@ -177,6 +177,11 @@ Dali::PixelData FrameBuffer::GetRenderResult()
   return mRenderObject->GetRenderResult();
 }
 
+Dali::PixelBuffer FrameBuffer::GetRenderResultBuffer()
+{
+  return mRenderObject->GetRenderResultBuffer();
+}
+
 FrameBuffer::~FrameBuffer()
 {
   if(DALI_UNLIKELY(!EventThreadServices::IsEventThread()))

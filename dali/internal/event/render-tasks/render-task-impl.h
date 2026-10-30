@@ -346,6 +346,11 @@ public:
    */
   Dali::PixelData GetRenderResult();
 
+  /**
+   * @copydoc Dali::RenderTask::GetRenderResultBuffer
+   */
+  Dali::PixelBuffer GetRenderResultBuffer();
+
 private:
   /**
    * @brief Clears the internal camera actor, without change camera actor type.

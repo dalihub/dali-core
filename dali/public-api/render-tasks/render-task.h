@@ -22,6 +22,7 @@
 #include <cstdint> // uint32_t
 
 // INTERNAL INCLUDES
+#include <dali/public-api/images/pixel-buffer.h>
 #include <dali/public-api/images/pixel-data.h>
 #include <dali/public-api/math/viewport.h>
 #include <dali/public-api/object/handle.h>
@@ -726,13 +727,30 @@ public:
   void ClearRenderResult();
 
   /**
-   * @brief Retrieves the rendered result as PixelData.
+   * @DEPRECATED_2_5.47 Use GetRenderResultBuffer() instead.
+   *
+   * @brief Retrieves a copy of the rendered result as PixelData.
    * @SINCE_2_3.51
-   * @return Dali::PixelData that contains rendered result.
+   * @return Dali::PixelData that contains a copy of the rendered result.
    * @note This method is only available after the FinishedSignal is emitted.
    * If this method is called before the FinishedSignal is emitted, an empty handle is returned.
    */
   Dali::PixelData GetRenderResult();
+
+  /**
+   * @brief Retrieves the rendered result as a PixelBuffer, whose pixels the application
+   * can read through PixelBuffer::GetBuffer().
+   *
+   * The RenderTask shares ownership of the result with the application: repeated calls
+   * return a handle to the same object, and a handle stays valid after
+   * ClearRenderResult(), which only releases the RenderTask's own reference.
+   *
+   * @SINCE_2_5.47
+   * @return Dali::PixelBuffer that contains the rendered result.
+   * @note This method is only available after the FinishedSignal is emitted.
+   * If this method is called before the FinishedSignal is emitted, an empty handle is returned.
+   */
+  Dali::PixelBuffer GetRenderResultBuffer();
 
 public: // Signals
   /**

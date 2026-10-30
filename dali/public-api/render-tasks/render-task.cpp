@@ -369,6 +369,11 @@ PixelData RenderTask::GetRenderResult()
   return GetImplementation(*this).GetRenderResult();
 }
 
+PixelBuffer RenderTask::GetRenderResultBuffer()
+{
+  return GetImplementation(*this).GetRenderResultBuffer();
+}
+
 RenderTask::RenderTask(Internal::RenderTask* internal)
 : Handle(internal)
 {
