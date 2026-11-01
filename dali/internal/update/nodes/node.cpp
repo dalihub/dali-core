@@ -18,6 +18,9 @@
 // CLASS HEADER
 #include <dali/internal/update/nodes/node.h>
 
+// EXTERNAL INCLUDES
+#include <atomic>
+
 // INTERNAL INCLUDES
 #include <dali/internal/common/internal-constants.h>
 #include <dali/internal/common/memory-pool-object-allocator.h>
@@ -35,13 +38,14 @@ Dali::Internal::SceneGraph::MemoryPoolCollection*                               
 static constexpr Dali::Internal::SceneGraph::MemoryPoolCollection::MemoryPoolType gMemoryPoolType       = Dali::Internal::SceneGraph::MemoryPoolCollection::MemoryPoolType::NODE;
 
 #ifdef DEBUG_ENABLED
-// keep track of nodes alive, to ensure we have 0 when the process exits or DALi library is unloaded
-int32_t gNodeCount = 0;
+// Creation and destruction can run on the event and update threads concurrently.
+// Keep the debug count atomic so balanced lifetimes cannot report a false leak.
+std::atomic<int32_t> gNodeCount{0};
 
 // Called when the process is about to exit, Node count should be zero at this point.
 void __attribute__((destructor)) ShutDown(void)
 {
-  DALI_ASSERT_DEBUG((gNodeCount == 0) && "Node memory leak");
+  DALI_ASSERT_DEBUG((gNodeCount.load(std::memory_order_relaxed) == 0) && "Node memory leak");
 }
 #endif
 } // Unnamed namespace
@@ -126,7 +130,7 @@ Node::Node()
   mUseTextureUpdateArea(false)
 {
 #ifdef DEBUG_ENABLED
-  gNodeCount++;
+  gNodeCount.fetch_add(1, std::memory_order_relaxed);
 #endif
 }
 
@@ -142,7 +146,7 @@ Node::~Node()
   mRareData = nullptr;
 
 #ifdef DEBUG_ENABLED
-  gNodeCount--;
+  gNodeCount.fetch_sub(1, std::memory_order_relaxed);
 #endif
 }
 
