@@ -19,6 +19,7 @@
 #include <dali/internal/update/render-tasks/scene-graph-render-task.h>
 
 // INTERNAL INCLUDES
+#include <dali/internal/common/render-task-default-values.h>
 #include <dali/internal/render/common/render-instruction.h>
 #include <dali/internal/render/common/render-tracker.h>
 #include <dali/internal/update/controllers/render-manager-dispatcher.h>
@@ -607,7 +608,7 @@ void RenderTask::AddInitializeResetter(ResetterManager& manager) const
 RenderTask::RenderTask()
 : mViewportPosition(Vector2::ZERO),
   mViewportSize(Vector2::ZERO),
-  mClearColor(Dali::RenderTask::DEFAULT_CLEAR_COLOR),
+  mClearColor(RenderTaskDefaultValues::CLEAR_COLOR),
   mResetterManager(nullptr),
   mRenderManagerDispatcher(nullptr),
   mRenderSyncTracker(nullptr),
@@ -616,20 +617,20 @@ RenderTask::RenderTask()
   mCameraNode(nullptr),
   mViewportGuideNode(nullptr),
   mFrameBuffer(nullptr),
-  mRefreshRate(Dali::RenderTask::DEFAULT_REFRESH_RATE),
+  mRefreshRate(RenderTaskDefaultValues::REFRESH_RATE),
   mFrameCounter(0u),
   mRenderedOnceCounter(0u),
   mRenderedScaleFactor(Vector2::ONE),
-  mState((Dali::RenderTask::DEFAULT_REFRESH_RATE == Dali::RenderTask::REFRESH_ALWAYS)
+  mState((RenderTaskDefaultValues::REFRESH_RATE == Dali::RenderTask::REFRESH_ALWAYS)
            ? RENDER_CONTINUOUSLY
            : RENDER_ONCE_WAITING_FOR_RESOURCES),
   mRequiresSync(false),
   mActive(false),
   mWaitingToRender(false),
   mNotifyTrigger(false),
-  mExclusive(Dali::RenderTask::DEFAULT_EXCLUSIVE),
-  mClearEnabled(Dali::RenderTask::DEFAULT_CLEAR_ENABLED),
-  mCullMode(Dali::RenderTask::DEFAULT_CULL_MODE)
+  mExclusive(RenderTaskDefaultValues::EXCLUSIVE),
+  mClearEnabled(RenderTaskDefaultValues::CLEAR_ENABLED),
+  mCullMode(RenderTaskDefaultValues::CULL_MODE)
 {
 }
 

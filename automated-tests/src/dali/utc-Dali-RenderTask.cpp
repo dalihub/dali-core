@@ -1701,6 +1701,16 @@ int UtcDaliRenderTaskIsExclusive01(void)
 
   RenderTask newTask = taskList.CreateTask();
   DALI_TEST_CHECK(false == newTask.IsExclusive());
+  DALI_TEST_EQUALS(newTask.GetInputEnabled(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(newTask.GetClearColor(), Vector4(0.0f, 0.0f, 0.0f, 1.0f), TEST_LOCATION);
+  DALI_TEST_EQUALS(newTask.GetClearEnabled(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(newTask.GetCullMode(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(newTask.GetRefreshRate(), static_cast<uint32_t>(RenderTask::REFRESH_ALWAYS), TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(newTask.GetCurrentProperty<Vector4>(RenderTask::Property::CLEAR_COLOR), Vector4(0.0f, 0.0f, 0.0f, 1.0f), TEST_LOCATION);
 
   END_TEST;
 }
@@ -2760,7 +2770,7 @@ int UtcDaliRenderTaskGetClearColorP(void)
 
   RenderTaskList taskList = application.GetScene().GetRenderTaskList();
   RenderTask     task     = taskList.GetTask(0u);
-  DALI_TEST_EQUALS(task.GetClearColor(), RenderTask::DEFAULT_CLEAR_COLOR, TEST_LOCATION);
+  DALI_TEST_EQUALS(task.GetClearColor(), Vector4(0.0f, 0.0f, 0.0f, 1.0f), TEST_LOCATION);
   END_TEST;
 }
 

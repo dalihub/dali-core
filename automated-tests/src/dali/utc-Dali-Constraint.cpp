@@ -790,7 +790,7 @@ int UtcDaliConstraintRemoveActionP(void)
 
   Actor      actor      = Actor::New();
   Constraint constraint = Constraint::New<Vector3>(actor, Actor::Property::POSITION, &BasicFunction<Vector3>);
-  DALI_TEST_EQUALS(constraint.GetRemoveAction(), Constraint::DEFAULT_REMOVE_ACTION, TEST_LOCATION);
+  DALI_TEST_EQUALS(constraint.GetRemoveAction(), Constraint::BAKE, TEST_LOCATION);
 
   constraint.SetRemoveAction(Constraint::DISCARD);
   DALI_TEST_EQUALS(constraint.GetRemoveAction(), Constraint::DISCARD, TEST_LOCATION);
