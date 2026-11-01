@@ -21,7 +21,7 @@
 namespace DALI_NAMESPACE
 {
 
-Source::Source(Handle& obj, Property::Index index)
+Source::Source(const Handle& obj, Property::Index index)
 : propertyIndex(index),
   object(obj)
 {
@@ -44,6 +44,21 @@ ConstraintSource::ConstraintSource(ParentSource parent)
 : sourceType(PARENT_PROPERTY),
   propertyIndex(parent.propertyIndex)
 {
+}
+
+SourceType ConstraintSource::GetSourceType() const
+{
+  return sourceType;
+}
+
+Property::Index ConstraintSource::GetPropertyIndex() const
+{
+  return propertyIndex;
+}
+
+Handle ConstraintSource::GetObject() const
+{
+  return object;
 }
 
 } //namespace DALI_NAMESPACE

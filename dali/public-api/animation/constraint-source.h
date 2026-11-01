@@ -95,7 +95,7 @@ struct DALI_CORE_API Source
    * @param[in] object The object providing the property
    * @param[in] index The index of a property provided by object
    */
-  Source(Handle& object, Property::Index index);
+  Source(const Handle& object, Property::Index index);
 
   Property::Index propertyIndex; ///< The index of a property provided by object.
 
@@ -132,11 +132,32 @@ struct DALI_CORE_API ConstraintSource
    */
   ConstraintSource(ParentSource parent);
 
-  SourceType sourceType; ///< The source type
+  /**
+   * @brief Returns the source type.
+   * @SINCE_2_5.47
+   * @return The source type
+   */
+  SourceType GetSourceType() const;
 
-  Property::Index propertyIndex; ///< The index of the source property
+  /**
+   * @brief Returns the source property index.
+   * @SINCE_2_5.47
+   * @return The property index
+   */
+  Property::Index GetPropertyIndex() const;
 
-  Handle object; ///< The target object; only valid if sourceType == OBJECT_PROPERTY
+  /**
+   * @brief Returns the object providing the property.
+   * @SINCE_2_5.47
+   * @return The object, or an empty handle for local and parent sources
+   */
+  Handle GetObject() const;
+
+  SourceType sourceType; ///< The source type @DEPRECATED_2_5.47 will be private. Use GetSourceType() instead.
+
+  Property::Index propertyIndex; ///< The index of the source property @DEPRECATED_2_5.47 will be private. Use GetPropertyIndex() instead
+
+  Handle object; ///< The target object; only valid if sourceType == OBJECT_PROPERTY @DEPRECATED_2_5.47 will be private. Use GetObject() instead
 };
 
 /**

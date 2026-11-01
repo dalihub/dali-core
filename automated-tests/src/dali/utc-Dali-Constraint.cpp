@@ -2462,21 +2462,21 @@ int UtcDaliConstraintGetSourceAtP(void)
 
   // Test retrieving each source
   ConstraintSource source0 = constraint.GetSourceAt(0u);
-  DALI_TEST_EQUALS(source0.sourceType, Dali::SourceType::LOCAL_PROPERTY, TEST_LOCATION);
-  DALI_TEST_EQUALS(source0.propertyIndex, static_cast<Property::Index>(Actor::Property::SIZE), TEST_LOCATION);
+  DALI_TEST_EQUALS(source0.GetSourceType(), Dali::SourceType::LOCAL_PROPERTY, TEST_LOCATION);
+  DALI_TEST_EQUALS(source0.GetPropertyIndex(), static_cast<Property::Index>(Actor::Property::SIZE), TEST_LOCATION);
 
   ConstraintSource source1 = constraint.GetSourceAt(1u);
-  DALI_TEST_EQUALS(source1.sourceType, Dali::SourceType::PARENT_PROPERTY, TEST_LOCATION);
-  DALI_TEST_EQUALS(source1.propertyIndex, static_cast<Property::Index>(Actor::Property::ORIENTATION), TEST_LOCATION);
+  DALI_TEST_EQUALS(source1.GetSourceType(), Dali::SourceType::PARENT_PROPERTY, TEST_LOCATION);
+  DALI_TEST_EQUALS(source1.GetPropertyIndex(), static_cast<Property::Index>(Actor::Property::ORIENTATION), TEST_LOCATION);
 
   ConstraintSource source2 = constraint.GetSourceAt(2u);
-  DALI_TEST_EQUALS(source2.sourceType, Dali::SourceType::OBJECT_PROPERTY, TEST_LOCATION);
-  DALI_TEST_EQUALS(source2.propertyIndex, static_cast<Property::Index>(Actor::Property::COLOR_MULTIPLIER), TEST_LOCATION);
-  DALI_TEST_CHECK(source2.object == sourceActor);
+  DALI_TEST_EQUALS(source2.GetSourceType(), Dali::SourceType::OBJECT_PROPERTY, TEST_LOCATION);
+  DALI_TEST_EQUALS(source2.GetPropertyIndex(), static_cast<Property::Index>(Actor::Property::COLOR_MULTIPLIER), TEST_LOCATION);
+  DALI_TEST_CHECK(source2.GetObject() == sourceActor);
 
   ConstraintSource source3 = constraint.GetSourceAt(3u);
-  DALI_TEST_EQUALS(source3.sourceType, Dali::SourceType::LOCAL_PROPERTY, TEST_LOCATION);
-  DALI_TEST_EQUALS(source3.propertyIndex, static_cast<Property::Index>(Actor::Property::VISIBLE), TEST_LOCATION);
+  DALI_TEST_EQUALS(source3.GetSourceType(), Dali::SourceType::LOCAL_PROPERTY, TEST_LOCATION);
+  DALI_TEST_EQUALS(source3.GetPropertyIndex(), static_cast<Property::Index>(Actor::Property::VISIBLE), TEST_LOCATION);
 
   // Apply constraint and verify sources are still accessible
   constraint.Apply();
@@ -2485,8 +2485,8 @@ int UtcDaliConstraintGetSourceAtP(void)
 
   // Verify sources after applying
   ConstraintSource sourceAfterApply = constraint.GetSourceAt(0u);
-  DALI_TEST_EQUALS(sourceAfterApply.sourceType, Dali::SourceType::LOCAL_PROPERTY, TEST_LOCATION);
-  DALI_TEST_EQUALS(sourceAfterApply.propertyIndex, static_cast<Property::Index>(Actor::Property::SIZE), TEST_LOCATION);
+  DALI_TEST_EQUALS(sourceAfterApply.GetSourceType(), Dali::SourceType::LOCAL_PROPERTY, TEST_LOCATION);
+  DALI_TEST_EQUALS(sourceAfterApply.GetPropertyIndex(), static_cast<Property::Index>(Actor::Property::SIZE), TEST_LOCATION);
 
   END_TEST;
 }
@@ -2606,14 +2606,14 @@ int UtcDaliConstraintGetSourceAtWithClone(void)
   // Verify original constraint sources
   DALI_TEST_EQUALS(constraint.GetSourceCount(), 3u, TEST_LOCATION);
   ConstraintSource originalSource0 = constraint.GetSourceAt(0u);
-  DALI_TEST_EQUALS(originalSource0.sourceType, Dali::SourceType::LOCAL_PROPERTY, TEST_LOCATION);
-  DALI_TEST_EQUALS(originalSource0.propertyIndex, static_cast<Property::Index>(Actor::Property::SIZE), TEST_LOCATION);
+  DALI_TEST_EQUALS(originalSource0.GetSourceType(), Dali::SourceType::LOCAL_PROPERTY, TEST_LOCATION);
+  DALI_TEST_EQUALS(originalSource0.GetPropertyIndex(), static_cast<Property::Index>(Actor::Property::SIZE), TEST_LOCATION);
 
   // Verify cloned constraint sources
   DALI_TEST_EQUALS(clonedConstraint.GetSourceCount(), 3u, TEST_LOCATION);
   ConstraintSource clonedSource0 = clonedConstraint.GetSourceAt(0u);
-  DALI_TEST_EQUALS(clonedSource0.sourceType, Dali::SourceType::LOCAL_PROPERTY, TEST_LOCATION);
-  DALI_TEST_EQUALS(clonedSource0.propertyIndex, static_cast<Property::Index>(Actor::Property::SIZE), TEST_LOCATION);
+  DALI_TEST_EQUALS(clonedSource0.GetSourceType(), Dali::SourceType::LOCAL_PROPERTY, TEST_LOCATION);
+  DALI_TEST_EQUALS(clonedSource0.GetPropertyIndex(), static_cast<Property::Index>(Actor::Property::SIZE), TEST_LOCATION);
 
   // Apply both constraints and verify sources are still accessible
   constraint.Apply();
