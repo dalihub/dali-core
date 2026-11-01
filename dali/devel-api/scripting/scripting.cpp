@@ -111,7 +111,7 @@ Actor NewActor(const Property::Map& map)
   BaseHandle handle;
 
   // First find type and create Actor
-  Property::Value* typeValue = map.Find("type");
+  const Property::Value* typeValue = map.Find("type");
   if(typeValue)
   {
     String info;

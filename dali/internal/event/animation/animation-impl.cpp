@@ -1203,7 +1203,7 @@ bool Animation::DoAction(BaseObject* object, const Dali::String& actionName, con
 
     if(name == ACTION_PLAY)
     {
-      if(Property::Value* value = attributes.Find("duration", Property::FLOAT))
+      if(const Property::Value* value = attributes.Find("duration", Property::FLOAT))
       {
         animation->SetDuration(value->Get<float>());
       }

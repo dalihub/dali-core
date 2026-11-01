@@ -153,12 +153,22 @@ public:
    * @brief Retrieves the value at the specified position.
    *
    * @SINCE_1_0.0
+   * @note After 3_0.0, it will return const reference.
    * @param[in] position The specified position
    * @return A reference to the value at the specified position
    *
    * @note Will assert if position >= Count()
    */
   Value& GetValue(SizeType position) const;
+
+  /**
+   * @brief Retrieves a mutable value at the specified position.
+   * @SINCE_3_0.0
+   * @param[in] position The specified position
+   * @return A mutable reference to the value
+   * @note Will assert if position >= Count()
+   */
+  Value& GetValue(SizeType position);
 
   /**
    * @brief Retrieve the key at the specified position.
@@ -186,6 +196,7 @@ public:
    * @brief Finds the value for the specified key if it exists.
    *
    * @SINCE_1_0.0
+   * @note After 3_0.0, it will return const pointer.
    * @param[in] key The key to find
    *
    * @return A const pointer to the value if it exists, NULL otherwise
@@ -193,9 +204,18 @@ public:
   Value* Find(Dali::StringView key) const;
 
   /**
+   * @brief Finds a mutable value for the specified key.
+   * @SINCE_3_0.0
+   * @param[in] key The key to find
+   * @return A mutable pointer to the value, or nullptr if no match exists
+   */
+  Value* Find(Dali::StringView key);
+
+  /**
    * @brief Finds the value for the specified key if it exists.
    *
    * @SINCE_1_1.39
+   * @note After 3_0.0, it will return const pointer.
    * @param[in] key The key to find
    *
    * @return A const pointer to the value if it exists, NULL otherwise
@@ -203,11 +223,20 @@ public:
   Value* Find(Property::Index key) const;
 
   /**
+   * @brief Finds a mutable value for the specified key.
+   * @SINCE_3_0.0
+   * @param[in] key The key to find
+   * @return A mutable pointer to the value, or nullptr if no match exists
+   */
+  Value* Find(Property::Index key);
+
+  /**
    * @brief Finds the value for the specified keys if either exist.
    *
    * Will search for the index key first.
    *
    * @SINCE_1_1.45
+   * @note After 3_0.0, it will return const pointer.
    * @param[in] indexKey  The index key to find
    * @param[in] stringKey The string key to find
    *
@@ -216,9 +245,19 @@ public:
   Value* Find(Property::Index indexKey, Dali::StringView stringKey) const;
 
   /**
+   * @brief Finds a mutable value for the specified key.
+   * @SINCE_3_0.0
+   * @param[in] indexKey The index key to find first
+   * @param[in] stringKey The string key to find if the index key is absent
+   * @return A mutable pointer to the value, or nullptr if no match exists
+   */
+  Value* Find(Property::Index indexKey, Dali::StringView stringKey);
+
+  /**
    * @brief Finds the value for the specified key if it exists and its type is type.
    *
    * @SINCE_1_0.0
+   * @note After 3_0.0, it will return const pointer.
    * @param[in] key  The key to find
    * @param[in] type The type to check
    *
@@ -227,15 +266,34 @@ public:
   Value* Find(Dali::StringView key, Property::Type type) const;
 
   /**
+   * @brief Finds a mutable value for the specified key.
+   * @SINCE_3_0.0
+   * @param[in] key The key to find
+   * @param[in] type The required value type
+   * @return A mutable pointer to the value, or nullptr if no match exists
+   */
+  Value* Find(Dali::StringView key, Property::Type type);
+
+  /**
    * @brief Finds the value for the specified key if it exists and its type is type.
    *
    * @SINCE_1_1.39
+   * @note After 3_0.0, it will return const pointer.
    * @param[in] key  The key to find
    * @param[in] type The type to check
    *
    * @return A const pointer to the value if it exists, NULL otherwise
    */
   Value* Find(Property::Index key, Property::Type type) const;
+
+  /**
+   * @brief Finds a mutable value for the specified key.
+   * @SINCE_3_0.0
+   * @param[in] key The key to find
+   * @param[in] type The required value type
+   * @return A mutable pointer to the value, or nullptr if no match exists
+   */
+  Value* Find(Property::Index key, Property::Type type);
 
   /**
    * @brief Clears the map.
