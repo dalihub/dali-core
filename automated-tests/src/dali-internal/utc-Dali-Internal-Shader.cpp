@@ -45,8 +45,9 @@ int UtcDaliShaderTestVersion(void)
 
   Dali::Shader shader = Dali::Shader::New(ToDaliStringView(vertexShader), ToDaliStringView(fragmentShader));
   {
-    auto vertexPrefix   = Dali::Shader::GetVertexShaderPrefix();
-    auto fragmentPrefix = Dali::Shader::GetFragmentShaderPrefix();
+    DALI_TEST_EQUALS(ToStdString(Dali::Integration::GetShaderVersionPrefix()), application.GetGlAbstraction().GetShaderVersionPrefix(), TEST_LOCATION);
+    auto vertexPrefix   = Dali::Integration::GetVertexShaderPrefix();
+    auto fragmentPrefix = Dali::Integration::GetFragmentShaderPrefix();
 
     DALI_TEST_EQUALS(ToStdString(vertexPrefix).substr(0, 20), "//@legacy-prefix-end", TEST_LOCATION);
     DALI_TEST_EQUALS(ToStdString(fragmentPrefix).substr(0, 20), "//@legacy-prefix-end", TEST_LOCATION);
@@ -78,8 +79,8 @@ int UtcDaliShaderWithPrefixTestVersion(void)
     "//@version 101\n"
     "some code\n";
 
-  auto vertexPrefix   = Dali::Shader::GetVertexShaderPrefix();
-  auto fragmentPrefix = Dali::Shader::GetFragmentShaderPrefix();
+  auto vertexPrefix   = Dali::Integration::GetVertexShaderPrefix();
+  auto fragmentPrefix = Dali::Integration::GetFragmentShaderPrefix();
 
   Dali::Shader shader = Dali::Shader::New(
     ToDaliStringView(ToStdString(vertexPrefix) + vertexShader),
