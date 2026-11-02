@@ -48,6 +48,7 @@ SET( public_api_src_files
   ${public_api_src_dir}/events/tap-gesture-detector.cpp
   ${public_api_src_dir}/events/touch-event.cpp
   ${public_api_src_dir}/images/pixel.cpp
+  ${public_api_src_dir}/images/pixel-buffer.cpp
   ${public_api_src_dir}/images/pixel-data.cpp
   ${public_api_src_dir}/math/compile-time-math.cpp
   ${public_api_src_dir}/math/degree.cpp
@@ -181,6 +182,7 @@ SET( public_api_core_events_header_files
 
 SET( public_api_core_images_header_files
   ${public_api_src_dir}/images/pixel.h
+  ${public_api_src_dir}/images/pixel-buffer.h
   ${public_api_src_dir}/images/pixel-data.h
   ${public_api_src_dir}/images/native-image-interface.h
 )
