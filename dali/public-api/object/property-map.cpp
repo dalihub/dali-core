@@ -89,6 +89,17 @@ public:
   mutable std::size_t mHash{NOT_HASHED};
 };
 
+namespace Internal
+{
+struct DALI_INTERNAL PropertyMapAccess
+{
+  static const Property::Map::Impl* Read(const Property::Map& map)
+  {
+    return map.Read();
+  }
+};
+} // namespace Internal
+
 Property::Map::Map()
 : mImpl(new Impl)
 {
@@ -616,7 +627,7 @@ std::ostream& operator<<(std::ostream& stream, const Property::Map& map)
 {
   stream << "Map(" << map.Count() << ") = {";
 
-  auto impl = map.Read();
+  auto impl = Internal::PropertyMapAccess::Read(map);
   if(impl != nullptr)
   {
     int32_t count = 0;

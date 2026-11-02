@@ -30,6 +30,11 @@
 
 namespace DALI_NAMESPACE
 {
+namespace Internal
+{
+struct DALI_INTERNAL PropertyValueAccess;
+}
+
 /**
  * @addtogroup dali_core_object
  * @{
@@ -552,18 +557,27 @@ public:
    */
   std::size_t GetHash() const;
 
-public: // Not intended for developer use
+private: // Not intended for developer use
   /// @cond internal
+  friend struct Internal::PropertyValueAccess;
+
+public: // Deprecated internal API
+  /**
+   * @brief Internal implementation type.
+   * @DEPRECATED_2_5.47 will be private
+   */
   struct DALI_INTERNAL Impl;
 
   /**
    * @brief Retrieves an already constructed Impl object from the storage buffer.
+   * @DEPRECATED_2_5.47 will be private
    * @return A const reference to the Impl object
    */
   DALI_INTERNAL const Impl& Read() const;
 
   /**
    * @brief Retrieves an already constructed Impl object from the storage buffer.
+   * @DEPRECATED_2_5.47 will be private
    * @return A non const reference to the Impl object
    */
   DALI_INTERNAL Impl& Write();
