@@ -22,6 +22,7 @@
 #include <algorithm>
 #include <cstring> // for strcmp
 #include <limits>
+#include <utility>
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/object/type-registry.h>
@@ -318,6 +319,12 @@ void PanGestureDetector::OnActorDetach(Actor& actor)
   if(actor.OnScene() && actor.GetScene().IsGeometryHittestEnabled())
   {
     actor.TouchEventSignal().Disconnect(this, &PanGestureDetector::OnTouchEvent);
+
+    if(mGestureRecognizer &&
+       (mAttachedActors.empty() || mFeededActor.GetActor() == &actor || mCurrentPanActor.GetActor() == &actor))
+    {
+      ResetRecognition();
+    }
   }
 }
 
@@ -494,11 +501,14 @@ void PanGestureDetector::ProcessTouchEvent(Scene& scene, const Integration::Touc
     FillRequest(request);
     mGestureRecognizer->Update(request);
   }
-  mGestureRecognizer->SendEvent(scene, event);
+  // A signal callback may detach the actor and release the detector's recognizer.
+  GestureRecognizerPtr recognizer(mGestureRecognizer);
+  recognizer->SendEvent(scene, event);
 }
 
 void PanGestureDetector::Process(Scene& scene, const PanGestureEvent& panEvent)
 {
+  GestureRecognizerPtr recognizer(mGestureRecognizer);
   GestureState state = panEvent.state;
   if(state == GestureState::CONTINUING &&
      (panEvent.numberOfTouches < mActiveProfile.minimumTouches || panEvent.numberOfTouches > mActiveProfile.maximumTouches))
@@ -579,7 +589,8 @@ void PanGestureDetector::Process(Scene& scene, const PanGestureEvent& panEvent)
         EmitPanSignal(currentGesturedActor, panEvent, actorCoords, state, mRenderTask, scene);
       }
 
-      if((state == GestureState::FINISHED) || (state == GestureState::CANCELLED))
+      if(((state == GestureState::FINISHED) || (state == GestureState::CANCELLED)) &&
+         mGestureRecognizer == recognizer)
       {
         mCurrentPanActor.SetActor(nullptr);
       }
@@ -669,9 +680,11 @@ bool PanGestureDetector::CheckGestureDetector(const GestureEvent* gestureEvent, 
 
 void PanGestureDetector::CancelProcessing()
 {
-  if(mGestureRecognizer)
+  // Keep the old recognizer alive through cancellation callbacks and their cleanup.
+  GestureRecognizerPtr recognizer(mGestureRecognizer);
+  if(recognizer)
   {
-    mGestureRecognizer->CancelEvent();
+    recognizer->CancelEvent();
   }
 }
 
@@ -755,6 +768,19 @@ Actor* PanGestureDetector::GetCurrentGesturedActor()
 {
   // Return the current feeded actor
   return GestureDetector::GetCurrentGesturedActor();
+}
+
+void PanGestureDetector::ResetRecognition()
+{
+  // Release touch history only after clearing the detector's recognition state.
+  GestureRecognizerPtr recognizer(std::move(mGestureRecognizer));
+  SetDetected(false);
+  mFeededActor.ResetActor();
+  mRenderTask.Reset();
+  mCurrentPanActor.ResetActor();
+  mPossiblePanPosition = Vector2::ZERO;
+  mLastVelocity        = Vector2::ZERO;
+  mLastScreenVelocity  = Vector2::ZERO;
 }
 
 } // namespace Internal
