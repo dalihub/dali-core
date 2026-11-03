@@ -45,6 +45,7 @@ SET(TC_SOURCES
   utc-Dali-Internal-TapGestureRecognizer.cpp
   utc-Dali-Internal-Texture.cpp
   utc-Dali-Internal-ThreadLocalStorage.cpp
+  utc-Dali-Internal-Trace.cpp
   utc-Dali-Internal-TransformManagerProperty.cpp
 )
 
