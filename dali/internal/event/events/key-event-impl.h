@@ -47,6 +47,7 @@ public:
    * @param[in]  logicalKey      The logical key symbol (eg. shift + 1 == "exclamation")
    * @param[in]  keyString       The string of input characters or key pressed
    * @param[in]  keyCode         The unique key code for the key pressed.
+   * @param[in]  rawKeyCode      The raw platform key code, or zero if unavailable
    * @param[in]  keyModifier     The key modifier for special keys like shift and alt
    * @param[in]  timeStamp       The time (in ms) that the key event occurred.
    * @param[in]  keyState        The state of the key event.
@@ -59,6 +60,7 @@ public:
            const Dali::String&          logicalKey,
            const Dali::String&          keyString,
            int32_t                      keyCode,
+           uint32_t                     rawKeyCode,
            int32_t                      keyModifier,
            uint32_t                     timeStamp,
            const Dali::KeyEvent::State& keyState,
@@ -80,6 +82,7 @@ public:
    * @param[in]  logicalKey      The logical key symbol (eg. shift + 1 == "exclamation")
    * @param[in]  keyString       The string of input characters or key pressed
    * @param[in]  keyCode         The unique key code for the key pressed.
+   * @param[in]  rawKeyCode      The raw platform key code, or zero if unavailable
    * @param[in]  keyModifier     The key modifier for special keys like shift and alt
    * @param[in]  timeStamp       The time (in ms) that the key event occurred.
    * @param[in]  keyState        The state of the key event.
@@ -93,6 +96,7 @@ public:
                          const Dali::String&          logicalKey,
                          const Dali::String&          keyString,
                          int32_t                      keyCode,
+                         uint32_t                     rawKeyCode,
                          int32_t                      keyModifier,
                          uint32_t                     timeStamp,
                          const Dali::KeyEvent::State& keyState,
@@ -160,6 +164,11 @@ public:
    * @copydoc Dali::KeyEvent::GetKeyCode()
    */
   int32_t GetKeyCode() const;
+
+  /**
+   * @brief Gets the raw platform key code, or zero if unavailable.
+   */
+  uint32_t GetRawKeyCode() const;
 
   /**
    * @copydoc Dali::KeyEvent::GetKeyModifier()
@@ -306,6 +315,7 @@ private:
   Dali::String           mCompose;            ///< The key compose
   Dali::String           mDeviceName;         ///< The name of device the key event originated from
   int32_t                mKeyCode;            ///< The unique key code
+  uint32_t               mRawKeyCode;         ///< The raw platform key code, or zero if unavailable
   int32_t                mKeyModifier;        ///< The key modifier
   uint32_t               mTime;               ///< The time (in ms) that the key event occurred.
   uint32_t               mReceiveTime;        ///< The time when the key event was received.

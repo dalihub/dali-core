@@ -41,7 +41,8 @@ KeyEvent::KeyEvent()
   isRepeat(false),
   interceptProcessed(false),
   windowId(0),
-  receiveTime(0)
+  receiveTime(0),
+  rawKeyCode(0)
 {
 }
 
@@ -71,7 +72,8 @@ KeyEvent::KeyEvent(const Dali::String&    keyName,
   isRepeat(false),
   interceptProcessed(false),
   windowId(0),
-  receiveTime(0)
+  receiveTime(0),
+  rawKeyCode(0)
 {
 }
 
@@ -91,7 +93,8 @@ KeyEvent::KeyEvent(const Dali::KeyEvent& keyEvent)
   isRepeat(keyEvent.IsRepeat()),
   interceptProcessed(GetImplementation(keyEvent).IsInterceptProcessed()),
   windowId(keyEvent.GetWindowId()),
-  receiveTime(keyEvent.GetReceiveTime())
+  receiveTime(keyEvent.GetReceiveTime()),
+  rawKeyCode(GetImplementation(keyEvent).GetRawKeyCode())
 {
 }
 
@@ -111,11 +114,18 @@ KeyEvent::KeyEvent(const KeyEvent& rhs)
   isRepeat(rhs.isRepeat),
   interceptProcessed(rhs.interceptProcessed),
   windowId(rhs.windowId),
-  receiveTime(rhs.receiveTime)
+  receiveTime(rhs.receiveTime),
+  rawKeyCode(rhs.rawKeyCode)
 {
 }
 
 KeyEvent::~KeyEvent() = default;
+
+Dali::KeyEvent NewKeyEvent(const KeyEvent& keyEvent)
+{
+  Internal::KeyEventPtr internal = Internal::KeyEvent::New(keyEvent.keyName, keyEvent.logicalKey, keyEvent.keyString, keyEvent.keyCode, keyEvent.rawKeyCode, keyEvent.keyModifier, keyEvent.time, static_cast<Dali::KeyEvent::State>(keyEvent.state), keyEvent.compose, keyEvent.deviceName, keyEvent.deviceClass, keyEvent.deviceSubclass);
+  return Dali::KeyEvent(internal.Get());
+}
 
 } // namespace Integration
 

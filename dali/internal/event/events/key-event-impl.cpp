@@ -37,6 +37,7 @@ KeyEvent::KeyEvent()
   mCompose(""),
   mDeviceName(""),
   mKeyCode(KEY_INVALID_CODE),
+  mRawKeyCode(0),
   mKeyModifier(0),
   mTime(0),
   mReceiveTime(0),
@@ -53,6 +54,7 @@ KeyEvent::KeyEvent(const Dali::String&          keyName,
                    const Dali::String&          logicalKey,
                    const Dali::String&          keyString,
                    int32_t                      keyCode,
+                   uint32_t                     rawKeyCode,
                    int32_t                      keyModifier,
                    uint32_t                     timeStamp,
                    const Dali::KeyEvent::State& keyState,
@@ -66,6 +68,7 @@ KeyEvent::KeyEvent(const Dali::String&          keyName,
   mCompose(compose),
   mDeviceName(deviceName),
   mKeyCode(keyCode),
+  mRawKeyCode(rawKeyCode),
   mKeyModifier(keyModifier),
   mTime(timeStamp),
   mReceiveTime(0),
@@ -88,6 +91,7 @@ KeyEventPtr KeyEvent::New(const Dali::String&          keyName,
                           const Dali::String&          logicalKey,
                           const Dali::String&          keyString,
                           int32_t                      keyCode,
+                          uint32_t                     rawKeyCode,
                           int32_t                      keyModifier,
                           uint32_t                     timeStamp,
                           const Dali::KeyEvent::State& keyState,
@@ -96,7 +100,7 @@ KeyEventPtr KeyEvent::New(const Dali::String&          keyName,
                           const Device::Class::Type    deviceClass,
                           const Device::Subclass::Type deviceSubclass)
 {
-  KeyEventPtr keyEvent = new KeyEvent(keyName, logicalKey, keyString, keyCode, keyModifier, timeStamp, keyState, compose, deviceName, deviceClass, deviceSubclass);
+  KeyEventPtr keyEvent = new KeyEvent(keyName, logicalKey, keyString, keyCode, rawKeyCode, keyModifier, timeStamp, keyState, compose, deviceName, deviceClass, deviceSubclass);
   return keyEvent;
 }
 
@@ -158,6 +162,11 @@ const Dali::String& KeyEvent::GetLogicalKey() const
 int32_t KeyEvent::GetKeyCode() const
 {
   return mKeyCode;
+}
+
+uint32_t KeyEvent::GetRawKeyCode() const
+{
+  return mRawKeyCode;
 }
 
 int32_t KeyEvent::GetKeyModifier() const

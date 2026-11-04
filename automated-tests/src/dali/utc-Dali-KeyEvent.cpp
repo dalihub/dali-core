@@ -114,6 +114,7 @@ int UtcDaliKeyEventDefaultConstructor(void)
   DALI_TEST_EQUALS(Device::Subclass::NONE, event.GetDeviceSubclass(), TEST_LOCATION); // check device subclass
   DALI_TEST_EQUALS(false, event.IsRepeat(), TEST_LOCATION);                           // check repeat
   DALI_TEST_EQUALS(0, event.GetWindowId(), TEST_LOCATION);                            // check window id
+  DALI_TEST_EQUALS(Integration::KeyEvent(event).rawKeyCode, 0u, TEST_LOCATION);
 
   END_TEST;
 }
@@ -136,6 +137,8 @@ int UtcDaliKeyEventConstructor(void)
   DALI_TEST_EQUALS("", event.GetDeviceName(), TEST_LOCATION);                         // check device name
   DALI_TEST_EQUALS(Device::Class::NONE, event.GetDeviceClass(), TEST_LOCATION);       // check device class
   DALI_TEST_EQUALS(Device::Subclass::NONE, event.GetDeviceSubclass(), TEST_LOCATION); // check device subclass
+
+  DALI_TEST_EQUALS(Integration::KeyEvent(event).rawKeyCode, 0u, TEST_LOCATION);
 
   END_TEST;
 }
@@ -508,6 +511,7 @@ int UtcDaliIntegrationKeyEvent(void)
     DALI_TEST_CHECK(keyEvent.logicalKey == "");
     DALI_TEST_CHECK(keyEvent.keyString == "");
     DALI_TEST_EQUALS(keyEvent.keyCode, -1, TEST_LOCATION);
+    DALI_TEST_EQUALS(keyEvent.rawKeyCode, 0u, TEST_LOCATION);
     DALI_TEST_EQUALS(keyEvent.keyModifier, 0, TEST_LOCATION);
     DALI_TEST_EQUALS(keyEvent.time, 0u, TEST_LOCATION);
     DALI_TEST_EQUALS(keyEvent.state, Dali::Integration::KeyEvent::DOWN, TEST_LOCATION);
@@ -536,6 +540,7 @@ int UtcDaliIntegrationKeyEvent(void)
     DALI_TEST_CHECK(keyEvent.logicalKey == logicalKey);
     DALI_TEST_CHECK(keyEvent.keyString == keyString);
     DALI_TEST_EQUALS(keyEvent.keyCode, keyCode, TEST_LOCATION);
+    DALI_TEST_EQUALS(keyEvent.rawKeyCode, 0u, TEST_LOCATION);
     DALI_TEST_EQUALS(keyEvent.keyModifier, keyModifier, TEST_LOCATION);
     DALI_TEST_EQUALS(keyEvent.time, timeStamp, TEST_LOCATION);
     DALI_TEST_EQUALS(keyEvent.state, keyState, TEST_LOCATION);
@@ -594,6 +599,95 @@ int UtcDaliIntegrationKeyEventFromHandle(void)
   DALI_TEST_EQUALS(defaultEvent.windowId, 0u, TEST_LOCATION);
   DALI_TEST_EQUALS(defaultEvent.keyCode, KEY_INVALID_CODE, TEST_LOCATION);
 
+  END_TEST;
+}
+
+int UtcDaliIntegrationNewKeyEvent(void)
+{
+  TestApplication application;
+
+  Integration::KeyEvent source("a", "A", "a", 10014, SHIFT_MODIFIER, 123u, Integration::KeyEvent::UP, "compose", "keyboard", Device::Class::KEYBOARD, Device::Subclass::NONE);
+  source.rawKeyCode         = 0xf0000000u;
+  source.isRepeat           = true;
+  source.interceptProcessed = true;
+  source.windowId           = 7u;
+  source.receiveTime        = 124u;
+
+  Dali::KeyEvent event = Integration::NewKeyEvent(source);
+  DALI_TEST_EQUALS(event.GetKeyName(), source.keyName, TEST_LOCATION);
+  DALI_TEST_EQUALS(event.GetLogicalKey(), source.logicalKey, TEST_LOCATION);
+  DALI_TEST_EQUALS(event.GetKeyString(), source.keyString, TEST_LOCATION);
+  DALI_TEST_EQUALS(event.GetKeyCode(), source.keyCode, TEST_LOCATION);
+  DALI_TEST_EQUALS(event.GetKeyModifier(), source.keyModifier, TEST_LOCATION);
+  DALI_TEST_EQUALS(event.GetTime(), source.time, TEST_LOCATION);
+  DALI_TEST_EQUALS(event.GetState(), KeyEvent::UP, TEST_LOCATION);
+  DALI_TEST_EQUALS(event.GetCompose(), source.compose, TEST_LOCATION);
+  DALI_TEST_EQUALS(event.GetDeviceName(), source.deviceName, TEST_LOCATION);
+  DALI_TEST_EQUALS(event.GetDeviceClass(), source.deviceClass, TEST_LOCATION);
+  DALI_TEST_EQUALS(event.GetDeviceSubclass(), source.deviceSubclass, TEST_LOCATION);
+
+  Integration::KeyEvent restored(event);
+  DALI_TEST_EQUALS(restored.rawKeyCode, source.rawKeyCode, TEST_LOCATION);
+  // Preserve the defaults used by Window and GlWindow before this factory existed.
+  DALI_TEST_EQUALS(restored.isRepeat, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(restored.interceptProcessed, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(restored.windowId, 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(restored.receiveTime, 0u, TEST_LOCATION);
+
+  source.rawKeyCode = 38u;
+  source.keyCode    = 99;
+  DALI_TEST_EQUALS(Integration::KeyEvent(event).rawKeyCode, 0xf0000000u, TEST_LOCATION);
+  DALI_TEST_EQUALS(event.GetKeyCode(), 10014, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliKeyEventRawCodeReinjection(void)
+{
+  TestApplication application;
+  Dali::KeyEvent  received;
+  application.GetScene().KeyEventSignal().Connect(&application, [&](const Dali::KeyEvent& event)
+  {
+    received = event;
+  });
+
+  for(uint32_t rawKeyCode : {0u, 38u, 0xf0000000u})
+  {
+    for(auto state : {Integration::KeyEvent::DOWN, Integration::KeyEvent::UP})
+    {
+      Integration::KeyEvent source("a", "a", "a", 10014, 0, 0u, state, "", "keyboard", Device::Class::KEYBOARD, Device::Subclass::NONE);
+      source.rawKeyCode  = rawKeyCode;
+      source.isRepeat    = state == Integration::KeyEvent::DOWN;
+      source.windowId    = 7u;
+      source.receiveTime = 1u;
+      Integration::KeyEvent queued(source);
+      source.rawKeyCode = 99u;
+      application.ProcessEvent(queued);
+      application.SendNotification();
+      DALI_TEST_CHECK(received);
+
+      Integration::KeyEvent restored(received);
+      DALI_TEST_EQUALS(restored.rawKeyCode, rawKeyCode, TEST_LOCATION);
+      DALI_TEST_EQUALS(restored.keyCode, 10014, TEST_LOCATION);
+      DALI_TEST_EQUALS(restored.state, state, TEST_LOCATION);
+      DALI_TEST_EQUALS(restored.isRepeat, queued.isRepeat, TEST_LOCATION);
+      DALI_TEST_EQUALS(restored.windowId, 7u, TEST_LOCATION);
+      DALI_TEST_EQUALS(restored.receiveTime, 1u, TEST_LOCATION);
+
+      // Accessibility marks and re-injects the same handle after its asynchronous reply.
+      Dali::KeyEvent copied(received);
+      DevelKeyEvent::SetInterceptProcessed(copied, true);
+      Integration::KeyEvent reinjected(copied);
+      received.Reset();
+      application.ProcessEvent(reinjected);
+      application.SendNotification();
+      DALI_TEST_CHECK(received);
+      Integration::KeyEvent result(received);
+      DALI_TEST_EQUALS(result.rawKeyCode, rawKeyCode, TEST_LOCATION);
+      DALI_TEST_EQUALS(result.keyCode, 10014, TEST_LOCATION);
+      DALI_TEST_EQUALS(result.interceptProcessed, true, TEST_LOCATION);
+    }
+  }
   END_TEST;
 }
 

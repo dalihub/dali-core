@@ -177,7 +177,22 @@ struct DALI_CORE_API KeyEvent : public Event
    * The time (in ms)  when key event was received.
    */
   uint32_t receiveTime;
+
+  /**
+   * The platform key code before DALi mapping, preserved for IMF filtering
+   * (an XKB keycode on Ecore Wayland). Zero means no raw key code is available.
+   */
+  uint32_t rawKeyCode;
 };
+
+/**
+ * @brief Creates a key event handle from the constructor fields and raw key code.
+ *
+ * Other event metadata retains its default values.
+ * @param[in] keyEvent The integration event to initialize from
+ * @return A new key event handle
+ */
+DALI_CORE_API Dali::KeyEvent NewKeyEvent(const KeyEvent& keyEvent);
 
 } // namespace Integration
 
