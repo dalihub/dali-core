@@ -161,6 +161,11 @@ private: // GestureDetector overrides
    */
   void EmitRotationSignal(Actor* actor, const RotationGestureEvent& rotationEvent, Vector2 localCenter);
 
+  /**
+   * @brief Discards detector-owned recognition without emitting a gesture signal.
+   */
+  void ResetRecognition();
+
 private:
   Dali::RotationGestureDetector::DetectedSignalType mDetectedSignal;
 };

@@ -2024,6 +2024,24 @@ public:
   bool IsAllowSelfInitiatedTouchOnlyEnabled() const;
 
   /**
+   * @brief Sets whether to block touch propagation after this actor even if the touch event is not consumed.
+   * @SINCE_2_5.46
+   * @param[in] blocked True to block touch propagation
+   * @pre The actor has been initialized.
+   * @note Default is false. Only applies to geometry touch propagation.
+   */
+  void SetTouchPropagationBlocked(bool blocked);
+
+  /**
+   * @brief Gets whether touch propagation is blocked after this actor.
+   * @SINCE_2_5.46
+   * @return True if touch propagation is blocked
+   * @pre The actor has been initialized.
+   * @see SetTouchPropagationBlocked()
+   */
+  bool IsTouchPropagationBlocked() const;
+
+  /**
    * @brief Sets whether touch motion events (pointer move while pressed) are dispatched to the actor.
    * @param[in] enabled True to dispatch touch motion events
    * @pre The actor has been initialized.

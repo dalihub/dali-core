@@ -4095,7 +4095,7 @@ int UtcDaliSceneRequestFullUpdatePartialRendering(void)
 
   std::vector<BoundsInteger> damagedRects;
   BoundsInteger              clippingRect;
-  BoundsInteger              expectedRect1, expectedRect2;
+  BoundsInteger              expectedRect1;
 
   // Initial render to populate dirty rects
   application.SendNotification();

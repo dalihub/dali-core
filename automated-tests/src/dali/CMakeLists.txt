@@ -17,6 +17,7 @@ SET(TC_SOURCES
         utc-Dali-Callback.cpp
         utc-Dali-CameraActor.cpp
         utc-Dali-CircularQueue.cpp
+        utc-Dali-Constexpr.cpp
         utc-Dali-Common.cpp
         utc-Dali-ConditionalWait.cpp
         utc-Dali-ConnectionTracker.cpp
@@ -73,6 +74,7 @@ SET(TC_SOURCES
         utc-Dali-PinchGestureDetector.cpp
         utc-Dali-PinchGestureRecognizer.cpp
         utc-Dali-Pixel.cpp
+        utc-Dali-PixelBuffer.cpp
         utc-Dali-PixelData.cpp
         utc-Dali-Processors.cpp
         utc-Dali-PropertyArray.cpp
@@ -167,7 +169,7 @@ IF(DALI_TEST_SOURCE_LIST_ONLY)
 ENDIF()
 
 PKG_CHECK_MODULES(${CAPI_LIB} REQUIRED
-     dali2-core
+     dali3-core
 )
 
 ADD_COMPILE_OPTIONS( -rdynamic )

@@ -23,6 +23,7 @@
 // INTERNAL INCLUDES
 #include <dali/devel-api/object/type-registry.h>
 #include <dali/integration-api/string-utils.h>
+#include <dali/internal/common/render-task-default-values.h>
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/actors/camera-actor-impl.h>
 #include <dali/internal/event/common/event-thread-services.h>
@@ -978,6 +979,16 @@ Dali::PixelData RenderTask::GetRenderResult()
   return pixelData;
 }
 
+Dali::PixelBuffer RenderTask::GetRenderResultBuffer()
+{
+  Dali::PixelBuffer pixelBuffer;
+  if(mFrameBuffer)
+  {
+    pixelBuffer = mFrameBuffer->GetRenderResultBuffer();
+  }
+  return pixelBuffer;
+}
+
 void RenderTask::ClearInternalCameraActor()
 {
   if(mInternalCameraContext && mInternalCameraContext->mInternalCameraActor)
@@ -1326,18 +1337,18 @@ RenderTask::RenderTask(const SceneGraph::RenderTask* sceneObject, RenderTaskList
   mInputMappingActor(),
   mRenderTaskList(renderTaskList),
   mCameraActorType(Dali::RenderTask::CameraActorType::DEFAULT),
-  mClearColor(Dali::RenderTask::DEFAULT_CLEAR_COLOR),
+  mClearColor(RenderTaskDefaultValues::CLEAR_COLOR),
   mViewportPosition(Vector2::ZERO),
   mViewportSize(Vector2::ZERO),
-  mRefreshRate(Dali::RenderTask::DEFAULT_REFRESH_RATE),
+  mRefreshRate(RenderTaskDefaultValues::REFRESH_RATE),
   mRefreshOnceCounter(0u),
   mRenderedScaleFactor(Vector2::ONE),
   mScreenToFrameBufferFunction(Dali::RenderTask::DEFAULT_SCREEN_TO_FRAMEBUFFER_FUNCTION),
   mIsRequestedToKeepRenderResult(false),
-  mExclusive(Dali::RenderTask::DEFAULT_EXCLUSIVE),
-  mInputEnabled(Dali::RenderTask::DEFAULT_INPUT_ENABLED),
-  mClearEnabled(Dali::RenderTask::DEFAULT_CLEAR_ENABLED),
-  mCullMode(Dali::RenderTask::DEFAULT_CULL_MODE),
+  mExclusive(RenderTaskDefaultValues::EXCLUSIVE),
+  mInputEnabled(RenderTaskDefaultValues::INPUT_ENABLED),
+  mClearEnabled(RenderTaskDefaultValues::CLEAR_ENABLED),
+  mCullMode(RenderTaskDefaultValues::CULL_MODE),
   mRequiresSync(false),
   mInternalCameraContext(nullptr)
 {

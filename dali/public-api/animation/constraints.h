@@ -150,7 +150,7 @@ struct RelativeToConstraint
    * @SINCE_1_0.0
    * @param[in] scale Scale factor
    */
-  RelativeToConstraint(float scale)
+  constexpr RelativeToConstraint(float scale)
   : mScale(scale, scale, scale)
   {
   }
@@ -160,7 +160,7 @@ struct RelativeToConstraint
    * @SINCE_1_0.0
    * @param[in] scale Scale factor
    */
-  RelativeToConstraint(const Vector3& scale)
+  constexpr RelativeToConstraint(const Vector3& scale)
   : mScale(scale)
   {
   }
@@ -194,7 +194,7 @@ struct RelativeToConstraintFloat
    * @SINCE_1_0.0
    * @param[in] scale Scale factor
    */
-  RelativeToConstraintFloat(float scale)
+  constexpr RelativeToConstraintFloat(float scale)
   : mScale(scale)
   {
   }

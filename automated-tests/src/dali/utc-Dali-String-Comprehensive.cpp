@@ -942,10 +942,13 @@ int UtcDaliString_GetRawStorage_InternalUse(void)
   TestApplication application;
   String          str("Hello");
 
-  void* storage = str.GetRawStorage();
-  DALI_TEST_CHECK(storage != nullptr);
+  std::string extracted = Integration::ToStdString(std::move(str));
+  DALI_TEST_EQUALS(extracted, std::string("Hello"), TEST_LOCATION);
+  DALI_TEST_CHECK(str.Empty());
 
-  // This is for internal use, just verify it's accessible
+  String restored = Integration::ToDaliString(std::move(extracted));
+  DALI_TEST_EQUALS(restored.CStr(), "Hello", TEST_LOCATION);
+
   END_TEST;
 }
 
@@ -954,14 +957,11 @@ int UtcDaliString_ConstexprSizeAndAlign(void)
   tet_printf("Test storage size and alignment constants");
   TestApplication application;
 
-  // Verify constants are accessible
-  // StorageSize should be >= sizeof(std::string)
-  // StorageAlign should be >= alignof(std::string)
+  static_assert(sizeof(String) >= DALI_STRING_STORAGE_SIZE, "String storage must fit its configured buffer");
+  static_assert(alignof(String) >= alignof(std::string), "String storage must align std::string");
 
-  // This is compile-time verification, runtime just checks it's accessible
-  String str;
-  void*  storage = str.GetRawStorage();
-  DALI_TEST_CHECK(storage != nullptr);
+  String str("storage");
+  DALI_TEST_EQUALS(Integration::ToStdString(str), std::string("storage"), TEST_LOCATION);
 
   END_TEST;
 }

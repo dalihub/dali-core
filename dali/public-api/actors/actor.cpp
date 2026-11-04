@@ -587,6 +587,16 @@ bool Actor::IsAllowSelfInitiatedTouchOnlyEnabled() const
   return GetImplementation(*this).IsAllowSelfInitiatedTouchOnlyEnabled();
 }
 
+void Actor::SetTouchPropagationBlocked(bool blocked)
+{
+  GetImplementation(*this).SetTouchPropagationBlocked(blocked);
+}
+
+bool Actor::IsTouchPropagationBlocked() const
+{
+  return GetImplementation(*this).IsTouchPropagationBlocked();
+}
+
 void Actor::SetDispatchTouchMotionEnabled(bool enabled)
 {
   GetImplementation(*this).SetProperty(Actor::Property::DISPATCH_TOUCH_MOTION, enabled);

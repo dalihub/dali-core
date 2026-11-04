@@ -52,79 +52,6 @@ namespace DALI_NAMESPACE
 {
 const Matrix3 Matrix3::IDENTITY(1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f);
 
-Matrix3::Matrix3()
-{
-  float* m = AsFloat();
-  memset(m, 0, NUM_BYTES_IN_MATRIX);
-}
-
-Matrix3::Matrix3(const Matrix3& m)
-{
-  memcpy(mElements, m.mElements, NUM_BYTES_IN_MATRIX);
-}
-
-Matrix3::Matrix3(const Matrix& matrix)
-{
-  const float* m4 = matrix.AsFloat();
-  memcpy(&mElements[S00], m4, NUM_BYTES_IN_ROW);
-  memcpy(&mElements[S10], m4 + 4, NUM_BYTES_IN_ROW);
-  memcpy(&mElements[S20], m4 + 8, NUM_BYTES_IN_ROW);
-}
-
-Matrix3::Matrix3(float s00, float s01, float s02, float s10, float s11, float s12, float s20, float s21, float s22)
-{
-  mElements[S00] = s00;
-  mElements[S01] = s01;
-  mElements[S02] = s02;
-  mElements[S10] = s10;
-  mElements[S11] = s11;
-  mElements[S12] = s12;
-  mElements[S20] = s20;
-  mElements[S21] = s21;
-  mElements[S22] = s22;
-}
-
-void Matrix3::SetIdentity()
-{
-  memset(mElements, 0, NUM_BYTES_IN_MATRIX);
-  mElements[S00] = 1.0f;
-  mElements[S11] = 1.0f;
-  mElements[S22] = 1.0f;
-}
-
-Matrix3::Matrix3(Matrix3&& matrix) noexcept
-{
-  memcpy(mElements, matrix.mElements, NUM_BYTES_IN_MATRIX);
-}
-
-Matrix3& Matrix3::operator=(Matrix3&& matrix) noexcept
-{
-  if(this != &matrix)
-  {
-    memcpy(AsFloat(), matrix.AsFloat(), NUM_BYTES_IN_MATRIX);
-  }
-  return *this;
-}
-
-Matrix3& Matrix3::operator=(const Matrix3& matrix)
-{
-  // no point copying if self assigning
-  if(this != &matrix)
-  {
-    memcpy(AsFloat(), matrix.AsFloat(), NUM_BYTES_IN_MATRIX);
-  }
-  return *this;
-}
-
-Matrix3& Matrix3::operator=(const Matrix& matrix)
-{
-  const float* m4 = matrix.AsFloat();
-  memcpy(&mElements[S00], m4, NUM_BYTES_IN_ROW);
-  memcpy(&mElements[S10], m4 + 4, NUM_BYTES_IN_ROW);
-  memcpy(&mElements[S20], m4 + 8, NUM_BYTES_IN_ROW);
-  return *this;
-}
-
 bool Matrix3::Invert()
 {
   bool succeeded = false;
@@ -155,21 +82,6 @@ bool Matrix3::Invert()
     succeeded = true;
   }
   return succeeded;
-}
-
-bool Matrix3::Transpose()
-{
-  float tmp;
-  tmp            = mElements[S01];
-  mElements[S01] = mElements[S10];
-  mElements[S10] = tmp;
-  tmp            = mElements[S02];
-  mElements[S02] = mElements[S20];
-  mElements[S20] = tmp;
-  tmp            = mElements[S21];
-  mElements[S21] = mElements[S12];
-  mElements[S12] = tmp;
-  return true;
 }
 
 bool Matrix3::ScaledInverseTranspose()
@@ -224,29 +136,6 @@ bool Matrix3::ScaledInverseTranspose()
   return succeeded;
 }
 
-void Matrix3::Scale(float scale)
-{
-  mElements[S00] *= scale;
-  mElements[S01] *= scale;
-  mElements[S02] *= scale;
-  mElements[S10] *= scale;
-  mElements[S11] *= scale;
-  mElements[S12] *= scale;
-  mElements[S20] *= scale;
-  mElements[S21] *= scale;
-  mElements[S22] *= scale;
-}
-
-float Matrix3::Magnitude() const
-{
-  float avg = 0;
-  for(uint32_t i = 0; i < 9; i++)
-  {
-    avg += fabsf(mElements[i]);
-  }
-  return avg / 3.0f;
-}
-
 void Matrix3::Multiply(Matrix3& result, const Matrix3& lhs, const Matrix3& rhs)
 {
   Internal::MatrixUtils::Multiply(result, lhs, rhs);
@@ -263,32 +152,6 @@ Matrix3& Matrix3::operator*=(const Matrix3& rhs)
 {
   Internal::MatrixUtils::MultiplyAssign(*this, rhs);
   return *this;
-}
-
-Vector3 Matrix3::operator*(const Vector3& rhs) const
-{
-  return Vector3(rhs.x * mElements[S00] + rhs.y * mElements[S10] + rhs.z * mElements[S20],
-                 rhs.x * mElements[S01] + rhs.y * mElements[S11] + rhs.z * mElements[S21],
-                 rhs.x * mElements[S02] + rhs.y * mElements[S12] + rhs.z * mElements[S22]);
-}
-
-bool Matrix3::operator==(const Matrix3& rhs) const
-{
-  return (
-    Equals(mElements[0], rhs.mElements[0]) &&
-    Equals(mElements[1], rhs.mElements[1]) &&
-    Equals(mElements[2], rhs.mElements[2]) &&
-    Equals(mElements[3], rhs.mElements[3]) &&
-    Equals(mElements[4], rhs.mElements[4]) &&
-    Equals(mElements[5], rhs.mElements[5]) &&
-    Equals(mElements[6], rhs.mElements[6]) &&
-    Equals(mElements[7], rhs.mElements[7]) &&
-    Equals(mElements[8], rhs.mElements[8]));
-}
-
-bool Matrix3::operator!=(const Matrix3& rhs) const
-{
-  return !(*this == rhs);
 }
 
 } //namespace DALI_NAMESPACE

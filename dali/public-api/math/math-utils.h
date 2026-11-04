@@ -19,12 +19,14 @@
  */
 
 // EXTERNAL INCLUDES
+#include <math.h>
 #include <cstdint> // uint32_t
 #include <limits>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/constants.h>
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/math/scalar-math.h>
 
 namespace DALI_NAMESPACE
 {
@@ -38,21 +40,10 @@ namespace MathUtils
  * the public math helpers remain usable in constant expressions on every
  * supported compiler.
  */
-constexpr float Abs(float x)
-{
-  // Using <= also turns -0.0f into +0.0f, matching fabsf.
-  return x <= 0.0f ? -x : x;
-}
-
 #if defined(__GNUC__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wfloat-equal"
 #endif
-constexpr bool IsNaN(float x)
-{
-  return x != x;
-}
-
 constexpr float Floor(float x)
 {
   // A conversion from NaN, infinity, or an out-of-range float to an integer is
@@ -210,67 +201,16 @@ constexpr const T Lerp(float offset, const T& low, const T& high)
 }
 
 /**
- * @brief Get an epsilon that is valid for the given range.
- *
- * @SINCE_1_0.0
- * @param[in] a the first value in the range
- * @param[in] b the second value in the range.
- * @return a suitable epsilon
- */
-constexpr float GetRangedEpsilon(float a, float b)
-{
-  const float absA = Internal::MathUtils::Abs(a);
-  const float absB = Internal::MathUtils::Abs(b);
-
-  if(Internal::MathUtils::IsNaN(absA) || Internal::MathUtils::IsNaN(absB))
-  {
-    return Math::MACHINE_EPSILON_10000;
-  }
-
-  const float absF = absA > absB ? absA : absB;
-
-  float epsilon = Math::MACHINE_EPSILON_10000;
-  if(absF < 0.1f)
-  {
-    return Math::MACHINE_EPSILON_0;
-  }
-  else if(absF < 2.0f)
-  {
-    return Math::MACHINE_EPSILON_1;
-  }
-  else if(absF < 20.0f)
-  {
-    return Math::MACHINE_EPSILON_10;
-  }
-  else if(absF < 200.0f)
-  {
-    return Math::MACHINE_EPSILON_100;
-  }
-  else if(absF < 2000.0f)
-  {
-    return Math::MACHINE_EPSILON_1000;
-  }
-  return epsilon;
-}
-
-/**
  * @brief Helper function to compare equality of a floating point value with zero.
  *
  * @SINCE_1_0.0
  * @param[in] value the value to compare
  * @return true if the value is equal to zero
  */
-#if __GNUC__
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wfloat-equal"
-#endif
 constexpr bool EqualsZero(float value)
 {
-  return value == 0.0f;
+  return Internal::MathUtils::EqualsZero(value);
 }
-#if __GNUC__
-#pragma GCC diagnostic pop
-#endif
 
 /**
  * @brief Helper function to compare equality of two floating point values.

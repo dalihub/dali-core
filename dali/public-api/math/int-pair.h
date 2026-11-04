@@ -20,7 +20,6 @@
 
 // EXTERNAL INCLUDES
 #include <cstdint>
-#include <type_traits>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
@@ -40,7 +39,7 @@ namespace DALI_NAMESPACE
  * sizes and pixel coordinates where a pair of floating point numbers is
  * inefficient and illogical (i.e. the data is inherently integer).
  *
- * For example in IntPair<uint16_t>
+ * For example in Uint16Pair
  * one of these can be passed in a single 32 bit integer register on
  * common architectures.
  *
@@ -76,6 +75,7 @@ public:
    * @param[in] height The height or Y dimension of the tuple.
    */
   constexpr IntPair(tIntType width, tIntType height)
+  : mData(0)
   {
     /**
      * Do equivalent of the code below with one aligned memory access:
@@ -92,7 +92,7 @@ public:
    * @SINCE_2_1.45
    * @param[in] width The x dimension to be stored in this 2-tuple
    */
-  void SetWidth(tIntType width)
+  constexpr void SetWidth(tIntType width)
   {
     mComponents[0] = width;
   }
@@ -102,7 +102,7 @@ public:
    * @SINCE_2_1.45
    * @return the x dimension stored in this 2-tuple
    */
-  tIntType GetWidth() const
+  constexpr tIntType GetWidth() const
   {
     return mComponents[0];
   }
@@ -112,7 +112,7 @@ public:
    * @SINCE_2_1.45
    * @param[in] height The y dimension to be stored in this 2-tuple
    */
-  void SetHeight(tIntType height)
+  constexpr void SetHeight(tIntType height)
   {
     mComponents[1] = height;
   }
@@ -122,7 +122,7 @@ public:
    * @SINCE_2_1.45
    * @return Height
    */
-  tIntType GetHeight() const
+  constexpr tIntType GetHeight() const
   {
     return mComponents[1];
   }
@@ -132,7 +132,7 @@ public:
    * @SINCE_2_1.45
    * @param[in] x The x dimension to be stored in this 2-tuple
    */
-  void SetX(tIntType x)
+  constexpr void SetX(tIntType x)
   {
     mComponents[0] = x;
   }
@@ -142,7 +142,7 @@ public:
    * @SINCE_2_1.45
    * @return X
    */
-  tIntType GetX() const
+  constexpr tIntType GetX() const
   {
     return mComponents[0];
   }
@@ -152,7 +152,7 @@ public:
    * @SINCE_2_1.45
    * @param[in] y The y dimension to be stored in this 2-tuple
    */
-  void SetY(tIntType y)
+  constexpr void SetY(tIntType y)
   {
     mComponents[1] = y;
   }
@@ -162,9 +162,49 @@ public:
    * @SINCE_2_1.45
    * @return Y
    */
-  tIntType GetY() const
+  constexpr tIntType GetY() const
   {
     return mComponents[1];
+  }
+
+  /**
+   * @brief Sets the start value (same as x and width).
+   * @SINCE_2_5.45
+   * @param[in] start The first value stored in this pair
+   */
+  constexpr void SetStart(tIntType start)
+  {
+    SetX(start);
+  }
+
+  /**
+   * @brief Returns the start value (same as x and width).
+   * @SINCE_2_5.45
+   * @return The first value stored in this pair
+   */
+  constexpr tIntType GetStart() const
+  {
+    return GetX();
+  }
+
+  /**
+   * @brief Sets the end value (same as y and height).
+   * @SINCE_2_5.45
+   * @param[in] end The second value stored in this pair
+   */
+  constexpr void SetEnd(tIntType end)
+  {
+    SetY(end);
+  }
+
+  /**
+   * @brief Returns the end value (same as y and height).
+   * @SINCE_2_5.45
+   * @return The second value stored in this pair
+   */
+  constexpr tIntType GetEnd() const
+  {
+    return GetY();
   }
 
   /**
@@ -173,7 +213,7 @@ public:
    * @param[in] rhs A reference for comparison
    * @return True if same
    */
-  bool operator==(const IntPair& rhs) const
+  constexpr bool operator==(const IntPair& rhs) const
   {
     return mData == rhs.mData;
   }
@@ -184,7 +224,7 @@ public:
    * @param[in] rhs A reference for comparison
    * @return True if different
    */
-  bool operator!=(const IntPair& rhs) const
+  constexpr bool operator!=(const IntPair& rhs) const
   {
     return mData != rhs.mData;
   }
@@ -196,7 +236,7 @@ public:
    * @param[in] rhs A reference for comparison
    * @return True if less
    */
-  bool operator<(const IntPair& rhs) const
+  constexpr bool operator<(const IntPair& rhs) const
   {
     return mData < rhs.mData;
   }
@@ -208,7 +248,7 @@ public:
    * @param[in] rhs A reference for comparison
    * @return True if greater
    */
-  bool operator>(const IntPair& rhs) const
+  constexpr bool operator>(const IntPair& rhs) const
   {
     return mData > rhs.mData;
   }
@@ -218,46 +258,6 @@ public:
   IntPair(IntPair&&) noexcept            = default; ///< Default move constructor
   IntPair& operator=(const IntPair&)     = default; ///< Default copy assignment operator
   IntPair& operator=(IntPair&&) noexcept = default; ///< Default move assignment operator
-
-  /**
-   * @brief Sets the start value (same as x and width).
-   * @SINCE_2_5.45
-   * @param[in] start The first value stored in this pair
-   */
-  void SetStart(tIntType start)
-  {
-    SetX(start);
-  }
-
-  /**
-   * @brief Returns the start value (same as x and width).
-   * @SINCE_2_5.45
-   * @return The first value stored in this pair
-   */
-  tIntType GetStart() const
-  {
-    return GetX();
-  }
-
-  /**
-   * @brief Sets the end value (same as y and height).
-   * @SINCE_2_5.45
-   * @param[in] end The second value stored in this pair
-   */
-  void SetEnd(tIntType end)
-  {
-    SetY(end);
-  }
-
-  /**
-   * @brief Returns the end value (same as y and height).
-   * @SINCE_2_5.45
-   * @return The second value stored in this pair
-   */
-  tIntType GetEnd() const
-  {
-    return GetY();
-  }
 
 private:
   union
@@ -270,40 +270,10 @@ private:
 };
 
 /**
- * @brief Simple class for passing around pairs of signed integers.
- *
- * Use this for integer dimensions and points with limited range such as window
- * position and screen coordinates where a pair of floating point numbers is
- * inefficient and illogical (i.e. the data is inherently integer).
- * One of these can be passed in a single 64 bit integer.
- * @SINCE_2_1.45
+ * @brief Pair of signed 16-bit integers.
+ * @SINCE_2_5.47
  */
-class Int32Pair : public IntPair<int32_t, uint32_t, uint64_t>
-{
-public:
-  /**
-   * @brief Default constructor for the (0, 0) tuple.
-   * @SINCE_2_1.45
-   */
-  constexpr Int32Pair() = default;
-
-  /**
-   * @brief Constructor taking separate x and y (width and height) parameters.
-   * @SINCE_2_1.45
-   * @param[in] x The width or X dimension of the tuple.
-   * @param[in] y The height or Y dimension of the tuple.
-   */
-  constexpr Int32Pair(uint32_t x, uint32_t y)
-  : IntPair(x, y)
-  {
-  }
-
-public:
-  Int32Pair(const Int32Pair&)                = default; ///< Default copy constructor
-  Int32Pair(Int32Pair&&) noexcept            = default; ///< Default move constructor
-  Int32Pair& operator=(const Int32Pair&)     = default; ///< Default copy assignment operator
-  Int32Pair& operator=(Int32Pair&&) noexcept = default; ///< Default move assignment operator
-};
+using Int16Pair = IntPair<int16_t, uint16_t, uint32_t>;
 
 /**
  * @brief Simple class for passing around pairs of small unsigned integers.
@@ -315,84 +285,28 @@ public:
  * common architectures.
  * @SINCE_1_0.0
  */
-class Uint16Pair : public IntPair<uint16_t, uint16_t, uint32_t>
-{
-public:
-  /**
-   * @brief Default constructor for the (0, 0) tuple.
-   * @SINCE_1_0.0
-   */
-  constexpr Uint16Pair() = default;
+using Uint16Pair = IntPair<uint16_t, uint16_t, uint32_t>;
 
-  /**
-   * @brief Constructor taking separate x and y (width and height) parameters.
-   * @SINCE_1_0.0
-   * @param[in] width The width or X dimension of the tuple. Make sure it is less than 65536.
-   * @param[in] height The height or Y dimension of the tuple. Make sure it is less than 65536.
-   */
-  constexpr Uint16Pair(uint32_t width, uint32_t height)
-  : IntPair(static_cast<uint16_t>(width), static_cast<uint16_t>(height))
-  {
-    DALI_ASSERT_DEBUG(width < (1u << 16) && "Width parameter not representable.");
-    DALI_ASSERT_DEBUG(height < (1u << 16) && "Height parameter not representable.");
-  }
+/**
+ * @brief Simple class for passing around pairs of signed integers.
+ *
+ * Use this for integer dimensions and points with limited range such as window
+ * position and screen coordinates where a pair of floating point numbers is
+ * inefficient and illogical (i.e. the data is inherently integer).
+ * One of these can be passed in a single 64 bit integer.
+ * @SINCE_2_1.45
+ */
+using Int32Pair = IntPair<int32_t, uint32_t, uint64_t>;
 
-  /**
-   * @brief Creates an instance by rounding a floating point vector to closest
-   * integers.
-   *
-   * Uses a template for loose coupling, to save a header include, and allow any
-   * vector type with .x and .y members to be converted.
-   * @SINCE_1_0.0
-   * @param[in] from Floating point vector2
-   * @return Closest integer value
-   */
-  template<typename FLOAT_VECTOR_N_TYPE>
-  static Uint16Pair FromFloatVec2(const FLOAT_VECTOR_N_TYPE& from)
-  {
-    DALI_ASSERT_DEBUG(from.x + 0.5f < 65536.0f);
-    DALI_ASSERT_DEBUG(from.y + 0.5f < 65536.0f);
-    return Uint16Pair(static_cast<uint16_t>(from.x + 0.5f), static_cast<uint16_t>(from.y + 0.5f));
-  }
+/**
+ * @brief Pair of unsigned 32-bit integers.
+ * @SINCE_2_5.47
+ */
+using Uint32Pair = IntPair<uint32_t, uint32_t, uint64_t>;
 
-  /**
-   * @brief Creates an instance by rounding a floating point array to closest
-   * integers.
-   *
-   * Uses a template to allow any vector type with operator [] to be converted
-   * in addition to plain arrays.
-   * @SINCE_1_0.0
-   * @param[in] from Floating point array
-   * @return Closest integer value
-   */
-  template<typename FLOAT_ARRAY>
-  static Uint16Pair FromFloatArray(const FLOAT_ARRAY& from)
-  {
-    DALI_ASSERT_DEBUG(from[0] + 0.5f < 65536.0f);
-    DALI_ASSERT_DEBUG(from[1] + 0.5f < 65536.0f);
-    return Uint16Pair(static_cast<uint16_t>(from[0] + 0.5f), static_cast<uint16_t>(from[1] + 0.5f));
-  }
-
-public:
-  Uint16Pair(const Uint16Pair&)                = default; ///< Default copy constructor
-  Uint16Pair(Uint16Pair&&) noexcept            = default; ///< Default move constructor
-  Uint16Pair& operator=(const Uint16Pair&)     = default; ///< Default copy assignment operator
-  Uint16Pair& operator=(Uint16Pair&&) noexcept = default; ///< Default move assignment operator
-};
-
-// Allow Int32Pair to be treated as a POD type
-template<>
-struct TypeTraits<Int32Pair> : public BasicTypes<Int32Pair>
-{
-  enum
-  {
-    IS_TRIVIAL_TYPE = true
-  };
-};
-
-// Allow Uint16Pair to be treated as a POD type
-template<>
-struct TypeTraits<Uint16Pair> : public BasicTypes<Uint16Pair>
+// Allow IntPair to be treated as a POD type
+template<typename tIntType, typename tUintType, typename tDataType>
+struct TypeTraits<IntPair<tIntType, tUintType, tDataType> > : public BasicTypes<IntPair<tIntType, tUintType, tDataType> >
 {
   enum
   {

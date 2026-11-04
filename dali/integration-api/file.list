@@ -10,6 +10,7 @@ SET( platform_abstraction_src_files
    ${platform_abstraction_src_dir}/debug.cpp
    ${platform_abstraction_src_dir}/input-options.cpp
    ${platform_abstraction_src_dir}/lockless-buffer.cpp
+   ${platform_abstraction_src_dir}/pixel-buffer-integ.cpp
    ${platform_abstraction_src_dir}/pixel-data-integ.cpp
    ${platform_abstraction_src_dir}/profiling.cpp
    ${platform_abstraction_src_dir}/render-task-list-integ.cpp
@@ -59,6 +60,7 @@ SET( platform_abstraction_header_files
    ${platform_abstraction_src_dir}/lockless-buffer.h
    ${platform_abstraction_src_dir}/open-hash-map.h
    ${platform_abstraction_src_dir}/ordered-set.h
+   ${platform_abstraction_src_dir}/pixel-buffer-integ.h
    ${platform_abstraction_src_dir}/pixel-data-integ.h
    ${platform_abstraction_src_dir}/platform-abstraction.h
    ${platform_abstraction_src_dir}/profiling.h

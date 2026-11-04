@@ -22,6 +22,7 @@
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/common/scene-impl.h>
+#include <dali/internal/event/events/geometry-touch-propagation.h>
 #include <dali/internal/event/events/hit-test-algorithm-impl.h>
 #include <dali/internal/event/events/touch-event-impl.h>
 #include <dali/public-api/actors/actor.h>
@@ -250,6 +251,9 @@ void GeometryTouchStreamRouter::ProcessTouchEvent(const Integration::TouchEvent&
             initialHit->candidatesRootToFront.push_front(ActorPtr(*candidate));
           }
         }
+
+        initialHit->touchPropagationBoundaries = CaptureTouchPropagationBoundaries(initialHit->candidatesRootToFront);
+        LimitTouchPropagation(initialHit->candidatesRootToFront, initialHit->touchPropagationBoundaries);
 
         // Group the point by the nearest candidate requiring a multi-touch gesture, so that the points of such a
         // gesture share one stream even when they hit different actors. Fall back to the hit actor itself when no

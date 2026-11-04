@@ -816,7 +816,7 @@ MoveIfNoexcept(Type& arg) noexcept
  * @endcode
  */
 template<typename Type>
-inline Type&& Forward(typename RemoveReference<Type>::type& arg) noexcept
+inline constexpr Type&& Forward(typename RemoveReference<Type>::type& arg) noexcept
 {
   return static_cast<Type&&>(arg);
 }
@@ -834,7 +834,7 @@ inline Type&& Forward(typename RemoveReference<Type>::type& arg) noexcept
  * @SINCE_2_5.11
  */
 template<typename Type>
-inline Type&& Forward(typename RemoveReference<Type>::type&& arg) noexcept
+inline constexpr Type&& Forward(typename RemoveReference<Type>::type&& arg) noexcept
 {
   static_assert(!IsLValueReference<Type>::value, "Cannot forward an rvalue as an lvalue");
   return static_cast<Type&&>(arg);

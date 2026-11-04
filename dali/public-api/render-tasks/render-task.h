@@ -22,6 +22,7 @@
 #include <cstdint> // uint32_t
 
 // INTERNAL INCLUDES
+#include <dali/public-api/images/pixel-buffer.h>
 #include <dali/public-api/images/pixel-data.h>
 #include <dali/public-api/math/viewport.h>
 #include <dali/public-api/object/handle.h>
@@ -209,12 +210,12 @@ public:
     BUILTIN_STOPPER_ACTOR, ///< CameraActor set by SetBuiltinCameraActor with BuiltinCameraType::ATTACHED_TO_STOPPER_ACTOR. @SINCE_2_5.21
   };
 
-  static const bool     DEFAULT_EXCLUSIVE;     ///< Default exclusive setting, false. @SINCE_2_5.46
-  static const bool     DEFAULT_INPUT_ENABLED; ///< Default input enabled setting, true. @SINCE_2_5.46
-  static const Vector4  DEFAULT_CLEAR_COLOR;   ///< Default clear color, Color::BLACK. @SINCE_2_5.46
-  static const bool     DEFAULT_CLEAR_ENABLED; ///< Default clear enabled setting, false. @SINCE_2_5.46
-  static const bool     DEFAULT_CULL_MODE;     ///< Default cull mode, true. @SINCE_2_5.46
-  static const uint32_t DEFAULT_REFRESH_RATE;  ///< Default refresh rate, REFRESH_ALWAYS. @SINCE_2_5.46
+  static const bool     DEFAULT_EXCLUSIVE;     ///< Default exclusive setting, false. @SINCE_2_5.46 @DEPRECATED_2_5.47
+  static const bool     DEFAULT_INPUT_ENABLED; ///< Default input enabled setting, true. @SINCE_2_5.46 @DEPRECATED_2_5.47
+  static const Vector4  DEFAULT_CLEAR_COLOR;   ///< Default clear color, Color::BLACK. @SINCE_2_5.46 @DEPRECATED_2_5.47
+  static const bool     DEFAULT_CLEAR_ENABLED; ///< Default clear enabled setting, false. @SINCE_2_5.46 @DEPRECATED_2_5.47
+  static const bool     DEFAULT_CULL_MODE;     ///< Default cull mode, true. @SINCE_2_5.46 @DEPRECATED_2_5.47
+  static const uint32_t DEFAULT_REFRESH_RATE;  ///< Default refresh rate, REFRESH_ALWAYS. @SINCE_2_5.46 @DEPRECATED_2_5.47
 
   /**
    * @brief Creates an empty RenderTask handle.
@@ -308,6 +309,7 @@ public:
 
   /**
    * @brief Queries whether the RenderTask has exclusive access to the source actors.
+   * @note The default is false.
    * @SINCE_1_0.0
    * @return True if the source actors will only be rendered by this RenderTask
    */
@@ -327,6 +329,7 @@ public:
 
   /**
    * @brief Queries whether the RenderTask should be considered for input handling.
+   * @note The default is true.
    * @SINCE_1_0.0
    * @return True if the RenderTask should be considered for input handling
    */
@@ -555,6 +558,7 @@ public:
 
   /**
    * @brief Retrieves the clear color used when SetClearEnabled(true) is used.
+   * @note The default is Color::BLACK (0, 0, 0, 1).
    * @SINCE_1_0.0
    * @return The clear color that was last set (the target of any ongoing animation), which may differ from the color currently used for rendering
    */
@@ -577,6 +581,7 @@ public:
 
   /**
    * @brief Queries whether the RenderTask will clear the results of previous RenderTasks.
+   * @note The default is false.
    * @SINCE_1_0.0
    * @return True if the RenderTask should clear
    */
@@ -596,6 +601,7 @@ public:
   /**
    * @brief Gets the cull mode.
    *
+   * @note The default is true (culling enabled).
    * @SINCE_1_0.0
    * @return True if the RenderTask should cull the actors to the camera's view frustum
    */
@@ -623,6 +629,7 @@ public:
 
   /**
    * @brief Queries the refresh-rate of the RenderTask.
+   * @note The default is REFRESH_ALWAYS (1).
    * @SINCE_1_0.0
    * @return The refresh-rate
    */
@@ -726,13 +733,30 @@ public:
   void ClearRenderResult();
 
   /**
-   * @brief Retrieves the rendered result as PixelData.
+   * @DEPRECATED_2_5.47 Use GetRenderResultBuffer() instead.
+   *
+   * @brief Retrieves a copy of the rendered result as PixelData.
    * @SINCE_2_3.51
-   * @return Dali::PixelData that contains rendered result.
+   * @return Dali::PixelData that contains a copy of the rendered result.
    * @note This method is only available after the FinishedSignal is emitted.
    * If this method is called before the FinishedSignal is emitted, an empty handle is returned.
    */
   Dali::PixelData GetRenderResult();
+
+  /**
+   * @brief Retrieves the rendered result as a PixelBuffer, whose pixels the application
+   * can read through PixelBuffer::GetBuffer().
+   *
+   * The RenderTask shares ownership of the result with the application: repeated calls
+   * return a handle to the same object, and a handle stays valid after
+   * ClearRenderResult(), which only releases the RenderTask's own reference.
+   *
+   * @SINCE_2_5.47
+   * @return Dali::PixelBuffer that contains the rendered result.
+   * @note This method is only available after the FinishedSignal is emitted.
+   * If this method is called before the FinishedSignal is emitted, an empty handle is returned.
+   */
+  Dali::PixelBuffer GetRenderResultBuffer();
 
 public: // Signals
   /**

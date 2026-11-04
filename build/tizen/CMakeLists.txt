@@ -4,7 +4,12 @@ IF(POLICY CMP0177)
   CMAKE_POLICY(SET CMP0177 NEW) # install() DESTINATION paths are normalized.
 ENDIF()
 
-SET(name "dali2-core")
+# API major version (Not DALi release version). It also names the library,
+# the pkg-config file and the CMake package: dali<major>-core.
+IF(NOT DALI_API_MAJOR)
+  SET(DALI_API_MAJOR 3)
+ENDIF()
+SET(name "dali${DALI_API_MAJOR}-core")
 
 SET(CMAKE_C_STANDARD 99)
 SET(CMAKE_CXX_STANDARD 17)
@@ -19,7 +24,7 @@ IF(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 ENDIF()
 
 # API VERSION (Not DALi release version)
-SET(${name}_VERSION_MAJOR 2)
+SET(${name}_VERSION_MAJOR ${DALI_API_MAJOR})
 SET(${name}_VERSION_MINOR 0)
 SET(${name}_VERSION_PATCH 0)
 SET(${name}_VERSION ${${name}_VERSION_MAJOR}.${${name}_VERSION_MINOR}.${${name}_VERSION_PATCH})
@@ -144,8 +149,8 @@ IF( ENABLE_PKG_CONFIGURE )
   # Requires the following variables to be setup:
   # @PREFIX@ @EXEC_PREFIX@ @DALI_VERSION@ @LIB_DIR@ @DEV_INCLUDE_PATH@
   SET( DEV_INCLUDE_PATH ${INCLUDE_DIR} )
-  SET( CORE_PKG_CFG_FILE ${CMAKE_CURRENT_SOURCE_DIR}/dali2-core.pc )
-  CONFIGURE_FILE( ${CORE_PKG_CFG_FILE}.in ${CORE_PKG_CFG_FILE} @ONLY )
+  SET( CORE_PKG_CFG_FILE ${CMAKE_CURRENT_SOURCE_DIR}/${name}.pc )
+  CONFIGURE_FILE( ${CMAKE_CURRENT_SOURCE_DIR}/dali-core.pc.in ${CORE_PKG_CFG_FILE} @ONLY )
 ENDIF()
 
 IF( WIN32 ) # WIN32 includes x64 as well according to the cmake doc.

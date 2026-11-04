@@ -79,7 +79,7 @@ public:
    * @param[in] bufferFormat Map of names and types that describes the components of the buffer
    * @return Handle to a newly allocated VertexBuffer
    */
-  static VertexBuffer New(Dali::Property::Map& bufferFormat);
+  static VertexBuffer New(const Dali::Property::Map& bufferFormat);
 
   /**
    * @brief Default constructor, creates an empty handle.

@@ -1712,6 +1712,22 @@ public:
   }
 
   /**
+   * @copydoc Dali::Actor::SetTouchPropagationBlocked()
+   */
+  void SetTouchPropagationBlocked(bool blocked)
+  {
+    mTouchPropagationBlocked = blocked;
+  }
+
+  /**
+   * @copydoc Dali::Actor::IsTouchPropagationBlocked()
+   */
+  bool IsTouchPropagationBlocked() const
+  {
+    return mTouchPropagationBlocked;
+  }
+
+  /**
    * Query whether the actor send touch motion event.
    * @return true, it send touch motion event.
    */
@@ -2613,6 +2629,7 @@ protected:
   bool mNeedGesturePropagation : 1;      ///< Whether the parent listens for gesture events or not
   bool mEnabled : 1;                     ///< Whether the actor is enabled for user interaction.
   bool mAllowSelfInitiatedTouchOnly : 1; ///< Whether the actor only receives touches that originated on itself.
+  bool mTouchPropagationBlocked : 1;     ///< Whether ordinary geometry touch propagation stops at this actor without consumption.
   bool mUseTextureUpdateArea : 1;        ///< Whether the actor uses the update area of the texture instead of its own.
   bool mDispatchTouchMotion : 1;         ///< Whether to send touch motion events or not.
   bool mDispatchHoverMotion : 1;         ///< Whether to send hover motion events or not.

@@ -210,6 +210,7 @@ public:
    * @note This can potentially block until GL has been initialized
    * when the first time any DALi application is launched in the system.
    * @SINCE_2_3.11
+   * @DEPRECATED_2_5.47 Use Dali::Integration::GetShaderLanguageVersion() instead.
    * @return shader languange version as integer.
    */
   static uint32_t GetShaderLanguageVersion();
@@ -219,6 +220,7 @@ public:
    * @note This can potentially block until GL has been initialized
    * when the first time any DALi application is launched in the system.
    * @SINCE_1_9.36
+   * @DEPRECATED_2_5.47 Use Dali::Integration::GetShaderVersionPrefix() instead.
    * @return shader preprocessor string.
    */
   static Dali::String GetShaderVersionPrefix();
@@ -228,6 +230,7 @@ public:
    * @note This can potentially block until GL has been initialized
    * when the first time any DALi application is launched in the system.
    * @SINCE_1_9.36
+   * @DEPRECATED_2_5.47 Use Dali::Integration::GetVertexShaderPrefix() instead.
    * @return Vertex shader preprocessor string.
    */
   static Dali::String GetVertexShaderPrefix();
@@ -237,6 +240,7 @@ public:
    * @note This can potentially block until GL has been initialized
    * when the first time any DALi application is launched in the system.
    * @SINCE_1_9.36
+   * @DEPRECATED_2_5.47 Use Dali::Integration::GetFragmentShaderPrefix() instead.
    * @return Fragment shader preprocessor string.
    */
   static Dali::String GetFragmentShaderPrefix();

@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/type-traits.h>
+#include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/math/vector3.h>
 
@@ -64,7 +65,10 @@ public:
    * @brief Constructor.
    * @SINCE_1_0.0
    */
-  Matrix3();
+  constexpr Matrix3()
+  : mElements{}
+  {
+  }
 
   /**
    * @brief Copy Constructor.
@@ -72,7 +76,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] m A reference to the copied 3x3 matrix
    */
-  Matrix3(const Matrix3& m);
+  constexpr Matrix3(const Matrix3& m) = default;
 
   /**
    * @brief Constructor.
@@ -80,7 +84,10 @@ public:
    * @SINCE_1_0.0
    * @param[in] m A 4x4 matrix. The translation and shear components are ignored
    */
-  Matrix3(const Matrix& m);
+  constexpr Matrix3(const Matrix& m)
+  : mElements{m.AsFloat()[0], m.AsFloat()[1], m.AsFloat()[2], m.AsFloat()[4], m.AsFloat()[5], m.AsFloat()[6], m.AsFloat()[8], m.AsFloat()[9], m.AsFloat()[10]}
+  {
+  }
 
   /**
    * @brief Constructor.
@@ -96,7 +103,10 @@ public:
    * @param[in] s21 Eighth element
    * @param[in] s22 Ninth element
    */
-  Matrix3(float s00, float s01, float s02, float s10, float s11, float s12, float s20, float s21, float s22);
+  constexpr Matrix3(float s00, float s01, float s02, float s10, float s11, float s12, float s20, float s21, float s22)
+  : mElements{s00, s01, s02, s10, s11, s12, s20, s21, s22}
+  {
+  }
 
   /**
    * @brief Move constructor.
@@ -104,7 +114,7 @@ public:
    * @SINCE_1_9.21
    * @param[in] matrix A reference to the moved matrix
    */
-  Matrix3(Matrix3&& matrix) noexcept;
+  constexpr Matrix3(Matrix3&& matrix) noexcept = default;
 
   /**
    * @brief Move assignment operator.
@@ -113,7 +123,7 @@ public:
    * @param[in] matrix A reference to the moved matrix
    * @return A reference to this
    */
-  Matrix3& operator=(Matrix3&& matrix) noexcept;
+  constexpr Matrix3& operator=(Matrix3&& matrix) noexcept = default;
 
   /**
    * @brief Assignment Operator.
@@ -121,7 +131,7 @@ public:
    * @param[in] matrix From which to copy values
    * @return Reference to this object
    */
-  Matrix3& operator=(const Matrix3& matrix);
+  constexpr Matrix3& operator=(const Matrix3& matrix) = default;
 
   /**
    * @brief Assignment Operator.
@@ -129,7 +139,17 @@ public:
    * @param[in] matrix A reference to the copied matrix
    * @return A reference to this
    */
-  Matrix3& operator=(const Matrix& matrix);
+  constexpr Matrix3& operator=(const Matrix& matrix)
+  {
+    for(unsigned int column = 0; column < 3; ++column)
+    {
+      for(unsigned int row = 0; row < 3; ++row)
+      {
+        mElements[column * 3 + row] = matrix.AsFloat()[column * 4 + row];
+      }
+    }
+    return *this;
+  }
 
   /**
    * @brief The equality operator.
@@ -140,7 +160,19 @@ public:
    * @param[in] rhs The Matrix to compare this to
    * @return True if the matrices are equal
    */
-  bool operator==(const Matrix3& rhs) const;
+  constexpr bool operator==(const Matrix3& rhs) const
+  {
+    return (
+      Equals(mElements[0], rhs.mElements[0]) &&
+      Equals(mElements[1], rhs.mElements[1]) &&
+      Equals(mElements[2], rhs.mElements[2]) &&
+      Equals(mElements[3], rhs.mElements[3]) &&
+      Equals(mElements[4], rhs.mElements[4]) &&
+      Equals(mElements[5], rhs.mElements[5]) &&
+      Equals(mElements[6], rhs.mElements[6]) &&
+      Equals(mElements[7], rhs.mElements[7]) &&
+      Equals(mElements[8], rhs.mElements[8]));
+  }
 
   /**
    * @brief The inequality operator.
@@ -151,7 +183,10 @@ public:
    * @param[in] rhs The Matrix to compare this to
    * @return true if the matrices are equal
    */
-  bool operator!=(const Matrix3& rhs) const;
+  constexpr bool operator!=(const Matrix3& rhs) const
+  {
+    return !(*this == rhs);
+  }
 
   /**
    * @brief Destructor.
@@ -163,7 +198,13 @@ public:
    * @brief Sets the matrix to the identity matrix.
    * @SINCE_1_0.0
    */
-  void SetIdentity();
+  constexpr void SetIdentity()
+  {
+    for(unsigned int index = 0; index < 9; ++index)
+    {
+      mElements[index] = (index % 4 == 0) ? 1.f : 0.f;
+    }
+  }
 
   /**
    * @brief Returns the contents of the matrix as an array of 9 floats.
@@ -177,7 +218,7 @@ public:
    * @SINCE_1_0.0
    * @return The matrix contents as an array of 9 floats
    */
-  const float* AsFloat() const
+  constexpr const float* AsFloat() const
   {
     return &mElements[0];
   }
@@ -194,7 +235,7 @@ public:
    * @SINCE_1_0.0
    * @return The matrix contents as an array of 9 floats
    */
-  float* AsFloat()
+  constexpr float* AsFloat()
   {
     return &mElements[0];
   }
@@ -212,7 +253,20 @@ public:
    * @SINCE_1_0.0
    * @return True if successful
    */
-  bool Transpose();
+  constexpr bool Transpose()
+  {
+    float tmp    = 0.f;
+    tmp          = mElements[1];
+    mElements[1] = mElements[3];
+    mElements[3] = tmp;
+    tmp          = mElements[2];
+    mElements[2] = mElements[6];
+    mElements[6] = tmp;
+    tmp          = mElements[7];
+    mElements[7] = mElements[5];
+    mElements[5] = tmp;
+    return true;
+  }
 
   /**
    * @brief Multiplies all elements of the matrix by the scale value.
@@ -220,7 +274,18 @@ public:
    * @SINCE_1_0.0
    * @param[in] scale The value by which to scale the whole matrix
    */
-  void Scale(float scale);
+  constexpr void Scale(float scale)
+  {
+    mElements[0] *= scale;
+    mElements[1] *= scale;
+    mElements[2] *= scale;
+    mElements[3] *= scale;
+    mElements[4] *= scale;
+    mElements[5] *= scale;
+    mElements[6] *= scale;
+    mElements[7] *= scale;
+    mElements[8] *= scale;
+  }
 
   /**
    * @brief Magnitude returns the average of the absolute values of the
@@ -230,7 +295,15 @@ public:
    * @SINCE_1_0.0
    * @return The magnitude - always positive
    */
-  float Magnitude() const;
+  constexpr float Magnitude() const
+  {
+    float avg = 0;
+    for(uint32_t i = 0; i < 9; i++)
+    {
+      avg += Internal::MathUtils::Abs(mElements[i]);
+    }
+    return avg / 3.0f;
+  }
 
   /**
    * @brief If the matrix is invertible, then this method inverts, transposes
@@ -294,7 +367,12 @@ public:
    * @param[in] rhs The Vector3 to multiply this by
    * @return A Vector3 containing the result
    */
-  Vector3 operator*(const Vector3& rhs) const;
+  constexpr Vector3 operator*(const Vector3& rhs) const
+  {
+    return Vector3(rhs.x * mElements[0] + rhs.y * mElements[3] + rhs.z * mElements[6],
+                   rhs.x * mElements[1] + rhs.y * mElements[4] + rhs.z * mElements[7],
+                   rhs.x * mElements[2] + rhs.y * mElements[5] + rhs.z * mElements[8]);
+  }
 
 private:
   float mElements[9]; ///< The elements of the matrix

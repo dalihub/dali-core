@@ -44,7 +44,7 @@ struct AngleAxis
    * @brief Creates an angle-axis pair.
    * @SINCE_1_0.0
    */
-  AngleAxis()
+  constexpr AngleAxis()
   : angle(0.0f),
     axis(0.0f, 0.0f, 0.0f)
   {
@@ -57,7 +57,7 @@ struct AngleAxis
    * @param[in] initialAngle The initial angle in radians
    * @param[in] initialAxis The initial axis
    */
-  AngleAxis(Radian initialAngle, const Vector3& initialAxis)
+  constexpr AngleAxis(Radian initialAngle, const Vector3& initialAxis)
   : angle(initialAngle),
     axis(initialAxis)
   {
@@ -84,7 +84,7 @@ public:
  * @param rhs angle axis
  * @return True if they are equal
  */
-inline bool operator==(const Dali::AngleAxis& lhs, const Dali::AngleAxis& rhs)
+inline constexpr bool operator==(const Dali::AngleAxis& lhs, const Dali::AngleAxis& rhs)
 {
   return (lhs.angle == rhs.angle) && (lhs.axis == rhs.axis);
 }

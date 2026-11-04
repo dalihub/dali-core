@@ -47,7 +47,7 @@ public:
    * @note T1 and T2 must be default constructible.
    * @SINCE_2_5.16
    */
-  Pair()
+  constexpr Pair()
   : first{},
     second{}
   {
@@ -59,7 +59,7 @@ public:
    * @param[in] t1 The first value
    * @param[in] t2 The second value
    */
-  Pair(const T1& t1, const T2& t2)
+  constexpr Pair(const T1& t1, const T2& t2)
   : first(t1),
     second(t2)
   {
@@ -71,7 +71,7 @@ public:
    * @param[in] t1 The first value
    * @param[in] t2 The second value
    */
-  Pair(T1&& t1, T2&& t2)
+  constexpr Pair(T1&& t1, T2&& t2)
   : first(static_cast<T1&&>(t1)),
     second(static_cast<T2&&>(t2))
   {
@@ -82,14 +82,14 @@ public:
    * @SINCE_2_5.16
    * @param[in] other The pair to copy from
    */
-  Pair(const Pair& other) = default;
+  constexpr Pair(const Pair& other) = default;
 
   /**
    * @brief Move constructor.
    * @SINCE_2_5.16
    * @param[in] other The pair to move from
    */
-  Pair(Pair&& other) noexcept = default;
+  constexpr Pair(Pair&& other) noexcept = default;
 
   /**
    * @brief Converting constructor from another pair type.
@@ -103,7 +103,7 @@ public:
    * @SINCE_2_5.16
    */
   template<typename U1, typename U2>
-  Pair(const Pair<U1, U2>& other)
+  constexpr Pair(const Pair<U1, U2>& other)
   : first(other.first),
     second(other.second)
   {
@@ -120,7 +120,7 @@ public:
    * @SINCE_2_5.16
    */
   template<typename U1, typename U2>
-  Pair(Pair<U1, U2>&& other)
+  constexpr Pair(Pair<U1, U2>&& other)
   : first(static_cast<U1&&>(other.first)),
     second(static_cast<U2&&>(other.second))
   {
@@ -132,7 +132,7 @@ public:
    * @param[in] other The pair to copy from
    * @return Reference to this pair
    */
-  Pair& operator=(const Pair& other) = default;
+  constexpr Pair& operator=(const Pair& other) = default;
 
   /**
    * @brief Move assignment operator.
@@ -140,7 +140,7 @@ public:
    * @param[in] other The pair to move from
    * @return Reference to this pair
    */
-  Pair& operator=(Pair&& other) noexcept = default;
+  constexpr Pair& operator=(Pair&& other) noexcept = default;
 
   /**
    * @brief Converting copy assignment operator.
@@ -154,7 +154,7 @@ public:
    * @SINCE_2_5.16
    */
   template<typename U1, typename U2>
-  Pair& operator=(const Pair<U1, U2>& other)
+  constexpr Pair& operator=(const Pair<U1, U2>& other)
   {
     first  = other.first;
     second = other.second;
@@ -173,7 +173,7 @@ public:
    * @SINCE_2_5.16
    */
   template<typename U1, typename U2>
-  Pair& operator=(Pair<U1, U2>&& other)
+  constexpr Pair& operator=(Pair<U1, U2>&& other)
   {
     first  = static_cast<U1&&>(other.first);
     second = static_cast<U2&&>(other.second);
@@ -186,7 +186,7 @@ public:
    * @param[in] other The pair to compare with
    * @return true if both first and second elements are equal
    */
-  bool operator==(const Pair& other) const
+  constexpr bool operator==(const Pair& other) const
   {
     return (first == other.first) && (second == other.second);
   }
@@ -197,7 +197,7 @@ public:
    * @param[in] other The pair to compare with
    * @return true if first or second elements differ
    */
-  bool operator!=(const Pair& other) const
+  constexpr bool operator!=(const Pair& other) const
   {
     return !(*this == other);
   }
@@ -208,7 +208,7 @@ public:
    * @param[in] other The pair to compare with
    * @return true if this pair is lexicographically less than other
    */
-  bool operator<(const Pair& other) const
+  constexpr bool operator<(const Pair& other) const
   {
     if(first < other.first)
     {
@@ -227,7 +227,7 @@ public:
    * @param[in] other The pair to compare with
    * @return true if this pair is less than or equal to other
    */
-  bool operator<=(const Pair& other) const
+  constexpr bool operator<=(const Pair& other) const
   {
     return !(other < *this);
   }
@@ -238,7 +238,7 @@ public:
    * @param[in] other The pair to compare with
    * @return true if this pair is greater than other
    */
-  bool operator>(const Pair& other) const
+  constexpr bool operator>(const Pair& other) const
   {
     return other < *this;
   }
@@ -249,7 +249,7 @@ public:
    * @param[in] other The pair to compare with
    * @return true if this pair is greater than or equal to other
    */
-  bool operator>=(const Pair& other) const
+  constexpr bool operator>=(const Pair& other) const
   {
     return !(*this < other);
   }
@@ -259,7 +259,7 @@ public:
    * @SINCE_2_5.16
    * @param[in] other The pair to swap with
    */
-  void Swap(Pair& other)
+  constexpr void Swap(Pair& other)
   {
     Dali::Swap(first, other.first);
     Dali::Swap(second, other.second);
@@ -312,7 +312,7 @@ struct TypeTraits<Pair<T1, T2>>
  * @SINCE_2_5.16
  */
 template<typename T1, typename T2>
-inline Pair<typename DecayType<T1>::type, typename DecayType<T2>::type>
+inline constexpr Pair<typename DecayType<T1>::type, typename DecayType<T2>::type>
 MakePair(T1&& t1, T2&& t2)
 {
   return Pair<typename DecayType<T1>::type, typename DecayType<T2>::type>(Dali::Forward<T1>(t1), Dali::Forward<T2>(t2));
@@ -325,7 +325,7 @@ MakePair(T1&& t1, T2&& t2)
  * @param[in] rhs Second pair to swap
  */
 template<typename T1, typename T2>
-inline void Swap(Pair<T1, T2>& lhs, Pair<T1, T2>& rhs)
+inline constexpr void Swap(Pair<T1, T2>& lhs, Pair<T1, T2>& rhs)
 {
   lhs.Swap(rhs);
 }

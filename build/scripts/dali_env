@@ -434,7 +434,7 @@ sub install_usd
         my $tbb_source_path="$usd_source_path/oneTBB-2019_U9";
         print "Building TBB\n";
         chdir("$tbb_source_path");
-        system('make','-j8');
+        system('make','CXXFLAGS=-Wno-error=changes-meaning', '-j8');
         my $tbbBuildFolder=`make info | grep tbb_build_prefix | cut -d= -f 2`;
         chomp($tbbBuildFolder);
         $tbbBuildFolder=$tbbBuildFolder . "_release";

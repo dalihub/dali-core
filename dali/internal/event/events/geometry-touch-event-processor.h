@@ -27,6 +27,7 @@
 #include <dali/public-api/math/vector2.h>
 
 #include <list>
+#include <vector>
 
 namespace DALI_NAMESPACE
 {
@@ -50,6 +51,7 @@ struct GeometryTouchInitialHit
   RenderTaskPtr       renderTask;
   Vector2             actorCoordinates;
   std::list<ActorPtr> candidatesRootToFront;
+  std::vector<ActorPtr> touchPropagationBoundaries;
 };
 
 /**
@@ -58,7 +60,9 @@ struct GeometryTouchInitialHit
  * The GeometryTouchEventProcessor processes one geometry-routed touch stream.
  *
  * Coordinate candidates remain eligible until one consumes an event. The consumer then
- * becomes the stable owner. Until interception succeeds, intercept traversal follows the path
+ * becomes the stable owner. Ordinary candidates stop at the first boundary captured on DOWN,
+ * including the boundary itself, without treating that boundary as a consumer.
+ * Until interception succeeds, intercept traversal follows the path
  * from the root to the initial hit actor, including children below the owner. If the initial hit
  * leaves the scene, traversal uses the owner's path. A later interception can reopen terminated
  * recipients on the intercepted path. Every displaced active recipient receives one terminal event.

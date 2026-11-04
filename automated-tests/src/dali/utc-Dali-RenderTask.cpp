@@ -22,6 +22,7 @@
 #include <dali/devel-api/events/hit-test-algorithm.h>
 #include <dali/devel-api/threading/thread.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/pixel-data-integ.h>
 #include <dali/public-api/dali-core.h>
 #include <mesh-builder.h>
 #include <stdlib.h>
@@ -1700,6 +1701,16 @@ int UtcDaliRenderTaskIsExclusive01(void)
 
   RenderTask newTask = taskList.CreateTask();
   DALI_TEST_CHECK(false == newTask.IsExclusive());
+  DALI_TEST_EQUALS(newTask.GetInputEnabled(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(newTask.GetClearColor(), Vector4(0.0f, 0.0f, 0.0f, 1.0f), TEST_LOCATION);
+  DALI_TEST_EQUALS(newTask.GetClearEnabled(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(newTask.GetCullMode(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(newTask.GetRefreshRate(), static_cast<uint32_t>(RenderTask::REFRESH_ALWAYS), TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(newTask.GetCurrentProperty<Vector4>(RenderTask::Property::CLEAR_COLOR), Vector4(0.0f, 0.0f, 0.0f, 1.0f), TEST_LOCATION);
 
   END_TEST;
 }
@@ -2759,7 +2770,7 @@ int UtcDaliRenderTaskGetClearColorP(void)
 
   RenderTaskList taskList = application.GetScene().GetRenderTaskList();
   RenderTask     task     = taskList.GetTask(0u);
-  DALI_TEST_EQUALS(task.GetClearColor(), RenderTask::DEFAULT_CLEAR_COLOR, TEST_LOCATION);
+  DALI_TEST_EQUALS(task.GetClearColor(), Vector4(0.0f, 0.0f, 0.0f, 1.0f), TEST_LOCATION);
   END_TEST;
 }
 
@@ -6096,6 +6107,83 @@ int UtcDaliRenderTaskKeepRenderResult(void)
   application.SendNotification();
   application.Render();
   DALI_TEST_CHECK(!newTask.GetRenderResult());
+
+  END_TEST;
+}
+
+int UtcDaliRenderTaskGetRenderResultBuffer(void)
+{
+  TestApplication application;
+
+  tet_infoline("Testing RenderTask::GetRenderResultBuffer()");
+
+  CameraActor offscreenCameraActor = CameraActor::New();
+
+  application.GetScene().Add(offscreenCameraActor);
+
+  Texture image     = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 10, 10);
+  Actor   rootActor = CreateRenderableActor(image);
+  rootActor.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
+  application.GetScene().Add(rootActor);
+
+  RenderTaskList taskList           = application.GetScene().GetRenderTaskList();
+  Texture        frameBufferTexture = Texture::New(TextureType::TEXTURE_2D, Pixel::Format::RGBA8888, 10, 10);
+  FrameBuffer    frameBuffer        = FrameBuffer::New(frameBufferTexture.GetWidth(), frameBufferTexture.GetHeight());
+  frameBuffer.AttachColorTexture(frameBufferTexture);
+
+  RenderTask newTask = taskList.CreateTask();
+  newTask.SetCameraActor(offscreenCameraActor);
+  newTask.SetSourceActor(rootActor);
+  newTask.SetInputEnabled(false);
+  newTask.SetClearColor(Vector4(0.f, 0.f, 0.f, 0.f));
+  newTask.SetClearEnabled(true);
+  newTask.SetExclusive(true);
+  newTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
+  newTask.SetFrameBuffer(frameBuffer);
+  newTask.KeepRenderResult();
+
+  bool               finished = false;
+  RenderTaskFinished renderTaskFinished(finished);
+  newTask.FinishedSignal().Connect(&application, renderTaskFinished);
+
+  // Before the FinishedSignal, an empty handle is returned
+  DALI_TEST_CHECK(!newTask.GetRenderResultBuffer());
+
+  // Flush the queue and render.
+  application.SendNotification();
+  application.Render();
+  application.Render();
+  application.SendNotification();
+  DALI_TEST_CHECK(finished);
+
+  PixelBuffer pixelBuffer = newTask.GetRenderResultBuffer();
+  DALI_TEST_CHECK(pixelBuffer);
+  DALI_TEST_CHECK(pixelBuffer.GetBuffer() != nullptr);
+  DALI_TEST_EQUALS(pixelBuffer.GetWidth(), 10u, TEST_LOCATION);
+  DALI_TEST_EQUALS(pixelBuffer.GetHeight(), 10u, TEST_LOCATION);
+  DALI_TEST_EQUALS(pixelBuffer.GetBufferSize(), 10u * 10u * 4u, TEST_LOCATION);
+  DALI_TEST_CHECK(pixelBuffer.GetPixelFormat() == Pixel::RGBA8888);
+
+  // Repeated calls share the same object
+  PixelBuffer pixelBuffer2 = newTask.GetRenderResultBuffer();
+  DALI_TEST_CHECK(pixelBuffer == pixelBuffer2);
+
+  // The deprecated GetRenderResult() returns a copy of the result
+  PixelData pixelData = newTask.GetRenderResult();
+  DALI_TEST_CHECK(pixelData);
+  DALI_TEST_EQUALS(pixelData.GetWidth(), 10u, TEST_LOCATION);
+  Dali::Integration::PixelDataBuffer pixelDataBuffer = Dali::Integration::GetPixelDataBuffer(pixelData);
+  DALI_TEST_CHECK(pixelDataBuffer.buffer != pixelBuffer.GetBuffer());
+  DALI_TEST_EQUALS(pixelDataBuffer.bufferSize, pixelBuffer.GetBufferSize(), TEST_LOCATION);
+
+  // ClearRenderResult() releases the RenderTask's reference only:
+  // the application's handle stays valid
+  newTask.ClearRenderResult();
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_CHECK(!newTask.GetRenderResultBuffer());
+  DALI_TEST_CHECK(pixelBuffer.GetBuffer() != nullptr);
+  DALI_TEST_EQUALS(pixelBuffer.GetBufferSize(), 10u * 10u * 4u, TEST_LOCATION);
 
   END_TEST;
 }

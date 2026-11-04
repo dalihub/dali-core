@@ -80,6 +80,7 @@
 #include <dali/public-api/events/wheel-event.h>
 
 #include <dali/public-api/images/native-image-interface.h>
+#include <dali/public-api/images/pixel-buffer.h>
 #include <dali/public-api/images/pixel-data.h>
 #include <dali/public-api/images/pixel.h>
 
@@ -94,6 +95,7 @@
 #include <dali/public-api/math/radian.h>
 #include <dali/public-api/math/random.h>
 #include <dali/public-api/math/rect.h>
+#include <dali/public-api/math/scalar-math.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector3.h>
 #include <dali/public-api/math/vector4.h>
