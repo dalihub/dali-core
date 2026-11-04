@@ -57,7 +57,7 @@ compile_commands.json
 *.cache/
 # dali-core only
 dali.info
-libdali*-core.so*
+libdali2-core.so*
 /build/tizen-cmake/doc
 /_build/
 file-list.cmake
