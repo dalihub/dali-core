@@ -242,13 +242,6 @@ public:
   bool GetColorMultiplier(uint32_t id, Vector4& multiplier) const;
 
   /**
-   * @brief Given the Actor ID, retrieves that Actor's local color.
-   * @deprecated Use GetColorMultiplier() instead.
-   * @SINCE_2_5.21
-   */
-  bool GetColor(uint32_t id, Vector4& color) const;
-
-  /**
    * @brief Allows setting an Actor's local color multiplier from the Frame callback function for the current frame only.
    * @param[in]  id          The Actor ID
    * @param[in]  multiplier  The color multiplier to set
@@ -259,13 +252,6 @@ public:
   bool SetColorMultiplier(uint32_t id, const Vector4& multiplier);
 
   /**
-   * @brief Allows setting an Actor's local color from the Frame callback function.
-   * @deprecated Use SetColorMultiplier() instead.
-   * @SINCE_2_5.21
-   */
-  bool SetColor(uint32_t id, const Vector4& color);
-
-  /**
    * @brief Allows baking an Actor's local color multiplier from the Frame callback function.
    * @param[in]  id          The Actor ID
    * @param[in]  multiplier  The color multiplier to bake
@@ -274,13 +260,6 @@ public:
    * @SINCE_2_5.38
    */
   bool BakeColorMultiplier(uint32_t id, const Vector4& multiplier);
-
-  /**
-   * @brief Allows baking an Actor's local color from the Frame callback function.
-   * @deprecated Use BakeColorMultiplier() instead.
-   * @SINCE_2_5.21
-   */
-  bool BakeColor(uint32_t id, const Vector4& color);
 
   /**
    * @brief Pop a sync point off the stack.

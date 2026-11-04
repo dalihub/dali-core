@@ -289,17 +289,17 @@ public:
 
     mGetSizeCallSuccess                      = updateProxy.GetSize(mActorId, vec3);
     mGetPositionCallSuccess                  = updateProxy.GetPosition(mActorId, vec3);
-    mGetColorCallSuccess                     = updateProxy.GetColor(mActorId, vec4);
+    mGetColorCallSuccess                     = updateProxy.GetColorMultiplier(mActorId, vec4);
     mGetScaleCallSuccess                     = updateProxy.GetScale(mActorId, vec3);
     mGetPositionAndSizeCallSuccess           = updateProxy.GetPositionAndSize(mActorId, vec3, vec3);
     mGetWorldPositionScaleAndSizeCallSuccess = updateProxy.GetWorldPositionScaleAndSize(mActorId, vec3, vec3, vec3);
     mSetSizeCallSuccess                      = updateProxy.SetSize(mActorId, vec3);
     mSetPositionCallSuccess                  = updateProxy.SetPosition(mActorId, vec3);
-    mSetColorCallSuccess                     = updateProxy.SetColor(mActorId, vec4);
+    mSetColorCallSuccess                     = updateProxy.SetColorMultiplier(mActorId, vec4);
     mSetScaleCallSuccess                     = updateProxy.SetScale(mActorId, vec3);
     mBakeSizeCallSuccess                     = updateProxy.BakeSize(mActorId, vec3);
     mBakePositionCallSuccess                 = updateProxy.BakePosition(mActorId, vec3);
-    mBakeColorCallSuccess                    = updateProxy.BakeColor(mActorId, vec4);
+    mBakeColorCallSuccess                    = updateProxy.BakeColorMultiplier(mActorId, vec4);
     mBakeScaleCallSuccess                    = updateProxy.BakeScale(mActorId, vec3);
     mGetPivotCallSuccess                     = updateProxy.GetPivot(mActorId, vec3);
 
