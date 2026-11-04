@@ -167,7 +167,7 @@ IF(DALI_TEST_SOURCE_LIST_ONLY)
 ENDIF()
 
 PKG_CHECK_MODULES(${CAPI_LIB} REQUIRED
-     dali3-core
+     dali2-core
 )
 
 ADD_COMPILE_OPTIONS( -rdynamic )
