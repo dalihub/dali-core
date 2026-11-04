@@ -254,6 +254,11 @@ private: // GestureDetector overrides
    */
   Actor* GetCurrentGesturedActor() override;
 
+  /**
+   * @brief Discards detector-owned recognition without emitting a gesture signal.
+   */
+  void ResetRecognition();
+
 private:
   Dali::LongPressGestureDetector::DetectedSignalType mDetectedSignal;
 

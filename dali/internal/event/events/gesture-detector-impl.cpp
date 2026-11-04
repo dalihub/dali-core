@@ -276,6 +276,8 @@ Dali::Actor GestureDetector::GetAttachedActor(uint32_t index) const
 
 bool GestureDetector::HandleEvent(Dali::Actor& actor, const Dali::TouchEvent& touch)
 {
+  // A callback may replace the recognizer by detaching and starting another sequence.
+  GestureRecognizerPtr   recognizer(mGestureRecognizer);
   bool                   ret = false;
   Dali::Internal::Actor& actorImpl(GetImplementation(actor));
   if(touch.GetPointCount() > 0 && actorImpl.OnScene())
@@ -323,12 +325,13 @@ bool GestureDetector::HandleEvent(Dali::Actor& actor, const Dali::TouchEvent& to
       {
         ProcessTouchEvent(actorImpl.GetScene(), touchEvent);
       }
-      ret = IsDetected() && !actorImpl.NeedGesturePropagation();
+      ret = (!recognizer || recognizer == mGestureRecognizer) && IsDetected() && !actorImpl.NeedGesturePropagation();
     }
 
     actorImpl.SetNeedGesturePropagation(false);
 
-    if(state == PointState::FINISHED || state == PointState::INTERRUPTED)
+    if((state == PointState::FINISHED || state == PointState::INTERRUPTED) &&
+       (!recognizer || recognizer == mGestureRecognizer))
     {
       Clear();
     }

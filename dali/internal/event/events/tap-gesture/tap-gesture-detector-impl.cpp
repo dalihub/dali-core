@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <algorithm>
 #include <cstring> // for strcmp
+#include <utility>
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/events/gesture-impl.h>
@@ -233,6 +234,7 @@ void TapGestureDetector::NotifyProfilesChanged()
 
 void TapGestureDetector::EmitTapGestureSignal(Dali::Actor tappedActor, const Dali::TapGesture& tap, uint32_t maximumMultiTapInterval)
 {
+  GestureRecognizerPtr recognizer(mGestureRecognizer);
   if(!CheckMinMaxTapsRequired(mActiveProfile))
   {
     return;
@@ -250,6 +252,10 @@ void TapGestureDetector::EmitTapGestureSignal(Dali::Actor tappedActor, const Dal
       // sequence is still waiting for more taps: that tap is final, deliver it before handling the new one.
       Dali::TapGestureDetector handle(this);
       mDetectedSignal.Emit(mTappedActor, mTap);
+      if(mGestureRecognizer != recognizer)
+      {
+        return;
+      }
     }
   }
 
@@ -288,10 +294,18 @@ bool TapGestureDetector::TimerCallback()
 {
   // Guard against destruction during signal emission
   Dali::TapGestureDetector handle(this);
+  GestureRecognizerPtr     recognizer(mGestureRecognizer);
+  const uint32_t           timerId                = mTimerId;
+  const bool               geometryHittestEnabled = mTappedActor && GetImplementation(mTappedActor).OnScene() &&
+                                      GetImplementation(mTappedActor).GetScene().IsGeometryHittestEnabled();
   DALI_LOG_DEBUG_INFO("emitting tap gesture actor id(%d)\n", mTappedActor.GetProperty<int32_t>(Dali::Actor::Property::ID));
   mDetectedSignal.Emit(mTappedActor, mTap);
 
-  mTimerId = 0;
+  // A detach callback may have started another sequence with its own timer.
+  if(!geometryHittestEnabled || (mGestureRecognizer == recognizer && mTimerId == timerId))
+  {
+    mTimerId = 0;
+  }
   return false;
 }
 
@@ -331,6 +345,18 @@ void TapGestureDetector::OnActorDetach(Actor& actor)
   if(actor.OnScene() && actor.GetScene().IsGeometryHittestEnabled())
   {
     actor.TouchEventSignal().Disconnect(this, &TapGestureDetector::OnTouchEvent);
+
+    // A completed tap may belong to a different actor than the current input.
+    if(mAttachedActors.empty() || (mTappedActor && &GetImplementation(mTappedActor) == &actor))
+    {
+      ResetPendingTap();
+    }
+
+    if(mGestureRecognizer &&
+       (mAttachedActors.empty() || mFeededActor.GetActor() == &actor || mCurrentTapActor.GetActor() == &actor))
+    {
+      ResetRecognition();
+    }
   }
 }
 
@@ -404,6 +430,7 @@ void TapGestureDetector::ProcessTouchEvent(Scene& scene, const Integration::Touc
 
 void TapGestureDetector::Process(Scene& scene, const TapGestureEvent& tapEvent)
 {
+  GestureRecognizerPtr recognizer(mGestureRecognizer);
   switch(tapEvent.state)
   {
     case GestureState::POSSIBLE:
@@ -430,7 +457,10 @@ void TapGestureDetector::Process(Scene& scene, const TapGestureEvent& tapEvent)
 
         Dali::Actor actorHandle(feededActor);
         EmitTapGestureSignal(actorHandle, Dali::TapGesture(tap.Get()), tapEvent.maximumMultiTapInterval);
-        mPossibleProcessed = false;
+        if(mGestureRecognizer == recognizer)
+        {
+          mPossibleProcessed = false;
+        }
       }
       break;
     }
@@ -461,6 +491,28 @@ Actor* TapGestureDetector::GetCurrentGesturedActor()
 {
   // Return the current feeded actor
   return GestureDetector::GetCurrentGesturedActor();
+}
+
+void TapGestureDetector::ResetRecognition()
+{
+  // Release touch history only after clearing the detector's recognition state.
+  GestureRecognizerPtr recognizer(std::move(mGestureRecognizer));
+  SetDetected(false);
+  mFeededActor.ResetActor();
+  mRenderTask.Reset();
+  mCurrentTapActor.ResetActor();
+  mPossibleProcessed = false;
+}
+
+void TapGestureDetector::ResetPendingTap()
+{
+  if(mTimerId != 0 && ThreadLocalStorage::Created())
+  {
+    ThreadLocalStorage::Get().GetPlatformAbstraction().CancelTimer(mTimerId);
+  }
+  mTimerId = 0;
+  mTappedActor.Reset();
+  mTap.Reset();
 }
 
 } // namespace Internal
