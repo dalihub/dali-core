@@ -26,27 +26,24 @@
 #include <dali/internal/common/matrix-utils.h>
 #include <dali/public-api/math/math-utils.h>
 
-#define S00 0
-#define S01 1
-#define S02 2
-#define S10 3
-#define S11 4
-#define S12 5
-#define S20 6
-#define S21 7
-#define S22 8
+namespace
+{
+constexpr uint32_t S00 = 0;
+constexpr uint32_t S01 = 1;
+constexpr uint32_t S02 = 2;
+constexpr uint32_t S10 = 3;
+constexpr uint32_t S11 = 4;
+constexpr uint32_t S12 = 5;
+constexpr uint32_t S20 = 6;
+constexpr uint32_t S21 = 7;
+constexpr uint32_t S22 = 8;
+} // namespace
 
 /*
  * S00 S10 S20
  * S01 S11 S21
  * S02 S12 S22
  */
-
-namespace
-{
-const uint32_t NUM_BYTES_IN_ROW    = 3 * sizeof(float);
-const uint32_t NUM_BYTES_IN_MATRIX = 9 * sizeof(float);
-} // namespace
 
 namespace DALI_NAMESPACE
 {
