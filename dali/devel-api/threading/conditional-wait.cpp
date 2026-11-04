@@ -43,9 +43,9 @@ struct ConditionalWait::ConditionalWaitImpl
  */
 struct ConditionalWait::ScopedLock::ScopedLockImpl
 {
-  ScopedLockImpl(ConditionalWait& wait)
-  : wait(wait),
-    lock(wait.mImpl->mutex) // locks for the lifecycle of this object
+  ScopedLockImpl(ConditionalWait& initWait)
+  : wait(initWait),
+    lock(initWait.mImpl->mutex) // locks for the lifecycle of this object
   {
   }
   ConditionalWait&             wait;

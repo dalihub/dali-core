@@ -190,11 +190,11 @@ struct Command
   {
   }
 
-  Command(CommandType type)
-  : type(type)
+  Command(CommandType initType)
+  : type(initType)
   {
     // do non-trivial initialization
-    switch(type)
+    switch(initType)
     {
       case CommandType::BEGIN_RENDER_PASS:
       {

@@ -31,9 +31,9 @@ MultiPointEvent::MultiPointEvent(Type eventType)
 {
 }
 
-MultiPointEvent::MultiPointEvent(Type eventType, uint32_t time)
+MultiPointEvent::MultiPointEvent(Type eventType, uint32_t initTime)
 : Event(eventType),
-  time(time)
+  time(initTime)
 {
 }
 

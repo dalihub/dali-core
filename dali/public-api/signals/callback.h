@@ -38,6 +38,44 @@ namespace DALI_NAMESPACE
 
 class CallbackBase;
 
+namespace Internal
+{
+namespace CallbackUtils
+{
+#if defined(__clang__)
+#if __has_warning("-Wcast-function-type")
+#define DALI_CALLBACK_IGNORE_CAST_FUNCTION_TYPE
+#endif
+#elif defined(__GNUC__) && __GNUC__ >= 8
+#define DALI_CALLBACK_IGNORE_CAST_FUNCTION_TYPE
+#endif
+
+#if defined(DALI_CALLBACK_IGNORE_CAST_FUNCTION_TYPE)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-function-type"
+#endif
+/**
+ * @brief Casts between pointer to member function types.
+ *
+ * CallbackBase stores member functions as a type-erased pointer and the dispatcher casts it back
+ * to the original type before calling it, so this cast is intentional.
+ * There is no pointer to member type which is compatible with every other one (like void(*)() for
+ * normal functions), so -Wcast-function-type is suppressed here only.
+ * @param[in] function The member function pointer to cast
+ * @return The casted member function pointer
+ */
+template<typename To, typename From>
+inline To MemberFunctionCast(From function)
+{
+  return reinterpret_cast<To>(function);
+}
+#if defined(DALI_CALLBACK_IGNORE_CAST_FUNCTION_TYPE)
+#pragma GCC diagnostic pop
+#undef DALI_CALLBACK_IGNORE_CAST_FUNCTION_TYPE
+#endif
+} // namespace CallbackUtils
+} // namespace Internal
+
 /**
  * @brief Callback base class to hold the data for callback function and member function calls.
  * @SINCE_1_0.0
@@ -92,7 +130,8 @@ public:
     if(callback.mImpl.mObjectPointer)
     {
       using Dispatcher      = R (*)(CallbackBase&, Args...);
-      Dispatcher dispatcher = reinterpret_cast<Dispatcher>(callback.mImpl.mMemberFunctionDispatcher);
+      // Cast through void(*)() which is compatible with every function type, to avoid -Wcast-function-type
+      Dispatcher dispatcher = reinterpret_cast<Dispatcher>(reinterpret_cast<void (*)()>(callback.mImpl.mMemberFunctionDispatcher));
       returnVal             = (*dispatcher)(callback, args...);
     }
     else if(callback.mStaticFunction)
@@ -123,7 +162,8 @@ public:
     if(callback.mImpl.mObjectPointer)
     {
       using Dispatcher      = void (*)(CallbackBase&, Args...);
-      Dispatcher dispatcher = reinterpret_cast<Dispatcher>(callback.mImpl.mMemberFunctionDispatcher);
+      // Cast through void(*)() which is compatible with every function type, to avoid -Wcast-function-type
+      Dispatcher dispatcher = reinterpret_cast<Dispatcher>(reinterpret_cast<void (*)()>(callback.mImpl.mMemberFunctionDispatcher));
       (*dispatcher)(callback, args...);
     }
     else if(callback.mStaticFunction)
@@ -279,7 +319,7 @@ struct Dispatcher0
     // "downcast" the object and function type back to the correct ones
     T* object               = reinterpret_cast<T*>(callback.mImpl.mObjectPointer);
     using MemberFunction    = void (T::*)();
-    MemberFunction function = reinterpret_cast<MemberFunction>(callback.mMemberFunction);
+    MemberFunction function = Internal::CallbackUtils::MemberFunctionCast<MemberFunction>(callback.mMemberFunction);
     (object->*function)();
   }
 };
@@ -303,7 +343,7 @@ struct Dispatcher1
     // "downcast" the object and function type back to the correct ones
     T* object               = reinterpret_cast<T*>(callback.mImpl.mObjectPointer);
     using MemberFunction    = void (T::*)(P1);
-    MemberFunction function = reinterpret_cast<MemberFunction>(callback.mMemberFunction);
+    MemberFunction function = Internal::CallbackUtils::MemberFunctionCast<MemberFunction>(callback.mMemberFunction);
     (object->*function)(param1);
   }
 };
@@ -328,7 +368,7 @@ struct Dispatcher2
     // "downcast" the object and function type back to the correct ones
     T* object               = reinterpret_cast<T*>(callback.mImpl.mObjectPointer);
     using MemberFunction    = void (T::*)(P1, P2);
-    MemberFunction function = reinterpret_cast<MemberFunction>(callback.mMemberFunction);
+    MemberFunction function = Internal::CallbackUtils::MemberFunctionCast<MemberFunction>(callback.mMemberFunction);
     (object->*function)(param1, param2);
   }
 };
@@ -354,7 +394,7 @@ struct Dispatcher3
     // "downcast" the object and function type back to the correct ones
     T* object               = reinterpret_cast<T*>(callback.mImpl.mObjectPointer);
     using MemberFunction    = void (T::*)(P1, P2, P3);
-    MemberFunction function = reinterpret_cast<MemberFunction>(callback.mMemberFunction);
+    MemberFunction function = Internal::CallbackUtils::MemberFunctionCast<MemberFunction>(callback.mMemberFunction);
     (object->*function)(param1, param2, param3);
   }
 };
@@ -378,7 +418,7 @@ struct DispatcherReturn0
     // "downcast" the object and function type back to the correct ones
     T* object               = reinterpret_cast<T*>(callback.mImpl.mObjectPointer);
     using MemberFunction    = R (T::*)();
-    MemberFunction function = reinterpret_cast<MemberFunction>(callback.mMemberFunction);
+    MemberFunction function = Internal::CallbackUtils::MemberFunctionCast<MemberFunction>(callback.mMemberFunction);
     return (object->*function)();
   }
 };
@@ -403,7 +443,7 @@ struct DispatcherReturn1
     // "downcast" the object and function type back to the correct ones
     T* object               = reinterpret_cast<T*>(callback.mImpl.mObjectPointer);
     using MemberFunction    = R (T::*)(P1);
-    MemberFunction function = reinterpret_cast<MemberFunction>(callback.mMemberFunction);
+    MemberFunction function = Internal::CallbackUtils::MemberFunctionCast<MemberFunction>(callback.mMemberFunction);
     return (object->*function)(param1);
   }
 };
@@ -429,7 +469,7 @@ struct DispatcherReturn2
     // "downcast" the object and function type back to the correct ones
     T* object               = reinterpret_cast<T*>(callback.mImpl.mObjectPointer);
     using MemberFunction    = R (T::*)(P1, P2);
-    MemberFunction function = reinterpret_cast<MemberFunction>(callback.mMemberFunction);
+    MemberFunction function = Internal::CallbackUtils::MemberFunctionCast<MemberFunction>(callback.mMemberFunction);
     return (object->*function)(param1, param2);
   }
 };
@@ -456,7 +496,7 @@ struct DispatcherReturn3
     // "downcast" the object and function type back to the correct ones
     T* object               = reinterpret_cast<T*>(callback.mImpl.mObjectPointer);
     using MemberFunction    = R (T::*)(P1, P2, P3);
-    MemberFunction function = reinterpret_cast<MemberFunction>(callback.mMemberFunction);
+    MemberFunction function = Internal::CallbackUtils::MemberFunctionCast<MemberFunction>(callback.mMemberFunction);
     return (object->*function)(param1, param2, param3);
   }
 };
@@ -665,7 +705,7 @@ struct VoidFunctorDispatcher0
     // "downcast" the object and function type back to the correct ones
     T* object               = reinterpret_cast<T*>(callback.mImpl.mObjectPointer);
     using MemberFunction    = void (T::*)();
-    MemberFunction function = reinterpret_cast<MemberFunction>(callback.mMemberFunction);
+    MemberFunction function = Internal::CallbackUtils::MemberFunctionCast<MemberFunction>(callback.mMemberFunction);
     (object->*function)();
   }
 };
@@ -691,7 +731,7 @@ struct VoidFunctorDispatcher1
     // "downcast" the object and function type back to the correct ones
     T* object               = reinterpret_cast<T*>(callback.mImpl.mObjectPointer);
     using MemberFunction    = void (T::*)();
-    MemberFunction function = reinterpret_cast<MemberFunction>(callback.mMemberFunction);
+    MemberFunction function = Internal::CallbackUtils::MemberFunctionCast<MemberFunction>(callback.mMemberFunction);
     (object->*function)(/*ignore params*/);
   }
 };
@@ -718,7 +758,7 @@ struct VoidFunctorDispatcher2
     // "downcast" the object and function type back to the correct ones
     T* object               = reinterpret_cast<T*>(callback.mImpl.mObjectPointer);
     using MemberFunction    = void (T::*)();
-    MemberFunction function = reinterpret_cast<MemberFunction>(callback.mMemberFunction);
+    MemberFunction function = Internal::CallbackUtils::MemberFunctionCast<MemberFunction>(callback.mMemberFunction);
     (object->*function)(/*ignore params*/);
   }
 };
@@ -746,7 +786,7 @@ struct VoidFunctorDispatcher3
     // "downcast" the object and function type back to the correct ones
     T* object               = reinterpret_cast<T*>(callback.mImpl.mObjectPointer);
     using MemberFunction    = void (T::*)();
-    MemberFunction function = reinterpret_cast<MemberFunction>(callback.mMemberFunction);
+    MemberFunction function = Internal::CallbackUtils::MemberFunctionCast<MemberFunction>(callback.mMemberFunction);
     (object->*function)(/*ignore params*/);
   }
 };
@@ -772,7 +812,7 @@ struct VoidFunctorDispatcherReturn0
     // "downcast" the object and function type back to the correct ones
     T* object               = reinterpret_cast<T*>(callback.mImpl.mObjectPointer);
     using MemberFunction    = void (T::*)();
-    MemberFunction function = reinterpret_cast<MemberFunction>(callback.mMemberFunction);
+    MemberFunction function = Internal::CallbackUtils::MemberFunctionCast<MemberFunction>(callback.mMemberFunction);
     (object->*function)(/*ignore params*/);
     return R();
   }
@@ -800,7 +840,7 @@ struct VoidFunctorDispatcherReturn1
     // "downcast" the object and function type back to the correct ones
     T* object               = reinterpret_cast<T*>(callback.mImpl.mObjectPointer);
     using MemberFunction    = void (T::*)();
-    MemberFunction function = reinterpret_cast<MemberFunction>(callback.mMemberFunction);
+    MemberFunction function = Internal::CallbackUtils::MemberFunctionCast<MemberFunction>(callback.mMemberFunction);
     (object->*function)(/*ignore params*/);
     return R();
   }
@@ -829,7 +869,7 @@ struct VoidFunctorDispatcherReturn2
     // "downcast" the object and function type back to the correct ones
     T* object               = reinterpret_cast<T*>(callback.mImpl.mObjectPointer);
     using MemberFunction    = void (T::*)();
-    MemberFunction function = reinterpret_cast<MemberFunction>(callback.mMemberFunction);
+    MemberFunction function = Internal::CallbackUtils::MemberFunctionCast<MemberFunction>(callback.mMemberFunction);
     (object->*function)(/*ignore params*/);
     return R();
   }
@@ -859,7 +899,7 @@ struct VoidFunctorDispatcherReturn3
     // "downcast" the object and function type back to the correct ones
     T* object               = reinterpret_cast<T*>(callback.mImpl.mObjectPointer);
     using MemberFunction    = void (T::*)();
-    MemberFunction function = reinterpret_cast<MemberFunction>(callback.mMemberFunction);
+    MemberFunction function = Internal::CallbackUtils::MemberFunctionCast<MemberFunction>(callback.mMemberFunction);
     (object->*function)(/*ignore params*/);
     return R();
   }
@@ -898,57 +938,57 @@ public:
    */
   CallbackMember(T* object, void (T::*memberFunction)(void))
   : CallbackBase(object,
-                 reinterpret_cast<CallbackBase::MemberFunction>(memberFunction),
-                 reinterpret_cast<CallbackBase::Dispatcher>(&Dispatcher0<T>::Dispatch))
+                 Internal::CallbackUtils::MemberFunctionCast<CallbackBase::MemberFunction>(memberFunction),
+                 reinterpret_cast<CallbackBase::Dispatcher>(reinterpret_cast<void (*)()>(&Dispatcher0<T>::Dispatch)))
   {
   }
   template<typename P1>
   CallbackMember(T* object, void (T::*memberFunction)(P1))
   : CallbackBase(object,
-                 reinterpret_cast<CallbackBase::MemberFunction>(memberFunction),
-                 reinterpret_cast<CallbackBase::Dispatcher>(&Dispatcher1<T, P1>::Dispatch))
+                 Internal::CallbackUtils::MemberFunctionCast<CallbackBase::MemberFunction>(memberFunction),
+                 reinterpret_cast<CallbackBase::Dispatcher>(reinterpret_cast<void (*)()>(&Dispatcher1<T, P1>::Dispatch)))
   {
   }
   template<typename P1, typename P2>
   CallbackMember(T* object, void (T::*memberFunction)(P1, P2))
   : CallbackBase(object,
-                 reinterpret_cast<CallbackBase::MemberFunction>(memberFunction),
-                 reinterpret_cast<CallbackBase::Dispatcher>(&Dispatcher2<T, P1, P2>::Dispatch))
+                 Internal::CallbackUtils::MemberFunctionCast<CallbackBase::MemberFunction>(memberFunction),
+                 reinterpret_cast<CallbackBase::Dispatcher>(reinterpret_cast<void (*)()>(&Dispatcher2<T, P1, P2>::Dispatch)))
   {
   }
   template<typename P1, typename P2, typename P3>
   CallbackMember(T* object, void (T::*memberFunction)(P1, P2, P3))
   : CallbackBase(object,
-                 reinterpret_cast<CallbackBase::MemberFunction>(memberFunction),
-                 reinterpret_cast<CallbackBase::Dispatcher>(&Dispatcher3<T, P1, P2, P3>::Dispatch))
+                 Internal::CallbackUtils::MemberFunctionCast<CallbackBase::MemberFunction>(memberFunction),
+                 reinterpret_cast<CallbackBase::Dispatcher>(reinterpret_cast<void (*)()>(&Dispatcher3<T, P1, P2, P3>::Dispatch)))
   {
   }
   template<typename R>
   CallbackMember(T* object, R (T::*memberFunction)(void))
   : CallbackBase(object,
-                 reinterpret_cast<CallbackBase::MemberFunction>(memberFunction),
-                 reinterpret_cast<CallbackBase::Dispatcher>(&DispatcherReturn0<T, R>::Dispatch))
+                 Internal::CallbackUtils::MemberFunctionCast<CallbackBase::MemberFunction>(memberFunction),
+                 reinterpret_cast<CallbackBase::Dispatcher>(reinterpret_cast<void (*)()>(&DispatcherReturn0<T, R>::Dispatch)))
   {
   }
   template<typename R, typename P1>
   CallbackMember(T* object, R (T::*memberFunction)(P1))
   : CallbackBase(object,
-                 reinterpret_cast<CallbackBase::MemberFunction>(memberFunction),
-                 reinterpret_cast<CallbackBase::Dispatcher>(&DispatcherReturn1<T, R, P1>::Dispatch))
+                 Internal::CallbackUtils::MemberFunctionCast<CallbackBase::MemberFunction>(memberFunction),
+                 reinterpret_cast<CallbackBase::Dispatcher>(reinterpret_cast<void (*)()>(&DispatcherReturn1<T, R, P1>::Dispatch)))
   {
   }
   template<typename R, typename P1, typename P2>
   CallbackMember(T* object, R (T::*memberFunction)(P1, P2))
   : CallbackBase(object,
-                 reinterpret_cast<CallbackBase::MemberFunction>(memberFunction),
-                 reinterpret_cast<CallbackBase::Dispatcher>(&DispatcherReturn2<T, R, P1, P2>::Dispatch))
+                 Internal::CallbackUtils::MemberFunctionCast<CallbackBase::MemberFunction>(memberFunction),
+                 reinterpret_cast<CallbackBase::Dispatcher>(reinterpret_cast<void (*)()>(&DispatcherReturn2<T, R, P1, P2>::Dispatch)))
   {
   }
   template<typename R, typename P1, typename P2, typename P3>
   CallbackMember(T* object, R (T::*memberFunction)(P1, P2, P3))
   : CallbackBase(object,
-                 reinterpret_cast<CallbackBase::MemberFunction>(memberFunction),
-                 reinterpret_cast<CallbackBase::Dispatcher>(&DispatcherReturn3<T, R, P1, P2, P3>::Dispatch))
+                 Internal::CallbackUtils::MemberFunctionCast<CallbackBase::MemberFunction>(memberFunction),
+                 reinterpret_cast<CallbackBase::Dispatcher>(reinterpret_cast<void (*)()>(&DispatcherReturn3<T, R, P1, P2, P3>::Dispatch)))
   {
   }
 };
@@ -970,7 +1010,7 @@ public:
   CallbackFunctor0(const T& object)
   : CallbackBase(reinterpret_cast<void*>(new T(object)), // copy the object
                  NULL,                                   // uses operator() instead of member function
-                 reinterpret_cast<CallbackBase::Dispatcher>(&FunctorDispatcher0<T>::Dispatch),
+                 reinterpret_cast<CallbackBase::Dispatcher>(reinterpret_cast<void (*)()>(&FunctorDispatcher0<T>::Dispatch)),
                  reinterpret_cast<CallbackBase::Destructor>(&Destroyer<T>::Delete))
   {
   }
@@ -992,8 +1032,8 @@ public:
    */
   CallbackFunctorDelegate0(FunctorDelegate* object)
   : CallbackBase(reinterpret_cast<void*>(object), // transfer ownership
-                 reinterpret_cast<CallbackBase::MemberFunction>(&FunctorDelegate::Execute),
-                 reinterpret_cast<CallbackBase::Dispatcher>(&VoidFunctorDispatcher0<FunctorDelegate>::Dispatch),
+                 Internal::CallbackUtils::MemberFunctionCast<CallbackBase::MemberFunction>(&FunctorDelegate::Execute),
+                 reinterpret_cast<CallbackBase::Dispatcher>(reinterpret_cast<void (*)()>(&VoidFunctorDispatcher0<FunctorDelegate>::Dispatch)),
                  reinterpret_cast<CallbackBase::Destructor>(&Destroyer<FunctorDelegate>::Delete))
   {
   }
@@ -1016,7 +1056,7 @@ public:
   CallbackFunctor1(const T& object)
   : CallbackBase(reinterpret_cast<void*>(new T(object)), // copy the object
                  NULL,                                   // uses operator() instead of member function
-                 reinterpret_cast<CallbackBase::Dispatcher>(&FunctorDispatcher1<T, P1>::Dispatch),
+                 reinterpret_cast<CallbackBase::Dispatcher>(reinterpret_cast<void (*)()>(&FunctorDispatcher1<T, P1>::Dispatch)),
                  reinterpret_cast<CallbackBase::Destructor>(&Destroyer<T>::Delete))
   {
   }
@@ -1039,8 +1079,8 @@ public:
    */
   CallbackFunctorDelegate1(FunctorDelegate* object)
   : CallbackBase(reinterpret_cast<void*>(object), // transfer ownership
-                 reinterpret_cast<CallbackBase::MemberFunction>(&FunctorDelegate::Execute),
-                 reinterpret_cast<CallbackBase::Dispatcher>(&VoidFunctorDispatcher1<FunctorDelegate, P1>::Dispatch),
+                 Internal::CallbackUtils::MemberFunctionCast<CallbackBase::MemberFunction>(&FunctorDelegate::Execute),
+                 reinterpret_cast<CallbackBase::Dispatcher>(reinterpret_cast<void (*)()>(&VoidFunctorDispatcher1<FunctorDelegate, P1>::Dispatch)),
                  reinterpret_cast<CallbackBase::Destructor>(&Destroyer<FunctorDelegate>::Delete))
   {
   }
@@ -1063,7 +1103,7 @@ public:
   CallbackFunctor2(const T& object)
   : CallbackBase(reinterpret_cast<void*>(new T(object)), // copy the object
                  NULL,                                   // uses operator() instead of member function
-                 reinterpret_cast<CallbackBase::Dispatcher>(&FunctorDispatcher2<T, P1, P2>::Dispatch),
+                 reinterpret_cast<CallbackBase::Dispatcher>(reinterpret_cast<void (*)()>(&FunctorDispatcher2<T, P1, P2>::Dispatch)),
                  reinterpret_cast<CallbackBase::Destructor>(&Destroyer<T>::Delete))
   {
   }
@@ -1086,8 +1126,8 @@ public:
    */
   CallbackFunctorDelegate2(FunctorDelegate* object)
   : CallbackBase(reinterpret_cast<void*>(object), // transfer ownership
-                 reinterpret_cast<CallbackBase::MemberFunction>(&FunctorDelegate::Execute),
-                 reinterpret_cast<CallbackBase::Dispatcher>(&VoidFunctorDispatcher2<FunctorDelegate, P1, P2>::Dispatch),
+                 Internal::CallbackUtils::MemberFunctionCast<CallbackBase::MemberFunction>(&FunctorDelegate::Execute),
+                 reinterpret_cast<CallbackBase::Dispatcher>(reinterpret_cast<void (*)()>(&VoidFunctorDispatcher2<FunctorDelegate, P1, P2>::Dispatch)),
                  reinterpret_cast<CallbackBase::Destructor>(&Destroyer<FunctorDelegate>::Delete))
   {
   }
@@ -1110,7 +1150,7 @@ public:
   CallbackFunctor3(const T& object)
   : CallbackBase(reinterpret_cast<void*>(new T(object)), // copy the object
                  NULL,                                   // uses operator() instead of member function
-                 reinterpret_cast<CallbackBase::Dispatcher>(&FunctorDispatcher3<T, P1, P2, P3>::Dispatch),
+                 reinterpret_cast<CallbackBase::Dispatcher>(reinterpret_cast<void (*)()>(&FunctorDispatcher3<T, P1, P2, P3>::Dispatch)),
                  reinterpret_cast<CallbackBase::Destructor>(&Destroyer<T>::Delete))
   {
   }
@@ -1133,8 +1173,8 @@ public:
    */
   CallbackFunctorDelegate3(FunctorDelegate* object)
   : CallbackBase(reinterpret_cast<void*>(object), // transfer ownership
-                 reinterpret_cast<CallbackBase::MemberFunction>(&FunctorDelegate::Execute),
-                 reinterpret_cast<CallbackBase::Dispatcher>(&VoidFunctorDispatcher3<FunctorDelegate, P1, P2, P3>::Dispatch),
+                 Internal::CallbackUtils::MemberFunctionCast<CallbackBase::MemberFunction>(&FunctorDelegate::Execute),
+                 reinterpret_cast<CallbackBase::Dispatcher>(reinterpret_cast<void (*)()>(&VoidFunctorDispatcher3<FunctorDelegate, P1, P2, P3>::Dispatch)),
                  reinterpret_cast<CallbackBase::Destructor>(&Destroyer<FunctorDelegate>::Delete))
   {
   }
@@ -1157,7 +1197,7 @@ public:
   CallbackFunctorReturn0(const T& object)
   : CallbackBase(reinterpret_cast<void*>(new T(object)), // copy the object
                  NULL,                                   // uses operator() instead of member function
-                 reinterpret_cast<CallbackBase::Dispatcher>(&FunctorDispatcherReturn0<T, R>::Dispatch),
+                 reinterpret_cast<CallbackBase::Dispatcher>(reinterpret_cast<void (*)()>(&FunctorDispatcherReturn0<T, R>::Dispatch)),
                  reinterpret_cast<CallbackBase::Destructor>(&Destroyer<T>::Delete))
   {
   }
@@ -1180,8 +1220,8 @@ public:
    */
   CallbackFunctorDelegateReturn0(FunctorDelegate* object)
   : CallbackBase(reinterpret_cast<void*>(object), // transfer ownership
-                 reinterpret_cast<CallbackBase::MemberFunction>(&FunctorDelegate::Execute),
-                 reinterpret_cast<CallbackBase::Dispatcher>(&VoidFunctorDispatcherReturn0<FunctorDelegate, R>::Dispatch),
+                 Internal::CallbackUtils::MemberFunctionCast<CallbackBase::MemberFunction>(&FunctorDelegate::Execute),
+                 reinterpret_cast<CallbackBase::Dispatcher>(reinterpret_cast<void (*)()>(&VoidFunctorDispatcherReturn0<FunctorDelegate, R>::Dispatch)),
                  reinterpret_cast<CallbackBase::Destructor>(&Destroyer<FunctorDelegate>::Delete))
   {
   }
@@ -1204,7 +1244,7 @@ public:
   CallbackFunctorReturn1(const T& object)
   : CallbackBase(reinterpret_cast<void*>(new T(object)), // copy the object
                  NULL,                                   // uses operator() instead of member function
-                 reinterpret_cast<CallbackBase::Dispatcher>(&FunctorDispatcherReturn1<T, R, P1>::Dispatch),
+                 reinterpret_cast<CallbackBase::Dispatcher>(reinterpret_cast<void (*)()>(&FunctorDispatcherReturn1<T, R, P1>::Dispatch)),
                  reinterpret_cast<CallbackBase::Destructor>(&Destroyer<T>::Delete))
   {
   }
@@ -1227,8 +1267,8 @@ public:
    */
   CallbackFunctorDelegateReturn1(FunctorDelegate* object)
   : CallbackBase(reinterpret_cast<void*>(object), // transfer ownership
-                 reinterpret_cast<CallbackBase::MemberFunction>(&FunctorDelegate::Execute),
-                 reinterpret_cast<CallbackBase::Dispatcher>(&VoidFunctorDispatcherReturn1<FunctorDelegate, R, P1>::Dispatch),
+                 Internal::CallbackUtils::MemberFunctionCast<CallbackBase::MemberFunction>(&FunctorDelegate::Execute),
+                 reinterpret_cast<CallbackBase::Dispatcher>(reinterpret_cast<void (*)()>(&VoidFunctorDispatcherReturn1<FunctorDelegate, R, P1>::Dispatch)),
                  reinterpret_cast<CallbackBase::Destructor>(&Destroyer<FunctorDelegate>::Delete))
   {
   }
@@ -1251,7 +1291,7 @@ public:
   CallbackFunctorReturn2(const T& object)
   : CallbackBase(reinterpret_cast<void*>(new T(object)), // copy the object
                  NULL,                                   // uses operator() instead of member function
-                 reinterpret_cast<CallbackBase::Dispatcher>(&FunctorDispatcherReturn2<T, R, P1, P2>::Dispatch),
+                 reinterpret_cast<CallbackBase::Dispatcher>(reinterpret_cast<void (*)()>(&FunctorDispatcherReturn2<T, R, P1, P2>::Dispatch)),
                  reinterpret_cast<CallbackBase::Destructor>(&Destroyer<T>::Delete))
   {
   }
@@ -1274,8 +1314,8 @@ public:
    */
   CallbackFunctorDelegateReturn2(FunctorDelegate* object)
   : CallbackBase(reinterpret_cast<void*>(object), // transfer ownership
-                 reinterpret_cast<CallbackBase::MemberFunction>(&FunctorDelegate::Execute),
-                 reinterpret_cast<CallbackBase::Dispatcher>(&VoidFunctorDispatcherReturn2<FunctorDelegate, R, P1, P2>::Dispatch),
+                 Internal::CallbackUtils::MemberFunctionCast<CallbackBase::MemberFunction>(&FunctorDelegate::Execute),
+                 reinterpret_cast<CallbackBase::Dispatcher>(reinterpret_cast<void (*)()>(&VoidFunctorDispatcherReturn2<FunctorDelegate, R, P1, P2>::Dispatch)),
                  reinterpret_cast<CallbackBase::Destructor>(&Destroyer<FunctorDelegate>::Delete))
   {
   }
@@ -1298,7 +1338,7 @@ public:
   CallbackFunctorReturn3(const T& object)
   : CallbackBase(reinterpret_cast<void*>(new T(object)), // copy the object
                  NULL,                                   // uses operator() instead of member function
-                 reinterpret_cast<CallbackBase::Dispatcher>(&FunctorDispatcherReturn3<T, R, P1, P2, P3>::Dispatch),
+                 reinterpret_cast<CallbackBase::Dispatcher>(reinterpret_cast<void (*)()>(&FunctorDispatcherReturn3<T, R, P1, P2, P3>::Dispatch)),
                  reinterpret_cast<CallbackBase::Destructor>(&Destroyer<T>::Delete))
   {
   }
@@ -1321,8 +1361,8 @@ public:
    */
   CallbackFunctorDelegateReturn3(FunctorDelegate* object)
   : CallbackBase(reinterpret_cast<void*>(object), // transfer ownership
-                 reinterpret_cast<CallbackBase::MemberFunction>(&FunctorDelegate::Execute),
-                 reinterpret_cast<CallbackBase::Dispatcher>(&VoidFunctorDispatcherReturn3<FunctorDelegate, R, P1, P2, P3>::Dispatch),
+                 Internal::CallbackUtils::MemberFunctionCast<CallbackBase::MemberFunction>(&FunctorDelegate::Execute),
+                 reinterpret_cast<CallbackBase::Dispatcher>(reinterpret_cast<void (*)()>(&VoidFunctorDispatcherReturn3<FunctorDelegate, R, P1, P2, P3>::Dispatch)),
                  reinterpret_cast<CallbackBase::Destructor>(&Destroyer<FunctorDelegate>::Delete))
   {
   }

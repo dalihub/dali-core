@@ -644,8 +644,7 @@ uint32_t Camera::UpdateViewMatrix()
           mReflectionEye     = position;
           mUseReflectionClip = true;
 
-          Matrix& viewMatrix = mViewMatrix.Get();
-          Matrix  oldViewMatrix(viewMatrix);
+          Matrix oldViewMatrix(viewMatrix);
           MatrixUtils::MultiplyTransformMatrix(viewMatrix, oldViewMatrix, mReflectionMtx);
         }
 

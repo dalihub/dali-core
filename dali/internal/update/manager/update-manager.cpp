@@ -184,8 +184,8 @@ struct UpdateManager::Impl
   // SceneInfo keeps the root node of the Scene, its scene graph render task list, and the list of Layer pointers sorted by depth
   struct SceneInfo
   {
-    SceneInfo(Layer* root) ///< Constructor
-    : root(root)
+    SceneInfo(Layer* initRoot) ///< Constructor
+    : root(initRoot)
     {
     }
 
@@ -201,27 +201,27 @@ struct UpdateManager::Impl
     OwnerPointer<Scene>          scene;           ///< Scene graph object of the scene
   };
 
-  Impl(NotificationManager&           notificationManager,
-       CompleteNotificationInterface& animationPlaylist,
-       PropertyNotifier&              propertyNotifier,
-       RenderController&              renderController,
-       RenderManager&                 renderManager,
-       RenderTaskProcessor&           renderTaskProcessor)
-  : renderManagerDispatcher(renderManager),
-    notificationManager(notificationManager),
+  Impl(NotificationManager&           initNotificationManager,
+       CompleteNotificationInterface& initAnimationPlaylist,
+       PropertyNotifier&              initPropertyNotifier,
+       RenderController&              initRenderController,
+       RenderManager&                 initRenderManager,
+       RenderTaskProcessor&           initRenderTaskProcessor)
+  : renderManagerDispatcher(initRenderManager),
+    notificationManager(initNotificationManager),
     transformManager(),
-    animationPlaylist(animationPlaylist),
-    propertyNotifier(propertyNotifier),
-    renderController(renderController),
-    renderManager(renderManager),
-    renderTaskProcessor(renderTaskProcessor),
+    animationPlaylist(initAnimationPlaylist),
+    propertyNotifier(initPropertyNotifier),
+    renderController(initRenderController),
+    renderManager(initRenderManager),
+    renderTaskProcessor(initRenderTaskProcessor),
     backgroundColor(Dali::DEFAULT_BACKGROUND_COLOR),
     renderers(),
     textureSets(),
     shaders(),
     uniformBlocks(),
     panGestureProcessor(nullptr),
-    messageQueue(renderController),
+    messageQueue(initRenderController),
     frameCallbackProcessor(nullptr),
     nodeDirtyFlags(NodePropertyFlags::TRANSFORM), // set to TransformFlag to ensure full update the first time through Update()
     frameCounter(0),

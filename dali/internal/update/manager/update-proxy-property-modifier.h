@@ -171,9 +171,9 @@ public:
     SceneGraph::Node*         node;
     SceneGraph::PropertyBase* propertyBase;
 
-    constexpr NodePropertyPair(SceneGraph::Node* node, SceneGraph::PropertyBase* propertyBase)
-    : node(node),
-      propertyBase(propertyBase)
+    constexpr NodePropertyPair(SceneGraph::Node* initNode, SceneGraph::PropertyBase* initPropertyBase)
+    : node(initNode),
+      propertyBase(initPropertyBase)
     {
     }
 

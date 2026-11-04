@@ -22,8 +22,8 @@ namespace DALI_NAMESPACE
 {
 namespace Internal
 {
-PanGestureEvent::PanGestureEvent(GestureState state)
-: GestureEvent(GestureType::PAN, state),
+PanGestureEvent::PanGestureEvent(GestureState initState)
+: GestureEvent(GestureType::PAN, initState),
   timeDelta(0),
   numberOfTouches(1)
 {

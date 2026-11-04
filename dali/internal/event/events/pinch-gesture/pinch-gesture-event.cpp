@@ -25,8 +25,8 @@ namespace DALI_NAMESPACE
 {
 namespace Internal
 {
-PinchGestureEvent::PinchGestureEvent(GestureState state)
-: GestureEvent(GestureType::PINCH, state),
+PinchGestureEvent::PinchGestureEvent(GestureState initState)
+: GestureEvent(GestureType::PINCH, initState),
   scale(0.0f),
   speed(0.0f),
   centerPoint()

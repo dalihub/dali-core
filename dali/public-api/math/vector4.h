@@ -67,16 +67,16 @@ struct DALI_CORE_API Vector4
    * @brief Conversion constructor from four floats.
    *
    * @SINCE_1_0.0
-   * @param[in] x x (or r/s) component
-   * @param[in] y y (or g/t) component
-   * @param[in] z z (or b/p) component
-   * @param[in] w w (or a/q) component
+   * @param[in] initX x (or r/s) component
+   * @param[in] initY y (or g/t) component
+   * @param[in] initZ z (or b/p) component
+   * @param[in] initW w (or a/q) component
    */
-  explicit constexpr Vector4(float x, float y, float z, float w)
-  : x(x),
-    y(y),
-    z(z),
-    w(w)
+  explicit constexpr Vector4(float initX, float initY, float initZ, float initW)
+  : x(initX),
+    y(initY),
+    z(initZ),
+    w(initW)
   {
   }
 
@@ -115,9 +115,9 @@ struct DALI_CORE_API Vector4
    *
    * @SINCE_2_4.19
    * @param[in] vec3 Vector3 to copy from
-   * @param[in] w w (or a/q) component
+   * @param[in] initW w (or a/q) component
    */
-  explicit Vector4(const Vector3& vec3, float w);
+  explicit Vector4(const Vector3& vec3, float initW);
 
   // Constants
   static const Vector4 ONE;   ///< (1.0f,1.0f,1.0f,1.0f)

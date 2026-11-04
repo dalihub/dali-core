@@ -107,15 +107,15 @@ public:
    */
   struct StencilParameters
   {
-    StencilParameters(RenderMode::Type renderMode, StencilFunction::Type stencilFunction, int stencilFunctionMask, int stencilFunctionReference, int stencilMask, StencilOperation::Type stencilOperationOnFail, StencilOperation::Type stencilOperationOnZFail, StencilOperation::Type stencilOperationOnZPass)
-    : stencilFunctionMask(stencilFunctionMask),
-      stencilFunctionReference(stencilFunctionReference),
-      stencilMask(stencilMask),
-      renderMode(renderMode),
-      stencilFunction(stencilFunction),
-      stencilOperationOnFail(stencilOperationOnFail),
-      stencilOperationOnZFail(stencilOperationOnZFail),
-      stencilOperationOnZPass(stencilOperationOnZPass)
+    StencilParameters(RenderMode::Type initRenderMode, StencilFunction::Type initStencilFunction, int initStencilFunctionMask, int initStencilFunctionReference, int initStencilMask, StencilOperation::Type initStencilOperationOnFail, StencilOperation::Type initStencilOperationOnZFail, StencilOperation::Type initStencilOperationOnZPass)
+    : stencilFunctionMask(initStencilFunctionMask),
+      stencilFunctionReference(initStencilFunctionReference),
+      stencilMask(initStencilMask),
+      renderMode(initRenderMode),
+      stencilFunction(initStencilFunction),
+      stencilOperationOnFail(initStencilOperationOnFail),
+      stencilOperationOnZFail(initStencilOperationOnZFail),
+      stencilOperationOnZPass(initStencilOperationOnZPass)
     {
     }
 

@@ -56,8 +56,8 @@ struct KeyFrameChannel
     {
       // Find lowest element s.t. progress is greater than progress.
       // So start->GetProgress() <= progress < end->GetProgress() is satisfied.
-      auto end   = std::lower_bound(mValues.begin(), mValues.end(), progress, [](const auto& element, const float& progress)
-        { return element.GetProgress() <= progress; });
+      auto end   = std::lower_bound(mValues.begin(), mValues.end(), progress, [](const auto& element, const float& targetProgress)
+        { return element.GetProgress() <= targetProgress; });
       auto start = end - 1;
 
       const bool validInterval = (end != mValues.end()) && (start->GetProgress() <= progress);
