@@ -23,6 +23,7 @@
 #include <dali/internal/render/common/render-target-graphics-objects.h>
 #include <dali/internal/render/renderers/render-sampler.h>
 #include <dali/internal/render/renderers/render-texture-key.h>
+#include <dali/public-api/images/pixel-buffer.h>
 
 #include <unordered_map>
 
@@ -126,28 +127,38 @@ public:
   void ClearRenderResult();
 
   /**
-   * @brief Retrieves the rendered result as PixelData.
-   * @return Dali::PixelData that contains rendered result.
+   * @brief Retrieves a copy of the rendered result as PixelData.
+   * @return Dali::PixelData that contains a copy of the rendered result.
    * If the frame is not yet rendered, empty handle is returned.
+   * @note Kept for the deprecated Dali::RenderTask::GetRenderResult(); remove together.
    */
   Dali::PixelData GetRenderResult();
 
   /**
-   * @brief Retrieves whether keeping render result is requested or not.
-   * @return True if keeping render result is requested.
+   * @brief Retrieves the rendered result as a PixelBuffer, sharing ownership with this object.
+   * @return Dali::PixelBuffer that contains the rendered result.
+   * If the frame is not yet rendered, empty handle is returned.
    */
-  bool IsKeepingRenderResultRequested() const;
+  Dali::PixelBuffer GetRenderResultBuffer();
 
   /**
-   * @brief Retrieves buffer pointer that the render result is stored.
-   * @return Buffer pointer of the render result buffer.
+   * @brief Retrieves whether a render result is requested and not served yet.
+   * The request is served by StoreRenderResult() or cancelled by ClearRenderResult().
+   * @return True if a render result is requested.
    */
-  uint8_t* GetRenderResultBuffer();
+  bool IsRenderResultRequested() const;
 
   /**
-   * @brief Notifies the drawing call of the frame is finished.
+   * @brief Allocates the buffer that the render result is read back into.
+   * @return Buffer pointer of the render result buffer, or nullptr if the allocation fails.
    */
-  void SetRenderResultDrawn();
+  uint8_t* AllocateRenderResultBuffer();
+
+  /**
+   * @brief Stores the pixels read back by the finished frame as the render result,
+   * which serves the request. Called when the drawing of the frame is finished.
+   */
+  void StoreRenderResult();
 
   /**
    * @brief Checks whether the buffer usage can be changed at runtime.
@@ -229,10 +240,10 @@ private:
   Render::TextureKey              mDepthTexture;
   Render::TextureKey              mDepthStencilTexture;
 
-  bool            mIsKeepingRenderResultRequested{false};
-  uint8_t*        mRenderResult;
-  Dali::PixelData mRenderedPixelData;
-  Dali::Mutex     mPixelDataMutex;
+  bool              mIsRenderResultRequested{false};
+  uint8_t*          mRenderResult;
+  Dali::PixelBuffer mRenderedPixelBuffer;
+  Dali::Mutex       mRenderResultMutex;
 
   uint32_t mWidth;
   uint32_t mHeight;

@@ -76,7 +76,7 @@ ConstraintBase::ConstraintBase(Object& object, Property::Index targetPropertyInd
   mSources(sources),
   mObservedObjects(),
   mTargetPropertyIndex(targetPropertyIndex),
-  mRemoveAction(Dali::Constraint::DEFAULT_REMOVE_ACTION),
+  mRemoveAction(Dali::Constraint::BAKE),
   mApplyRate(Dali::Constraint::APPLY_ALWAYS),
   mTag(0),
   mApplied(false),

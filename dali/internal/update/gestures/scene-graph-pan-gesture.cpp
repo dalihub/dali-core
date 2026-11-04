@@ -1152,8 +1152,6 @@ bool PanGesture::NewAlgorithm(unsigned int lastVSyncTime, unsigned int nextVSync
       #### Get second interpolated point, and blend the resultant velocity and acceleration (optional)
       #########################################################################################*/
 
-    PanInfo         outPoint;
-    RelativeVectors interpolatedAcceleration;
     if(mTwoPointPredictionEnabled)
     {
       // Get second interpolated point with target time = current time - past interpolate time.

@@ -20,6 +20,7 @@
 // INTERNAL INCLUDES
 #include <dali/graphics-api/graphics-types.h>
 #include <dali/integration-api/debug.h>
+#include <dali/internal/event/images/pixel-buffer-impl.h>
 #include <dali/internal/render/common/render-manager.h> ///< TODO : Could we remove it?
 #include <dali/internal/render/renderers/render-texture.h>
 
@@ -128,50 +129,54 @@ void FrameBuffer::SetMultiSamplingLevel(uint8_t multiSamplingLevel)
 
 void FrameBuffer::KeepRenderResult()
 {
-  mIsKeepingRenderResultRequested = true;
+  mIsRenderResultRequested = true;
 }
 
 void FrameBuffer::ClearRenderResult()
 {
-  if(mIsKeepingRenderResultRequested)
+  if(mIsRenderResultRequested)
   {
-    mIsKeepingRenderResultRequested = false;
-    delete[] mRenderResult;
+    mIsRenderResultRequested = false;
+    free(mRenderResult);
+    mRenderResult = nullptr;
   }
 
-  Dali::Mutex::ScopedLock lock(mPixelDataMutex);
-  if(mRenderedPixelData)
+  Dali::Mutex::ScopedLock lock(mRenderResultMutex);
+  if(mRenderedPixelBuffer)
   {
-    mRenderedPixelData.Reset();
+    mRenderedPixelBuffer.Reset();
   }
 }
 
-bool FrameBuffer::IsKeepingRenderResultRequested() const
+bool FrameBuffer::IsRenderResultRequested() const
 {
-  return mIsKeepingRenderResultRequested;
+  return mIsRenderResultRequested;
 }
 
-uint8_t* FrameBuffer::GetRenderResultBuffer()
+uint8_t* FrameBuffer::AllocateRenderResultBuffer()
 {
   uint8_t* buffer = nullptr;
-  if(mIsKeepingRenderResultRequested)
+  if(mIsRenderResultRequested)
   {
-    if(mRenderResult)
+    free(mRenderResult);
+    const uint32_t bufferSize = mWidth * mHeight * Dali::Pixel::GetBytesPerPixel(Pixel::Format::RGBA8888);
+    mRenderResult             = static_cast<uint8_t*>(malloc(bufferSize));
+    if(DALI_UNLIKELY(!mRenderResult))
     {
-      delete[] mRenderResult;
+      DALI_LOG_ERROR("malloc is failed. request malloc size : %u\n", bufferSize);
     }
-    mRenderResult = new uint8_t[mWidth * mHeight * Dali::Pixel::GetBytesPerPixel(Pixel::Format::RGBA8888)];
-    buffer        = mRenderResult;
+    buffer = mRenderResult;
   }
   return buffer;
 }
 
-void FrameBuffer::SetRenderResultDrawn()
+void FrameBuffer::StoreRenderResult()
 {
-  Dali::Mutex::ScopedLock lock(mPixelDataMutex);
-  mRenderedPixelData              = Dali::PixelData::New(mRenderResult, mWidth * mHeight * Dali::Pixel::GetBytesPerPixel(Pixel::Format::RGBA8888), mWidth, mHeight, Pixel::Format::RGBA8888, Dali::PixelData::DELETE_ARRAY);
-  mRenderResult                   = nullptr;
-  mIsKeepingRenderResultRequested = false;
+  Dali::Mutex::ScopedLock  lock(mRenderResultMutex);
+  Internal::PixelBufferPtr pixelBuffer = Internal::PixelBuffer::New(mRenderResult, mWidth * mHeight * Dali::Pixel::GetBytesPerPixel(Pixel::Format::RGBA8888), mWidth, mHeight, 0u, Pixel::Format::RGBA8888);
+  mRenderedPixelBuffer                 = Dali::PixelBuffer(pixelBuffer.Get());
+  mRenderResult                        = nullptr;
+  mIsRenderResultRequested             = false;
 }
 
 void FrameBuffer::UpdateAttachedTextures(SceneGraph::RenderManager& renderManager)
@@ -197,13 +202,25 @@ void FrameBuffer::UpdateAttachedTextures(SceneGraph::RenderManager& renderManage
 // Called from Main thread.
 Dali::PixelData FrameBuffer::GetRenderResult()
 {
-  Dali::Mutex::ScopedLock lock(mPixelDataMutex);
+  Dali::Mutex::ScopedLock lock(mRenderResultMutex);
   Dali::PixelData         pixelData;
-  if(!mIsKeepingRenderResultRequested && mRenderedPixelData)
+  if(!mIsRenderResultRequested && mRenderedPixelBuffer)
   {
-    pixelData = mRenderedPixelData;
+    pixelData = GetImplementation(mRenderedPixelBuffer).CreatePixelData();
   }
   return pixelData;
+}
+
+// Called from Main thread.
+Dali::PixelBuffer FrameBuffer::GetRenderResultBuffer()
+{
+  Dali::Mutex::ScopedLock lock(mRenderResultMutex);
+  Dali::PixelBuffer       pixelBuffer;
+  if(!mIsRenderResultRequested && mRenderedPixelBuffer)
+  {
+    pixelBuffer = mRenderedPixelBuffer;
+  }
+  return pixelBuffer;
 }
 
 bool FrameBuffer::CreateGraphicsObjects()

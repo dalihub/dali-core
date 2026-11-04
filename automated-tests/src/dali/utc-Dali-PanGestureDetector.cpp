@@ -241,6 +241,26 @@ Dali::Integration::TouchEvent GenerateSingleTouch(PointState::Type state, const 
   touchEvent.time = time;
   return touchEvent;
 }
+
+Actor AddGeometryPanActor(TestApplication& application, const Vector2& position = Vector2::ZERO)
+{
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
+  actor.SetProperty(Actor::Property::POSITION, Vector3(position.x, position.y, 0.0f));
+  application.GetScene().Add(actor);
+  return actor;
+}
+
+void FeedGeometryPanTouch(TestApplication& application, GestureDetector& detector, Actor actor, PointState::Type state, const Vector2& position, uint32_t time)
+{
+  Integration::TouchEvent touch = GenerateSingleTouch(state, position, time);
+  Internal::TouchEventPtr event(new Internal::TouchEvent(time));
+  event->AddPoint(touch.GetPoint(0));
+  event->SetRenderTask(application.GetScene().GetRenderTaskList().GetTask(0));
+  TouchEvent handle(event.Get());
+  detector.HandleEvent(actor, handle);
+}
 } // namespace
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -4293,5 +4313,332 @@ int UtcDaliPanGestureDetectorDeviceOptionsFinishAboveMaximumTouches(void)
 {
   CheckPanDeviceTouchRange(false, false);
   CheckPanDeviceTouchRange(false, true);
+  END_TEST;
+}
+
+int UtcDaliPanGestureGeometryDetachReuse(void)
+{
+  TestApplication application(1920, 1080);
+  application.GetScene().SetGeometryHittestEnabled(true);
+  Integration::SetPanGestureMinimumDistance(15);
+  Integration::SetPanGestureMinimumPanEvents(3);
+  PanGestureDetector detector = PanGestureDetector::New();
+  detector.SetMaximumMotionEventAge(std::numeric_limits<uint32_t>::max());
+  std::vector<PanGesture> gestures;
+  detector.DetectedSignal().Connect(&application, [&](Actor, const PanGesture& pan)
+  {
+    gestures.push_back(pan);
+  });
+
+  Actor previous = AddGeometryPanActor(application);
+  previous.SetProperty(Actor::Property::SIZE, Vector2(1920.0f, 1080.0f));
+  previous.TouchEventSignal().Connect(&application, [&](Actor, const TouchEvent& touch)
+  {
+    if(touch.GetState(0) == PointState::UP)
+    {
+      detector.DetachAll();
+    }
+    return false;
+  });
+  detector.Attach(previous);
+  application.SendNotification();
+  application.Render();
+
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(1601.0f, 358.0f), 100));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(1600.0f, 358.0f), 108));
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(1600.0f, 358.0f), 164));
+  DALI_TEST_CHECK(gestures.empty());
+  previous.Unparent();
+
+  Actor actor = AddGeometryPanActor(application);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(1920.0f, 1080.0f));
+  actor.TouchEventSignal().Connect(&application, [](Actor, const TouchEvent&)
+  {
+    return false;
+  });
+  application.SendNotification();
+  application.Render();
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(1719.0f, 375.0f), 26286));
+  detector.Attach(actor);
+
+  for(uint32_t i = 0; i < 30; ++i)
+  {
+    application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(1718.0f - i, 375.0f), 26991 + i * 8));
+    if(i < 15)
+    {
+      DALI_TEST_CHECK(gestures.empty());
+    }
+  }
+  DALI_TEST_CHECK(!gestures.empty());
+  DALI_TEST_EQUALS(gestures.front().GetState(), GestureState::STARTED, TEST_LOCATION);
+  for(const PanGesture& pan : gestures)
+  {
+    DALI_TEST_CHECK(pan.GetScreenDisplacement().x < 0.0f);
+    DALI_TEST_EQUALS(pan.GetScreenPosition().y, 375.0f, 0.01f, TEST_LOCATION);
+  }
+  END_TEST;
+}
+
+int UtcDaliPanGestureGeometryDetachSilent(void)
+{
+  TestApplication application;
+  application.GetScene().SetGeometryHittestEnabled(true);
+  Actor actor = AddGeometryPanActor(application);
+  application.SendNotification();
+  application.Render();
+
+  for(uint32_t stage = 0; stage < 3; ++stage)
+  {
+    PanGestureDetector detector = PanGestureDetector::New();
+    detector.SetMaximumMotionEventAge(std::numeric_limits<uint32_t>::max());
+    std::vector<PanGesture> gestures;
+    detector.DetectedSignal().Connect(&application, [&](Actor, const PanGesture& pan)
+    {
+      gestures.push_back(pan);
+    });
+    detector.Attach(actor);
+    FeedGeometryPanTouch(application, detector, actor, PointState::DOWN, Vector2(20.0f, 20.0f), 100);
+    FeedGeometryPanTouch(application, detector, actor, PointState::MOTION, Vector2(40.0f, 20.0f), 108);
+    if(stage > 0)
+    {
+      FeedGeometryPanTouch(application, detector, actor, PointState::MOTION, Vector2(60.0f, 20.0f), 116);
+    }
+    if(stage > 1)
+    {
+      FeedGeometryPanTouch(application, detector, actor, PointState::MOTION, Vector2(70.0f, 20.0f), 124);
+    }
+    DALI_TEST_EQUALS(gestures.size(), stage, TEST_LOCATION);
+    detector.Detach(actor);
+    detector.DetachAll();
+    DALI_TEST_EQUALS(gestures.size(), stage, TEST_LOCATION);
+
+    detector.Attach(actor);
+    FeedGeometryPanTouch(application, detector, actor, PointState::MOTION, Vector2(80.0f, 20.0f), 1000);
+    DALI_TEST_EQUALS(gestures.size(), stage, TEST_LOCATION);
+    FeedGeometryPanTouch(application, detector, actor, PointState::MOTION, Vector2(60.0f, 20.0f), 1008);
+    FeedGeometryPanTouch(application, detector, actor, PointState::MOTION, Vector2(40.0f, 20.0f), 1016);
+    DALI_TEST_EQUALS(gestures.size(), stage + 1, TEST_LOCATION);
+    DALI_TEST_EQUALS(gestures.back().GetState(), GestureState::STARTED, TEST_LOCATION);
+    DALI_TEST_CHECK(gestures.back().GetScreenDisplacement().x < 0.0f);
+    detector.DetachAll();
+    DALI_TEST_EQUALS(gestures.size(), stage + 1, TEST_LOCATION);
+  }
+  END_TEST;
+}
+
+int UtcDaliPanGestureDetachPreservesHandleEventWithoutGeometryHittest(void)
+{
+  TestApplication application;
+  application.GetScene().SetGeometryHittestEnabled(false);
+  Actor actor = AddGeometryPanActor(application);
+  application.SendNotification();
+  application.Render();
+
+  PanGestureDetector detector = PanGestureDetector::New();
+  detector.SetMaximumMotionEventAge(std::numeric_limits<uint32_t>::max());
+  detector.Attach(actor);
+  std::vector<PanGesture> gestures;
+  detector.DetectedSignal().Connect(&application, [&](Actor, const PanGesture& pan)
+  {
+    gestures.push_back(pan);
+  });
+
+  // Explicit HandleEvent streams retain their existing behavior outside Geometry mode.
+  FeedGeometryPanTouch(application, detector, actor, PointState::DOWN, Vector2(20.0f, 20.0f), 100);
+  FeedGeometryPanTouch(application, detector, actor, PointState::MOTION, Vector2(40.0f, 20.0f), 108);
+  FeedGeometryPanTouch(application, detector, actor, PointState::MOTION, Vector2(60.0f, 20.0f), 116);
+  DALI_TEST_EQUALS(gestures.size(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(gestures.back().GetState(), GestureState::STARTED, TEST_LOCATION);
+
+  detector.DetachAll();
+  detector.Attach(actor);
+  FeedGeometryPanTouch(application, detector, actor, PointState::MOTION, Vector2(70.0f, 20.0f), 124);
+  DALI_TEST_EQUALS(gestures.size(), 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(gestures.back().GetState(), GestureState::CONTINUING, TEST_LOCATION);
+  FeedGeometryPanTouch(application, detector, actor, PointState::UP, Vector2(70.0f, 20.0f), 132);
+  DALI_TEST_EQUALS(gestures.size(), 3u, TEST_LOCATION);
+  DALI_TEST_EQUALS(gestures.back().GetState(), GestureState::FINISHED, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliPanGestureGeometryDetachOtherActor(void)
+{
+  TestApplication application;
+  application.GetScene().SetGeometryHittestEnabled(true);
+  Actor first  = AddGeometryPanActor(application);
+  Actor second = AddGeometryPanActor(application, Vector2(120.0f, 0.0f));
+  application.SendNotification();
+  application.Render();
+  PanGestureDetector detector = PanGestureDetector::New();
+  detector.SetMaximumMotionEventAge(std::numeric_limits<uint32_t>::max());
+  detector.Attach(first);
+  detector.Attach(second);
+  std::vector<PanGesture> gestures;
+  detector.DetectedSignal().Connect(&application, [&](Actor, const PanGesture& pan)
+  {
+    gestures.push_back(pan);
+  });
+  FeedGeometryPanTouch(application, detector, first, PointState::DOWN, Vector2(20.0f, 20.0f), 100);
+  FeedGeometryPanTouch(application, detector, first, PointState::MOTION, Vector2(40.0f, 20.0f), 108);
+  FeedGeometryPanTouch(application, detector, first, PointState::MOTION, Vector2(60.0f, 20.0f), 116);
+  DALI_TEST_EQUALS(gestures.size(), 1u, TEST_LOCATION);
+
+  detector.Detach(second);
+  FeedGeometryPanTouch(application, detector, first, PointState::MOTION, Vector2(70.0f, 20.0f), 124);
+  DALI_TEST_EQUALS(gestures.size(), 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(gestures.back().GetState(), GestureState::CONTINUING, TEST_LOCATION);
+  detector.Attach(second);
+  detector.Detach(first);
+  DALI_TEST_EQUALS(gestures.size(), 2u, TEST_LOCATION);
+
+  FeedGeometryPanTouch(application, detector, second, PointState::MOTION, Vector2(180.0f, 20.0f), 1000);
+  DALI_TEST_EQUALS(gestures.size(), 2u, TEST_LOCATION);
+  FeedGeometryPanTouch(application, detector, second, PointState::MOTION, Vector2(160.0f, 20.0f), 1008);
+  FeedGeometryPanTouch(application, detector, second, PointState::MOTION, Vector2(140.0f, 20.0f), 1016);
+  DALI_TEST_EQUALS(gestures.size(), 3u, TEST_LOCATION);
+  DALI_TEST_EQUALS(gestures.back().GetState(), GestureState::STARTED, TEST_LOCATION);
+  DALI_TEST_CHECK(gestures.back().GetScreenDisplacement().x < 0.0f);
+  END_TEST;
+}
+
+int UtcDaliPanGestureGeometryDetachOtherDetector(void)
+{
+  TestApplication application;
+  application.GetScene().SetGeometryHittestEnabled(true);
+  Actor              actor  = AddGeometryPanActor(application);
+  PanGestureDetector first  = PanGestureDetector::New();
+  PanGestureDetector second = PanGestureDetector::New();
+  first.SetMaximumMotionEventAge(std::numeric_limits<uint32_t>::max());
+  second.SetMaximumMotionEventAge(std::numeric_limits<uint32_t>::max());
+  first.Attach(actor);
+  second.Attach(actor);
+  std::vector<PanGesture> firstGestures;
+  std::vector<PanGesture> secondGestures;
+  first.DetectedSignal().Connect(&application, [&](Actor, const PanGesture& pan)
+  {
+    firstGestures.push_back(pan);
+  });
+  second.DetectedSignal().Connect(&application, [&](Actor, const PanGesture& pan)
+  {
+    secondGestures.push_back(pan);
+  });
+  application.SendNotification();
+  application.Render();
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), 100));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(40.0f, 20.0f), 108));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(60.0f, 20.0f), 116));
+  DALI_TEST_EQUALS(firstGestures.size(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(secondGestures.size(), 1u, TEST_LOCATION);
+
+  first.DetachAll();
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(70.0f, 20.0f), 124));
+  DALI_TEST_EQUALS(firstGestures.size(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(secondGestures.size(), 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(secondGestures.back().GetState(), GestureState::CONTINUING, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliPanGestureGeometryDetachDuringFinished(void)
+{
+  TestApplication application;
+  application.GetScene().SetGeometryHittestEnabled(true);
+  Actor              actor    = AddGeometryPanActor(application);
+  PanGestureDetector detector = PanGestureDetector::New();
+  detector.SetMaximumMotionEventAge(std::numeric_limits<uint32_t>::max());
+  detector.Attach(actor);
+  application.SendNotification();
+  application.Render();
+  bool                    restarted = false;
+  std::vector<PanGesture> gestures;
+  detector.DetectedSignal().Connect(&application, [&](Actor, const PanGesture& pan)
+  {
+    gestures.push_back(pan);
+    if(pan.GetState() == GestureState::FINISHED && !restarted)
+    {
+      restarted = true;
+      detector.DetachAll();
+      detector.Attach(actor);
+      FeedGeometryPanTouch(application, detector, actor, PointState::DOWN, Vector2(80.0f, 20.0f), 1000);
+    }
+  });
+  FeedGeometryPanTouch(application, detector, actor, PointState::DOWN, Vector2(20.0f, 20.0f), 100);
+  FeedGeometryPanTouch(application, detector, actor, PointState::MOTION, Vector2(40.0f, 20.0f), 108);
+  FeedGeometryPanTouch(application, detector, actor, PointState::MOTION, Vector2(60.0f, 20.0f), 116);
+  FeedGeometryPanTouch(application, detector, actor, PointState::UP, Vector2(60.0f, 20.0f), 124);
+  DALI_TEST_EQUALS(gestures.size(), 2u, TEST_LOCATION);
+  FeedGeometryPanTouch(application, detector, actor, PointState::MOTION, Vector2(60.0f, 20.0f), 1008);
+  FeedGeometryPanTouch(application, detector, actor, PointState::MOTION, Vector2(40.0f, 20.0f), 1016);
+  DALI_TEST_EQUALS(gestures.size(), 3u, TEST_LOCATION);
+  DALI_TEST_EQUALS(gestures.back().GetState(), GestureState::STARTED, TEST_LOCATION);
+  FeedGeometryPanTouch(application, detector, actor, PointState::MOTION, Vector2(30.0f, 20.0f), 1024);
+  DALI_TEST_EQUALS(gestures.size(), 4u, TEST_LOCATION);
+  DALI_TEST_EQUALS(gestures.back().GetState(), GestureState::CONTINUING, TEST_LOCATION);
+  DALI_TEST_CHECK(gestures.back().GetScreenDisplacement().x < 0.0f);
+
+  LongPressGestureDetector other = LongPressGestureDetector::New();
+  other.CancelAllOtherGestureDetectors();
+  DALI_TEST_EQUALS(gestures.size(), 5u, TEST_LOCATION);
+  DALI_TEST_EQUALS(gestures.back().GetState(), GestureState::CANCELLED, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliPanGestureGeometryDetachDuringCancel(void)
+{
+  TestApplication application;
+  application.GetScene().SetGeometryHittestEnabled(true);
+  Actor              actor    = AddGeometryPanActor(application);
+  PanGestureDetector detector = PanGestureDetector::New();
+  detector.SetMaximumMotionEventAge(std::numeric_limits<uint32_t>::max());
+  detector.Attach(actor);
+  application.SendNotification();
+  application.Render();
+  uint32_t cancelled = 0;
+  detector.DetectedSignal().Connect(&application, [&](Actor, const PanGesture& pan)
+  {
+    if(pan.GetState() == GestureState::CANCELLED)
+    {
+      ++cancelled;
+      detector.DetachAll();
+    }
+  });
+  FeedGeometryPanTouch(application, detector, actor, PointState::DOWN, Vector2(20.0f, 20.0f), 100);
+  FeedGeometryPanTouch(application, detector, actor, PointState::MOTION, Vector2(40.0f, 20.0f), 108);
+  FeedGeometryPanTouch(application, detector, actor, PointState::MOTION, Vector2(60.0f, 20.0f), 116);
+  LongPressGestureDetector other = LongPressGestureDetector::New();
+  other.CancelAllOtherGestureDetectors();
+  DALI_TEST_EQUALS(cancelled, 1u, TEST_LOCATION);
+  other.CancelAllOtherGestureDetectors();
+  DALI_TEST_EQUALS(cancelled, 1u, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliPanGestureGeometryDetachRepeated(void)
+{
+  TestApplication application;
+  application.GetScene().SetGeometryHittestEnabled(true);
+  Actor actor = AddGeometryPanActor(application);
+  application.SendNotification();
+  application.Render();
+  PanGestureDetector detector = PanGestureDetector::New();
+  detector.SetMaximumMotionEventAge(std::numeric_limits<uint32_t>::max());
+  std::vector<PanGesture> gestures;
+  detector.DetectedSignal().Connect(&application, [&](Actor, const PanGesture& pan)
+  {
+    gestures.push_back(pan);
+  });
+
+  for(uint32_t i = 0; i < 100; ++i)
+  {
+    detector.Attach(actor);
+    FeedGeometryPanTouch(application, detector, actor, PointState::MOTION, Vector2(80.0f, 20.0f), 100 + i * 100);
+    FeedGeometryPanTouch(application, detector, actor, PointState::MOTION, Vector2(60.0f, 20.0f), 108 + i * 100);
+    FeedGeometryPanTouch(application, detector, actor, PointState::MOTION, Vector2(40.0f, 20.0f), 116 + i * 100);
+    DALI_TEST_EQUALS(gestures.size(), i + 1u, TEST_LOCATION);
+    DALI_TEST_EQUALS(gestures.back().GetState(), GestureState::STARTED, TEST_LOCATION);
+    DALI_TEST_CHECK(gestures.back().GetScreenDisplacement().x < 0.0f);
+    detector.DetachAll();
+    detector.DetachAll();
+    DALI_TEST_EQUALS(gestures.size(), i + 1u, TEST_LOCATION);
+  }
   END_TEST;
 }

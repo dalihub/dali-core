@@ -24,7 +24,7 @@
 #include <dali/internal/render/renderers/render-frame-buffer.h>
 #include <dali/internal/update/common/animatable-property.h>
 #include <dali/internal/update/common/property-owner.h>
-#include <dali/public-api/math/viewport.h>
+#include <dali/public-api/math/rect.h>
 #include <dali/public-api/render-tasks/render-task.h>
 
 namespace DALI_NAMESPACE
@@ -215,7 +215,7 @@ public:
    * @param[out] viewport The viewport position and size is populated.
    * @return true if the viewport has been set
    */
-  bool QueryViewport(Viewport& viewport) const;
+  bool QueryViewport(BoundsInteger& viewport) const;
 
   /**
    * Set the value of property clearColor

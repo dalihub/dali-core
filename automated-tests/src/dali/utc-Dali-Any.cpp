@@ -406,6 +406,20 @@ int UtcDaliAnyNegativeGet(void)
     assert2 = true;
   }
 
+  const Any& constValue          = value2;
+  bool       pointerTypeMismatch = false;
+  try
+  {
+    constValue.GetPointer<unsigned int>();
+  }
+  catch(Dali::DaliException& e)
+  {
+    DALI_TEST_PRINT_ASSERT(e);
+    pointerTypeMismatch = true;
+    DALI_TEST_EQUALS(e.condition, "Any::GetPointer(). Trying to retrieve a pointer to a value of a different type than the template one.", TEST_LOCATION);
+  }
+  DALI_TEST_CHECK(pointerTypeMismatch);
+
   if(assert1 && assert2)
   {
     tet_result(TET_PASS);

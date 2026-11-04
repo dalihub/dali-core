@@ -63,7 +63,7 @@ Any& Any::operator=(const Any& any)
         // Check if two Any types have the same type. Avoids assignments of values with different types.
         if(mContainer->GetType() != any.GetType())
         {
-          AssertAlways("Any::operator=( const Any& Any ). Trying to assign two values with different types.");
+          DALI_ABORT("Any::operator=( const Any& Any ). Trying to assign two values with different types.");
         }
       }
 

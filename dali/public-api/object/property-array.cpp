@@ -66,6 +66,17 @@ public:
   mutable std::size_t mHash{NOT_HASHED};
 };
 
+namespace Internal
+{
+struct DALI_INTERNAL PropertyArrayAccess
+{
+  static const Property::Array::Impl* Read(const Property::Array& array)
+  {
+    return array.Read();
+  }
+};
+} // namespace Internal
+
 Property::Array::Array()
 : mImpl(new Impl)
 {
@@ -255,7 +266,7 @@ std::ostream& operator<<(std::ostream& stream, const Property::Array& array)
 {
   stream << "Array(" << array.Count() << ") = [";
 
-  auto impl = array.Read();
+  auto impl = Internal::PropertyArrayAccess::Read(array);
   if(impl != nullptr)
   {
     for(Property::Array::SizeType i = 0; i < array.Count(); ++i)

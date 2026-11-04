@@ -114,8 +114,6 @@ void AnimationPlaylist::OnClear(Animation& animation, bool ignoreRequired)
     mPlaylist.erase(iter);
   }
 
-  DALI_LOG_ANIMATION_INFO("OnClear(%d) Animation[%u]\n", ignoreRequired, animation.GetAnimationId());
-
   if(ignoreRequired)
   {
     mIgnoredAnimations.insert(animation.GetAnimationId());

@@ -25,6 +25,7 @@
 #include <dali/internal/event/rendering/texture-impl.h>
 #include <dali/public-api/common/dali-common.h>   // DALI_ASSERT_ALWAYS
 #include <dali/public-api/common/intrusive-ptr.h> // Dali::IntrusivePtr
+#include <dali/public-api/images/pixel-buffer.h>
 #include <dali/public-api/math/int-pair.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/rendering/frame-buffer.h>
@@ -141,11 +142,19 @@ public:
   void ClearRenderResult();
 
   /**
-   * @brief Retrieves the rendered result as PixelData.
-   * @return Dali::PixelData that contains rendered result.
+   * @brief Retrieves a copy of the rendered result as PixelData.
+   * @return Dali::PixelData that contains a copy of the rendered result.
    * If the frame is not yet rendered, empty handle is returned.
+   * @note Kept for the deprecated Dali::RenderTask::GetRenderResult(); remove together.
    */
   Dali::PixelData GetRenderResult();
+
+  /**
+   * @brief Retrieves the rendered result as a PixelBuffer, sharing ownership with the render object.
+   * @return Dali::PixelBuffer that contains the rendered result.
+   * If the frame is not yet rendered, empty handle is returned.
+   */
+  Dali::PixelBuffer GetRenderResultBuffer();
 
   /**
    * @brief Get the number of color attachments

@@ -17622,7 +17622,7 @@ int UtcDaliAnimationGetEventThreadVariablesForVariousCase(void)
 
     if(halfProgressCheck)
     {
-      tet_printf("Target : %f, 50% : %f, Final : %f\n", targetPosition.x, halfProgressPosition.x, finalPosition.x);
+      tet_printf("Target : %f, 50%% : %f, Final : %f\n", targetPosition.x, halfProgressPosition.x, finalPosition.x);
     }
     else
     {

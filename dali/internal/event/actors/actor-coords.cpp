@@ -57,7 +57,7 @@ bool GetViewportExtentsFromRenderTask(const RenderTask& renderTask, Bounds& view
   }
   else
   {
-    Viewport viewport;
+    BoundsInteger viewport;
     renderTask.GetViewport(viewport);
     viewportExtent.x      = static_cast<float>(viewport.x);
     viewportExtent.y      = static_cast<float>(viewport.y);
@@ -230,15 +230,15 @@ Vector2 CalculateActorTopLeftScreenPosition(const SceneSizeType& sceneSize, cons
 } // namespace
 
 bool ConvertScreenToLocal(
-  const Matrix&   viewMatrix,
-  const Matrix&   projectionMatrix,
-  const Matrix&   worldMatrix,
-  const Vector3&  currentSize,
-  const Viewport& viewport,
-  float&          localX,
-  float&          localY,
-  float           screenX,
-  float           screenY)
+  const Matrix&        viewMatrix,
+  const Matrix&        projectionMatrix,
+  const Matrix&        worldMatrix,
+  const Vector3&       currentSize,
+  const BoundsInteger& viewport,
+  float&               localX,
+  float&               localY,
+  float                screenX,
+  float                screenY)
 {
   // Get the ModelView matrix
   Matrix modelView;
@@ -296,7 +296,7 @@ bool ConvertScreenToLocalRenderTask(
   CameraActor* camera  = renderTask.GetCameraActor();
   if(camera)
   {
-    Viewport viewport;
+    BoundsInteger viewport;
     renderTask.GetViewport(viewport);
 
     // need to translate coordinates to render tasks coordinate space

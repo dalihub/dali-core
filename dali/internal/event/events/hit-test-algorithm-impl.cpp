@@ -133,8 +133,10 @@ struct ActorTouchableCheck : public HitTestInterface
 {
   bool IsActorHittable(Actor* actor) override
   {
-    return (actor->GetTouchRequired() || actor->GetInterceptTouchRequired() || actor->IsFocusOnTouchEnabled()) && // Does the Application or derived actor type require a touch event or a intercept touch event? or focusable by touch?
-           actor->IsHittable();                                                                                   // Is actor sensitive, visible and on the scene?
+    const bool boundaryRequired = GetPropagationType() == Integration::Scene::TouchPropagationType::GEOMETRY &&
+                                  actor->IsTouchPropagationBlocked();
+    return (actor->GetTouchRequired() || actor->GetInterceptTouchRequired() || actor->IsFocusOnTouchEnabled() || boundaryRequired) &&
+           actor->IsHittable();
   }
 
   bool DescendActorHierarchy(Actor* actor) override
@@ -755,7 +757,7 @@ bool HitTestRenderTask(std::vector<std::shared_ptr<HitResult>>& hitResultList,
 
 bool ConvertScreenCoordinates(Vector2& convertedScreenCoordinates, const Vector2& screenCoordinates, const RenderTask& targetRenderTask)
 {
-  Viewport viewport;
+  BoundsInteger viewport;
   targetRenderTask.GetViewport(viewport);
 
   if(screenCoordinates.x < static_cast<float>(viewport.x) ||
@@ -822,7 +824,7 @@ bool HitTestRenderTaskList(const Vector2&                                 sceneS
 
     // Don't need to consider a RenderTask draws on window and its source actor is inside FBO.
     // Can't support it.
-    Viewport                                viewport;
+    BoundsInteger                           viewport;
     std::vector<std::shared_ptr<HitResult>> hitResults;
     Vector2                                 convertedScreenCoordinates;
     renderTask.GetViewport(viewport);

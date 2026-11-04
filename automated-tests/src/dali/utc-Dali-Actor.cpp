@@ -218,9 +218,7 @@ struct OrientationComponentConstraint
   void operator()(Quaternion& orientation, const PropertyInputContainer& inputs)
   {
     const Quaternion& parentOrientation = inputs[0]->GetQuaternion();
-    Vector3           pos, scale;
-    Quaternion        rot;
-    orientation = parentOrientation;
+    orientation                         = parentOrientation;
   }
 };
 

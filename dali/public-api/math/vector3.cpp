@@ -96,24 +96,6 @@ Vector3& Vector3::operator*=(const Quaternion& rhs)
   return *this;
 }
 
-bool Vector3::operator==(const Vector3& rhs) const
-{
-  if(fabsf(x - rhs.x) > GetRangedEpsilon(x, rhs.x))
-  {
-    return false;
-  }
-  if(fabsf(y - rhs.y) > GetRangedEpsilon(y, rhs.y))
-  {
-    return false;
-  }
-  if(fabsf(z - rhs.z) > GetRangedEpsilon(z, rhs.z))
-  {
-    return false;
-  }
-
-  return true;
-}
-
 float Vector3::Dot(const Vector3& other) const
 {
   MATH_INCREASE_BY(PerformanceMonitor::FLOAT_POINT_MULTIPLY, 3);

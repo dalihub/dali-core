@@ -122,7 +122,7 @@ uint32_t GetPropertyImplementationAlignment(Property::Type& propertyType)
 
 } // unnamed namespace
 
-VertexBufferPtr VertexBuffer::New(Dali::Property::Map& format)
+VertexBufferPtr VertexBuffer::New(const Dali::Property::Map& format)
 {
   DALI_ASSERT_ALWAYS(format.Count() && "Format cannot be empty.");
 
@@ -225,7 +225,7 @@ VertexBuffer::VertexBuffer()
 {
 }
 
-void VertexBuffer::Initialize(Dali::Property::Map& formatMap)
+void VertexBuffer::Initialize(const Dali::Property::Map& formatMap)
 {
   mRenderObject = new Render::VertexBuffer();
   OwnerPointer<Render::VertexBuffer> transferOwnership(mRenderObject);

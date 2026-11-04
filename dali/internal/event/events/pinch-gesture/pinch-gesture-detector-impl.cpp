@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <cstring> // for strcmp
+#include <utility>
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/object/type-registry.h>
@@ -116,6 +117,11 @@ void PinchGestureDetector::OnActorDetach(Actor& actor)
   if(actor.OnScene() && actor.GetScene().IsGeometryHittestEnabled())
   {
     actor.TouchEventSignal().Disconnect(this, &PinchGestureDetector::OnTouchEvent);
+
+    if(mGestureRecognizer && (mAttachedActors.empty() || mFeededActor.GetActor() == &actor))
+    {
+      ResetRecognition();
+    }
   }
 }
 
@@ -132,9 +138,10 @@ bool PinchGestureDetector::OnTouchEvent(Dali::Actor actor, Dali::TouchEvent touc
 
 void PinchGestureDetector::CancelProcessing()
 {
-  if(mGestureRecognizer)
+  GestureRecognizerPtr recognizer(mGestureRecognizer);
+  if(recognizer)
   {
-    mGestureRecognizer->CancelEvent();
+    recognizer->CancelEvent();
   }
 }
 
@@ -235,6 +242,15 @@ Actor* PinchGestureDetector::GetCurrentGesturedActor()
 {
   // Return the current feeded actor
   return GestureDetector::GetCurrentGesturedActor();
+}
+
+void PinchGestureDetector::ResetRecognition()
+{
+  // Release touch history only after clearing the detector's recognition state.
+  GestureRecognizerPtr recognizer(std::move(mGestureRecognizer));
+  SetDetected(false);
+  mFeededActor.ResetActor();
+  mRenderTask.Reset();
 }
 
 } // namespace Internal

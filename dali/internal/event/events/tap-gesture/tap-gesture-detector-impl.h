@@ -256,6 +256,16 @@ private: // GestureDetector overrides
    */
   Actor* GetCurrentGesturedActor() override;
 
+  /**
+   * @brief Discards detector-owned recognition without emitting a gesture signal.
+   */
+  void ResetRecognition();
+
+  /**
+   * @brief Discards the pending tap result and cancels its delivery timer.
+   */
+  void ResetPendingTap();
+
 private:
   Dali::TapGestureDetector::DetectedSignalType mDetectedSignal;
 

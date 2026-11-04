@@ -148,6 +148,29 @@ int UtcDaliRectAssignmentOperatorVector4(void)
   DALI_TEST_EQUALS(rect.y, 20.0f, 0.001f, TEST_LOCATION);
   DALI_TEST_EQUALS(rect.width, 400.0f, 0.001f, TEST_LOCATION);
   DALI_TEST_EQUALS(rect.height, 200.0f, 0.001f, TEST_LOCATION);
+
+  const Vector4 fractional(-10.75f, 20.5f, 400.875f, 200.25f);
+  Rect<int>     integral;
+  Rect<int>&    assigned = (integral = fractional);
+  DALI_TEST_CHECK(&assigned == &integral);
+  DALI_TEST_EQUALS(integral.x, -10, TEST_LOCATION);
+  DALI_TEST_EQUALS(integral.y, 20, TEST_LOCATION);
+  DALI_TEST_EQUALS(integral.width, 400, TEST_LOCATION);
+  DALI_TEST_EQUALS(integral.height, 200, TEST_LOCATION);
+  DALI_TEST_CHECK(integral == Rect<int>(fractional));
+
+  Rect<unsigned int> unsignedRectangle;
+  unsignedRectangle = Vector4(1.75f, 2.5f, 3.25f, 4.875f);
+  DALI_TEST_EQUALS(unsignedRectangle.x, 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(unsignedRectangle.y, 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(unsignedRectangle.width, 3u, TEST_LOCATION);
+  DALI_TEST_EQUALS(unsignedRectangle.height, 4u, TEST_LOCATION);
+
+  rect = fractional;
+  DALI_TEST_EQUALS(rect.x, fractional.x, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(rect.y, fractional.y, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(rect.width, fractional.z, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(rect.height, fractional.w, 0.001f, TEST_LOCATION);
   END_TEST;
 }
 

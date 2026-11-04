@@ -51,6 +51,26 @@ using LogContextFunction = void (*)(bool, const char*, const char*);
  */
 DALI_CORE_API void InstallLogContextFunction(const LogContextFunction& logContextFunction);
 
+/**
+ * Used by tracing macros to log an instant marker event without a begin/end pair
+ * @param[in] tag a unique event tag name
+ * @param[in] message an additional message for this marker. Ignore if it is nullptr
+ */
+DALI_CORE_API void MarkContext(const char* tag, const char* message = nullptr);
+
+/**
+ * typedef for the MarkContextFunction function.
+ */
+using MarkContextFunction = void (*)(const char*, const char*);
+
+/**
+ * A MarkContextFunction function can be installed for a thread whose instant markers
+ * should reach the platform's native instant-event channel. Without one, MarkContext
+ * falls back to an adjacent begin/end pair so span-based backends stay balanced.
+ * @param MarkContextFunction the Mark Context function to install
+ */
+DALI_CORE_API void InstallMarkContextFunction(const MarkContextFunction& markContextFunction);
+
 /********************************************************************************
  *                                    Filter                                    *
  ********************************************************************************/
@@ -137,6 +157,19 @@ public:
    * @param[in] message - an additional message for this trace if needs.
    */
   void EndTrace(const char* tagName, const char* message);
+
+  /**
+   * Instant marker trace, emitted as a single event without a begin/end pair.
+   * @param[in] tagName - a unique event tag name.
+   */
+  void Mark(const char* tagName);
+
+  /**
+   * Instant marker trace, emitted as a single event without a begin/end pair.
+   * @param[in] tagName - a unique event tag name.
+   * @param[in] message - an additional message for this trace if needs.
+   */
+  void Mark(const char* tagName, const char* message);
 
   /**
    * Enable trace on all filters.
@@ -262,6 +295,34 @@ public:
   }
 
 /**
+ * Instant marker without a begin/end pair
+ */
+#define DALI_TRACE_MARK(filter, tag)     \
+  if(filter && filter->IsTraceEnabled()) \
+  {                                      \
+    filter->Mark(tag);                   \
+  }
+
+#define DALI_TRACE_MARK_WITH_MESSAGE(filter, tag, message) \
+  if(filter && filter->IsTraceEnabled())                   \
+  {                                                        \
+    filter->Mark(tag, message);                            \
+  }
+
+#define DALI_TRACE_MARK_WITH_MESSAGE_GENERATOR(filter, tag, messageGenerator) \
+  if(filter && filter->IsTraceEnabled())                                      \
+  {                                                                           \
+    std::ostringstream oss;                                                   \
+    oss.imbue(std::locale::classic());                                        \
+    auto __traceFlags     = oss.flags();                                      \
+    auto __tracePrecision = oss.precision();                                  \
+    messageGenerator(oss);                                                    \
+    oss.flags(__traceFlags);                                                  \
+    oss.precision(__tracePrecision);                                          \
+    filter->Mark(tag, oss.str().c_str());                                     \
+  }
+
+/**
  * Used for function tracing. It logs tracing of the fuction from start to end.
  */
 #define DALI_TRACE_FUNCTION(filter) \
@@ -287,6 +348,9 @@ public:
 #define DALI_TRACE_END(filter, tag)
 #define DALI_TRACE_END_WITH_MESSAGE(filter, tag, message)
 #define DALI_TRACE_END_WITH_MESSAGE_GENERATOR(filter, tag, messageGenerator)
+#define DALI_TRACE_MARK(filter, tag)
+#define DALI_TRACE_MARK_WITH_MESSAGE(filter, tag, message)
+#define DALI_TRACE_MARK_WITH_MESSAGE_GENERATOR(filter, tag, messageGenerator)
 #define DALI_TRACE_FUNCTION(filter)
 #define DALI_TRACE_SCOPE(filter, tag)
 #define DALI_TRACE_SCOPE_WITH_FORMAT(filter, tag, format, ...)

@@ -1040,7 +1040,8 @@ int UtcDaliHitTestAlgorithmScreenToFrameBufferFunction(void)
   offRenderTask.SetCameraActor(cameraActor);
   offRenderTask.SetSourceActor(green);
   offRenderTask.SetScreenToFrameBufferFunction(RenderTask::FULLSCREEN_FRAMEBUFFER_FUNCTION);
-  offRenderTask.SetViewport(Viewport(Vector4(0, 0, 480, 800)));
+  offRenderTask.SetViewportPosition(Vector2(0, 0));
+  offRenderTask.SetViewportSize(Vector2(480, 800));
 
   Dali::Texture texture      = Dali::Texture::New(TextureType::TEXTURE_2D, Pixel::RGB888, unsigned(stageSize.width), unsigned(stageSize.height));
   FrameBuffer   renderTarget = FrameBuffer::New(static_cast<uint32_t>(stageSize.width), static_cast<uint32_t>(stageSize.height), FrameBuffer::Attachment::DEPTH);

@@ -139,7 +139,11 @@ if [ $opt_tct == 1 ] ; then
     scripts/summarize.pl
 
 else
-    # Execute test cases using own test harness
+    # Execute test cases with a private bus that exits with the test command.
+    if ! command -v dbus-run-session >/dev/null 2>&1 ; then
+        echo "dbus-run-session is required to run the test harness" >&2
+        exit 1
+    fi
 
     if [ -z "$1" ] ; then
         # No arguments:
@@ -150,7 +154,7 @@ else
             echo -e "$ASCII_BOLD"
             echo -e "Executing $mod$ASCII_RESET"
             output_start $mod
-            dbus-launch build/src/$mod/tct-$mod-core $opt_serial $opt_noFailedRerun $opt_quiet $opt_match
+            dbus-run-session -- build/src/$mod/tct-$mod-core $opt_serial $opt_noFailedRerun $opt_quiet $opt_match
             output_end $mod
         done
         summary_end
@@ -162,7 +166,7 @@ else
         module=$1
         shift;
         output_start ${module}
-        dbus-launch build/src/$module/tct-$module-core $opt_serial $opt_noFailedRerun $opt_quiet $opt_match $*
+        dbus-run-session -- build/src/$module/tct-$module-core $opt_serial $opt_noFailedRerun $opt_quiet $opt_match $*
         output_end ${module}
         summary_end
 
@@ -171,12 +175,12 @@ else
         # Try executing each executable with the test case name until success/known failure
         for mod in $modules
         do
-            output=`build/src/$mod/tct-$mod-core $1`
+            output=`dbus-run-session -- build/src/$mod/tct-$mod-core $1`
             ret=$?
             if [ $ret -ne 6 ] ; then
                 if [ $opt_debug -ne 0 ] ; then
                     echo DEBUGGING:
-                    dbus-launch gdb --args build/src/$mod/tct-$mod-core $1
+                    dbus-run-session -- gdb --args build/src/$mod/tct-$mod-core $1
 
                 else
                     echo $output
@@ -186,19 +190,6 @@ else
             fi
         done
         echo $1 not found
-    fi
-
-    # Kill off any dangling or sleeping dbus sessions that we would have created
-    cgroup=$(awk -F ':' '$2 == "name=systemd" { print $3 }' /proc/self/cgroup)
-    if [ -n "$cgroup" ] ; then
-        for pid in $(cat /sys/fs/cgroup/systemd/$cgroup/tasks 2>/dev/null); do
-            comm=$(cat /proc/$pid/comm 2>/dev/null)
-            case "$comm" in
-            dbus-daemon|dbus-launch)
-                kill $pid
-                ;;
-            esac
-        done
     fi
 fi
 

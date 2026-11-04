@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 #include <stdlib.h>
 
 #include <iostream>
+#include <type_traits>
 
 using namespace Dali;
 
@@ -227,34 +228,6 @@ int UtcDaliUint16PairGreaterThanP(void)
   END_TEST;
 }
 
-int UtcDaliUint16PairFromFloatVecP(void)
-{
-  Dali::Vector2 v2(5.f, 5.f);
-
-  Uint16Pair u = Uint16Pair::FromFloatVec2(v2);
-  DALI_TEST_EQUALS(u.GetX(), 5u, TEST_LOCATION);
-  DALI_TEST_EQUALS(u.GetY(), 5u, TEST_LOCATION);
-
-  Dali::Vector3 v3(5.f, 5.f, 5.f);
-
-  u = Uint16Pair::FromFloatVec2(v3);
-  DALI_TEST_EQUALS(u.GetX(), 5u, TEST_LOCATION);
-  DALI_TEST_EQUALS(u.GetY(), 5u, TEST_LOCATION);
-
-  END_TEST;
-}
-
-int UtcDaliUint16PairFromFloatArrayP(void)
-{
-  float array[] = {5.f, 5.f};
-
-  Uint16Pair u = Uint16Pair::FromFloatArray(array);
-  DALI_TEST_EQUALS(u.GetX(), 5u, TEST_LOCATION);
-  DALI_TEST_EQUALS(u.GetY(), 5u, TEST_LOCATION);
-
-  END_TEST;
-}
-
 // class Int32Pair
 
 int UtcDaliInt32PairConstructor01P(void)
@@ -450,7 +423,7 @@ int UtcDaliUint16PairRangeAliasesP(void)
 
 int UtcDaliIntPairSigned16RangeAliasesP(void)
 {
-  IntPair<int16_t, uint16_t, uint32_t> value(5, 10);
+  Int16Pair value(5, 10);
   value.SetStart(-32768);
   value.SetEnd(32767);
   DALI_TEST_EQUALS(static_cast<int32_t>(value.GetX()), -32768, TEST_LOCATION);
@@ -467,7 +440,7 @@ int UtcDaliIntPairSigned16RangeAliasesP(void)
 
 int UtcDaliIntPairUnsigned32RangeAliasesP(void)
 {
-  IntPair<uint32_t, uint32_t, uint64_t> value(5u, 10u);
+  Uint32Pair value(5u, 10u);
   value.SetStart(0xffffffffu);
   value.SetEnd(0x80000000u);
   DALI_TEST_EQUALS(value.GetX(), 0xffffffffu, TEST_LOCATION);
@@ -479,5 +452,45 @@ int UtcDaliIntPairUnsigned32RangeAliasesP(void)
   value.SetHeight(19u);
   DALI_TEST_EQUALS(value.GetStart(), 7u, TEST_LOCATION);
   DALI_TEST_EQUALS(value.GetEnd(), 19u, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliIntPairTypeAliases(void)
+{
+  static_assert(std::is_same_v<Int16Pair, IntPair<int16_t, uint16_t, uint32_t>>);
+  static_assert(std::is_same_v<Uint16Pair, IntPair<uint16_t, uint16_t, uint32_t>>);
+  static_assert(std::is_same_v<Int32Pair, IntPair<int32_t, uint32_t, uint64_t>>);
+  static_assert(std::is_same_v<Uint32Pair, IntPair<uint32_t, uint32_t, uint64_t>>);
+  static_assert(std::is_base_of_v<BasicTypes<Int16Pair>, TypeTraits<Int16Pair>>);
+  static_assert(std::is_base_of_v<BasicTypes<Uint16Pair>, TypeTraits<Uint16Pair>>);
+  static_assert(std::is_base_of_v<BasicTypes<Int32Pair>, TypeTraits<Int32Pair>>);
+  static_assert(std::is_base_of_v<BasicTypes<Uint32Pair>, TypeTraits<Uint32Pair>>);
+  static_assert(TypeTraits<Int16Pair>::IS_TRIVIAL_TYPE);
+  static_assert(TypeTraits<Uint16Pair>::IS_TRIVIAL_TYPE);
+  static_assert(TypeTraits<Int32Pair>::IS_TRIVIAL_TYPE);
+  static_assert(TypeTraits<Uint32Pair>::IS_TRIVIAL_TYPE);
+  static_assert(sizeof(Int16Pair) == 4 && alignof(Int16Pair) == alignof(uint32_t));
+  static_assert(sizeof(Uint16Pair) == 4 && alignof(Uint16Pair) == alignof(uint32_t));
+  static_assert(sizeof(Int32Pair) == 8 && alignof(Int32Pair) == alignof(uint64_t));
+  static_assert(sizeof(Uint32Pair) == 8 && alignof(Uint32Pair) == alignof(uint64_t));
+  constexpr Int16Pair  signed16(static_cast<int16_t>(0xffff8000u), 0x7fff);
+  constexpr Uint16Pair unsigned16(static_cast<uint16_t>(0x1234ffffu), static_cast<uint16_t>(0xabcd8000u));
+  constexpr Int32Pair  signed32(static_cast<int32_t>(0x80000000u), static_cast<int32_t>(0xffffffffu));
+  constexpr Uint32Pair unsigned32(0xffffffffu, 0x80000000u);
+  DALI_TEST_EQUALS(static_cast<int32_t>(signed16.GetX()), -32768, TEST_LOCATION);
+  DALI_TEST_EQUALS(static_cast<int32_t>(signed16.GetY()), 32767, TEST_LOCATION);
+  DALI_TEST_EQUALS(unsigned16.GetX(), 65535u, TEST_LOCATION);
+  DALI_TEST_EQUALS(unsigned16.GetY(), 32768u, TEST_LOCATION);
+  DALI_TEST_EQUALS(signed32.GetX(), (-2147483647 - 1), TEST_LOCATION);
+  DALI_TEST_EQUALS(signed32.GetY(), -1, TEST_LOCATION);
+  DALI_TEST_EQUALS(unsigned32.GetX(), 0xffffffffu, TEST_LOCATION);
+  DALI_TEST_EQUALS(unsigned32.GetY(), 0x80000000u, TEST_LOCATION);
+  Int16Pair negative16(-7, -19);
+  DALI_TEST_EQUALS(static_cast<int32_t>(negative16.GetX()), -7, TEST_LOCATION);
+  DALI_TEST_EQUALS(static_cast<int32_t>(negative16.GetY()), -19, TEST_LOCATION);
+  Int16Pair  default16;
+  Uint32Pair default32;
+  DALI_TEST_EQUALS(static_cast<int32_t>(default16.GetX()), 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(default32.GetY(), 0u, TEST_LOCATION);
   END_TEST;
 }

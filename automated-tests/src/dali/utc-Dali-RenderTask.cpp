@@ -22,6 +22,7 @@
 #include <dali/devel-api/events/hit-test-algorithm.h>
 #include <dali/devel-api/threading/thread.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/pixel-data-integ.h>
 #include <dali/public-api/dali-core.h>
 #include <mesh-builder.h>
 #include <stdlib.h>
@@ -67,8 +68,10 @@ void utc_dali_render_task_cleanup(void)
  * SetScreenToFrameBufferMappingActor  1+ve, 1-ve
  * GetScreenToFrameBufferMappingActor  1+ve, 1-ve
  * SetViewportPosition                 1+ve
+ * GetViewportPosition                 2+ve, 1-ve
  * GetCurrentViewportPosition          1+ve
  * SetViewportSize                     1+ve
+ * GetViewportSize                     2+ve, 1-ve
  * GetCurrentViewportSize              1+ve
  * SetViewport                         2+ve, 1-ve
  * GetViewport                         2+ve, 1-ve
@@ -1698,6 +1701,16 @@ int UtcDaliRenderTaskIsExclusive01(void)
 
   RenderTask newTask = taskList.CreateTask();
   DALI_TEST_CHECK(false == newTask.IsExclusive());
+  DALI_TEST_EQUALS(newTask.GetInputEnabled(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(newTask.GetClearColor(), Vector4(0.0f, 0.0f, 0.0f, 1.0f), TEST_LOCATION);
+  DALI_TEST_EQUALS(newTask.GetClearEnabled(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(newTask.GetCullMode(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(newTask.GetRefreshRate(), static_cast<uint32_t>(RenderTask::REFRESH_ALWAYS), TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(newTask.GetCurrentProperty<Vector4>(RenderTask::Property::CLEAR_COLOR), Vector4(0.0f, 0.0f, 0.0f, 1.0f), TEST_LOCATION);
 
   END_TEST;
 }
@@ -2312,40 +2325,43 @@ int UtcDaliRenderTaskGetScreenToFrameBufferMappingActor02N(void)
 
 int UtcDaliRenderTaskGetViewportP01(void)
 {
+  // TODO : This API is deprecated. Remove it when API remove patch.
   TestApplication application;
 
   tet_infoline("Testing RenderTask::GetViewport() on default task");
 
   RenderTaskList taskList = application.GetScene().GetRenderTaskList();
   RenderTask     task     = taskList.GetTask(0u);
-  Viewport       viewport = task.GetViewport();
+  BoundsInteger  viewport = task.GetViewport();
 
   // By default the viewport should match the scene width/height
-  Vector2  sceneSize = application.GetScene().GetSize();
-  Viewport expectedViewport(0, 0, static_cast<int>(sceneSize.width), static_cast<int>(sceneSize.height));
+  Vector2       sceneSize = application.GetScene().GetSize();
+  BoundsInteger expectedViewport(0, 0, static_cast<int>(sceneSize.width), static_cast<int>(sceneSize.height));
   DALI_TEST_CHECK(viewport == expectedViewport);
   END_TEST;
 }
 
 int UtcDaliRenderTaskGetViewportP02(void)
 {
+  // TODO : This API is deprecated. Remove it when API remove patch.
   TestApplication application;
 
   tet_infoline("Testing RenderTask::GetViewport() on new task");
 
   RenderTaskList taskList = application.GetScene().GetRenderTaskList();
   RenderTask     task     = taskList.CreateTask();
-  Viewport       viewport = task.GetViewport();
+  BoundsInteger  viewport = task.GetViewport();
 
   // By default the viewport should match the scene width/height
-  Vector2  sceneSize = application.GetScene().GetSize();
-  Viewport expectedViewport(0, 0, static_cast<int>(sceneSize.width), static_cast<int>(sceneSize.height));
+  Vector2       sceneSize = application.GetScene().GetSize();
+  BoundsInteger expectedViewport(0, 0, static_cast<int>(sceneSize.width), static_cast<int>(sceneSize.height));
   DALI_TEST_CHECK(viewport == expectedViewport);
   END_TEST;
 }
 
 int UtcDaliRenderTaskGetViewportN(void)
 {
+  // TODO : This API is deprecated. Remove it when API remove patch.
   TestApplication application;
 
   tet_infoline("Testing RenderTask::GetViewport() on empty handle");
@@ -2353,7 +2369,7 @@ int UtcDaliRenderTaskGetViewportN(void)
   RenderTask task;
   try
   {
-    Viewport viewport = task.GetViewport();
+    BoundsInteger viewport = task.GetViewport();
     (void)viewport;
   }
   catch(Dali::DaliException& e)
@@ -2366,15 +2382,16 @@ int UtcDaliRenderTaskGetViewportN(void)
 
 int UtcDaliRenderTaskSetViewportP(void)
 {
+  // TODO : This API is deprecated. Remove it when API remove patch.
   TestApplication application;
 
   tet_infoline("Testing RenderTask::SetViewport()");
 
   RenderTaskList taskList = application.GetScene().GetRenderTaskList();
 
-  RenderTask task      = taskList.GetTask(0u);
-  Vector2    sceneSize = application.GetScene().GetSize();
-  Viewport   newViewport(0, 0, static_cast<int>(sceneSize.width * 0.5f), static_cast<int>(sceneSize.height * 0.5f));
+  RenderTask    task      = taskList.GetTask(0u);
+  Vector2       sceneSize = application.GetScene().GetSize();
+  BoundsInteger newViewport(0, 0, static_cast<int>(sceneSize.width * 0.5f), static_cast<int>(sceneSize.height * 0.5f));
   task.SetViewport(newViewport);
 
   // Update (viewport is a property)
@@ -2387,6 +2404,7 @@ int UtcDaliRenderTaskSetViewportP(void)
 
 int UtcDaliRenderTaskSetViewportN(void)
 {
+  // TODO : This API is deprecated. Remove it when API remove patch.
   TestApplication application;
 
   tet_infoline("Testing RenderTask::SetViewport()");
@@ -2396,8 +2414,8 @@ int UtcDaliRenderTaskSetViewportN(void)
   RenderTask task;
   try
   {
-    Vector2  sceneSize = application.GetScene().GetSize();
-    Viewport newViewport(0, 0, static_cast<int>(sceneSize.width * 0.5f), static_cast<int>(sceneSize.height * 0.5f));
+    Vector2       sceneSize = application.GetScene().GetSize();
+    BoundsInteger newViewport(0, 0, static_cast<int>(sceneSize.width * 0.5f), static_cast<int>(sceneSize.height * 0.5f));
     task.SetViewport(newViewport);
   }
   catch(Dali::DaliException& e)
@@ -2419,13 +2437,14 @@ int UtcDaliRenderTaskSetViewportPosition(void)
 
   RenderTask task = taskList.GetTask(0u);
 
-  Viewport viewport = task.GetViewport();
+  Vector2 viewportPosition = task.GetCurrentViewportPosition();
+  Vector2 viewportSize     = task.GetCurrentViewportSize();
 
   // By default the viewport should match the scene width/height
 
-  Vector2  sceneSize = application.GetScene().GetSize();
-  Viewport expectedViewport(0, 0, static_cast<int>(sceneSize.width), static_cast<int>(sceneSize.height));
-  DALI_TEST_CHECK(viewport == expectedViewport);
+  Vector2 sceneSize = application.GetScene().GetSize();
+  DALI_TEST_CHECK(viewportPosition == Vector2::ZERO);
+  DALI_TEST_CHECK(viewportSize == sceneSize);
 
   // 'Setter' test
   Vector2 newPosition(25.0f, 50.0f);
@@ -2494,13 +2513,14 @@ int UtcDaliRenderTaskSetViewportSize(void)
 
   RenderTask task = taskList.GetTask(0u);
 
-  Viewport viewport = task.GetViewport();
+  Vector2 viewportPosition = task.GetCurrentViewportPosition();
+  Vector2 viewportSize     = task.GetCurrentViewportSize();
 
   // By default the viewport should match the scene width/height
 
-  Vector2  sceneSize = application.GetScene().GetSize();
-  Viewport expectedViewport(0, 0, static_cast<int>(sceneSize.width), static_cast<int>(sceneSize.height));
-  DALI_TEST_CHECK(viewport == expectedViewport);
+  Vector2 sceneSize = application.GetScene().GetSize();
+  DALI_TEST_CHECK(viewportPosition == Vector2::ZERO);
+  DALI_TEST_CHECK(viewportSize == sceneSize);
 
   Vector2 newSize(128.0f, 64.0f);
   task.SetViewportSize(newSize);
@@ -2558,6 +2578,101 @@ int UtcDaliRenderTaskSetViewportSize(void)
   END_TEST;
 }
 
+int UtcDaliRenderTaskGetViewportPositionP(void)
+{
+  TestApplication application;
+
+  tet_infoline("Testing RenderTask::GetViewportPosition() returns the value that was last set");
+
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
+  RenderTask     task     = taskList.CreateTask();
+
+  DALI_TEST_EQUALS(task.GetViewportPosition(), Vector2::ZERO, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  // Returns the new value before the update
+  Vector2 newPosition(25.0f, 50.0f);
+  task.SetViewportPosition(newPosition);
+  DALI_TEST_EQUALS(task.GetViewportPosition(), newPosition, TEST_LOCATION);
+  DALI_TEST_EQUALS(task.GetCurrentProperty<Vector2>(RenderTask::Property::VIEWPORT_POSITION), Vector2::ZERO, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(task.GetViewportPosition(), newPosition, TEST_LOCATION);
+  DALI_TEST_EQUALS(task.GetCurrentProperty<Vector2>(RenderTask::Property::VIEWPORT_POSITION), newPosition, TEST_LOCATION);
+
+  // Set by Property
+  Vector2 newPosition2(32.0f, 16.0f);
+  task.SetProperty(RenderTask::Property::VIEWPORT_POSITION, newPosition2);
+  DALI_TEST_EQUALS(task.GetViewportPosition(), newPosition2, TEST_LOCATION);
+
+  // Returns the animation target while the animation is in progress
+  Vector2   newPosition3(64.0f, 0.0f);
+  Animation animation = Animation::New(1.0f);
+  animation.AnimateTo(Property(task, RenderTask::Property::VIEWPORT_POSITION), newPosition3, AlphaFunction::LINEAR);
+  animation.Play();
+
+  application.SendNotification();
+  application.Render(500);
+
+  DALI_TEST_EQUALS(task.GetViewportPosition(), newPosition3, TEST_LOCATION);
+  DALI_TEST_CHECK(task.GetCurrentProperty<Vector2>(RenderTask::Property::VIEWPORT_POSITION) != newPosition3);
+
+  END_TEST;
+}
+
+int UtcDaliRenderTaskGetViewportSizeP(void)
+{
+  TestApplication application;
+
+  tet_infoline("Testing RenderTask::GetViewportSize() returns the value that was last set");
+
+  RenderTaskList taskList  = application.GetScene().GetRenderTaskList();
+  RenderTask     task      = taskList.CreateTask();
+  Vector2        sceneSize = application.GetScene().GetSize();
+
+  // Not set yet, while the scene size is used for rendering
+  DALI_TEST_EQUALS(task.GetViewportSize(), Vector2::ZERO, TEST_LOCATION);
+  DALI_TEST_EQUALS(task.GetCurrentProperty<Vector2>(RenderTask::Property::VIEWPORT_SIZE), sceneSize, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  // Returns the new value before the update
+  Vector2 newSize(128.0f, 64.0f);
+  task.SetViewportSize(newSize);
+  DALI_TEST_EQUALS(task.GetViewportSize(), newSize, TEST_LOCATION);
+  DALI_TEST_EQUALS(task.GetCurrentProperty<Vector2>(RenderTask::Property::VIEWPORT_SIZE), sceneSize, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(task.GetViewportSize(), newSize, TEST_LOCATION);
+  DALI_TEST_EQUALS(task.GetCurrentProperty<Vector2>(RenderTask::Property::VIEWPORT_SIZE), newSize, TEST_LOCATION);
+
+  // Set by Property
+  Vector2 newSize2(50.0f, 50.0f);
+  task.SetProperty(RenderTask::Property::VIEWPORT_SIZE, newSize2);
+  DALI_TEST_EQUALS(task.GetViewportSize(), newSize2, TEST_LOCATION);
+
+  // Returns the animation target while the animation is in progress
+  Vector2   newSize3(10.0f, 10.0f);
+  Animation animation = Animation::New(1.0f);
+  animation.AnimateTo(Property(task, RenderTask::Property::VIEWPORT_SIZE), newSize3, AlphaFunction::LINEAR);
+  animation.Play();
+
+  application.SendNotification();
+  application.Render(500);
+
+  DALI_TEST_EQUALS(task.GetViewportSize(), newSize3, TEST_LOCATION);
+  DALI_TEST_CHECK(task.GetCurrentProperty<Vector2>(RenderTask::Property::VIEWPORT_SIZE) != newSize3);
+
+  END_TEST;
+}
+
 int UtcDaliRenderTaskSetClearColorP(void)
 {
   TestApplication application;
@@ -2574,12 +2689,17 @@ int UtcDaliRenderTaskSetClearColorP(void)
 
   task.SetClearColor(testColor);
 
+  // Returns the new color before the update
+  DALI_TEST_EQUALS(task.GetClearColor(), testColor, TEST_LOCATION);
+  DALI_TEST_CHECK(task.GetCurrentProperty<Vector4>(RenderTask::Property::CLEAR_COLOR) != testColor);
+
   // Wait a frame.
   Wait(application);
 
   DALI_TEST_EQUALS(task.GetClearColor(), testColor, TEST_LOCATION);
 
   task.SetProperty(RenderTask::Property::CLEAR_COLOR, testColor2);
+  DALI_TEST_EQUALS(task.GetClearColor(), testColor2, TEST_LOCATION);
   DALI_TEST_EQUALS(task.GetProperty<Vector4>(RenderTask::Property::CLEAR_COLOR), testColor2, TEST_LOCATION);
   DALI_TEST_EQUALS(task.GetCurrentProperty<Vector4>(RenderTask::Property::CLEAR_COLOR), testColor, TEST_LOCATION); // still the old color
 
@@ -2595,6 +2715,8 @@ int UtcDaliRenderTaskSetClearColorP(void)
   animation.AnimateTo(Property(task, RenderTask::Property::CLEAR_COLOR), newColor3, AlphaFunction::LINEAR);
   animation.Play();
 
+  // Returns the animation target while the animation is in progress
+  DALI_TEST_EQUALS(task.GetClearColor(), newColor3, Math::MACHINE_EPSILON_1, TEST_LOCATION);
   DALI_TEST_EQUALS(task.GetProperty<Vector4>(RenderTask::Property::CLEAR_COLOR), newColor3, Math::MACHINE_EPSILON_1, TEST_LOCATION);
   DALI_TEST_EQUALS(task.GetCurrentProperty<Vector4>(RenderTask::Property::CLEAR_COLOR), testColor2, TEST_LOCATION);
 
@@ -2648,7 +2770,7 @@ int UtcDaliRenderTaskGetClearColorP(void)
 
   RenderTaskList taskList = application.GetScene().GetRenderTaskList();
   RenderTask     task     = taskList.GetTask(0u);
-  DALI_TEST_EQUALS(task.GetClearColor(), RenderTask::DEFAULT_CLEAR_COLOR, TEST_LOCATION);
+  DALI_TEST_EQUALS(task.GetClearColor(), Vector4(0.0f, 0.0f, 0.0f, 1.0f), TEST_LOCATION);
   END_TEST;
 }
 
@@ -3923,11 +4045,12 @@ int UtcDaliRenderTaskSetCullModeNegative(void)
 
 int UtcDaliRenderTaskSetViewportNegative(void)
 {
+  // TODO : This API is deprecated. Remove it when API remove patch.
   TestApplication  application;
   Dali::RenderTask instance;
   try
   {
-    Dali::BoundsInteger arg1;
+    BoundsInteger arg1;
     instance.SetViewport(arg1);
     DALI_TEST_CHECK(false); // Should not get here
   }
@@ -4176,6 +4299,7 @@ int UtcDaliRenderTaskGetCullModeNegative(void)
 
 int UtcDaliRenderTaskGetViewportNegative(void)
 {
+  // TODO : This API is deprecated. Remove it when API remove patch.
   TestApplication  application;
   Dali::RenderTask instance;
   try
@@ -4381,6 +4505,38 @@ int UtcDaliRenderTaskGetCurrentViewportPositionNegative(void)
   try
   {
     instance.GetCurrentViewportPosition();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliRenderTaskGetViewportSizeNegative(void)
+{
+  TestApplication  application;
+  Dali::RenderTask instance;
+  try
+  {
+    instance.GetViewportSize();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliRenderTaskGetViewportPositionNegative(void)
+{
+  TestApplication  application;
+  Dali::RenderTask instance;
+  try
+  {
+    instance.GetViewportPosition();
     DALI_TEST_CHECK(false); // Should not get here
   }
   catch(...)
@@ -4909,6 +5065,70 @@ int UtcDaliRenderTaskViewportGuideActor(void)
   END_TEST;
 }
 
+int UtcDaliRenderTaskViewportGuideActorGetViewport(void)
+{
+  TestApplication application;
+  tet_infoline("Testing RenderTask::GetViewportPosition() and GetViewportSize() are not changed by ViewportGuideActor");
+
+  Dali::Integration::Scene scene = application.GetScene();
+  Vector2                  sceneSize(scene.GetSize());
+
+  Actor blue                                 = Actor::New();
+  blue[Dali::Actor::Property::NAME]          = "Blue";
+  blue[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
+  blue[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
+  blue[Dali::Actor::Property::SIZE]          = Vector2(300, 300);
+  blue[Dali::Actor::Property::POSITION]      = Vector2(0, 0);
+
+  Geometry geometry = Geometry::New();
+  Shader   shader   = Shader::New("vertexSrc", "fragmentSrc");
+  Renderer renderer = Renderer::New(geometry, shader);
+  blue.AddRenderer(renderer);
+
+  scene.Add(blue);
+
+  RenderTaskList renderTaskList = scene.GetRenderTaskList();
+  RenderTask     renderTask     = renderTaskList.CreateTask();
+
+  Dali::CameraActor cameraActor                     = Dali::CameraActor::New(sceneSize);
+  cameraActor[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
+  cameraActor[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
+  scene.Add(cameraActor);
+
+  Vector2 viewportPosition(10.0f, 20.0f);
+  Vector2 viewportSize(100.0f, 200.0f);
+  renderTask.SetViewportPosition(viewportPosition);
+  renderTask.SetViewportSize(viewportSize);
+
+  renderTask.SetExclusive(true);
+  renderTask.SetInputEnabled(true);
+  renderTask.SetCameraActor(cameraActor);
+  renderTask.SetSourceActor(blue);
+  renderTask.SetViewportGuideActor(blue);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render(16);
+
+  // The guide actor changes only the current value
+  DALI_TEST_EQUALS(renderTask.GetCurrentProperty<Vector2>(RenderTask::Property::VIEWPORT_POSITION), Vector2(90, 250), TEST_LOCATION);
+  DALI_TEST_EQUALS(renderTask.GetCurrentProperty<Vector2>(RenderTask::Property::VIEWPORT_SIZE), Vector2(300, 300), TEST_LOCATION);
+  DALI_TEST_EQUALS(renderTask.GetViewportPosition(), viewportPosition, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderTask.GetViewportSize(), viewportSize, TEST_LOCATION);
+
+  renderTask.ResetViewportGuideActor();
+
+  application.SendNotification();
+  application.Render(16);
+
+  DALI_TEST_EQUALS(renderTask.GetCurrentProperty<Vector2>(RenderTask::Property::VIEWPORT_POSITION), viewportPosition, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderTask.GetCurrentProperty<Vector2>(RenderTask::Property::VIEWPORT_SIZE), viewportSize, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderTask.GetViewportPosition(), viewportPosition, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderTask.GetViewportSize(), viewportSize, TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliRenderTaskViewportGuideActor02(void)
 {
   TestApplication application(
@@ -5044,8 +5264,8 @@ int UtcDaliRenderTaskViewportGuideActor03(void)
   renderTask.SetCameraActor(cameraActor);
   renderTask.SetSourceActor(green);
 
-  Viewport viewport(75, 55, 150, 250);
-  renderTask.SetViewport(viewport);
+  renderTask.SetViewportPosition(Vector2(75, 55));
+  renderTask.SetViewportSize(Vector2(150, 250));
 
   // Render and notify
   application.SendNotification();
@@ -5143,8 +5363,8 @@ int UtcDaliRenderTaskViewportGuideActor04(void)
   renderTask.SetCameraActor(cameraActor);
   renderTask.SetSourceActor(green);
 
-  Viewport viewport(75, 55, 150, 250);
-  renderTask.SetViewport(viewport);
+  renderTask.SetViewportPosition(Vector2(75, 55));
+  renderTask.SetViewportSize(Vector2(150, 250));
 
   // Render and notify
   application.SendNotification();
@@ -5238,8 +5458,8 @@ int UtcDaliRenderTaskViewportGuideActorDestroyed(void)
   Vector2 viewportPosition = renderTask.GetCurrentViewportPosition();
   Vector2 viewportSize     = renderTask.GetCurrentViewportSize();
 
-  // Check viewport return 0 without guide actor
-  DALI_TEST_EQUALS(viewportSize, Vector2(0, 0), TEST_LOCATION);
+  // Check viewport return scene positoin size without guide actor
+  DALI_TEST_EQUALS(viewportSize, sceneSize, TEST_LOCATION);
   DALI_TEST_EQUALS(viewportPosition, Vector2(0, 0), TEST_LOCATION);
 
   // Set ViewportGuideActor
@@ -5284,7 +5504,7 @@ int UtcDaliRenderTaskViewportGuideActorDestroyed(void)
   viewportSize     = renderTask.GetCurrentViewportSize();
 
   // Check view port revert as origin well.
-  DALI_TEST_EQUALS(viewportSize, Vector2(0, 0), TEST_LOCATION);
+  DALI_TEST_EQUALS(viewportSize, sceneSize, TEST_LOCATION);
   DALI_TEST_EQUALS(viewportPosition, Vector2(0, 0), TEST_LOCATION);
 
   // Render several frames.
@@ -5298,7 +5518,7 @@ int UtcDaliRenderTaskViewportGuideActorDestroyed(void)
   viewportPosition = renderTask.GetCurrentViewportPosition();
   viewportSize     = renderTask.GetCurrentViewportSize();
 
-  DALI_TEST_EQUALS(viewportSize, Vector2(0, 0), TEST_LOCATION);
+  DALI_TEST_EQUALS(viewportSize, sceneSize, TEST_LOCATION);
   DALI_TEST_EQUALS(viewportPosition, Vector2(0, 0), TEST_LOCATION);
 
   END_TEST;
@@ -5887,6 +6107,83 @@ int UtcDaliRenderTaskKeepRenderResult(void)
   application.SendNotification();
   application.Render();
   DALI_TEST_CHECK(!newTask.GetRenderResult());
+
+  END_TEST;
+}
+
+int UtcDaliRenderTaskGetRenderResultBuffer(void)
+{
+  TestApplication application;
+
+  tet_infoline("Testing RenderTask::GetRenderResultBuffer()");
+
+  CameraActor offscreenCameraActor = CameraActor::New();
+
+  application.GetScene().Add(offscreenCameraActor);
+
+  Texture image     = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 10, 10);
+  Actor   rootActor = CreateRenderableActor(image);
+  rootActor.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
+  application.GetScene().Add(rootActor);
+
+  RenderTaskList taskList           = application.GetScene().GetRenderTaskList();
+  Texture        frameBufferTexture = Texture::New(TextureType::TEXTURE_2D, Pixel::Format::RGBA8888, 10, 10);
+  FrameBuffer    frameBuffer        = FrameBuffer::New(frameBufferTexture.GetWidth(), frameBufferTexture.GetHeight());
+  frameBuffer.AttachColorTexture(frameBufferTexture);
+
+  RenderTask newTask = taskList.CreateTask();
+  newTask.SetCameraActor(offscreenCameraActor);
+  newTask.SetSourceActor(rootActor);
+  newTask.SetInputEnabled(false);
+  newTask.SetClearColor(Vector4(0.f, 0.f, 0.f, 0.f));
+  newTask.SetClearEnabled(true);
+  newTask.SetExclusive(true);
+  newTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
+  newTask.SetFrameBuffer(frameBuffer);
+  newTask.KeepRenderResult();
+
+  bool               finished = false;
+  RenderTaskFinished renderTaskFinished(finished);
+  newTask.FinishedSignal().Connect(&application, renderTaskFinished);
+
+  // Before the FinishedSignal, an empty handle is returned
+  DALI_TEST_CHECK(!newTask.GetRenderResultBuffer());
+
+  // Flush the queue and render.
+  application.SendNotification();
+  application.Render();
+  application.Render();
+  application.SendNotification();
+  DALI_TEST_CHECK(finished);
+
+  PixelBuffer pixelBuffer = newTask.GetRenderResultBuffer();
+  DALI_TEST_CHECK(pixelBuffer);
+  DALI_TEST_CHECK(pixelBuffer.GetBuffer() != nullptr);
+  DALI_TEST_EQUALS(pixelBuffer.GetWidth(), 10u, TEST_LOCATION);
+  DALI_TEST_EQUALS(pixelBuffer.GetHeight(), 10u, TEST_LOCATION);
+  DALI_TEST_EQUALS(pixelBuffer.GetBufferSize(), 10u * 10u * 4u, TEST_LOCATION);
+  DALI_TEST_CHECK(pixelBuffer.GetPixelFormat() == Pixel::RGBA8888);
+
+  // Repeated calls share the same object
+  PixelBuffer pixelBuffer2 = newTask.GetRenderResultBuffer();
+  DALI_TEST_CHECK(pixelBuffer == pixelBuffer2);
+
+  // The deprecated GetRenderResult() returns a copy of the result
+  PixelData pixelData = newTask.GetRenderResult();
+  DALI_TEST_CHECK(pixelData);
+  DALI_TEST_EQUALS(pixelData.GetWidth(), 10u, TEST_LOCATION);
+  Dali::Integration::PixelDataBuffer pixelDataBuffer = Dali::Integration::GetPixelDataBuffer(pixelData);
+  DALI_TEST_CHECK(pixelDataBuffer.buffer != pixelBuffer.GetBuffer());
+  DALI_TEST_EQUALS(pixelDataBuffer.bufferSize, pixelBuffer.GetBufferSize(), TEST_LOCATION);
+
+  // ClearRenderResult() releases the RenderTask's reference only:
+  // the application's handle stays valid
+  newTask.ClearRenderResult();
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_CHECK(!newTask.GetRenderResultBuffer());
+  DALI_TEST_CHECK(pixelBuffer.GetBuffer() != nullptr);
+  DALI_TEST_EQUALS(pixelBuffer.GetBufferSize(), 10u * 10u * 4u, TEST_LOCATION);
 
   END_TEST;
 }

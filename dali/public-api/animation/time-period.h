@@ -40,7 +40,11 @@ struct DALI_CORE_API TimePeriod
    * @SINCE_1_0.0
    * @param[in] durationSeconds The duration of the time period in seconds
    */
-  explicit TimePeriod(float durationSeconds);
+  explicit constexpr TimePeriod(float durationSeconds)
+  : delaySeconds(0.f),
+    durationSeconds(durationSeconds)
+  {
+  }
 
   /**
    * @brief Creates a time period.
@@ -49,13 +53,17 @@ struct DALI_CORE_API TimePeriod
    * @param[in] delaySeconds A delay before the time period in seconds
    * @param[in] durationSeconds The duration of the time period in seconds
    */
-  TimePeriod(float delaySeconds, float durationSeconds);
+  constexpr TimePeriod(float delaySeconds, float durationSeconds)
+  : delaySeconds(delaySeconds),
+    durationSeconds(durationSeconds)
+  {
+  }
 
   /**
    * @brief Non-virtual destructor. TimePeriod is not intended as a base class.
    * @SINCE_1_0.0
    */
-  ~TimePeriod();
+  ~TimePeriod() = default;
 
   float delaySeconds;    ///< A delay before the time period in seconds
   float durationSeconds; ///< The duration of the time period in seconds

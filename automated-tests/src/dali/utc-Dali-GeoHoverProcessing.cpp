@@ -1034,9 +1034,10 @@ int UtcDaliGeoHoverMultipleRenderTasks(void)
   scene.Add(actor);
 
   // Create render task
-  Viewport   viewport(static_cast<int>(sceneSize.width * 0.5f), static_cast<int>(sceneSize.height * 0.5f), static_cast<int>(sceneSize.width * 0.5f), static_cast<int>(sceneSize.height * 0.5f));
-  RenderTask renderTask(application.GetScene().GetRenderTaskList().CreateTask());
-  renderTask.SetViewport(viewport);
+  BoundsInteger viewport(static_cast<int>(sceneSize.width * 0.5f), static_cast<int>(sceneSize.height * 0.5f), static_cast<int>(sceneSize.width * 0.5f), static_cast<int>(sceneSize.height * 0.5f));
+  RenderTask    renderTask(application.GetScene().GetRenderTaskList().CreateTask());
+  renderTask.SetViewportPosition(Vector2(static_cast<float>(viewport.x), static_cast<float>(viewport.y)));
+  renderTask.SetViewportSize(Vector2(static_cast<float>(viewport.width), static_cast<float>(viewport.height)));
   renderTask.SetInputEnabled(true);
 
   // Render and notify
@@ -1087,9 +1088,10 @@ int UtcDaliGeoHoverMultipleRenderTasksWithChildLayer(void)
   DevelActor::Add(actor, layer);
 
   // Create render task
-  Viewport   viewport(static_cast<int>(sceneSize.width * 0.5f), static_cast<int>(sceneSize.height * 0.5f), static_cast<int>(sceneSize.width * 0.5f), static_cast<int>(sceneSize.height * 0.5f));
-  RenderTask renderTask(application.GetScene().GetRenderTaskList().CreateTask());
-  renderTask.SetViewport(viewport);
+  BoundsInteger viewport(static_cast<int>(sceneSize.width * 0.5f), static_cast<int>(sceneSize.height * 0.5f), static_cast<int>(sceneSize.width * 0.5f), static_cast<int>(sceneSize.height * 0.5f));
+  RenderTask    renderTask(application.GetScene().GetRenderTaskList().CreateTask());
+  renderTask.SetViewportPosition(Vector2(static_cast<float>(viewport.x), static_cast<float>(viewport.y)));
+  renderTask.SetViewportSize(Vector2(static_cast<float>(viewport.width), static_cast<float>(viewport.height)));
   renderTask.SetInputEnabled(true);
   renderTask.SetSourceActor(actor);
 
@@ -1781,8 +1783,8 @@ int UtcDaliGeoHoverLeaveOnSecondaryButtonUp(void)
     point.SetDeviceSubclass(Device::Subclass::NONE);
     point.SetMouseButton(button);
 
-    Dali::Integration::TouchEvent touchEvent;
-    Dali::Integration::HoverEvent hoverEvent;
+    Dali::Integration::TouchEvent                            touchEvent;
+    Dali::Integration::HoverEvent                            hoverEvent;
     Dali::Integration::TouchEventCombiner::EventDispatchType type =
       combiner.GetNextTouchEvent(point, time, touchEvent, hoverEvent);
 

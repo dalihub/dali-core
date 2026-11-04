@@ -124,7 +124,8 @@ int UtcDaliVertexBufferNew01(void)
   texturedQuadVertexFormat["aPosition"]    = Property::VECTOR2;
   texturedQuadVertexFormat["aVertexCoord"] = Property::VECTOR2;
 
-  VertexBuffer vertexBuffer = VertexBuffer::New(texturedQuadVertexFormat);
+  const Property::Map& vertexFormat = texturedQuadVertexFormat;
+  VertexBuffer         vertexBuffer = VertexBuffer::New(vertexFormat);
 
   DALI_TEST_EQUALS((bool)vertexBuffer, true, TEST_LOCATION);
   END_TEST;

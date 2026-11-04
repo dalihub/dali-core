@@ -63,7 +63,7 @@ uint32_t VertexBufferUpdateCallback::Invoke(void* data, size_t size)
 
 namespace DALI_NAMESPACE
 {
-VertexBuffer VertexBuffer::New(Dali::Property::Map& bufferFormat)
+VertexBuffer VertexBuffer::New(const Dali::Property::Map& bufferFormat)
 {
   Internal::VertexBufferPtr vertexBuffer = Internal::VertexBuffer::New(bufferFormat);
 

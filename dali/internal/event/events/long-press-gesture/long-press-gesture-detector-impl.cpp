@@ -22,6 +22,7 @@
 #include <algorithm>
 #include <cstring> // for strcmp
 #include <limits>
+#include <utility>
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/object/type-registry.h>
@@ -239,6 +240,12 @@ void LongPressGestureDetector::OnActorDetach(Actor& actor)
   if(actor.OnScene() && actor.GetScene().IsGeometryHittestEnabled())
   {
     actor.TouchEventSignal().Disconnect(this, &LongPressGestureDetector::OnTouchEvent);
+
+    if(mGestureRecognizer &&
+       (mAttachedActors.empty() || mFeededActor.GetActor() == &actor || mCurrentLongPressActor.GetActor() == &actor))
+    {
+      ResetRecognition();
+    }
   }
 }
 
@@ -271,9 +278,10 @@ bool LongPressGestureDetector::CheckGestureDetector(const GestureEvent* gestureE
 
 void LongPressGestureDetector::CancelProcessing()
 {
-  if(mGestureRecognizer)
+  GestureRecognizerPtr recognizer(mGestureRecognizer);
+  if(recognizer)
   {
-    mGestureRecognizer->CancelEvent();
+    recognizer->CancelEvent();
   }
 }
 
@@ -392,6 +400,16 @@ Actor* LongPressGestureDetector::GetCurrentGesturedActor()
 {
   // Return the current feeded actor
   return GestureDetector::GetCurrentGesturedActor();
+}
+
+void LongPressGestureDetector::ResetRecognition()
+{
+  // Releasing the recognizer also cancels its pending holding timer.
+  GestureRecognizerPtr recognizer(std::move(mGestureRecognizer));
+  SetDetected(false);
+  mFeededActor.ResetActor();
+  mRenderTask.Reset();
+  mCurrentLongPressActor.ResetActor();
 }
 
 } // namespace Internal

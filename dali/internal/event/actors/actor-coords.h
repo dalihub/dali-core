@@ -21,8 +21,8 @@
 #include <dali/internal/event/render-tasks/render-task-impl.h>
 #include <dali/internal/event/render-tasks/render-task-list-impl.h>
 #include <dali/public-api/math/matrix.h>
+#include <dali/public-api/math/rect.h>
 #include <dali/public-api/math/vector3.h>
-#include <dali/public-api/math/viewport.h>
 
 namespace DALI_NAMESPACE::Internal
 {
@@ -40,15 +40,15 @@ namespace DALI_NAMESPACE::Internal
  * @param[in] screenY The screen Y coordinate
  * @return true if the conversion was successful
  */
-bool ConvertScreenToLocal(const Matrix&   viewMatrix,
-                          const Matrix&   projectionMatrix,
-                          const Matrix&   worldMatrix,
-                          const Vector3&  currentSize,
-                          const Viewport& viewport,
-                          float&          localX,
-                          float&          localY,
-                          float           screenX,
-                          float           screenY);
+bool ConvertScreenToLocal(const Matrix&        viewMatrix,
+                          const Matrix&        projectionMatrix,
+                          const Matrix&        worldMatrix,
+                          const Vector3&       currentSize,
+                          const BoundsInteger& viewport,
+                          float&               localX,
+                          float&               localY,
+                          float                screenX,
+                          float                screenY);
 
 /**
  * Convert screen coordinates to local coordinates
@@ -182,13 +182,13 @@ Bounds CalculateCurrentActorScreenBounds(const Actor& actor);
  * @param[out] screenY The screen Y coordinate
  * @return true if the conversion was successful
  */
-bool ConvertLocalToScreen(const Matrix&   viewMatrix,
-                          const Matrix&   projectionMatrix,
-                          const Matrix&   worldMatrix,
-                          const Viewport& viewport,
-                          const Vector3&  localPosition,
-                          float&          screenX,
-                          float&          screenY);
+bool ConvertLocalToScreen(const Matrix&        viewMatrix,
+                          const Matrix&        projectionMatrix,
+                          const Matrix&        worldMatrix,
+                          const BoundsInteger& viewport,
+                          const Vector3&       localPosition,
+                          float&               screenX,
+                          float&               screenY);
 
 /**
  * Convert local coordinates to screen coordinates

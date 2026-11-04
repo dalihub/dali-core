@@ -19,6 +19,7 @@
 #include <dali/devel-api/threading/thread.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/events/touch-integ.h>
+#include <dali/integration-api/input-options.h>
 #include <dali/integration-api/render-task-list-integ.h>
 #include <dali/internal/event/events/tap-gesture/tap-gesture-detector-impl.h>
 #include <dali/internal/event/events/touch-event-impl.h>
@@ -28,6 +29,8 @@
 
 #include <algorithm>
 #include <iostream>
+#include <utility>
+#include <vector>
 
 using namespace Dali;
 
@@ -789,5 +792,577 @@ int UtcDaliGestureDetectorDestructWorkerThreadN(void)
   // Always success
   DALI_TEST_CHECK(true);
 
+  END_TEST;
+}
+
+namespace
+{
+Actor AddDetachTestActor(TestApplication& application)
+{
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
+  application.GetScene().Add(actor);
+  application.SendNotification();
+  application.Render();
+  return actor;
+}
+
+void FeedDetachTestTouch(TestApplication& application, GestureDetector detector, Actor actor, PointState::Type state, uint32_t time, float separation = 0.0f)
+{
+  Internal::TouchEventPtr event(new Internal::TouchEvent(time));
+  Integration::Point      point;
+  point.SetState(state);
+  point.SetDeviceId(0);
+  point.SetScreenPosition(Vector2(20.0f, 20.0f));
+  event->AddPoint(point);
+  if(separation > 0.0f)
+  {
+    point.SetDeviceId(1);
+    point.SetScreenPosition(Vector2(20.0f + separation, 20.0f));
+    event->AddPoint(point);
+  }
+  event->SetRenderTask(application.GetScene().GetRenderTaskList().GetTask(0));
+  TouchEvent handle(event.Get());
+  detector.HandleEvent(actor, handle);
+}
+
+void ConfigureDetachTestGestures()
+{
+  Integration::SetPinchGestureMinimumDistance(1.0f);
+  Integration::SetPinchGestureMinimumTouchEvents(4u);
+  Integration::SetPinchGestureMinimumTouchEventsAfterStart(2u);
+  Integration::SetRotationGestureMinimumTouchEvents(4u);
+  Integration::SetRotationGestureMinimumTouchEventsAfterStart(2u);
+}
+
+void StartDetachTestGesture(TestApplication& application, GestureDetector detector, Actor actor, uint32_t time)
+{
+  FeedDetachTestTouch(application, detector, actor, PointState::DOWN, time, 60.0f);
+  for(uint32_t i = 0; i < 3; ++i)
+  {
+    FeedDetachTestTouch(application, detector, actor, PointState::MOTION, time + 10u + i * 10u, 50.0f - i * 10.0f);
+  }
+}
+
+template<typename Detector, typename GestureType>
+void CheckContinuousGestureDetach(bool geometry)
+{
+  TestApplication application;
+  application.GetScene().SetGeometryHittestEnabled(geometry);
+  ConfigureDetachTestGestures();
+  Actor actor = AddDetachTestActor(application);
+  for(uint32_t stage = 0; stage < 3; ++stage)
+  {
+    Detector detector = Detector::New();
+    detector.Attach(actor);
+    std::vector<GestureState> states;
+    detector.DetectedSignal().Connect(&application, [&](Actor, const GestureType& gesture)
+    {
+      states.push_back(gesture.GetState());
+    });
+    if(stage == 0)
+    {
+      FeedDetachTestTouch(application, detector, actor, PointState::DOWN, 100u, 60.0f);
+    }
+    else
+    {
+      StartDetachTestGesture(application, detector, actor, 100u);
+    }
+    if(stage == 2)
+    {
+      FeedDetachTestTouch(application, detector, actor, PointState::MOTION, 140u, 20.0f);
+      FeedDetachTestTouch(application, detector, actor, PointState::MOTION, 150u, 10.0f);
+    }
+    DALI_TEST_EQUALS(states.size(), stage, TEST_LOCATION);
+    detector.Detach(actor);
+    detector.DetachAll();
+    DALI_TEST_EQUALS(states.size(), stage, TEST_LOCATION);
+    detector.Attach(actor);
+    FeedDetachTestTouch(application, detector, actor, PointState::MOTION, 1000u, 60.0f);
+    FeedDetachTestTouch(application, detector, actor, PointState::MOTION, 1010u, 50.0f);
+    if(geometry)
+    {
+      DALI_TEST_EQUALS(states.size(), stage, TEST_LOCATION);
+    }
+    else if(stage > 0)
+    {
+      DALI_TEST_EQUALS(states.size(), stage + 1u, TEST_LOCATION);
+      DALI_TEST_EQUALS(states.back(), GestureState::CONTINUING, TEST_LOCATION);
+    }
+    FeedDetachTestTouch(application, detector, actor, PointState::MOTION, 1020u, 40.0f);
+    FeedDetachTestTouch(application, detector, actor, PointState::MOTION, 1030u, 30.0f);
+    if(geometry)
+    {
+      DALI_TEST_EQUALS(states.size(), stage + 1u, TEST_LOCATION);
+      DALI_TEST_EQUALS(states.back(), GestureState::STARTED, TEST_LOCATION);
+    }
+    FeedDetachTestTouch(application, detector, actor, PointState::UP, 1040u, 30.0f);
+    DALI_TEST_EQUALS(states.back(), GestureState::FINISHED, TEST_LOCATION);
+  }
+}
+
+template<typename Detector, typename GestureType>
+void CheckContinuousGestureDetachIsolation()
+{
+  TestApplication application;
+  application.GetScene().SetGeometryHittestEnabled(true);
+  ConfigureDetachTestGestures();
+  Actor    actor       = AddDetachTestActor(application);
+  Actor    other       = AddDetachTestActor(application);
+  Detector detector    = Detector::New();
+  Detector independent = Detector::New();
+  detector.Attach(actor);
+  detector.Attach(other);
+  independent.Attach(actor);
+  std::vector<GestureState> states;
+  std::vector<GestureState> independentStates;
+  detector.DetectedSignal().Connect(&application, [&](Actor, const GestureType& gesture)
+  {
+    states.push_back(gesture.GetState());
+  });
+  independent.DetectedSignal().Connect(&application, [&](Actor, const GestureType& gesture)
+  {
+    independentStates.push_back(gesture.GetState());
+  });
+  StartDetachTestGesture(application, detector, actor, 100u);
+  StartDetachTestGesture(application, independent, actor, 100u);
+  detector.Detach(other);
+  FeedDetachTestTouch(application, detector, actor, PointState::MOTION, 140u, 20.0f);
+  FeedDetachTestTouch(application, detector, actor, PointState::MOTION, 150u, 10.0f);
+  DALI_TEST_EQUALS(states.size(), 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(states.back(), GestureState::CONTINUING, TEST_LOCATION);
+  detector.DetachAll();
+  FeedDetachTestTouch(application, independent, actor, PointState::MOTION, 140u, 20.0f);
+  FeedDetachTestTouch(application, independent, actor, PointState::MOTION, 150u, 10.0f);
+  DALI_TEST_EQUALS(independentStates.size(), 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(independentStates.back(), GestureState::CONTINUING, TEST_LOCATION);
+}
+
+template<typename Detector, typename GestureType>
+void CheckContinuousGestureDetachDuringSignal()
+{
+  TestApplication application;
+  application.GetScene().SetGeometryHittestEnabled(true);
+  ConfigureDetachTestGestures();
+  Actor    actor    = AddDetachTestActor(application);
+  Detector detector = Detector::New();
+  detector.Attach(actor);
+  std::vector<GestureState> states;
+  bool                      restarted = false;
+  detector.DetectedSignal().Connect(&application, [&](Actor, const GestureType& gesture)
+  {
+    states.push_back(gesture.GetState());
+    if(!restarted && gesture.GetState() == GestureState::STARTED)
+    {
+      restarted = true;
+      detector.DetachAll();
+      detector.Attach(actor);
+      FeedDetachTestTouch(application, detector, actor, PointState::DOWN, 1000u, 60.0f);
+    }
+  });
+  StartDetachTestGesture(application, detector, actor, 100u);
+  DALI_TEST_EQUALS(states.size(), 1u, TEST_LOCATION);
+  for(uint32_t i = 0; i < 3; ++i)
+  {
+    FeedDetachTestTouch(application, detector, actor, PointState::MOTION, 1010u + i * 10u, 50.0f - i * 10.0f);
+  }
+  DALI_TEST_EQUALS(states.size(), 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(states.back(), GestureState::STARTED, TEST_LOCATION);
+  FeedDetachTestTouch(application, detector, actor, PointState::UP, 1040u, 30.0f);
+  DALI_TEST_EQUALS(states.size(), 3u, TEST_LOCATION);
+  DALI_TEST_EQUALS(states.back(), GestureState::FINISHED, TEST_LOCATION);
+}
+
+template<typename Detector, typename GestureType>
+void CheckContinuousGestureDetachDuringCancel()
+{
+  TestApplication application;
+  application.GetScene().SetGeometryHittestEnabled(true);
+  ConfigureDetachTestGestures();
+  Actor    actor    = AddDetachTestActor(application);
+  Detector detector = Detector::New();
+  detector.Attach(actor);
+  uint32_t cancelled = 0u;
+  detector.DetectedSignal().Connect(&application, [&](Actor, const GestureType& gesture)
+  {
+    if(gesture.GetState() == GestureState::CANCELLED)
+    {
+      ++cancelled;
+      detector.DetachAll();
+    }
+  });
+  StartDetachTestGesture(application, detector, actor, 100u);
+  FeedDetachTestTouch(application, detector, actor, PointState::MOTION, 140u, 20.0f);
+  LongPressGestureDetector other = LongPressGestureDetector::New();
+  other.CancelAllOtherGestureDetectors();
+  DALI_TEST_EQUALS(cancelled, 1u, TEST_LOCATION);
+}
+} // namespace
+
+int UtcDaliGestureGeometryDetachTapReuse(void)
+{
+  TestApplication application;
+  application.GetScene().SetGeometryHittestEnabled(true);
+  Actor              actor    = AddDetachTestActor(application);
+  TapGestureDetector detector = TapGestureDetector::New();
+  uint32_t           signals  = 0u;
+  detector.DetectedSignal().Connect(&application, [&](Actor, const TapGesture&)
+  {
+    ++signals;
+  });
+  detector.Attach(actor);
+  FeedDetachTestTouch(application, detector, actor, PointState::DOWN, 100u);
+  detector.DetachAll();
+  detector.Attach(actor);
+  FeedDetachTestTouch(application, detector, actor, PointState::UP, 120u);
+  DALI_TEST_EQUALS(signals, 0u, TEST_LOCATION);
+  FeedDetachTestTouch(application, detector, actor, PointState::DOWN, 200u);
+  FeedDetachTestTouch(application, detector, actor, PointState::UP, 220u);
+  DALI_TEST_EQUALS(signals, 1u, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliGestureGeometryDetachTapPending(void)
+{
+  TestApplication application;
+  application.GetScene().SetGeometryHittestEnabled(true);
+  Actor              actor    = AddDetachTestActor(application);
+  TapGestureDetector detector = TapGestureDetector::New();
+  detector.SetMaximumTapsRequired(2u);
+  uint32_t signals = 0u;
+  detector.DetectedSignal().Connect(&application, [&](Actor, const TapGesture&)
+  {
+    ++signals;
+  });
+  detector.Attach(actor);
+  FeedDetachTestTouch(application, detector, actor, PointState::DOWN, 100u);
+  FeedDetachTestTouch(application, detector, actor, PointState::UP, 120u);
+  detector.DetachAll();
+  application.GetPlatform().TriggerTimer();
+  DALI_TEST_EQUALS(signals, 0u, TEST_LOCATION);
+  detector.Attach(actor);
+  FeedDetachTestTouch(application, detector, actor, PointState::DOWN, 200u);
+  FeedDetachTestTouch(application, detector, actor, PointState::UP, 220u);
+  application.GetPlatform().TriggerTimer();
+  DALI_TEST_EQUALS(signals, 1u, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliGestureGeometryDetachTapOtherActor(void)
+{
+  TestApplication application;
+  application.GetScene().SetGeometryHittestEnabled(true);
+  Actor              actor    = AddDetachTestActor(application);
+  Actor              other    = AddDetachTestActor(application);
+  TapGestureDetector detector = TapGestureDetector::New();
+  detector.SetMaximumTapsRequired(2u);
+  detector.Attach(actor);
+  detector.Attach(other);
+  std::vector<Actor> actors;
+  detector.DetectedSignal().Connect(&application, [&](Actor tappedActor, const TapGesture&)
+  {
+    actors.push_back(tappedActor);
+  });
+  FeedDetachTestTouch(application, detector, actor, PointState::DOWN, 100u);
+  FeedDetachTestTouch(application, detector, actor, PointState::UP, 120u);
+  FeedDetachTestTouch(application, detector, other, PointState::DOWN, 200u);
+  detector.Detach(other);
+  application.GetPlatform().TriggerTimer();
+  DALI_TEST_EQUALS(actors.size(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(actors.back(), actor, TEST_LOCATION);
+
+  detector.Attach(other);
+  FeedDetachTestTouch(application, detector, actor, PointState::DOWN, 300u);
+  FeedDetachTestTouch(application, detector, actor, PointState::UP, 320u);
+  FeedDetachTestTouch(application, detector, other, PointState::DOWN, 400u);
+  detector.Detach(actor);
+  application.GetPlatform().TriggerTimer();
+  DALI_TEST_EQUALS(actors.size(), 1u, TEST_LOCATION);
+  FeedDetachTestTouch(application, detector, other, PointState::UP, 420u);
+  application.GetPlatform().TriggerTimer();
+  DALI_TEST_EQUALS(actors.size(), 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(actors.back(), other, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliGestureGeometryDetachTapDuringSignal(void)
+{
+  TestApplication application;
+  application.GetScene().SetGeometryHittestEnabled(true);
+  Actor              actor    = AddDetachTestActor(application);
+  TapGestureDetector detector = TapGestureDetector::New();
+  detector.Attach(actor);
+  uint32_t signals  = 0u;
+  uint32_t observed = 0u;
+  detector.DetectedSignal().Connect(&application, [&](Actor, const TapGesture&)
+  {
+    if(++signals == 1u)
+    {
+      detector.DetachAll();
+      detector.Attach(actor);
+      FeedDetachTestTouch(application, detector, actor, PointState::DOWN, 1000u);
+    }
+  });
+  detector.DetectedSignal().Connect(&application, [&](Actor, const TapGesture& tap)
+  {
+    DALI_TEST_EQUALS(tap.GetNumberOfTaps(), 1u, TEST_LOCATION);
+    ++observed;
+  });
+  FeedDetachTestTouch(application, detector, actor, PointState::DOWN, 100u);
+  FeedDetachTestTouch(application, detector, actor, PointState::UP, 120u);
+  FeedDetachTestTouch(application, detector, actor, PointState::UP, 1020u);
+  DALI_TEST_EQUALS(signals, 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(observed, 2u, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliGestureGeometryDetachTapDuringTimer(void)
+{
+  TestApplication application;
+  application.GetScene().SetGeometryHittestEnabled(true);
+  Actor              actor    = AddDetachTestActor(application);
+  TapGestureDetector detector = TapGestureDetector::New();
+  detector.SetMaximumTapsRequired(2u);
+  detector.Attach(actor);
+  uint32_t signals = 0u;
+  detector.DetectedSignal().Connect(&application, [&](Actor, const TapGesture&)
+  {
+    if(++signals == 1u)
+    {
+      detector.DetachAll();
+      detector.Attach(actor);
+      FeedDetachTestTouch(application, detector, actor, PointState::DOWN, 1000u);
+      FeedDetachTestTouch(application, detector, actor, PointState::UP, 1020u);
+    }
+  });
+  FeedDetachTestTouch(application, detector, actor, PointState::DOWN, 100u);
+  FeedDetachTestTouch(application, detector, actor, PointState::UP, 120u);
+  application.GetPlatform().TriggerTimer();
+  DALI_TEST_EQUALS(signals, 1u, TEST_LOCATION);
+  detector.DetachAll();
+  application.GetPlatform().TriggerTimer();
+  DALI_TEST_EQUALS(signals, 1u, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliGestureGeometryDetachTapPendingCallback(void)
+{
+  TestApplication application;
+  application.GetScene().SetGeometryHittestEnabled(true);
+  Actor              actor    = AddDetachTestActor(application);
+  Actor              other    = AddDetachTestActor(application);
+  TapGestureDetector detector = TapGestureDetector::New();
+  detector.SetMaximumTapsRequired(2u);
+  detector.Attach(actor);
+  detector.Attach(other);
+  uint32_t signals = 0u;
+  detector.DetectedSignal().Connect(&application, [&](Actor tappedActor, const TapGesture&)
+  {
+    if(++signals == 1u)
+    {
+      DALI_TEST_EQUALS(tappedActor, actor, TEST_LOCATION);
+      detector.DetachAll();
+      detector.Attach(other);
+      FeedDetachTestTouch(application, detector, other, PointState::DOWN, 1000u);
+    }
+  });
+  FeedDetachTestTouch(application, detector, actor, PointState::DOWN, 100u);
+  FeedDetachTestTouch(application, detector, actor, PointState::UP, 120u);
+  FeedDetachTestTouch(application, detector, other, PointState::DOWN, 200u);
+  FeedDetachTestTouch(application, detector, other, PointState::UP, 220u);
+  DALI_TEST_EQUALS(signals, 1u, TEST_LOCATION);
+  FeedDetachTestTouch(application, detector, other, PointState::UP, 1020u);
+  application.GetPlatform().TriggerTimer();
+  DALI_TEST_EQUALS(signals, 2u, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliGestureGeometryDetachLongPressTimer(void)
+{
+  TestApplication application;
+  application.GetScene().SetGeometryHittestEnabled(true);
+  Actor                    actor    = AddDetachTestActor(application);
+  LongPressGestureDetector detector = LongPressGestureDetector::New();
+  detector.Attach(actor);
+  uint32_t signals = 0u;
+  detector.DetectedSignal().Connect(&application, [&](Actor, const LongPressGesture&)
+  {
+    ++signals;
+  });
+  FeedDetachTestTouch(application, detector, actor, PointState::DOWN, 100u);
+  detector.DetachAll();
+  application.GetPlatform().TriggerTimer();
+  DALI_TEST_EQUALS(signals, 0u, TEST_LOCATION);
+  detector.Attach(actor);
+  FeedDetachTestTouch(application, detector, actor, PointState::DOWN, 1000u);
+  application.GetPlatform().TriggerTimer();
+  DALI_TEST_EQUALS(signals, 1u, TEST_LOCATION);
+  detector.DetachAll();
+  detector.Attach(actor);
+  FeedDetachTestTouch(application, detector, actor, PointState::UP, 2000u);
+  DALI_TEST_EQUALS(signals, 1u, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliGestureGeometryDetachLongPressOtherActor(void)
+{
+  TestApplication application;
+  application.GetScene().SetGeometryHittestEnabled(true);
+  Actor                    actor    = AddDetachTestActor(application);
+  Actor                    other    = AddDetachTestActor(application);
+  LongPressGestureDetector detector = LongPressGestureDetector::New();
+  detector.Attach(actor);
+  detector.Attach(other);
+  uint32_t signals = 0u;
+  detector.DetectedSignal().Connect(&application, [&](Actor pressedActor, const LongPressGesture&)
+  {
+    DALI_TEST_EQUALS(pressedActor, actor, TEST_LOCATION);
+    ++signals;
+  });
+  FeedDetachTestTouch(application, detector, actor, PointState::DOWN, 100u);
+  detector.Detach(other);
+  application.GetPlatform().TriggerTimer();
+  DALI_TEST_EQUALS(signals, 1u, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliGestureGeometryDetachLongPressDuringTimer(void)
+{
+  TestApplication application;
+  application.GetScene().SetGeometryHittestEnabled(true);
+  Actor                    actor    = AddDetachTestActor(application);
+  LongPressGestureDetector detector = LongPressGestureDetector::New();
+  detector.Attach(actor);
+  std::vector<GestureState> states;
+  detector.DetectedSignal().Connect(&application, [&](Actor, const LongPressGesture& gesture)
+  {
+    states.push_back(gesture.GetState());
+    if(states.size() == 1u)
+    {
+      detector.DetachAll();
+      detector.Attach(actor);
+      FeedDetachTestTouch(application, detector, actor, PointState::DOWN, 1000u);
+    }
+  });
+  FeedDetachTestTouch(application, detector, actor, PointState::DOWN, 100u);
+  application.GetPlatform().TriggerTimer();
+  application.GetPlatform().TriggerTimer();
+  DALI_TEST_EQUALS(states.size(), 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(states.back(), GestureState::STARTED, TEST_LOCATION);
+  FeedDetachTestTouch(application, detector, actor, PointState::UP, 2000u);
+  DALI_TEST_EQUALS(states.size(), 3u, TEST_LOCATION);
+  DALI_TEST_EQUALS(states.back(), GestureState::FINISHED, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliGestureGeometryDetachLongPressDuringCancel(void)
+{
+  TestApplication application;
+  application.GetScene().SetGeometryHittestEnabled(true);
+  Actor                    actor    = AddDetachTestActor(application);
+  LongPressGestureDetector detector = LongPressGestureDetector::New();
+  detector.Attach(actor);
+  uint32_t signals = 0u;
+  detector.DetectedSignal().Connect(&application, [&](Actor, const LongPressGesture& gesture)
+  {
+    ++signals;
+    if(gesture.GetState() == GestureState::FINISHED)
+    {
+      detector.DetachAll();
+    }
+  });
+  FeedDetachTestTouch(application, detector, actor, PointState::DOWN, 100u);
+  application.GetPlatform().TriggerTimer();
+  LongPressGestureDetector other = LongPressGestureDetector::New();
+  other.CancelAllOtherGestureDetectors();
+  DALI_TEST_EQUALS(signals, 2u, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliGestureGeometryDetachPinchReuse(void)
+{
+  CheckContinuousGestureDetach<PinchGestureDetector, PinchGesture>(true);
+  END_TEST;
+}
+
+int UtcDaliGestureGeometryDetachRotationReuse(void)
+{
+  CheckContinuousGestureDetach<RotationGestureDetector, RotationGesture>(true);
+  END_TEST;
+}
+
+int UtcDaliGestureGeometryDetachPinchIsolation(void)
+{
+  CheckContinuousGestureDetachIsolation<PinchGestureDetector, PinchGesture>();
+  END_TEST;
+}
+
+int UtcDaliGestureGeometryDetachRotationIsolation(void)
+{
+  CheckContinuousGestureDetachIsolation<RotationGestureDetector, RotationGesture>();
+  END_TEST;
+}
+
+int UtcDaliGestureGeometryDetachPinchDuringSignal(void)
+{
+  CheckContinuousGestureDetachDuringSignal<PinchGestureDetector, PinchGesture>();
+  END_TEST;
+}
+
+int UtcDaliGestureGeometryDetachRotationDuringSignal(void)
+{
+  CheckContinuousGestureDetachDuringSignal<RotationGestureDetector, RotationGesture>();
+  END_TEST;
+}
+
+int UtcDaliGestureGeometryDetachPinchDuringCancel(void)
+{
+  CheckContinuousGestureDetachDuringCancel<PinchGestureDetector, PinchGesture>();
+  END_TEST;
+}
+
+int UtcDaliGestureGeometryDetachRotationDuringCancel(void)
+{
+  CheckContinuousGestureDetachDuringCancel<RotationGestureDetector, RotationGesture>();
+  END_TEST;
+}
+
+int UtcDaliGestureDetachPreservesParentRecognition(void)
+{
+  CheckContinuousGestureDetach<PinchGestureDetector, PinchGesture>(false);
+  CheckContinuousGestureDetach<RotationGestureDetector, RotationGesture>(false);
+  TestApplication application;
+  application.GetScene().SetGeometryHittestEnabled(false);
+  Actor                    actor     = AddDetachTestActor(application);
+  TapGestureDetector       tap       = TapGestureDetector::New();
+  LongPressGestureDetector longPress = LongPressGestureDetector::New();
+  tap.Attach(actor);
+  longPress.Attach(actor);
+  uint32_t tapSignals       = 0u;
+  uint32_t longPressSignals = 0u;
+  tap.DetectedSignal().Connect(&application, [&](Actor, const TapGesture&)
+  {
+    ++tapSignals;
+  });
+  longPress.DetectedSignal().Connect(&application, [&](Actor, const LongPressGesture&)
+  {
+    ++longPressSignals;
+  });
+  FeedDetachTestTouch(application, tap, actor, PointState::DOWN, 100u);
+  tap.DetachAll();
+  tap.Attach(actor);
+  FeedDetachTestTouch(application, tap, actor, PointState::UP, 120u);
+  DALI_TEST_EQUALS(tapSignals, 1u, TEST_LOCATION);
+  tap.SetMaximumTapsRequired(2u);
+  FeedDetachTestTouch(application, tap, actor, PointState::DOWN, 1000u);
+  FeedDetachTestTouch(application, tap, actor, PointState::UP, 1020u);
+  tap.DetachAll();
+  application.GetPlatform().TriggerTimer();
+  DALI_TEST_EQUALS(tapSignals, 2u, TEST_LOCATION);
+  FeedDetachTestTouch(application, longPress, actor, PointState::DOWN, 100u);
+  longPress.DetachAll();
+  application.GetPlatform().TriggerTimer();
+  DALI_TEST_EQUALS(longPressSignals, 1u, TEST_LOCATION);
   END_TEST;
 }

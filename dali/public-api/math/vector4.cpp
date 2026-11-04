@@ -80,28 +80,6 @@ Vector4& Vector4::operator=(const Vector3& vec3)
   return *this;
 }
 
-bool Vector4::operator==(const Vector4& rhs) const
-{
-  if(fabsf(x - rhs.x) > GetRangedEpsilon(x, rhs.x))
-  {
-    return false;
-  }
-  if(fabsf(y - rhs.y) > GetRangedEpsilon(y, rhs.y))
-  {
-    return false;
-  }
-  if(fabsf(z - rhs.z) > GetRangedEpsilon(z, rhs.z))
-  {
-    return false;
-  }
-  if(fabsf(w - rhs.w) > GetRangedEpsilon(w, rhs.w))
-  {
-    return false;
-  }
-
-  return true;
-}
-
 float Vector4::Dot(const Vector3& other) const
 {
   MATH_INCREASE_BY(PerformanceMonitor::FLOAT_POINT_MULTIPLY, 3);

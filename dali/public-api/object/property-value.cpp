@@ -925,6 +925,25 @@ private:
   Data mData;
 };
 
+namespace Internal
+{
+struct DALI_INTERNAL PropertyValueAccess
+{
+  static const Property::Value::Impl& Read(const Property::Value& value)
+  {
+    return value.Read();
+  }
+
+  static Property::Value FromExtents(const Extents& extentsValue)
+  {
+    const Property::Value::Impl extents(extentsValue);
+    Property::Value             value;
+    value.Write() = extents;
+    return value;
+  }
+};
+} // namespace Internal
+
 /*
  * Safe way to read an already constructed Object from a buffer.
  */
@@ -1530,7 +1549,7 @@ std::size_t Property::Value::GetHash() const
 
 std::ostream& operator<<(std::ostream& stream, const Property::Value& value)
 {
-  const auto& obj = value.Read();
+  const auto& obj = Internal::PropertyValueAccess::Read(value);
 
   if(obj.GetType() == DevelProperty::EXTENTS)
   {
@@ -1620,18 +1639,14 @@ std::ostream& operator<<(std::ostream& stream, const Property::Value& value)
 // Extents is a devel type, but its storage is part of Property::Value::Impl, so these are defined here.
 Extents::operator Property::Value() const
 {
-  const Property::Value::Impl extents(*this);
-
-  Property::Value value;
-  value.Write() = extents;
-  return value;
+  return Internal::PropertyValueAccess::FromExtents(*this);
 }
 
 bool GetExtents(const Property::Value& value, Extents& extentsValue)
 {
   bool converted = false;
 
-  const auto& obj = value.Read();
+  const auto& obj = Internal::PropertyValueAccess::Read(value);
 
   if(obj.GetType() == DevelProperty::EXTENTS)
   {

@@ -26,6 +26,10 @@
 
 namespace DALI_NAMESPACE
 {
+namespace Internal
+{
+class DALI_INTERNAL StringImpl;
+}
 /**
  * @addtogroup dali_core_common
  * @{
@@ -283,10 +287,14 @@ public:
    */
   friend DALI_CORE_API String operator+(const String& lhs, const String& rhs);
 
-public: // Not intended for Application Developers
+private: // Not for use by application developer
+  /// @cond internal
+  friend class Internal::StringImpl;
+
+public: // Deprecated internal API
   /**
-   * @cond internal
    * @brief Get the raw storage pointer (internal use only).
+   * @DEPRECATED_2_5.47 will be private
    *
    * This method provides access to the internal storage for internal
    * use within Dali

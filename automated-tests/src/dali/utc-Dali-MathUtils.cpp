@@ -320,15 +320,30 @@ int UtcDaliMathUtilsRoundP(void)
 
 int UtcDaliMathUtilsSpecialValuesP(void)
 {
-  const float infinity = std::numeric_limits<float>::infinity();
-  const float nan      = std::numeric_limits<float>::quiet_NaN();
+  // Keep special-value checks at runtime: older compilers can reject
+  // floating-point exceptions during constant evaluation.
+  volatile float nanInput = std::numeric_limits<float>::quiet_NaN();
+  const float    infinity = std::numeric_limits<float>::infinity();
+  const float    nan      = nanInput;
 
+  DALI_TEST_CHECK(Internal::MathUtils::IsNaN(nan));
+  DALI_TEST_CHECK(Internal::MathUtils::IsNaN(-nan));
+  DALI_TEST_CHECK(!Internal::MathUtils::IsNaN(0.0f));
+  DALI_TEST_CHECK(!Internal::MathUtils::IsNaN(infinity));
+  DALI_TEST_CHECK(std::isnan(Internal::MathUtils::Abs(nan)));
+  DALI_TEST_CHECK(std::isnan(Internal::MathUtils::Abs(-nan)));
+  DALI_TEST_CHECK(!std::signbit(Internal::MathUtils::Abs(-0.0f)));
+  tet_printf("%f\n", Internal::MathUtils::Abs(0.0f));
+  DALI_TEST_CHECK(!std::signbit(Internal::MathUtils::Abs(0.0f)));
   DALI_TEST_CHECK(std::isnan(Internal::MathUtils::Floor(nan)));
   DALI_TEST_CHECK(std::isinf(Internal::MathUtils::Floor(infinity)) && Internal::MathUtils::Floor(infinity) > 0.0f);
   DALI_TEST_CHECK(std::isinf(Internal::MathUtils::Floor(-infinity)) && Internal::MathUtils::Floor(-infinity) < 0.0f);
   DALI_TEST_EQUALS(GetRangedEpsilon(infinity, 1.0f), Math::MACHINE_EPSILON_10000, TEST_LOCATION);
   DALI_TEST_EQUALS(GetRangedEpsilon(nan, 1.0f), Math::MACHINE_EPSILON_10000, TEST_LOCATION);
   DALI_TEST_EQUALS(GetRangedEpsilon(1.0f, nan), Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+  DALI_TEST_EQUALS(GetRangedEpsilon(nan, 100.0f), Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+  DALI_TEST_EQUALS(GetRangedEpsilon(nan, nan), Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+  DALI_TEST_EQUALS(GetRangedEpsilon(-nan, 100.0f), Math::MACHINE_EPSILON_10000, TEST_LOCATION);
 
   // Both extremes must complete without signed overflow or an exponent-sized loop.
   DALI_TEST_CHECK(std::isnan(Round(1.0f, std::numeric_limits<int32_t>::min())));
@@ -339,6 +354,12 @@ int UtcDaliMathUtilsSpecialValuesP(void)
 
 int UtcDaliMathUtilsConstExprP(void)
 {
+  static_assert(Internal::MathUtils::Abs(-3.5f) == 3.5f);
+  static_assert(Internal::MathUtils::Abs(3.5f) == 3.5f);
+  static_assert(Internal::MathUtils::Abs(-0.0f) == 0.0f);
+  static_assert(Internal::MathUtils::Abs(0.0f) == 0.0f);
+  static_assert(!Internal::MathUtils::IsNaN(1.0f));
+
   // Equals
   constexpr float zero  = 0.0f;
   constexpr float v1    = 1.49f;

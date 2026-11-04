@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <cstring> // for strcmp
+#include <utility>
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/object/type-registry.h>
@@ -114,6 +115,11 @@ void RotationGestureDetector::OnActorDetach(Actor& actor)
   if(actor.OnScene() && actor.GetScene().IsGeometryHittestEnabled())
   {
     actor.TouchEventSignal().Disconnect(this, &RotationGestureDetector::OnTouchEvent);
+
+    if(mGestureRecognizer && (mAttachedActors.empty() || mFeededActor.GetActor() == &actor))
+    {
+      ResetRecognition();
+    }
   }
 }
 
@@ -125,9 +131,10 @@ bool RotationGestureDetector::OnTouchEvent(Dali::Actor actor, Dali::TouchEvent t
 
 void RotationGestureDetector::CancelProcessing()
 {
-  if(mGestureRecognizer)
+  GestureRecognizerPtr recognizer(mGestureRecognizer);
+  if(recognizer)
   {
-    mGestureRecognizer->CancelEvent();
+    recognizer->CancelEvent();
   }
 }
 
@@ -231,6 +238,15 @@ Actor* RotationGestureDetector::GetCurrentGesturedActor()
 {
   // Return the current feeded actor
   return GestureDetector::GetCurrentGesturedActor();
+}
+
+void RotationGestureDetector::ResetRecognition()
+{
+  // Release touch history only after clearing the detector's recognition state.
+  GestureRecognizerPtr recognizer(std::move(mGestureRecognizer));
+  SetDetected(false);
+  mFeededActor.ResetActor();
+  mRenderTask.Reset();
 }
 
 } // namespace Internal

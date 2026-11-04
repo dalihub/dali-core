@@ -265,14 +265,14 @@ void Filter::Log(LogLevel level, const char* format, ...)
       if(numChars >= 0) // No error
       {
         std::string message = ArgListToString(buffer, arg);
-        LogMessage(INFO, message.c_str());
+        LogMessage(INFO, "%s", message.c_str());
         free(buffer);
       }
     }
     else
     {
       std::string message = ArgListToString(format, arg);
-      LogMessage(INFO, message.c_str());
+      LogMessage(INFO, "%s", message.c_str());
     }
     va_end(arg);
   }

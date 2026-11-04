@@ -44,7 +44,7 @@ struct Degree
    * @brief Default constructor, initialises to 0.
    * @SINCE_1_0.0
    */
-  Degree()
+  constexpr Degree()
   : degree(0.f)
   {
   }
@@ -66,7 +66,7 @@ struct Degree
    * @SINCE_1_0.0
    * @param[in] value The initial value in Radians
    */
-  DALI_CORE_API Degree(Radian value);
+  constexpr Degree(Radian value);
 
 public:
   Degree(const Degree&)                = default; ///< Default copy constructor
@@ -89,9 +89,9 @@ public:
  * @param[in] rhs Degree to compare to
  * @return True if the values are identical
  */
-inline bool operator==(const Degree& lhs, const Degree& rhs)
+inline constexpr bool operator==(const Degree& lhs, const Degree& rhs)
 {
-  return fabsf(lhs.degree - rhs.degree) < Math::MACHINE_EPSILON_1000; // expect degree angles to be between 0 and 1000
+  return Internal::MathUtils::Abs(lhs.degree - rhs.degree) < Math::MACHINE_EPSILON_1000; // expect degree angles to be between 0 and 1000
 }
 
 /**
@@ -102,7 +102,7 @@ inline bool operator==(const Degree& lhs, const Degree& rhs)
  * @param[in] rhs Degree to compare to
  * @return True if the values are not identical
  */
-inline bool operator!=(const Degree& lhs, const Degree& rhs)
+inline constexpr bool operator!=(const Degree& lhs, const Degree& rhs)
 {
   return !(operator==(lhs, rhs));
 }
@@ -115,7 +115,7 @@ inline bool operator!=(const Degree& lhs, const Degree& rhs)
  * @param max value
  * @return The resulting radian
  */
-inline Degree Clamp(Degree angle, float min, float max)
+inline constexpr Degree Clamp(Degree angle, float min, float max)
 {
   return Degree(Clamp<float>(angle.degree, min, max));
 }

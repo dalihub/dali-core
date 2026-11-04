@@ -159,6 +159,11 @@ private: // GestureDetector overrides
    */
   void EmitPinchSignal(Actor* actor, const PinchGestureEvent& pinchEvent, Vector2 localCenter);
 
+  /**
+   * @brief Discards detector-owned recognition without emitting a gesture signal.
+   */
+  void ResetRecognition();
+
 private:
   Dali::PinchGestureDetector::DetectedSignalType mDetectedSignal;
 };

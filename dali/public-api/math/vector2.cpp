@@ -26,6 +26,7 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/math/vector3.h>
+#include <dali/public-api/math/vector4.h>
 
 namespace DALI_NAMESPACE
 {
@@ -62,20 +63,6 @@ Vector2& Vector2::operator=(const Vector4& rhs)
   y = rhs.y;
 
   return *this;
-}
-
-bool Vector2::operator==(const Vector2& rhs) const
-{
-  if(fabsf(x - rhs.x) > GetRangedEpsilon(x, rhs.x))
-  {
-    return false;
-  }
-  if(fabsf(y - rhs.y) > GetRangedEpsilon(y, rhs.y))
-  {
-    return false;
-  }
-
-  return true;
 }
 
 float Vector2::Length() const

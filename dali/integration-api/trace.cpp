@@ -45,6 +45,26 @@ void LogContext(bool start, const char* tag, const char* message)
   gThreadLocalLogContextFunction(start, tag, message);
 }
 
+thread_local MarkContextFunction gThreadLocalMarkContextFunction = nullptr;
+
+void InstallMarkContextFunction(const MarkContextFunction& markContextFunction)
+{
+  gThreadLocalMarkContextFunction = markContextFunction;
+}
+
+void MarkContext(const char* tag, const char* message)
+{
+  if(gThreadLocalMarkContextFunction)
+  {
+    gThreadLocalMarkContextFunction(tag, message);
+    return;
+  }
+  // No native instant-event channel installed: fall back to an adjacent
+  // begin/end pair so span-based backends stay balanced.
+  LogContext(true, tag, message);
+  LogContext(false, tag, nullptr);
+}
+
 #ifdef TRACE_ENABLED
 
 typedef std::list<std::unique_ptr<Filter>>           FilterList;
@@ -130,6 +150,19 @@ void Filter::EndTrace(const char* tagName)
 void Filter::EndTrace(const char* tagName, const char* message)
 {
   Dali::Integration::Trace::LogContext(false, tagName, message);
+}
+
+/**
+ * Mark Trace
+ */
+void Filter::Mark(const char* tagName)
+{
+  Dali::Integration::Trace::MarkContext(tagName, nullptr);
+}
+
+void Filter::Mark(const char* tagName, const char* message)
+{
+  Dali::Integration::Trace::MarkContext(tagName, message);
 }
 
 /**

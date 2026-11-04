@@ -31,6 +31,51 @@
 namespace DALI_NAMESPACE::Integration
 {
 /**
+ * @brief Queries shader source information from the current thread's graphics configuration.
+ *
+ * These helpers are for graphics integration and legacy shader source preparation.
+ * They describe the current graphics configuration, not a particular Shader object
+ * or the capabilities of every graphics context. They require an initialized DALi
+ * thread-local context and may block until graphics initialization completes.
+ * Generated prefixes are implementation details and must not be cached across
+ * graphics configurations. Vertex and fragment prefixes include the legacy-prefix
+ * tag used by DALi's shader processing.
+ *
+ * @note Shader creation through Dali::Shader::New does not require calling these
+ * helpers when the supplied source already follows the supported DALi shader format.
+ * @{
+ */
+/**
+ * @brief Returns the shading language version reported by the current graphics configuration.
+ * @SINCE_2_5.47
+ * @return The reported shader language version number.
+ */
+DALI_CORE_API uint32_t GetShaderLanguageVersion();
+
+/**
+ * @brief Returns the raw shader language version prefix.
+ * @SINCE_2_5.47
+ * @return The untagged version prefix.
+ */
+DALI_CORE_API Dali::String GetShaderVersionPrefix();
+
+/**
+ * @brief Returns the tagged legacy vertex shader prefix, including the language version.
+ * @SINCE_2_5.47
+ * @return The vertex prefix with its legacy-prefix tag.
+ */
+DALI_CORE_API Dali::String GetVertexShaderPrefix();
+
+/**
+ * @brief Returns the tagged legacy fragment shader prefix, including the language version.
+ * @SINCE_2_5.47
+ * @return The fragment prefix with its legacy-prefix tag.
+ */
+DALI_CORE_API Dali::String GetFragmentShaderPrefix();
+
+/** @} */
+
+/**
  * @brief Creates Shader and connect by given uniform blocks
  *
  * @SINCE_2_4.14

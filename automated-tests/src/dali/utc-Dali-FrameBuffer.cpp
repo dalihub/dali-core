@@ -367,7 +367,7 @@ int UtcDaliFrameBufferMoveConstructor(void)
   DALI_TEST_CHECK(frameBuffer);
   DALI_TEST_EQUALS(1, frameBuffer.GetBaseObject().ReferenceCount(), TEST_LOCATION);
 
-  Texture texture = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
+  const Texture texture = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
   frameBuffer.AttachColorTexture(texture);
   DALI_TEST_EQUALS(frameBuffer.GetColorTexture(), texture, TEST_LOCATION);
 

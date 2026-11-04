@@ -67,6 +67,7 @@ public:
    * @brief Passes Assert message.
    *
    * @SINCE_1_0.0
+   * @DEPRECATED_2_5.47 Use DALI_ABORT instead.
    * @param[in] assertMessage Assert message to report
    */
   DALI_CORE_API static void AssertAlways(const char* assertMessage);
@@ -240,11 +241,11 @@ public:
   {
     if(nullptr == mContainer)
     {
-      AssertAlways("Any::Get(). mContainer is NULL");
+      DALI_ABORT("Any::Get(). mContainer is NULL");
     }
     else if(mContainer->GetType() != TypeInfoIdFromTypeid<Type>()) // Check if the value has the same value than the Any type.
     {
-      AssertAlways("Any::Get(). Trying to retrieve a value of a different type than the template one.");
+      DALI_ABORT("Any::Get(). Trying to retrieve a value of a different type than the template one.");
     }
     return static_cast<AnyContainerImpl<Type>*>(mContainer)->GetValue();
   }
@@ -265,7 +266,7 @@ public:
     // Check if the value has the same value than the Any type.
     if(mContainer->GetType() != TypeInfoIdFromTypeid<Type>())
     {
-      AssertAlways("Any::GetPointer(). Trying to retrieve a pointer to a value of a different type than the template one.");
+      DALI_ABORT("Any::GetPointer(). Trying to retrieve a pointer to a value of a different type than the template one.");
     }
     return static_cast<AnyContainerImpl<Type>*>(mContainer)->GetPointerToValue();
   }
@@ -286,7 +287,7 @@ public:
     // Check if the value has the same value than the Any type.
     if(mContainer->GetType() != TypeInfoIdFromTypeid<Type>())
     {
-      AssertAlways("Any::GetPointer(). Trying to retrieve a pointer to a value of a different type than the template one.");
+      DALI_ABORT("Any::GetPointer(). Trying to retrieve a pointer to a value of a different type than the template one.");
     }
     return static_cast<AnyContainerImpl<Type>*>(mContainer)->GetPointerToValue();
   }
@@ -302,15 +303,16 @@ public:
     return (nullptr == mContainer) ? true : false;
   }
 
-  struct AnyContainerBase; // Forward declaration for typedef
-  using CloneFunc = AnyContainerBase* (*)(const AnyContainerBase&);
+  struct AnyContainerBase;                                          // Forward declaration for typedef @DEPRECATED_2_5.47 will be private.
+  using CloneFunc = AnyContainerBase* (*)(const AnyContainerBase&); // @DEPRECATED_2_5.47 will be private.
 
-  using DeleteFunc = void (*)(const AnyContainerBase*);
+  using DeleteFunc = void (*)(const AnyContainerBase*); // @DEPRECATED_2_5.47 will be private.
 
   /**
    * @brief Base container to hold type for match verification and instance cloning function.
    *
    * @SINCE_1_0.0
+   * @DEPRECATED_2_5.47 will be private.
    */
   struct AnyContainerBase
   {
@@ -318,6 +320,7 @@ public:
      * @brief Constructor of base container.
      *
      * @SINCE_1_0.0
+     * @DEPRECATED_2_5.47 will be private.
      * @param[in] type TypeInfoId of container
      * @param[in] cloneFunc Cloning function to replicate this container type
      * @param[in] deleteFunc Deleting function to destroy this container type
@@ -333,6 +336,7 @@ public:
      * @brief Gets the TypeInfoId of this container.
      *
      * @SINCE_1_0.0
+     * @DEPRECATED_2_5.47 will be private.
      * @return Type
      */
     const TypeInfoId& GetType() const
@@ -349,6 +353,7 @@ public:
    * @brief Templated Clone function from container base.
    *
    * @SINCE_1_0.0
+   * @DEPRECATED_2_5.47 will be private.
    * @param[in] base The reference to container
    */
   template<typename Type>
@@ -364,6 +369,7 @@ public:
    * @brief Templated Delete function from container base.
    *
    * @SINCE_1_0.0
+   * @DEPRECATED_2_5.47 will be private.
    * @param[in] base The pointer to container
    */
   template<typename Type>
@@ -379,6 +385,7 @@ public:
    * @brief Templated class to hold value for type.
    *
    * @SINCE_1_0.0
+   * @DEPRECATED_2_5.47 will be private.
    */
   template<typename Type>
   class AnyContainerImpl : public AnyContainerBase
@@ -388,6 +395,7 @@ public:
      * @brief Constructor to create container holding value of type Type.
      *
      * @SINCE_1_0.0
+     * @DEPRECATED_2_5.47 will be private.
      * @param[in] value Value of Type
      */
     AnyContainerImpl(const Type& value)
@@ -402,6 +410,7 @@ public:
      * @brief Constructor to create new container of type from and existing container (cloning).
      *
      * @SINCE_1_0.0
+     * @DEPRECATED_2_5.47 will be private.
      * @param[in] base The reference to base container to copy from
      */
     AnyContainerImpl(const AnyContainerBase& base)
@@ -416,6 +425,7 @@ public:
      * @brief Gets the container's stored value.
      *
      * @SINCE_1_0.0
+     * @DEPRECATED_2_5.47 will be private.
      * @return Value of type Type
      */
     const Type& GetValue() const
@@ -427,6 +437,7 @@ public:
      * @brief Sets the container's stored value.
      *
      * @SINCE_1_0.0
+     * @DEPRECATED_2_5.47 will be private.
      * @param[in] value Value of type Type
      */
     void SetValue(const Type& value)
@@ -438,6 +449,7 @@ public:
      * @brief Gets a pointer to the value held.
      *
      * @SINCE_1_0.0
+     * @DEPRECATED_2_5.47 will be private.
      * @return Pointer to the value of type Type
      */
     Type* GetPointerToValue()
@@ -449,6 +461,7 @@ public:
      * @brief Gets a pointer to the value held.
      *
      * @SINCE_1_0.0
+     * @DEPRECATED_2_5.47 will be private.
      * @return Pointer to the value of type Type
      */
     const Type* GetPointerToValue() const

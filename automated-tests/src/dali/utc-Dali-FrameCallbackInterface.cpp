@@ -159,7 +159,6 @@ public:
 
   virtual bool Update(Dali::UpdateProxy& updateProxy, float elapsedSeconds) override
   {
-    Vector3 size;
     FrameCallbackBasic::Update(updateProxy, elapsedSeconds);
     updateProxy.SetSize(mActorId, mSizeToSet);
     updateProxy.SetPosition(mActorId, mPositionToSet);
@@ -214,7 +213,6 @@ public:
 
   virtual bool Update(Dali::UpdateProxy& updateProxy, float elapsedSeconds) override
   {
-    Vector3 size;
     FrameCallbackBasic::Update(updateProxy, elapsedSeconds);
     updateProxy.BakeSize(mActorId, mSizeToSet);
     updateProxy.BakePosition(mActorId, mPositionToSet);

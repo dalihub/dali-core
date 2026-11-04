@@ -76,12 +76,12 @@ FrameBuffer::FrameBuffer(FrameBuffer&& rhs) noexcept = default;
 
 FrameBuffer& FrameBuffer::operator=(FrameBuffer&& rhs) noexcept = default;
 
-void FrameBuffer::AttachColorTexture(Texture& texture)
+void FrameBuffer::AttachColorTexture(Texture texture)
 {
   AttachColorTexture(texture, 0u, 0u);
 }
 
-void FrameBuffer::AttachColorTexture(Texture& texture, uint32_t mipmapLevel, uint32_t layer)
+void FrameBuffer::AttachColorTexture(Texture texture, uint32_t mipmapLevel, uint32_t layer)
 {
   if(texture)
   {

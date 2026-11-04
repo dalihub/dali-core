@@ -32,6 +32,11 @@
 
 namespace DALI_NAMESPACE
 {
+namespace Internal
+{
+struct DALI_INTERNAL PropertyMapAccess;
+}
+
 /**
  * @addtogroup dali_core_object
  * @{
@@ -381,14 +386,24 @@ public:
    */
   std::size_t GetHash() const;
 
-public:                      // Not for use by application developer
-  struct DALI_INTERNAL Impl; ///< Private data
+private: // Not for use by application developer
+  /// @cond internal
+  friend struct Internal::PropertyMapAccess;
+
+public: // Deprecated internal API
+  /**
+   * @brief Internal implementation type.
+   * @DEPRECATED_2_5.47 will be private
+   */
+  struct DALI_INTERNAL Impl;
 
   /**
    * @brief Retrieves the Impl object.
-   * @
+   * @DEPRECATED_2_5.47 will be private
+   * @return The internal implementation, or nullptr for a moved-from map
    */
   DALI_INTERNAL const Impl* Read() const;
+  /// @endcond
 
 private:
   Impl* mImpl; ///< Pointer to private data

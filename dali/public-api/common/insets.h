@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/math/math-utils.h>
 
 namespace DALI_NAMESPACE
 {
@@ -40,7 +41,13 @@ struct DALI_CORE_API Insets
    * @brief Default constructor which provides an initialized Dali::Insets( 0.f, 0.f, 0.f, 0.f ).
    * @SINCE_2_5.38
    */
-  Insets();
+  constexpr Insets()
+  : start(0.0f),
+    end(0.0f),
+    top(0.0f),
+    bottom(0.0f)
+  {
+  }
 
   /**
    * @brief Copy constructor.
@@ -65,7 +72,13 @@ struct DALI_CORE_API Insets
    * @param[in] top    Top inset
    * @param[in] bottom Bottom inset
    */
-  Insets(float start, float end, float top, float bottom);
+  constexpr Insets(float start, float end, float top, float bottom)
+  : start(start),
+    end(end),
+    top(top),
+    bottom(bottom)
+  {
+  }
 
   /**
    * @brief Creates insets with symmetric horizontal and vertical values.
@@ -74,7 +87,13 @@ struct DALI_CORE_API Insets
    * @param[in] horizontal The value assigned to the start and end edges
    * @param[in] vertical   The value assigned to the top and bottom edges
    */
-  Insets(float horizontal, float vertical);
+  constexpr Insets(float horizontal, float vertical)
+  : start(horizontal),
+    end(horizontal),
+    top(vertical),
+    bottom(vertical)
+  {
+  }
 
   /**
    * @brief Copy Assignment operator.
@@ -99,7 +118,15 @@ struct DALI_CORE_API Insets
    * @param[in] array Array of float
    * @return Itself
    */
-  Insets& operator=(const float* array);
+  constexpr Insets& operator=(const float* array)
+  {
+    start  = array[0];
+    end    = array[1];
+    top    = array[2];
+    bottom = array[3];
+
+    return *this;
+  }
 
   /**
    * @brief Equality operator.
@@ -108,7 +135,13 @@ struct DALI_CORE_API Insets
    * @param[in] rhs The Insets to test against
    * @return True if the insets are equal
    */
-  bool operator==(const Insets& rhs) const;
+  constexpr bool operator==(const Insets& rhs) const
+  {
+    return (Internal::MathUtils::Abs(start - rhs.start) <= GetRangedEpsilon(start, rhs.start)) &&
+           (Internal::MathUtils::Abs(end - rhs.end) <= GetRangedEpsilon(end, rhs.end)) &&
+           (Internal::MathUtils::Abs(top - rhs.top) <= GetRangedEpsilon(top, rhs.top)) &&
+           (Internal::MathUtils::Abs(bottom - rhs.bottom) <= GetRangedEpsilon(bottom, rhs.bottom));
+  }
 
   /**
    * @brief Inequality operator.
@@ -117,7 +150,10 @@ struct DALI_CORE_API Insets
    * @param[in] rhs The Insets to test against
    * @return True if the insets are not equal
    */
-  bool operator!=(const Insets& rhs) const;
+  constexpr bool operator!=(const Insets& rhs) const
+  {
+    return !(*this == rhs);
+  }
 
 public:
   float start;  ///< The start inset.  @SINCE_2_5.38

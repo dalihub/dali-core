@@ -50,7 +50,7 @@ public:
   /**
    * @copydoc Dali::VertexBuffer::New()
    */
-  static VertexBufferPtr New(Dali::Property::Map& format);
+  static VertexBufferPtr New(const Dali::Property::Map& format);
 
   /**
    * @copydoc Dali::VertexBuffer::SetData()
@@ -105,7 +105,7 @@ private: // implementation
   /**
    * Second stage initialization
    */
-  void Initialize(Dali::Property::Map& format);
+  void Initialize(const Dali::Property::Map& format);
 
 private: // unimplemented methods
   VertexBuffer(const VertexBuffer&);

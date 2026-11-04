@@ -175,22 +175,22 @@ private:
 
 public:
   /**
-   * @copydoc Dali::Shader::GetShaderLanguageVersion()
+   * @copydoc Dali::Integration::GetShaderLanguageVersion()
    */
   static uint32_t GetShaderLanguageVersion();
 
   /**
-   * @copydoc Dali::Shader::GetShaderVersionPrefix()
+   * @copydoc Dali::Integration::GetShaderVersionPrefix()
    */
   static std::string GetShaderVersionPrefix();
 
   /**
-   * @copydoc Dali::Shader::GetVertexShaderPrefix()
+   * @copydoc Dali::Integration::GetVertexShaderPrefix()
    */
   static std::string GetVertexShaderPrefix();
 
   /**
-   * @copydoc Dali::Shader::GetFragmentShaderPrefix()
+   * @copydoc Dali::Integration::GetFragmentShaderPrefix()
    */
   static std::string GetFragmentShaderPrefix();
 

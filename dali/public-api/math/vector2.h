@@ -25,6 +25,7 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/type-traits.h>
 #include <dali/public-api/math/int-pair.h>
+#include <dali/public-api/math/scalar-math.h>
 
 namespace DALI_NAMESPACE
 {
@@ -52,7 +53,7 @@ public:
    * @brief Constructor.
    * @SINCE_1_0.0
    */
-  Vector2()
+  constexpr Vector2()
   : x(0.0f),
     y(0.0f)
   {
@@ -77,7 +78,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] array Array of xy
    */
-  explicit Vector2(const float* array)
+  explicit constexpr Vector2(const float* array)
   : x(array[0]),
     y(array[1])
   {
@@ -134,7 +135,7 @@ public:
    * @param[in] array Array of floats
    * @return Itself
    */
-  Vector2& operator=(const float* array)
+  constexpr Vector2& operator=(const float* array)
   {
     x = array[0];
     y = array[1];
@@ -167,7 +168,7 @@ public:
    * @param[in] rhs Vector to add
    * @return A vector containing the result of the addition
    */
-  Vector2 operator+(const Vector2& rhs) const
+  constexpr Vector2 operator+(const Vector2& rhs) const
   {
     Vector2 temp(*this);
 
@@ -181,7 +182,7 @@ public:
    * @param[in] rhs Vector to add
    * @return Itself
    */
-  Vector2& operator+=(const Vector2& rhs)
+  constexpr Vector2& operator+=(const Vector2& rhs)
   {
     x += rhs.x;
     y += rhs.y;
@@ -196,7 +197,7 @@ public:
    * @param[in] rhs The vector to subtract
    * @return A vector containing the result of the subtraction
    */
-  Vector2 operator-(const Vector2& rhs) const
+  constexpr Vector2 operator-(const Vector2& rhs) const
   {
     Vector2 temp(*this);
 
@@ -210,7 +211,7 @@ public:
    * @param[in] rhs The vector to subtract
    * @return Itself
    */
-  Vector2& operator-=(const Vector2& rhs)
+  constexpr Vector2& operator-=(const Vector2& rhs)
   {
     x -= rhs.x;
     y -= rhs.y;
@@ -225,7 +226,7 @@ public:
    * @param[in] rhs The vector to multiply
    * @return A vector containing the result of the multiplication
    */
-  Vector2 operator*(const Vector2& rhs) const
+  constexpr Vector2 operator*(const Vector2& rhs) const
   {
     return Vector2(x * rhs.x, y * rhs.y);
   }
@@ -237,7 +238,7 @@ public:
    * @param[in] rhs The float value to scale the vector
    * @return A vector containing the result of the scaling
    */
-  Vector2 operator*(float rhs) const
+  constexpr Vector2 operator*(float rhs) const
   {
     return Vector2(x * rhs, y * rhs);
   }
@@ -249,7 +250,7 @@ public:
    * @param[in] rhs The vector to multiply
    * @return Itself
    */
-  Vector2& operator*=(const Vector2& rhs)
+  constexpr Vector2& operator*=(const Vector2& rhs)
   {
     x *= rhs.x;
     y *= rhs.y;
@@ -264,7 +265,7 @@ public:
    * @param[in] rhs The float value to scale the vector
    * @return Itself
    */
-  Vector2& operator*=(float rhs)
+  constexpr Vector2& operator*=(float rhs)
   {
     x *= rhs;
     y *= rhs;
@@ -279,7 +280,7 @@ public:
    * @param[in] rhs The vector to divide
    * @return A vector containing the result of the division
    */
-  Vector2 operator/(const Vector2& rhs) const
+  constexpr Vector2 operator/(const Vector2& rhs) const
   {
     return Vector2(x / rhs.x, y / rhs.y);
   }
@@ -291,7 +292,7 @@ public:
    * @param[in] rhs The float value to scale the vector by
    * @return A vector containing the result of the scaling
    */
-  Vector2 operator/(float rhs) const
+  constexpr Vector2 operator/(float rhs) const
   {
     return Vector2(x / rhs, y / rhs);
   }
@@ -303,7 +304,7 @@ public:
    * @param[in] rhs The vector to divide
    * @return Itself
    */
-  Vector2& operator/=(const Vector2& rhs)
+  constexpr Vector2& operator/=(const Vector2& rhs)
   {
     x /= rhs.x;
     y /= rhs.y;
@@ -318,7 +319,7 @@ public:
    * @param[in] rhs The float value to scale the vector by
    * @return Itself
    */
-  Vector2& operator/=(float rhs)
+  constexpr Vector2& operator/=(float rhs)
   {
     x /= rhs;
     y /= rhs;
@@ -332,7 +333,7 @@ public:
    * @SINCE_1_0.0
    * @return A vector containing the negation
    */
-  Vector2 operator-() const
+  constexpr Vector2 operator-() const
   {
     Vector2 temp(-x, -y);
 
@@ -348,7 +349,19 @@ public:
    * @param[in] rhs The vector to test against
    * @return true if the vectors are equal
    */
-  bool operator==(const Vector2& rhs) const;
+  constexpr bool operator==(const Vector2& rhs) const
+  {
+    if(Internal::MathUtils::Abs(x - rhs.x) > GetRangedEpsilon(x, rhs.x))
+    {
+      return false;
+    }
+    if(Internal::MathUtils::Abs(y - rhs.y) > GetRangedEpsilon(y, rhs.y))
+    {
+      return false;
+    }
+
+    return true;
+  }
 
   /**
    * @brief Inequality operator.
@@ -359,7 +372,7 @@ public:
    * @param[in] rhs The vector to test against
    * @return true if the vectors are not equal
    */
-  bool operator!=(const Vector2& rhs) const
+  constexpr bool operator!=(const Vector2& rhs) const
   {
     return !(*this == rhs);
   }
@@ -372,11 +385,11 @@ public:
    * @param[in] index Subscript index
    * @return The float at the given index
    */
-  const float& operator[](uint32_t index) const
+  constexpr const float& operator[](uint32_t index) const
   {
     DALI_ASSERT_ALWAYS(index < 2 && "Vector element index out of bounds");
 
-    return AsFloat()[index];
+    return index == 0 ? x : y;
   }
 
   /**
@@ -387,11 +400,11 @@ public:
    * @param[in] index Subscript index
    * @return The float at the given index
    */
-  float& operator[](uint32_t index)
+  constexpr float& operator[](uint32_t index)
   {
     DALI_ASSERT_ALWAYS(index < 2 && "Vector element index out of bounds");
 
-    return AsFloat()[index];
+    return index == 0 ? x : y;
   }
 
   /**
@@ -509,7 +522,7 @@ using Scale = Vector2;
  * @param[in] b A vector
  * @return A vector containing the minimum of each component from a and b
  */
-inline Vector2 Min(const Vector2& a, const Vector2& b)
+inline constexpr Vector2 Min(const Vector2& a, const Vector2& b)
 {
   return Vector2(a.x < b.x ? a.x : b.x, a.y < b.y ? a.y : b.y);
 }
@@ -523,7 +536,7 @@ inline Vector2 Min(const Vector2& a, const Vector2& b)
  * @param[in] b A vector
  * @return A vector containing the maximum of each component from a and b
  */
-inline Vector2 Max(const Vector2& a, const Vector2& b)
+inline constexpr Vector2 Max(const Vector2& a, const Vector2& b)
 {
   return Vector2(a.x > b.x ? a.x : b.x, a.y > b.y ? a.y : b.y);
 }

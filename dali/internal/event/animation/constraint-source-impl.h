@@ -52,13 +52,14 @@ struct Source
    * the owner of this object is responsible for observing the Object's lifetime.
    */
   Source(Dali::ConstraintSource& source)
-  : sourceType(source.sourceType),
-    propertyIndex(source.propertyIndex),
+  : sourceType(source.GetSourceType()),
+    propertyIndex(source.GetPropertyIndex()),
     object(nullptr)
   {
-    if(source.object)
+    Handle sourceObject = source.GetObject();
+    if(sourceObject)
     {
-      object = &dynamic_cast<Object&>(GetImplementation(source.object));
+      object = &dynamic_cast<Object&>(GetImplementation(sourceObject));
     }
   }
 

@@ -38,15 +38,6 @@ const Quaternion Quaternion::IDENTITY;
 /**
  * Default Constructor
  */
-Quaternion::Quaternion()
-: mVector(0.0f, 0.0f, 0.0f, 1.0f)
-{
-}
-
-Quaternion::Quaternion(float cosThetaBy2, float iBySineTheta, float jBySineTheta, float kBySineTheta)
-: mVector(iBySineTheta, jBySineTheta, kBySineTheta, cosThetaBy2)
-{
-}
 
 Quaternion::Quaternion(Radian angle, const Vector3& axis)
 {
@@ -108,16 +99,6 @@ Quaternion::Quaternion(const Vector3& v0, const Vector3& v1)
   }
 }
 
-bool Quaternion::IsIdentity() const
-{
-  // start from w as its unlikely that any real rotation has w == 1
-  // Uses a relaxed epsilon, as composition of rotation introduces error
-  return ((fabsf(mVector.w - 1.0f) < Math::MACHINE_EPSILON_10) &&
-          (fabsf(mVector.x) < Math::MACHINE_EPSILON_10) &&
-          (fabsf(mVector.y) < Math::MACHINE_EPSILON_10) &&
-          (fabsf(mVector.z) < Math::MACHINE_EPSILON_10));
-}
-
 bool Quaternion::ToAxisAngle(Vector3& axis, Radian& angle) const
 {
   angle          = acosf(Dali::Clamp(mVector.w, -1.0f, 1.0f));
@@ -140,11 +121,6 @@ bool Quaternion::ToAxisAngle(Vector3& axis, Radian& angle) const
     converted = true;
   }
   return converted;
-}
-
-const Vector4& Quaternion::AsVector() const
-{
-  return mVector;
 }
 
 void Quaternion::SetEuler(Radian pitch, Radian yaw, Radian roll)

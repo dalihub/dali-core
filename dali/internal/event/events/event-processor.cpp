@@ -25,7 +25,6 @@
 #include <dali/integration-api/events/key-event-integ.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/events/wheel-event-integ.h>
-#include <dali/integration-api/trace.h>
 #include <dali/internal/common/core-impl.h>
 #include <dali/internal/event/common/notification-manager.h>
 #include <dali/internal/event/events/gesture-event-processor.h>
@@ -40,8 +39,6 @@ namespace // unnamed namespace
 {
 static constexpr size_t WARNING_PRINT_THRESHOLD  = 100u;
 static constexpr size_t ASSERT_PROGRAM_THRESHOLD = 10000u;
-
-DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_PERFORMANCE_MARKER, false);
 } // unnamed namespace
 
 EventProcessor::EventProcessor(Scene& scene, GestureEventProcessor& gestureEventProcessor)
@@ -118,9 +115,6 @@ void EventProcessor::ProcessEvents()
   // Switch current queue; events can be added safely while iterating through the other queue.
   mCurrentEventQueue = (&mEventQueue0 == mCurrentEventQueue) ? &mEventQueue1 : &mEventQueue0;
 
-  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_SCENE_PROCESS_EVENTS", [&](std::ostringstream& oss)
-  { oss << "[" << queueToProcess.size() << "]"; });
-
   while(!queueToProcess.empty())
   {
     // Get l-value of event.
@@ -181,7 +175,6 @@ void EventProcessor::ProcessEvents()
     // Pop the event end of the process, since we use l-value of events here.
     queueToProcess.pop();
   }
-  DALI_TRACE_END(gTraceFilter, "DALI_SCENE_PROCESS_EVENTS");
 }
 
 void EventProcessor::SendInterruptedEvents(Dali::Internal::Actor* actor)

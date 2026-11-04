@@ -358,6 +358,11 @@ private:
    */
   const PropertyInputImpl* GetSceneObjectInputProperty(Property::Index index) const override;
 
+  /**
+   * @brief Discards detector-owned recognition without emitting a gesture signal.
+   */
+  void ResetRecognition();
+
 private:
   Dali::PanGestureDetector::DetectedSignalType mDetectedSignal;
 

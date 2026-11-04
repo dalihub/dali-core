@@ -308,7 +308,7 @@ public:
     OBJECT_DESTROYED = 300, ///< Object destroyed. Could never be applied again. @SINCE_2_5.7
   };
 
-  static const RemoveAction DEFAULT_REMOVE_ACTION; ///< BAKE
+  static const RemoveAction DEFAULT_REMOVE_ACTION; ///< BAKE @DEPRECATED_2_5.47
 
   /**
    * @brief Creates an uninitialized Constraint; this can be initialized with Constraint::New().
@@ -542,6 +542,7 @@ public:
 
   /**
    * @brief Retrieves the remove action that will happen when the constraint is removed.
+   * @note The default is BAKE.
    *
    * @SINCE_1_0.0
    * @return The remove-action

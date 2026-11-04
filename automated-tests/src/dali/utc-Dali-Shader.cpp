@@ -17,6 +17,7 @@
 
 #include <dali-test-suite-utils.h>
 #include <dali/devel-api/threading/thread.h>
+#include <dali/integration-api/shader-integ.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/dali-core.h>
 #include <mesh-builder.h>
@@ -370,12 +371,12 @@ int UtcDaliShaderGetShaderLanguageVersion(void)
     uint32_t expectVersion                                = 100;
     application.GetGlAbstraction().mShaderLanguageVersion = expectVersion;
 
-    DALI_TEST_EQUALS(Dali::Shader::GetShaderLanguageVersion(), expectVersion, TEST_LOCATION);
+    DALI_TEST_EQUALS(Dali::Integration::GetShaderLanguageVersion(), expectVersion, TEST_LOCATION);
 
     expectVersion                                         = 200;
     application.GetGlAbstraction().mShaderLanguageVersion = expectVersion;
 
-    DALI_TEST_EQUALS(Dali::Shader::GetShaderLanguageVersion(), expectVersion, TEST_LOCATION);
+    DALI_TEST_EQUALS(Dali::Integration::GetShaderLanguageVersion(), expectVersion, TEST_LOCATION);
   }
   catch(...)
   {

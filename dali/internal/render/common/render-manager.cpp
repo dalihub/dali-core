@@ -1236,7 +1236,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
     bool clearFullFrameRect = (surfaceRect == viewportRect);
     if(instruction.mFrameBuffer != nullptr)
     {
-      Viewport frameRect(0, 0, instruction.mFrameBuffer->GetWidth(), instruction.mFrameBuffer->GetHeight());
+      BoundsInteger frameRect(0, 0, instruction.mFrameBuffer->GetWidth(), instruction.mFrameBuffer->GetHeight());
       clearFullFrameRect = (frameRect == viewportRect);
     }
 
@@ -1310,10 +1310,14 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
       }
       currentCommandBuffer->EndRenderPass(syncObject);
 
-      if(instruction.mFrameBuffer && instruction.mFrameBuffer->IsKeepingRenderResultRequested())
+      if(instruction.mFrameBuffer && instruction.mFrameBuffer->IsRenderResultRequested())
       {
-        currentCommandBuffer->ReadPixels(instruction.mFrameBuffer->GetRenderResultBuffer());
-        mImpl->renderedFrameBufferContainer.push_back(instruction.mFrameBuffer);
+        uint8_t* renderResultBuffer = instruction.mFrameBuffer->AllocateRenderResultBuffer();
+        if(DALI_LIKELY(renderResultBuffer))
+        {
+          currentCommandBuffer->ReadPixels(renderResultBuffer);
+          mImpl->renderedFrameBufferContainer.push_back(instruction.mFrameBuffer);
+        }
       }
     }
   }
@@ -1462,7 +1466,7 @@ void RenderManager::PostRender()
 
   for(auto& framebuffer : mImpl->renderedFrameBufferContainer)
   {
-    framebuffer->SetRenderResultDrawn();
+    framebuffer->StoreRenderResult();
   }
   mImpl->renderedFrameBufferContainer.clear();
 

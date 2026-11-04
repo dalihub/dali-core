@@ -46,7 +46,10 @@ public:
    * @brief Default Constructor.
    * @SINCE_1_0.0
    */
-  Quaternion();
+  constexpr Quaternion()
+  : mVector(0.0f, 0.0f, 0.0f, 1.0f)
+  {
+  }
 
   /**
    * @brief Constructs from a quaternion represented by floats.
@@ -57,7 +60,10 @@ public:
    * @param[in] jBySineTheta
    * @param[in] kBySineTheta
    */
-  Quaternion(float cosThetaBy2, float iBySineTheta, float jBySineTheta, float kBySineTheta);
+  constexpr Quaternion(float cosThetaBy2, float iBySineTheta, float jBySineTheta, float kBySineTheta)
+  : mVector(iBySineTheta, jBySineTheta, kBySineTheta, cosThetaBy2)
+  {
+  }
 
   /**
    * @brief Constructs from a quaternion represented by a vector.
@@ -134,7 +140,15 @@ public:
    * @SINCE_1_0.0
    * @return True if this is identity quaternion
    */
-  bool IsIdentity() const;
+  constexpr bool IsIdentity() const
+  {
+    // start from w as its unlikely that any real rotation has w == 1
+    // Uses a relaxed epsilon, as composition of rotation introduces error
+    return ((Internal::MathUtils::Abs(mVector.w - 1.0f) < Math::MACHINE_EPSILON_10) &&
+            (Internal::MathUtils::Abs(mVector.x) < Math::MACHINE_EPSILON_10) &&
+            (Internal::MathUtils::Abs(mVector.y) < Math::MACHINE_EPSILON_10) &&
+            (Internal::MathUtils::Abs(mVector.z) < Math::MACHINE_EPSILON_10));
+  }
 
   /**
    * @brief Converts the quaternion to an axis/angle pair.
@@ -152,7 +166,10 @@ public:
    * @SINCE_1_0.0
    * @return The vector representation of the quaternion
    */
-  const Vector4& AsVector() const;
+  constexpr const Vector4& AsVector() const
+  {
+    return mVector;
+  }
 
   /**
    * @brief SetEuler sets the quaternion from the Euler angles applied in x, y, z order.

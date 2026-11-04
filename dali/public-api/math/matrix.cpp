@@ -59,11 +59,6 @@ const float identityArray[] = {
 
 const Matrix Matrix::IDENTITY(identityArray);
 
-Matrix::Matrix()
-{
-  memset(mMatrix, 0, NUM_BYTES_IN_MATRIX);
-}
-
 Matrix::Matrix(bool initialize)
 {
   if(initialize)
@@ -72,46 +67,12 @@ Matrix::Matrix(bool initialize)
   }
 }
 
-Matrix::Matrix(const float* array)
-{
-  memcpy(mMatrix, array, NUM_BYTES_IN_MATRIX);
-}
-
 Matrix::Matrix(const Quaternion& rotation)
 {
   MATH_INCREASE_BY(PerformanceMonitor::FLOAT_POINT_MULTIPLY, 18);
 
   float* matrixPtr = &mMatrix[0];
   Internal::MatrixUtils::ConvertQuaternion(matrixPtr, rotation);
-}
-
-Matrix::Matrix(const Matrix& matrix)
-{
-  memcpy(mMatrix, matrix.mMatrix, NUM_BYTES_IN_MATRIX);
-}
-
-Matrix& Matrix::operator=(const Matrix& matrix)
-{
-  // no point copying if self assigning
-  if(this != &matrix)
-  {
-    memcpy(mMatrix, matrix.mMatrix, NUM_BYTES_IN_MATRIX);
-  }
-  return *this;
-}
-
-Matrix::Matrix(Matrix&& matrix) noexcept
-{
-  memcpy(mMatrix, matrix.mMatrix, NUM_BYTES_IN_MATRIX);
-}
-
-Matrix& Matrix::operator=(Matrix&& matrix) noexcept
-{
-  if(this != &matrix)
-  {
-    memcpy(mMatrix, matrix.mMatrix, NUM_BYTES_IN_MATRIX);
-  }
-  return *this;
 }
 
 void Matrix::InvertTransform(Matrix& result) const
@@ -191,60 +152,6 @@ bool Matrix::Invert()
   return InvertMatrix(temp.AsFloat(), mMatrix);
 }
 
-void Matrix::Transpose()
-{
-  float temp = mMatrix[1];
-  mMatrix[1] = mMatrix[4];
-  mMatrix[4] = temp;
-
-  temp       = mMatrix[2];
-  mMatrix[2] = mMatrix[8];
-  mMatrix[8] = temp;
-
-  temp        = mMatrix[3];
-  mMatrix[3]  = mMatrix[12];
-  mMatrix[12] = temp;
-
-  temp       = mMatrix[6];
-  mMatrix[6] = mMatrix[9];
-  mMatrix[9] = temp;
-
-  temp        = mMatrix[7];
-  mMatrix[7]  = mMatrix[13];
-  mMatrix[13] = temp;
-
-  temp        = mMatrix[11];
-  mMatrix[11] = mMatrix[14];
-  mMatrix[14] = temp;
-}
-
-void Matrix::SetIdentity()
-{
-  memcpy(mMatrix, identityArray, NUM_BYTES_IN_MATRIX);
-}
-
-void Matrix::SetIdentityAndScale(const Vector3& scale)
-{
-  // initialize to zeros
-  memset(mMatrix, 0, NUM_BYTES_IN_MATRIX);
-
-  // just apply scale on the diagonal
-  mMatrix[0]  = scale.x;
-  mMatrix[5]  = scale.y;
-  mMatrix[10] = scale.z;
-  mMatrix[15] = 1.0f;
-}
-
-void Matrix::SetTranslation(const Vector4& translation)
-{
-  memcpy(mMatrix + ROW3_OFFSET, &translation, NUM_BYTES_IN_ROW);
-}
-void Matrix::SetTranslation(const Vector3& other)
-{
-  memcpy(mMatrix + ROW3_OFFSET, &other, NUM_BYTES_IN_ROW_OF_3);
-  mMatrix[15] = 1.0f;
-}
-
 void Matrix::Multiply(Matrix& result, const Matrix& lhs, const Matrix& rhs)
 {
   Internal::MatrixUtils::Multiply(result, lhs, rhs);
@@ -312,37 +219,6 @@ Vector4 Matrix::operator*(const Vector4& rhs) const
   return temp;
 }
 
-bool Matrix::operator==(const Matrix& rhs) const
-{
-  return (
-    (fabsf(mMatrix[0] - rhs.mMatrix[0]) <= GetRangedEpsilon(mMatrix[0], rhs.mMatrix[0])) &&
-    (fabsf(mMatrix[1] - rhs.mMatrix[1]) <= GetRangedEpsilon(mMatrix[1], rhs.mMatrix[1])) &&
-    (fabsf(mMatrix[2] - rhs.mMatrix[2]) <= GetRangedEpsilon(mMatrix[2], rhs.mMatrix[2])) &&
-    (fabsf(mMatrix[3] - rhs.mMatrix[3]) <= GetRangedEpsilon(mMatrix[3], rhs.mMatrix[3])) &&
-    (fabsf(mMatrix[4] - rhs.mMatrix[4]) <= GetRangedEpsilon(mMatrix[4], rhs.mMatrix[4])) &&
-    (fabsf(mMatrix[5] - rhs.mMatrix[5]) <= GetRangedEpsilon(mMatrix[5], rhs.mMatrix[5])) &&
-    (fabsf(mMatrix[6] - rhs.mMatrix[6]) <= GetRangedEpsilon(mMatrix[6], rhs.mMatrix[6])) &&
-    (fabsf(mMatrix[7] - rhs.mMatrix[7]) <= GetRangedEpsilon(mMatrix[7], rhs.mMatrix[7])) &&
-    (fabsf(mMatrix[8] - rhs.mMatrix[8]) <= GetRangedEpsilon(mMatrix[8], rhs.mMatrix[8])) &&
-    (fabsf(mMatrix[9] - rhs.mMatrix[9]) <= GetRangedEpsilon(mMatrix[9], rhs.mMatrix[9])) &&
-    (fabsf(mMatrix[10] - rhs.mMatrix[10]) <= GetRangedEpsilon(mMatrix[10], rhs.mMatrix[10])) &&
-    (fabsf(mMatrix[11] - rhs.mMatrix[11]) <= GetRangedEpsilon(mMatrix[11], rhs.mMatrix[11])) &&
-    (fabsf(mMatrix[12] - rhs.mMatrix[12]) <= GetRangedEpsilon(mMatrix[12], rhs.mMatrix[12])) &&
-    (fabsf(mMatrix[13] - rhs.mMatrix[13]) <= GetRangedEpsilon(mMatrix[13], rhs.mMatrix[13])) &&
-    (fabsf(mMatrix[14] - rhs.mMatrix[14]) <= GetRangedEpsilon(mMatrix[14], rhs.mMatrix[14])) &&
-    (fabsf(mMatrix[15] - rhs.mMatrix[15]) <= GetRangedEpsilon(mMatrix[15], rhs.mMatrix[15])));
-}
-
-bool Matrix::operator!=(const Matrix& rhs) const
-{
-  if(*this == rhs)
-  {
-    return false;
-  }
-
-  return true;
-}
-
 void Matrix::OrthoNormalize()
 {
   Vector4 vector0(GetXAxis());
@@ -357,42 +233,6 @@ void Matrix::OrthoNormalize()
   memcpy(mMatrix, &vector0, NUM_BYTES_IN_ROW);
   memcpy(mMatrix + ROW1_OFFSET, &vector1, NUM_BYTES_IN_ROW);
   memcpy(mMatrix + ROW2_OFFSET, &vector2, NUM_BYTES_IN_ROW);
-}
-
-Vector3 Matrix::GetXAxis() const
-{
-  return Vector3(mMatrix[0], mMatrix[1], mMatrix[2]);
-}
-
-Vector3 Matrix::GetYAxis() const
-{
-  return Vector3(mMatrix[4], mMatrix[5], mMatrix[6]);
-}
-
-Vector3 Matrix::GetZAxis() const
-{
-  return Vector3(mMatrix[8], mMatrix[9], mMatrix[10]);
-}
-
-void Matrix::SetXAxis(const Vector3& axis)
-{
-  mMatrix[0] = axis.x;
-  mMatrix[1] = axis.y;
-  mMatrix[2] = axis.z;
-}
-
-void Matrix::SetYAxis(const Vector3& axis)
-{
-  mMatrix[4] = axis.x;
-  mMatrix[5] = axis.y;
-  mMatrix[6] = axis.z;
-}
-
-void Matrix::SetZAxis(const Vector3& axis)
-{
-  mMatrix[8]  = axis.x;
-  mMatrix[9]  = axis.y;
-  mMatrix[10] = axis.z;
 }
 
 void Matrix::SetTransformComponents(const Vector3&    scale,

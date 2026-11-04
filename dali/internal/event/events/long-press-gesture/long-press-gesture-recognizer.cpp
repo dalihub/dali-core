@@ -249,6 +249,8 @@ void LongPressGestureRecognizer::ApplyThresholds(const LongPressThresholdValues&
 
 bool LongPressGestureRecognizer::TimerCallback()
 {
+  // A STARTED callback may detach and release this detector-owned recognizer.
+  GestureRecognizerPtr recognizerHandle(this);
   EmitGesture(GestureState::STARTED);
 
   mState = FINISHED;

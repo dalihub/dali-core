@@ -19,10 +19,31 @@
 #include <dali/integration-api/shader-integ.h>
 
 // INTERNAL INCLUDES
+#include <dali/integration-api/string-utils.h>
 #include <dali/internal/event/rendering/shader-impl.h>
 
 namespace DALI_NAMESPACE::Integration
 {
+uint32_t GetShaderLanguageVersion()
+{
+  return Dali::Internal::Shader::GetShaderLanguageVersion();
+}
+
+Dali::String GetShaderVersionPrefix()
+{
+  return ToDaliString(Dali::Internal::Shader::GetShaderVersionPrefix());
+}
+
+Dali::String GetVertexShaderPrefix()
+{
+  return ToDaliString(Dali::Internal::Shader::GetVertexShaderPrefix());
+}
+
+Dali::String GetFragmentShaderPrefix()
+{
+  return ToDaliString(Dali::Internal::Shader::GetFragmentShaderPrefix());
+}
+
 Dali::Shader ShaderNewWithUniformBlock(Dali::StringView vertexShader, Dali::StringView fragmentShader, Shader::Hint::Value hints, Dali::StringView shaderName, std::vector<Dali::UniformBlock> uniformBlocks, bool strongConnection)
 {
   Internal::ShaderPtr shader = Dali::Internal::Shader::New(vertexShader, fragmentShader, hints, shaderName, std::move(uniformBlocks), strongConnection);

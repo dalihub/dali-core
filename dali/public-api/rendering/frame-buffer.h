@@ -166,7 +166,7 @@ public:
    * @note The texture has to have same size as that of FrameBuffer
    * otherwise it won't be attached.
    */
-  void AttachColorTexture(Texture& texture);
+  void AttachColorTexture(Texture texture);
 
   /**
    * @brief Attach a texture to the framebuffer for color rendering.
@@ -181,7 +181,7 @@ public:
    * @note The mipmapped texture has to have same size as that of FrameBuffer
    * otherwise it won't be attached.
    */
-  void AttachColorTexture(Texture& texture, uint32_t mipmapLevel, uint32_t layer);
+  void AttachColorTexture(Texture texture, uint32_t mipmapLevel, uint32_t layer);
 
   /**
    * @brief Gets the first color texture used as output in the FrameBuffer.
