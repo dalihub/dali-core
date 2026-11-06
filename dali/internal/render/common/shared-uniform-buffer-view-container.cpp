@@ -52,11 +52,11 @@ public:
 
   struct ProgramUniformBlockPair
   {
-    ProgramUniformBlockPair(const Render::UniformBlock::ProgramIndex programIndex, Render::UniformBlock* sharedUniformBlock, uint32_t blockSize, uint32_t blockSizeAligned)
-    : programIndex(programIndex),
-      sharedUniformBlock(sharedUniformBlock),
-      blockSize(blockSize),
-      blockSizeAligned(blockSizeAligned)
+    ProgramUniformBlockPair(const Render::UniformBlock::ProgramIndex initProgramIndex, Render::UniformBlock* initSharedUniformBlock, uint32_t initBlockSize, uint32_t initBlockSizeAligned)
+    : programIndex(initProgramIndex),
+      sharedUniformBlock(initSharedUniformBlock),
+      blockSize(initBlockSize),
+      blockSizeAligned(initBlockSizeAligned)
     {
     }
 

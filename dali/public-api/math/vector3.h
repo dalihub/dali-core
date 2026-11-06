@@ -64,14 +64,14 @@ struct DALI_CORE_API Vector3
    * @brief Constructor.
    *
    * @SINCE_1_0.0
-   * @param[in] x (or width) component
-   * @param[in] y (or height) component
-   * @param[in] z (or depth) component
+   * @param[in] initX (or width) component
+   * @param[in] initY (or height) component
+   * @param[in] initZ (or depth) component
    */
-  explicit constexpr Vector3(float x, float y, float z)
-  : x(x),
-    y(y),
-    z(z)
+  explicit constexpr Vector3(float initX, float initY, float initZ)
+  : x(initX),
+    y(initY),
+    z(initZ)
   {
   }
 

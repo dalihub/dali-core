@@ -55,16 +55,16 @@ struct Rect
    * @brief Constructor.
    *
    * @SINCE_1_0.0
-   * @param[in] x      X coordinate
-   * @param[in] y      Y coordinate
-   * @param[in] width  Width
-   * @param[in] height Height
+   * @param[in] initX      X coordinate
+   * @param[in] initY      Y coordinate
+   * @param[in] initWidth  Width
+   * @param[in] initHeight Height
    */
-  constexpr Rect(T x, T y, T width, T height)
-  : x(x),
-    y(y),
-    width(width),
-    height(height)
+  constexpr Rect(T initX, T initY, T initWidth, T initHeight)
+  : x(initX),
+    y(initY),
+    width(initWidth),
+    height(initHeight)
   {
   }
 
@@ -255,14 +255,14 @@ struct Rect
     const T right  = Dali::Min(rect.x + rect.width, x + width);
     const T bottom = Dali::Min(rect.y + rect.height, y + height);
 
-    const T width  = right - left;
-    const T height = bottom - top;
-    if(!(width < 0 || height < 0))
+    const T newWidth  = right - left;
+    const T newHeight = bottom - top;
+    if(!(newWidth < 0 || newHeight < 0))
     {
-      x            = left;
-      y            = top;
-      this->width  = width;
-      this->height = height;
+      x      = left;
+      y      = top;
+      width  = newWidth;
+      height = newHeight;
       return true;
     }
 

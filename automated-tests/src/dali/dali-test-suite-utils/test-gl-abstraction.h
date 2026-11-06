@@ -44,9 +44,9 @@ struct UniformData
 {
   std::string    name;
   Property::Type type;
-  UniformData(const std::string& name, Property::Type type = Property::Type::NONE)
-  : name(name),
-    type(type)
+  UniformData(const std::string& initName, Property::Type initType = Property::Type::NONE)
+  : name(initName),
+    type(initType)
   {
   }
 };

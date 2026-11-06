@@ -256,14 +256,14 @@ public:
 #define DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(filter, tag, messageGenerator) \
   if(filter && filter->IsTraceEnabled())                                       \
   {                                                                            \
-    std::ostringstream oss;                                                    \
-    oss.imbue(std::locale::classic());                                         \
-    auto __traceFlags     = oss.flags();                                       \
-    auto __tracePrecision = oss.precision();                                   \
-    messageGenerator(oss);                                                     \
-    oss.flags(__traceFlags);                                                   \
-    oss.precision(__tracePrecision);                                           \
-    filter->BeginTrace(tag, oss.str().c_str());                                \
+    std::ostringstream daliMessageStream;                                      \
+    daliMessageStream.imbue(std::locale::classic());                           \
+    auto __traceFlags     = daliMessageStream.flags();                         \
+    auto __tracePrecision = daliMessageStream.precision();                     \
+    messageGenerator(daliMessageStream);                                       \
+    daliMessageStream.flags(__traceFlags);                                     \
+    daliMessageStream.precision(__tracePrecision);                             \
+    filter->BeginTrace(tag, daliMessageStream.str().c_str());                  \
   }
 
 /**
@@ -284,14 +284,14 @@ public:
 #define DALI_TRACE_END_WITH_MESSAGE_GENERATOR(filter, tag, messageGenerator) \
   if(filter && filter->IsTraceEnabled())                                     \
   {                                                                          \
-    std::ostringstream oss;                                                  \
-    oss.imbue(std::locale::classic());                                       \
-    auto __traceFlags     = oss.flags();                                     \
-    auto __tracePrecision = oss.precision();                                 \
-    messageGenerator(oss);                                                   \
-    oss.flags(__traceFlags);                                                 \
-    oss.precision(__tracePrecision);                                         \
-    filter->EndTrace(tag, oss.str().c_str());                                \
+    std::ostringstream daliMessageStream;                                    \
+    daliMessageStream.imbue(std::locale::classic());                         \
+    auto __traceFlags     = daliMessageStream.flags();                       \
+    auto __tracePrecision = daliMessageStream.precision();                   \
+    messageGenerator(daliMessageStream);                                     \
+    daliMessageStream.flags(__traceFlags);                                   \
+    daliMessageStream.precision(__tracePrecision);                           \
+    filter->EndTrace(tag, daliMessageStream.str().c_str());                  \
   }
 
 /**
@@ -312,14 +312,14 @@ public:
 #define DALI_TRACE_MARK_WITH_MESSAGE_GENERATOR(filter, tag, messageGenerator) \
   if(filter && filter->IsTraceEnabled())                                      \
   {                                                                           \
-    std::ostringstream oss;                                                   \
-    oss.imbue(std::locale::classic());                                        \
-    auto __traceFlags     = oss.flags();                                      \
-    auto __tracePrecision = oss.precision();                                  \
-    messageGenerator(oss);                                                    \
-    oss.flags(__traceFlags);                                                  \
-    oss.precision(__tracePrecision);                                          \
-    filter->Mark(tag, oss.str().c_str());                                     \
+    std::ostringstream daliMessageStream;                                     \
+    daliMessageStream.imbue(std::locale::classic());                          \
+    auto __traceFlags     = daliMessageStream.flags();                        \
+    auto __tracePrecision = daliMessageStream.precision();                    \
+    messageGenerator(daliMessageStream);                                      \
+    daliMessageStream.flags(__traceFlags);                                    \
+    daliMessageStream.precision(__tracePrecision);                            \
+    filter->Mark(tag, daliMessageStream.str().c_str());                       \
   }
 
 /**

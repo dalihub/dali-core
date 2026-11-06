@@ -60,12 +60,12 @@ struct PartialRenderingData
   public:
     NodeInfomations() = default; // Default constructor
 
-    NodeInfomations(const Matrix& modelMatrix, const Vector4& worldColorMultiplier, const Vector4& updatedPositionSize, const Vector3& size, size_t hash = 0u)
-    : modelMatrix(modelMatrix),
-      worldColorMultiplier(worldColorMultiplier),
-      updatedPositionSize(updatedPositionSize),
-      size(size),
-      hash(hash)
+    NodeInfomations(const Matrix& initModelMatrix, const Vector4& initWorldColorMultiplier, const Vector4& initUpdatedPositionSize, const Vector3& initSize, size_t initHash = 0u)
+    : modelMatrix(initModelMatrix),
+      worldColorMultiplier(initWorldColorMultiplier),
+      updatedPositionSize(initUpdatedPositionSize),
+      size(initSize),
+      hash(initHash)
     {
     }
     NodeInfomations(NodeInfomations&& rhs)

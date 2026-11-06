@@ -33,14 +33,14 @@ WheelEvent::WheelEvent()
 {
 }
 
-WheelEvent::WheelEvent(Type type, int direction, unsigned int modifiers, Vector2 point, int delta, unsigned int timeStamp)
+WheelEvent::WheelEvent(Type initType, int initDirection, unsigned int initModifiers, Vector2 initPoint, int initDelta, unsigned int initTimeStamp)
 : Event(Wheel),
-  type(type),
-  direction(direction),
-  modifiers(modifiers),
-  point(point),
-  delta(delta),
-  timeStamp(timeStamp)
+  type(initType),
+  direction(initDirection),
+  modifiers(initModifiers),
+  point(initPoint),
+  delta(initDelta),
+  timeStamp(initTimeStamp)
 {
 }
 

@@ -153,9 +153,9 @@ Actor NewActor(const Property::Map& map)
       {
         // Create children
         Property::Array actorArray = value.Get<Property::Array>();
-        for(Property::Array::SizeType i = 0; i < actorArray.Size(); ++i)
+        for(Property::Array::SizeType j = 0; j < actorArray.Size(); ++j)
         {
-          DevelActor::Add(actor, NewActor(actorArray[i].Get<Property::Map>()));
+          DevelActor::Add(actor, NewActor(actorArray[j].Get<Property::Map>()));
         }
       }
       else
@@ -301,20 +301,20 @@ void NewAnimation(const Property::Map& map, Dali::AnimationData& outputAnimation
     else if(key == "timePeriod")
     {
       Property::Map timeMap = value.Get<Property::Map>();
-      for(Property::Map::SizeType i = 0; i < timeMap.Count(); ++i)
+      for(Property::Map::SizeType j = 0; j < timeMap.Count(); ++j)
       {
-        const KeyValuePair timePair(timeMap.GetKeyValue(i));
+        const KeyValuePair timePair(timeMap.GetKeyValue(j));
         if(timePair.first.type == Property::Key::INDEX)
         {
           continue;
         }
-        StringView key(timePair.first.stringKey);
+        StringView timeKey(timePair.first.stringKey);
 
-        if(key == "delay")
+        if(timeKey == "delay")
         {
           element->timePeriodDelay = timePair.second.Get<float>();
         }
-        else if(key == "duration")
+        else if(timeKey == "duration")
         {
           element->timePeriodDuration = timePair.second.Get<float>();
         }

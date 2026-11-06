@@ -96,9 +96,9 @@ Dali::String Demangle(const char* symbol)
   return result;
 }
 
-DALI_CORE_API DaliException::DaliException(const char* location, const char* condition)
-: location(location),
-  condition(condition)
+DALI_CORE_API DaliException::DaliException(const char* initLocation, const char* initCondition)
+: location(initLocation),
+  condition(initCondition)
 {
   // Note, if a memory error has occured, then the backtrace won't work - backtrace_symbols relies on
   // allocating memory.
@@ -106,9 +106,9 @@ DALI_CORE_API DaliException::DaliException(const char* location, const char* con
   // Initial dlog error message is output in DALI_ASSERT_ALWAYS macro
   // Also output on stderr
 #if defined(DEBUG_ENABLED)
-  fprintf(stderr, "Exception: \n%s\n thrown at %s\nSee dlog for backtrace\n", condition, location);
+  fprintf(stderr, "Exception: \n%s\n thrown at %s\nSee dlog for backtrace\n", initCondition, initLocation);
 #else
-  fprintf(stderr, "Exception: \n%s\n thrown\nSee dlog for backtrace\n", condition);
+  fprintf(stderr, "Exception: \n%s\n thrown\nSee dlog for backtrace\n", initCondition);
 #endif
 
   DALI_LOG_ERROR_NOFN("Backtrace:\n");
@@ -141,14 +141,14 @@ DALI_CORE_API void DaliPrintBackTrace()
 
 #else // BACKTRACE_ENABLED
 
-DALI_CORE_API DaliException::DaliException(const char* location, const char* condition)
-: location(location),
-  condition(condition)
+DALI_CORE_API DaliException::DaliException(const char* initLocation, const char* initCondition)
+: location(initLocation),
+  condition(initCondition)
 {
 #if defined(DEBUG_ENABLED)
-  printf("Exception: \n%s\n thrown at %s\n", condition, location);
+  printf("Exception: \n%s\n thrown at %s\n", initCondition, initLocation);
 #else
-  printf("Exception: \n%s\n thrown\n", condition);
+  printf("Exception: \n%s\n thrown\n", initCondition);
 #endif
 }
 

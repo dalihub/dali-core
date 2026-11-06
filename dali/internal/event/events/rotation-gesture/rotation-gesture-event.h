@@ -42,10 +42,10 @@ struct RotationGestureEvent : public GestureEvent
 
   /**
    * Default Constructor
-   * @param[in]  state  The state of the gesture
+   * @param[in]  initState  The state of the gesture
    */
-  RotationGestureEvent(GestureState state)
-  : GestureEvent(GestureType::ROTATION, state)
+  RotationGestureEvent(GestureState initState)
+  : GestureEvent(GestureType::ROTATION, initState)
   {
   }
 

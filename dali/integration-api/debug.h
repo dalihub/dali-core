@@ -693,18 +693,22 @@ public:
 #define DALI_TIME_CHECKER_END_WITH_MESSAGE_GENERATOR(filter, messageGenerator) \
   if(filter && filter->IsEnabled())                                            \
   {                                                                            \
-    std::ostringstream oss;                                                    \
-    oss.imbue(std::locale::classic());                                         \
-    messageGenerator(oss);                                                     \
-    filter->EndTimeCheck(oss.str().c_str(),                                    \
+    std::ostringstream daliMessageStream;                                      \
+    daliMessageStream.imbue(std::locale::classic());                           \
+    messageGenerator(daliMessageStream);                                       \
+    filter->EndTimeCheck(daliMessageStream.str().c_str(),                      \
                          DALI_LOG_FORMAT_PREFIX_ARGS);                         \
   }
 
+#define DALI_TIME_CHECKER_CONCAT_INNER(a, b) a##b
+#define DALI_TIME_CHECKER_CONCAT(a, b) DALI_TIME_CHECKER_CONCAT_INNER(a, b)
+
 /**
  * @brief Used for scope time check. It check time around a scope.
+ * @note The tracer variable name contains the line number, so nested scopes don't shadow each other.
  */
 #define DALI_TIME_CHECKER_SCOPE(filter, message) \
-  Dali::Integration::TimeChecker::ScopeTracer timeCheckerScopeTracer(filter, message, DALI_LOG_FORMAT_PREFIX_ARGS);
+  Dali::Integration::TimeChecker::ScopeTracer DALI_TIME_CHECKER_CONCAT(timeCheckerScopeTracer, __LINE__)(filter, message, DALI_LOG_FORMAT_PREFIX_ARGS);
 
 } // namespace TimeChecker
 } // namespace Integration

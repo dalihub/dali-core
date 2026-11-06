@@ -56,9 +56,9 @@ Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_TOU
  */
 struct ProcessTouchEventVariables
 {
-  ProcessTouchEventVariables(GeometryTouchEventProcessor& eventProcessor, bool streamEnding)
+  ProcessTouchEventVariables(GeometryTouchEventProcessor& eventProcessor, bool initStreamEnding)
   : processor(eventProcessor),
-    streamEnding(streamEnding)
+    streamEnding(initStreamEnding)
   {
   }
 

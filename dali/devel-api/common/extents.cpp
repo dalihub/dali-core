@@ -28,11 +28,11 @@ Extents::Extents()
 {
 }
 
-Extents::Extents(int16_t start, int16_t end, int16_t top, int16_t bottom)
-: start(start),
-  end(end),
-  top(top),
-  bottom(bottom)
+Extents::Extents(int16_t initStart, int16_t initEnd, int16_t initTop, int16_t initBottom)
+: start(initStart),
+  end(initEnd),
+  top(initTop),
+  bottom(initBottom)
 {
 }
 
