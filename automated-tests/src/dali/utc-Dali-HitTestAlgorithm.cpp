@@ -1936,3 +1936,77 @@ int UtcDaliHitTestAlgorithmFboFallbackNestedCase(void)
   tet_printf("Hit actor (child sensitive): %s\n", results.actor ? results.actor.GetProperty<String>(Actor::Property::NAME).CStr() : "NULL");
   END_TEST;
 }
+
+// A non-mapping exclusive task sharing the source must not hide the mapping task.
+int UtcDaliHitTestAlgorithmFboSharedExclusiveSource(void)
+{
+  TestApplication application;
+  tet_infoline("Testing FBO fallback in HitTestActorOnce scenario");
+
+  Dali::Integration::Scene scene     = application.GetScene();
+  Vector2                  stageSize = scene.GetSize();
+
+  // Build Root -> Parent -> MappingActor so the default task visits an exclusive child.
+  Actor rootActor = Actor::New();
+  rootActor.SetProperty(Actor::Property::NAME, "RootActor");
+  rootActor.SetProperty(Actor::Property::SIZE, stageSize);
+  rootActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  rootActor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
+  scene.Add(rootActor);
+
+  Actor parentActor = Actor::New();
+  parentActor.SetProperty(Actor::Property::NAME, "ParentActor");
+  parentActor.SetProperty(Actor::Property::SIZE, stageSize * 0.8f);
+  parentActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  parentActor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
+  rootActor.Add(parentActor);
+
+  Actor mappingActor = Actor::New();
+  mappingActor.SetProperty(Actor::Property::NAME, "MappingActor");
+  mappingActor.SetProperty(Actor::Property::SIZE, stageSize * 0.6f);
+  mappingActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  mappingActor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
+  parentActor.Add(mappingActor);
+
+  // Register the non-mapping task first to expose arbitrary-task selection bugs.
+  RenderTaskList renderTaskList = scene.GetRenderTaskList();
+  RenderTask     plainTask      = renderTaskList.CreateTask();
+  plainTask.SetSourceActor(mappingActor);
+  plainTask.SetExclusive(true);
+  plainTask.SetInputEnabled(false);
+
+  // A second task uses this actor as both source and framebuffer mapping actor.
+  RenderTask fboRenderTask = renderTaskList.CreateTask();
+
+  Dali::CameraActor fboCamera                     = Dali::CameraActor::New(stageSize);
+  fboCamera[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
+  fboCamera[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
+  scene.Add(fboCamera);
+
+  fboRenderTask.SetCameraActor(fboCamera);
+  fboRenderTask.SetSourceActor(mappingActor);
+  fboRenderTask.SetScreenToFrameBufferMappingActor(mappingActor);
+
+  // Attach a framebuffer so hit testing follows the mapping task into the FBO.
+  Texture     texture     = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, unsigned(stageSize.width), unsigned(stageSize.height));
+  FrameBuffer frameBuffer = FrameBuffer::New(static_cast<uint32_t>(stageSize.width), static_cast<uint32_t>(stageSize.height), FrameBuffer::Attachment::DEPTH);
+  frameBuffer.AttachColorTexture(texture);
+  fboRenderTask.SetFrameBuffer(frameBuffer);
+  fboRenderTask.SetInputEnabled(true);
+  fboRenderTask.SetExclusive(true);
+
+  // Apply the scene changes before hit testing.
+  application.SendNotification();
+  application.Render();
+
+  // The functor accepts the mapping actor once, then rejects the FBO hit.
+  // The fallback must still return the mapping actor despite the earlier plain task.
+  HitTestAlgorithm::Results results;
+  HitTest(scene, stageSize * 0.5f, results, &IsActorTouchableFunctionOnce);
+  gOnceHitActorList.clear();
+
+  tet_printf("hit name : %s\n", results.actor.GetProperty(Dali::Actor::Property::NAME).Get<String>().CStr());
+  DALI_TEST_CHECK(results.actor == mappingActor);
+
+  END_TEST;
+}

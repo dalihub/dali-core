@@ -18,6 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <unordered_map>
+
 // INTERNAL INCLUDES
 #include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/public-api/object/base-object.h>
@@ -57,20 +60,6 @@ class RenderTaskList : public BaseObject, public CompleteNotificationInterface, 
 {
 public:
   using RenderTaskContainer = std::vector<RenderTaskPtr>;
-
-  struct Exclusive
-  {
-    RenderTask*   renderTaskPtr; ///< Pointer for comparison with current rendertask.
-    ActorObserver actor;         ///< For comparison with current actor.
-
-    bool operator==(const Exclusive& other) const
-    {
-      return renderTaskPtr == other.renderTaskPtr;
-    }
-  };
-
-  using ExclusivesContainer = std::vector<Exclusive>;
-  using ExclusiveIter       = ExclusivesContainer::iterator;
 
   /**
    * Create a RenderTaskList.
@@ -136,22 +125,31 @@ public:
   }
 
   /**
-   * @brief Mark a rendertask as having exclusive access to its source actor.
+   * @brief Synchronize a task's exclusive source and mapping registrations.
    *
-   * @param[in] task Pointer to the rendertask.
-   * @param[in] exclusive If a rendertask is to have exclusive acesss to its source actor.
+   * Reflects changes to the source actor and screen-to-framebuffer mapping actor.
+   * Removes both registrations when exclusive is false, including task removal.
+   *
+   * @param[in] task The task whose registrations should be updated.
+   * @param[in] exclusive Whether the task should remain exclusively registered.
    */
-  void SetExclusive(RenderTask* task, bool exclusive);
+  void UpdateExclusiveRegistration(RenderTask* task, bool exclusive);
 
   /**
-   * @brief Return the list of rendertasks that exclusively own their source actor.
+   * @brief Queries whether an actor is the source of any exclusive render task.
    *
-   * @return [description]
+   * @param[in] actor The actor to query.
+   * @return True if the actor is the source of an exclusive render task, false otherwise.
    */
-  const ExclusivesContainer& GetExclusivesList() const
-  {
-    return mExclusives;
-  }
+  bool IsSourceActorOfExclusiveTask(const Actor& actor) const;
+
+  /**
+   * @brief Retrieves the first registered exclusive task whose source and mapping actor both match the actor.
+   *
+   * @param[in] actor The source and screen-to-framebuffer mapping actor to match.
+   * @return A retained render task, or an empty pointer if no matching task exists.
+   */
+  RenderTaskPtr GetExclusiveMappingTask(const Actor& actor) const;
 
   /**
    * @brief Request to sort RenderTasks along OrderIndex
@@ -233,12 +231,38 @@ private: // from CompleteNotificationInterface
   void NotifyCompleted(CompleteNotificationInterface::ParameterList notifierList) override;
 
 private:
+  struct ExclusiveRegistration
+  {
+    ActorObserver actor;                ///< Identifies the observed source lifetime, independently of its address.
+    Actor*        source{nullptr};      ///< Hash bucket key only; never used as actor identity.
+    bool          isMappingTask{false}; ///< Source and screen-to-framebuffer mapping actor match.
+  };
+
+  struct ExclusiveSource
+  {
+    std::vector<RenderTask*> tasks;
+    std::vector<RenderTask*> mappingTasks;
+  };
+
+  /**
+   * @brief Removes a task from its exclusive source and mapping task lists.
+   *
+   * Removes the source entry if no tasks remain and clears the mapping registration flag.
+   *
+   * @param[in] task The render task to remove.
+   * @param[in,out] registration The task's source registration whose mapping flag is cleared.
+   */
+  void RemoveExclusiveSource(RenderTask* task, ExclusiveRegistration& registration);
+
+private:
+  std::unordered_map<RenderTask*, ExclusiveRegistration> mExclusiveTasks;   ///< Direct registration lookup.
+  std::unordered_map<const Actor*, ExclusiveSource>      mExclusiveSources; ///< Tasks grouped by source; order is unspecified.
+
   RenderTaskDefaults* mDefaults; ///< Provider of default root/camera actors; may be nullptr for standalone lists.
 
   SceneGraph::RenderTaskList* mSceneObject; ///< Raw-pointer to the scene-graph object; not owned.
 
-  RenderTaskContainer mTasks;      ///< Reference counted render-tasks
-  ExclusivesContainer mExclusives; ///< List of rendertasks with exclusively owned source actors.
+  RenderTaskContainer mTasks; ///< Reference counted render-tasks
   RenderTaskPtr       mOverlayRenderTask{nullptr};
 
   bool mIsRequestedToSortTask{false};

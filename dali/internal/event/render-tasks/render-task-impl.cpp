@@ -173,10 +173,10 @@ void RenderTask::SetSourceActor(Actor* actor)
     {
       SetSourceNodeMessage(GetEventThreadServices(), *GetRenderTaskSceneObject(), nullptr);
     }
-  }
 
-  // set the actor on exclusive container for hit testing
-  mRenderTaskList.SetExclusive(this, mExclusive);
+    // Update hit-test registration only while the task belongs to the list.
+    mRenderTaskList.UpdateExclusiveRegistration(this, mExclusive);
+  }
 
   if(mInternalCameraContext)
   {
@@ -200,10 +200,10 @@ void RenderTask::SetExclusive(bool exclusive)
   {
     mExclusive = exclusive;
 
-    mRenderTaskList.SetExclusive(this, exclusive);
-
     if(GetRenderTaskSceneObject())
     {
+      mRenderTaskList.UpdateExclusiveRegistration(this, exclusive);
+
       // scene object is being used in a separate thread; queue a message to set the value
       SetExclusiveMessage(GetEventThreadServices(), *GetRenderTaskSceneObject(), mExclusive);
     }
@@ -428,6 +428,10 @@ void RenderTask::SetScreenToFrameBufferMappingActor(Dali::Actor& mappingActor)
       GetImplementation(oldInputMappingActor).SetIsRenderTaskMappingActor(false);
     }
     mInputMappingActor.Reset();
+    if(GetRenderTaskSceneObject())
+    {
+      mRenderTaskList.UpdateExclusiveRegistration(this, mExclusive);
+    }
     return;
   }
 
@@ -439,6 +443,10 @@ void RenderTask::SetScreenToFrameBufferMappingActor(Dali::Actor& mappingActor)
 
   mInputMappingActor = WeakHandle<Dali::Actor>(mappingActor);
   GetImplementation(mappingActor).SetIsRenderTaskMappingActor(true);
+  if(GetRenderTaskSceneObject())
+  {
+    mRenderTaskList.UpdateExclusiveRegistration(this, mExclusive);
+  }
 }
 
 Dali::Actor RenderTask::GetScreenToFrameBufferMappingActor() const

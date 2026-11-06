@@ -74,7 +74,7 @@ struct HitResult
 
 struct HitCommonInformation
 {
-  const RenderTaskList::ExclusivesContainer&  exclusives;
+  const RenderTaskList&                       taskList;
   std::unordered_map<uint32_t, RenderTaskPtr> mappingActors;
   LayerList&                                  layers;
 };
@@ -312,20 +312,11 @@ std::shared_ptr<HitResult> HitTestActor(Actor&                renderTaskSourceAc
   return hitResult;
 }
 
-bool IsActorExclusive(const Actor&                               actor,
-                      const RenderTaskList::ExclusivesContainer& exclusives)
-
+inline bool IsActorValid(Actor&                actor,
+                         const RenderTaskList& taskList,
+                         HitTestInterface&     hitCheck)
 {
-  auto result = std::find_if(exclusives.begin(), exclusives.end(), [&actor](const RenderTaskList::Exclusive& exclusive)
-  { return exclusive.actor.GetActor() == &actor; });
-  return (result != exclusives.end());
-}
-
-inline bool IsActorValid(Actor&                                     actor,
-                         const RenderTaskList::ExclusivesContainer& exclusives,
-                         HitTestInterface&                          hitCheck)
-{
-  if(IsActorExclusive(actor, exclusives))
+  if(taskList.IsSourceActorOfExclusiveTask(actor))
   {
     return false;
   }
@@ -487,17 +478,15 @@ bool HitTestActorRecursively(std::vector<std::shared_ptr<HitResult>>& hitResultL
       }
 
       // Even though the actor is exclusive by the RenderTask, if it is mapping actor, it should be checked.
-      auto result      = std::find_if(hitCommonInformation.exclusives.begin(), hitCommonInformation.exclusives.end(), [&childActor](const RenderTaskList::Exclusive& exclusive)
-           { return exclusive.actor.GetActor() == &childActor; });
-      bool isExclusive = result != hitCommonInformation.exclusives.end();
+      bool isExclusive = hitCommonInformation.taskList.IsSourceActorOfExclusiveTask(childActor);
       bool isHit       = false;
 
       if(isExclusive)
       {
-        bool isMappingActor = result->renderTaskPtr->GetScreenToFrameBufferMappingActor() == Dali::Actor(&childActor);
-        if(isMappingActor)
+        RenderTaskPtr mappingTask = hitCommonInformation.taskList.GetExclusiveMappingTask(childActor);
+        if(mappingTask)
         {
-          isHit = HitTestActorOnce(hitResultList, childActor, renderTaskSourceActor, hitCommonInformation, ray, projectedNearClippingDistance, projectedFarClippingDistance, hitCheck, layerBehavior, isOverlay, result->renderTaskPtr);
+          isHit = HitTestActorOnce(hitResultList, childActor, renderTaskSourceActor, hitCommonInformation, ray, projectedNearClippingDistance, projectedFarClippingDistance, hitCheck, layerBehavior, isOverlay, mappingTask);
         }
       }
       else
@@ -541,13 +530,13 @@ bool HitTestActorRecursively(std::vector<std::shared_ptr<HitResult>>& hitResultL
   return true;
 }
 
-void RetrieveValidActorTrees(std::vector<Actor*>&                       validActorRoots,
-                             Actor&                                     parentActor,
-                             const RenderTaskList::ExclusivesContainer& exclusives,
-                             HitTestInterface&                          hitCheck,
-                             const Ray&                                 ray,
-                             const float&                               projectedNearClippingDistance,
-                             const float&                               projectedFarClippingDistance)
+void RetrieveValidActorTrees(std::vector<Actor*>&  validActorRoots,
+                             Actor&                parentActor,
+                             const RenderTaskList& taskList,
+                             HitTestInterface&     hitCheck,
+                             const Ray&            ray,
+                             const float&          projectedNearClippingDistance,
+                             const float&          projectedFarClippingDistance)
 {
   if(parentActor.GetChildCount() == 0)
   {
@@ -582,7 +571,7 @@ void RetrieveValidActorTrees(std::vector<Actor*>&                       validAct
       // Should not make valid to false for scene root layer.
       while(currentNode && currentNode->GetParent())
       {
-        if(!IsActorValid(*currentNode, exclusives, hitCheck))
+        if(!IsActorValid(*currentNode, taskList, hitCheck))
         {
           valid = false;
           break;
@@ -596,7 +585,7 @@ void RetrieveValidActorTrees(std::vector<Actor*>&                       validAct
     }
     else
     {
-      RetrieveValidActorTrees(validActorRoots, childActor, exclusives, hitCheck, ray, projectedNearClippingDistance, projectedFarClippingDistance);
+      RetrieveValidActorTrees(validActorRoots, childActor, taskList, hitCheck, ray, projectedNearClippingDistance, projectedFarClippingDistance);
     }
   }
 }
@@ -616,7 +605,7 @@ bool HitTestWithinSubTree(std::vector<std::shared_ptr<HitResult>>& hitResultList
 
   if(actor.GetScene().HasOverlayContent())
   {
-    RetrieveValidActorTrees(validActorRoots, actor, hitCommonInformation.exclusives, hitCheck, ray, projectedNearClippingDistance, projectedFarClippingDistance);
+    RetrieveValidActorTrees(validActorRoots, actor, hitCommonInformation.taskList, hitCheck, ray, projectedNearClippingDistance, projectedFarClippingDistance);
   }
 
   bool isKeepingHitTestRequired = (hitCheck.GetPropagationType() == Integration::Scene::TouchPropagationType::GEOMETRY) || (layerBehavior == Dali::Layer::Behavior::LAYER_3D);
@@ -711,7 +700,7 @@ bool HitTestRenderTask(std::vector<std::shared_ptr<HitResult>>& hitResultList,
     }
 
     // If source Actor is been exclusive by other RenderTask, skip it.
-    if(IsActorExclusive(*testRootActor, hitCommonInformation.exclusives) && (!renderTask.IsExclusive() || testRootActor != sourceActor))
+    if(hitCommonInformation.taskList.IsSourceActorOfExclusiveTask(*testRootActor) && (!renderTask.IsExclusive() || testRootActor != sourceActor))
     {
       continue;
     }
@@ -807,9 +796,8 @@ bool HitTestRenderTaskList(const Vector2&                                 sceneS
 {
   bool                                 isHitSucceeded = false;
   RenderTaskList::RenderTaskContainer& tasks          = taskList.GetTasks();
-  const auto&                          exclusives     = taskList.GetExclusivesList();
 
-  HitCommonInformation hitCommonInformation{exclusives, std::unordered_map<uint32_t, RenderTaskPtr>(), layers};
+  HitCommonInformation hitCommonInformation{taskList, std::unordered_map<uint32_t, RenderTaskPtr>(), layers};
   CollectMappingActors(tasks, hitCommonInformation.mappingActors);
 
   RenderTaskList::RenderTaskContainer::reverse_iterator endIter = tasks.rend();

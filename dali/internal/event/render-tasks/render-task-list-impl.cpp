@@ -52,7 +52,16 @@ typedef std::vector<ForwardOffScreenRenderableSubTree>  OffScreenRenderableData;
 namespace
 {
 static constexpr uint32_t ORDER_INDEX_OVERLAY_RENDER_TASK = INT32_MAX;
+
+void EraseExclusiveTask(RenderTask* task, std::vector<RenderTask*>& tasks)
+{
+  auto position = std::find(tasks.begin(), tasks.end(), task);
+  DALI_ASSERT_ALWAYS(position != tasks.end() && "Exclusive task is not registered in the source list");
+  // Hit testing uses the first matching mapping task, so preserve survivor order.
+  tasks.erase(position);
 }
+
+} //namespace
 
 RenderTaskListPtr RenderTaskList::New(RenderTaskDefaults* defaults)
 {
@@ -115,12 +124,7 @@ void RenderTaskList::RemoveTask(Internal::RenderTask& task)
 
       task.RemoveRenderTaskSceneObject(*this);
 
-      Exclusive                     exclusive{ptr, ActorObserver()};
-      ExclusivesContainer::iterator exclusiveIter = find(mExclusives.begin(), mExclusives.end(), exclusive);
-      if(exclusiveIter != mExclusives.end())
-      {
-        mExclusives.erase(exclusiveIter);
-      }
+      UpdateExclusiveRegistration(&task, false);
       break; // we're finished
     }
   }
@@ -148,33 +152,102 @@ RenderTaskPtr RenderTaskList::GetOverlayTask() const
   return overlayRenderTask;
 }
 
-void RenderTaskList::SetExclusive(RenderTask* task, bool exclusive)
+void RenderTaskList::UpdateExclusiveRegistration(RenderTask* task, bool exclusive)
 {
-  // Check to see if this rendertask has an entry?
-  for(auto exclusiveIt = mExclusives.begin(); exclusiveIt != mExclusives.end(); ++exclusiveIt)
+  auto found = mExclusiveTasks.find(task);
+  if(!exclusive)
   {
-    if(exclusiveIt->renderTaskPtr == task)
+    if(found != mExclusiveTasks.end())
     {
-      if(!exclusive)
+      RemoveExclusiveSource(task, found->second);
+      mExclusiveTasks.erase(found);
+    }
+    return;
+  }
+
+  if(found == mExclusiveTasks.end())
+  {
+    found = mExclusiveTasks.try_emplace(task).first;
+  }
+
+  auto&  registration = found->second;
+  Actor* source       = task->GetSourceActor();
+  if(registration.source != source || registration.actor.GetActor() != source)
+  {
+    RemoveExclusiveSource(task, registration);
+    registration.source = source;
+    registration.actor.SetActor(source);
+    if(source)
+    {
+      mExclusiveSources[source].tasks.push_back(task);
+    }
+  }
+  const auto mappingActor  = task->GetScreenToFrameBufferMappingActor();
+  const bool isMappingTask = source && mappingActor && &GetImplementation(mappingActor) == source;
+  if(registration.isMappingTask != isMappingTask)
+  {
+    auto& mappingTasks = mExclusiveSources.at(source).mappingTasks;
+    if(isMappingTask)
+    {
+      mappingTasks.push_back(task);
+    }
+    else
+    {
+      EraseExclusiveTask(task, mappingTasks);
+    }
+    registration.isMappingTask = isMappingTask;
+  }
+}
+
+void RenderTaskList::RemoveExclusiveSource(RenderTask* task, ExclusiveRegistration& registration)
+{
+  if(registration.source)
+  {
+    auto  found  = mExclusiveSources.find(registration.source);
+    auto& source = found->second;
+    if(registration.isMappingTask)
+    {
+      EraseExclusiveTask(task, source.mappingTasks);
+    }
+    EraseExclusiveTask(task, source.tasks);
+    if(source.tasks.empty())
+    {
+      mExclusiveSources.erase(found);
+    }
+  }
+  registration.isMappingTask = false;
+}
+
+bool RenderTaskList::IsSourceActorOfExclusiveTask(const Actor& actor) const
+{
+  auto found = mExclusiveSources.find(&actor);
+  if(found != mExclusiveSources.end())
+  {
+    for(auto* task : found->second.tasks)
+    {
+      if(mExclusiveTasks.at(task).actor.GetActor() == &actor)
       {
-        mExclusives.erase(exclusiveIt);
-        break;
-      }
-      else
-      {
-        exclusiveIt->actor.SetActor(task->GetSourceActor());
-        exclusive = false;
-        break;
+        return true;
       }
     }
   }
-  if(exclusive)
+  return false;
+}
+
+RenderTaskPtr RenderTaskList::GetExclusiveMappingTask(const Actor& actor) const
+{
+  auto found = mExclusiveSources.find(&actor);
+  if(found != mExclusiveSources.end())
   {
-    Exclusive exclusiveSlot;
-    exclusiveSlot.renderTaskPtr = task;
-    exclusiveSlot.actor.SetActor(task->GetSourceActor());
-    mExclusives.emplace_back(std::move(exclusiveSlot));
+    for(auto* task : found->second.mappingTasks)
+    {
+      if(mExclusiveTasks.at(task).actor.GetActor() == &actor)
+      {
+        return RenderTaskPtr(task);
+      }
+    }
   }
+  return nullptr;
 }
 
 void RenderTaskList::SortTasks()

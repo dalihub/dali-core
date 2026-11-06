@@ -2859,3 +2859,56 @@ int UtcDaliGeoTouchStreamPinchOwnerGroupsPointsAcrossMappingActorEdge(void)
   DALI_TEST_EQUALS(0u, touchTrace.Count("right", CallbackKind::TOUCH, PointState::DOWN), TEST_LOCATION);
   END_TEST;
 }
+
+int UtcDaliGeoTouchStreamRemovedRenderTaskIsNotReused(void)
+{
+  TestApplication application;
+  TouchTrace      trace;
+  auto            scene = application.GetScene();
+  auto            tasks = scene.GetRenderTaskList();
+  Actor           actor = CreateTouchableActor("source");
+  scene.Add(actor);
+  TouchTraceFunctor functor(trace, "source", true);
+  actor.TouchEventSignal().Connect(&application, functor);
+
+  RenderTask removedTask = tasks.CreateTask();
+  removedTask.SetSourceActor(actor);
+  removedTask.SetExclusive(true);
+  removedTask.SetInputEnabled(true);
+  PrepareScene(application);
+
+  // Confirm that the custom task is initially used, then finish the touch stream.
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
+  const TraceEntry* initialDown = trace.Find("source", CallbackKind::TOUCH, PointState::DOWN);
+  DALI_TEST_CHECK(initialDown);
+  DALI_TEST_CHECK(initialDown->renderTask == removedTask);
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(10.0f, 10.0f)));
+
+  // A fresh geometry hit after removal must use the default task.
+  tasks.RemoveTask(removedTask);
+  application.SendNotification();
+  application.Render();
+  trace.Clear();
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
+  const TraceEntry* afterRemoval = trace.Find("source", CallbackKind::TOUCH, PointState::DOWN);
+  DALI_TEST_CHECK(afterRemoval);
+  DALI_TEST_CHECK(afterRemoval->renderTask == tasks.GetTask(0u));
+  DALI_TEST_CHECK(afterRemoval->renderTask != removedTask);
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(10.0f, 10.0f)));
+
+  // Updating a retained removed handle must not hide the actor or restore its task.
+  removedTask.SetSourceActor(actor);
+  removedTask.SetExclusive(false);
+  removedTask.SetExclusive(true);
+  application.SendNotification();
+  application.Render();
+  trace.Clear();
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
+  const TraceEntry* afterSetters = trace.Find("source", CallbackKind::TOUCH, PointState::DOWN);
+  DALI_TEST_CHECK(afterSetters);
+  DALI_TEST_CHECK(afterSetters->renderTask == tasks.GetTask(0u));
+  DALI_TEST_CHECK(afterSetters->renderTask != removedTask);
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(10.0f, 10.0f)));
+
+  END_TEST;
+}
