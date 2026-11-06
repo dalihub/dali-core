@@ -44,7 +44,7 @@ Dali::PixelData NewPixelDataWithReleaseAfterUpload(uint8_t*                   bu
                                                    Pixel::Format              pixelFormat,
                                                    PixelData::ReleaseFunction releaseFunction)
 {
-  IntrusivePtr<Internal::PixelData> internal = Internal::PixelData::New(buffer, bufferSize, width, height, strideBytes, pixelFormat, releaseFunction, true);
+  IntrusivePtr<Internal::PixelData> internal = Internal::PixelData::New(buffer, bufferSize, width, height, strideBytes, pixelFormat, releaseFunction, true, false);
   return PixelData(internal.Get());
 }
 

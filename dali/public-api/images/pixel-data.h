@@ -83,7 +83,13 @@ public:
   /**
    * @brief Creates a PixelData object.
    *
+   * Pass @c true as @c preMultiplied when handing over pixels whose color components
+   * have already been multiplied by their alpha value, so that consumers can blend them
+   * correctly. Left out, the PixelData reports straight (non-pre-multiplied) alpha, as
+   * does the overload without the parameter.
+   *
    * @SINCE_2_1.10
+   * @note The @c preMultiplied parameter is added @SINCE_3_0.0.
    * @param[in] buffer          The raw pixel data
    * @param[in] bufferSize      The size of the buffer in bytes
    * @param[in] width           Buffer width in pixels
@@ -91,6 +97,7 @@ public:
    * @param[in] stride          Buffer stride in pixels, 0 means the buffer is tightly packed
    * @param[in] pixelFormat     The pixel format
    * @param[in] releaseFunction The function used to release the memory
+   * @param[in] preMultiplied   Whether the colors are pre-multiplied by their alpha value
    * @return A handle to the PixelData
    */
   static PixelData New(uint8_t*        buffer,
@@ -99,7 +106,9 @@ public:
                        uint32_t        height,
                        uint32_t        stride,
                        Pixel::Format   pixelFormat,
-                       ReleaseFunction releaseFunction);
+                       ReleaseFunction releaseFunction,
+                       bool            preMultiplied = false);
+
   /**
    * @brief Creates an empty handle.
    * Use PixelData::New() to create an initialized object.
@@ -180,6 +189,19 @@ public:
    * @return The stride of the buffer in bytes. 0 means the buffer is tightly packed.
    */
   uint32_t GetStrideBytes() const;
+
+  /**
+   * @brief Returns whether the pixels are pre-multiplied: whether their color components
+   * have already been multiplied by their alpha value.
+   *
+   * The flag is stated at creation, by New(), or carried over from the pixel buffer by
+   * PixelBuffer::Convert(). It describes how the pixels are to be interpreted; the
+   * pixels themselves are not inspected.
+   *
+   * @SINCE_3_0.0
+   * @return true if the colors are pre-multiplied by their alpha value
+   */
+  bool IsAlphaPreMultiplied() const;
 
   /**
    * Class method to get the total currently allocated size of pixel buffers

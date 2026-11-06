@@ -370,18 +370,74 @@ int UtcDaliPixelBufferDevelMetadata(void)
   END_TEST;
 }
 
-int UtcDaliPixelBufferDevelIsAlphaPreMultiplied(void)
+int UtcDaliPixelBufferIntegSetPixelBufferPreMultiplied(void)
 {
   TestApplication application;
 
   PixelBuffer pixelBuffer = PixelBuffer::New(10u, 10u, Pixel::RGBA8888);
-  DALI_TEST_EQUALS(DevelPixelBuffer::IsAlphaPreMultiplied(pixelBuffer), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(pixelBuffer.IsAlphaPreMultiplied(), false, TEST_LOCATION);
 
   Integration::SetPixelBufferPreMultiplied(pixelBuffer, true);
-  DALI_TEST_EQUALS(DevelPixelBuffer::IsAlphaPreMultiplied(pixelBuffer), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(pixelBuffer.IsAlphaPreMultiplied(), true, TEST_LOCATION);
 
   Integration::SetPixelBufferPreMultiplied(pixelBuffer, false);
-  DALI_TEST_EQUALS(DevelPixelBuffer::IsAlphaPreMultiplied(pixelBuffer), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(pixelBuffer.IsAlphaPreMultiplied(), false, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliPixelBufferAlphaPreMultiplied(void)
+{
+  TestApplication application;
+
+  PixelBuffer pixelBuffer = PixelBuffer::New(10u, 10u, Pixel::RGBA8888);
+  DALI_TEST_EQUALS(pixelBuffer.IsAlphaPreMultiplied(), false, TEST_LOCATION);
+
+  pixelBuffer.SetAlphaPreMultiplied(true);
+  DALI_TEST_EQUALS(pixelBuffer.IsAlphaPreMultiplied(), true, TEST_LOCATION);
+
+  pixelBuffer.SetAlphaPreMultiplied(false);
+  DALI_TEST_EQUALS(pixelBuffer.IsAlphaPreMultiplied(), false, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliPixelBufferAlphaPreMultipliedConvert(void)
+{
+  TestApplication application;
+
+  // Convert() hands the flag over to the PixelData
+  PixelBuffer pixelBuffer = PixelBuffer::New(10u, 10u, Pixel::RGBA8888);
+  pixelBuffer.SetAlphaPreMultiplied(true);
+  PixelData pixelData = PixelBuffer::Convert(pixelBuffer);
+  DALI_TEST_EQUALS(pixelData.IsAlphaPreMultiplied(), true, TEST_LOCATION);
+
+  // ... whether or not the PixelData releases its buffer after upload
+  PixelBuffer uploadBuffer = PixelBuffer::New(10u, 10u, Pixel::RGBA8888);
+  uploadBuffer.SetAlphaPreMultiplied(true);
+  PixelData uploadData = DevelPixelBuffer::Convert(uploadBuffer, true);
+  DALI_TEST_EQUALS(uploadData.IsAlphaPreMultiplied(), true, TEST_LOCATION);
+
+  // A buffer that has not been marked stays straight alpha
+  PixelBuffer straight     = PixelBuffer::New(10u, 10u, Pixel::RGBA8888);
+  PixelData   straightData = PixelBuffer::Convert(straight);
+  DALI_TEST_EQUALS(straightData.IsAlphaPreMultiplied(), false, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliPixelBufferAlphaPreMultipliedCreatePixelData(void)
+{
+  TestApplication application;
+
+  // CreatePixelData() copies the flag along with the pixels
+  PixelBuffer pixelBuffer  = PixelBuffer::New(10u, 10u, Pixel::RGBA8888);
+  PixelData   straightCopy = DevelPixelBuffer::CreatePixelData(pixelBuffer);
+  DALI_TEST_EQUALS(straightCopy.IsAlphaPreMultiplied(), false, TEST_LOCATION);
+
+  pixelBuffer.SetAlphaPreMultiplied(true);
+  PixelData preMultipliedCopy = DevelPixelBuffer::CreatePixelData(pixelBuffer);
+  DALI_TEST_EQUALS(preMultipliedCopy.IsAlphaPreMultiplied(), true, TEST_LOCATION);
 
   END_TEST;
 }
@@ -441,7 +497,7 @@ int UtcDaliPixelBufferIntegResetPixelBufferData(void)
   // The metadata and the pre-multiplied flag are kept
   Property::Map metadata;
   DALI_TEST_EQUALS(DevelPixelBuffer::GetMetadata(pixelBuffer, metadata), true, TEST_LOCATION);
-  DALI_TEST_EQUALS(DevelPixelBuffer::IsAlphaPreMultiplied(pixelBuffer), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(pixelBuffer.IsAlphaPreMultiplied(), true, TEST_LOCATION);
 
   END_TEST;
 }
@@ -471,7 +527,7 @@ int UtcDaliPixelBufferIntegTakePixelBufferOwnership(void)
   // The metadata and the pre-multiplied flag are moved too
   Property::Map metadata;
   DALI_TEST_EQUALS(DevelPixelBuffer::GetMetadata(destination, metadata), true, TEST_LOCATION);
-  DALI_TEST_EQUALS(DevelPixelBuffer::IsAlphaPreMultiplied(destination), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(destination.IsAlphaPreMultiplied(), true, TEST_LOCATION);
 
   // The source is left without a buffer
   DALI_TEST_CHECK(source.GetBuffer() == nullptr);

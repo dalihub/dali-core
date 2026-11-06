@@ -237,7 +237,7 @@ public:
   void SetPreMultiplied(bool preMultiplied);
 
   /**
-   * @copydoc Dali::DevelPixelBuffer::IsAlphaPreMultiplied()
+   * @copydoc Dali::PixelBuffer::IsAlphaPreMultiplied()
    */
   bool IsAlphaPreMultiplied() const;
 

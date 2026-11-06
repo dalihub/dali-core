@@ -42,11 +42,6 @@ bool GetMetadata(PixelBuffer pixelBuffer, Property::Map& metadata)
   return GetImplementation(pixelBuffer).GetMetadata(metadata);
 }
 
-bool IsAlphaPreMultiplied(PixelBuffer pixelBuffer)
-{
-  return GetImplementation(pixelBuffer).IsAlphaPreMultiplied();
-}
-
 } // namespace DevelPixelBuffer
 
 } //namespace DALI_NAMESPACE
