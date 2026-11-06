@@ -667,6 +667,7 @@ public:
 
   inline void Finish(void) override
   {
+    ++mFinishCallCount;
   }
 
   inline void Flush(void) override
@@ -2044,7 +2045,8 @@ public:
 
   inline GLsync FenceSync(GLenum condition, GLbitfield flags) override
   {
-    return NULL;
+    ++mFenceSyncCallCount;
+    return mFenceSyncResult;
   }
 
   inline GLboolean IsSync(GLsync sync) override
@@ -2054,11 +2056,57 @@ public:
 
   inline void DeleteSync(GLsync sync) override
   {
+    ++mDeleteSyncCallCount;
   }
 
   inline GLenum ClientWaitSync(GLsync sync, GLbitfield flags, GLuint64 timeout) override
   {
-    return 0;
+    ++mClientWaitSyncCallCount;
+    auto iter = mClientWaitSyncResults.find(sync);
+    return iter != mClientWaitSyncResults.end() ? iter->second : mClientWaitSyncResult;
+  }
+
+  void SetFenceSyncResult(GLsync sync)
+  {
+    mFenceSyncResult = sync;
+  }
+
+  void SetClientWaitSyncResult(GLsync sync, GLenum result)
+  {
+    mClientWaitSyncResults[sync] = result;
+  }
+
+  void SetClientWaitSyncResult(GLenum result)
+  {
+    mClientWaitSyncResult = result;
+  }
+
+  void ResetSyncCallCounts()
+  {
+    mFenceSyncCallCount      = 0u;
+    mClientWaitSyncCallCount = 0u;
+    mFinishCallCount         = 0u;
+    mDeleteSyncCallCount     = 0u;
+  }
+
+  uint32_t GetClientWaitSyncCallCount() const
+  {
+    return mClientWaitSyncCallCount;
+  }
+
+  uint32_t GetFenceSyncCallCount() const
+  {
+    return mFenceSyncCallCount;
+  }
+
+  uint32_t GetFinishCallCount() const
+  {
+    return mFinishCallCount;
+  }
+
+  uint32_t GetDeleteSyncCallCount() const
+  {
+    return mDeleteSyncCallCount;
   }
 
   inline void WaitSync(GLsync sync, GLbitfield flags, GLuint64 timeout) override
@@ -2884,6 +2932,13 @@ public:
 
   ScissorParams   mScissorParams;
   ColorMaskParams mColorMaskParams;
+  GLsync                   mFenceSyncResult{nullptr};
+  uint32_t                 mFenceSyncCallCount{0u};
+  std::map<GLsync, GLenum> mClientWaitSyncResults;
+  uint32_t        mClientWaitSyncCallCount{0u};
+  GLenum          mClientWaitSyncResult{0u};
+  uint32_t        mFinishCallCount{0u};
+  uint32_t        mDeleteSyncCallCount{0u};
 };
 
 template<>
