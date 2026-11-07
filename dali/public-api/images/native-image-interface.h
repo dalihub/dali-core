@@ -72,6 +72,47 @@ public:
     UNKNOWN_ERROR = ERROR_MAX,
   };
 
+public: // Image queries, usable by applications
+  /**
+   * @brief Returns the width of the NativeImage.
+   *
+   * @SINCE_1_0.0
+   * @return Width
+   */
+  virtual uint32_t GetWidth() const = 0;
+
+  /**
+   * @brief Returns the height of the NativeImage.
+   *
+   * @SINCE_1_0.0
+   * @return Height
+   */
+  virtual uint32_t GetHeight() const = 0;
+
+  /**
+   * @brief Returns whether the pixels are pre-multiplied: whether their color components
+   * have already been multiplied by their alpha value.
+   *
+   * It describes how the pixels are to be interpreted; the pixels themselves are not
+   * inspected.
+   *
+   * @SINCE_3_0.0
+   * @return true if the colors are pre-multiplied by their alpha value
+   */
+  virtual bool IsAlphaPreMultiplied() const = 0;
+
+  /**
+   * @brief Apply custom fragment prefix for rendering native image.
+   *
+   * @param[in,out] shader shader code that will be applied fragment prefix.
+   * @param[in] mask the mask of samplers those uses native image.
+   *                 For example, if mask = 0x5, 1st and 3rd samplers become native samplers.
+   * @SINCE_2_4.33
+   * @return True if the shader is changed.
+   */
+  virtual bool ApplyNativeFragmentShader(Dali::String& shader, int mask) = 0;
+
+public: // Resource lifecycle and rendering hooks, called by DALi internally
   /**
    * @brief Creates the resource for the NativeImage.
    *
@@ -111,22 +152,6 @@ public:
   virtual PrepareTextureResult PrepareTexture() = 0;
 
   /**
-   * @brief Returns the width of the NativeImage.
-   *
-   * @SINCE_1_0.0
-   * @return Width
-   */
-  virtual uint32_t GetWidth() const = 0;
-
-  /**
-   * @brief Returns the height of the NativeImage.
-   *
-   * @SINCE_1_0.0
-   * @return Height
-   */
-  virtual uint32_t GetHeight() const = 0;
-
-  /**
    * @brief Queries whether blending is required.
    * @SINCE_1_0.0
    * @return True if blending is required
@@ -140,17 +165,6 @@ public:
    * @return Texture target.
    */
   virtual int GetTextureTarget() const = 0;
-
-  /**
-   * @brief Apply custom fragment prefix for rendering native image.
-   *
-   * @param[in,out] shader shader code that will be applied fragment prefix.
-   * @param[in] mask the mask of samplers those uses native image.
-   *                 For example, if mask = 0x5, 1st and 3rd samplers become native samplers.
-   * @SINCE_2_4.33
-   * @return True if the shader is changed.
-   */
-  virtual bool ApplyNativeFragmentShader(Dali::String& shader, int mask) = 0;
 
   /**
    * @brief Get custom sampler type name for rendering native image.

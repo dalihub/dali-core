@@ -78,6 +78,10 @@ public:
     mCallStack.PushCall("RequiresBlending", "");
     return true;
   };
+  inline virtual bool IsAlphaPreMultiplied() const override
+  {
+    return mAlphaPreMultiplied;
+  };
   inline virtual int GetTextureTarget() const override
   {
     mCallStack.PushCall("GetTextureTarget", "");
@@ -162,6 +166,7 @@ public:
   int32_t  mTargetTextureCalls;
   uint32_t mTargetTextureError{0u};
   bool     createResult;
+  bool     mAlphaPreMultiplied{false};
 
   /// Set to nullptr for a native image that samples as a plain 2D texture, which not
   /// every native image type needs a custom sampler to do.

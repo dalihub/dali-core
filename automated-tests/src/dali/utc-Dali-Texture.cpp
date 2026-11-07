@@ -2009,6 +2009,15 @@ int UtcDaliTextureIsAlphaPreMultiplied(void)
   DALI_TEST_CHECK(DevelTexture::UploadSubPixelData(texture, premultipliedData, 0u, 0u, width / 2u, height / 2u));
   DALI_TEST_CHECK(texture.IsAlphaPreMultiplied());
 
+  // A native image texture takes the flag the native image declares, at creation.
+  TestNativeImagePointer nativeImage   = TestNativeImage::New(4u, 4u);
+  Texture                nativeTexture = Texture::New(*nativeImage);
+  DALI_TEST_CHECK(!nativeTexture.IsAlphaPreMultiplied());
+
+  nativeImage->mAlphaPreMultiplied   = true;
+  Texture premultipliedNativeTexture = Texture::New(*nativeImage);
+  DALI_TEST_CHECK(premultipliedNativeTexture.IsAlphaPreMultiplied());
+
   END_TEST;
 }
 

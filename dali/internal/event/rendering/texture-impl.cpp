@@ -324,7 +324,7 @@ Texture::Texture(NativeImageInterfacePtr nativeImageInterface)
   mFormat(Pixel::RGB888),
   mResourceId(0u),
   mUseUploadedParameter(false),
-  mPreMultiplied(false)
+  mPreMultiplied(nativeImageInterface->IsAlphaPreMultiplied())
 #if defined(GPU_MEMORY_PROFILE_ENABLED)
   ,
   mMemoryInfo(new TextureMemoryInfo(static_cast<Dali::Integration::TextureContextTypeHint::Type>(Dali::Integration::TextureContextTypeHint::UNKNOWN + 1), "(NativeImage. Size could be changed)", mSize.GetWidth(), mSize.GetHeight(), 4)) // Most of NativeImage texture use 4 byte per pixels. Let we assume the data size maximize.
