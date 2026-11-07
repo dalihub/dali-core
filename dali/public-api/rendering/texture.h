@@ -229,6 +229,19 @@ public:
    */
   Pixel::Format GetPixelFormat() const;
 
+  /**
+   * @brief Returns whether the texels are pre-multiplied: whether their color components
+   * have already been multiplied by their alpha value.
+   *
+   * The flag is recorded from the pixel data of the last successful upload to mipmap
+   * level 0 (Dali::PixelData::IsAlphaPreMultiplied()). It describes how the texels are
+   * to be interpreted; the texels themselves are not inspected.
+   *
+   * @SINCE_3_0.0
+   * @return true if the colors are pre-multiplied by their alpha value
+   */
+  bool IsAlphaPreMultiplied() const;
+
 public:
   /**
    * @brief The constructor.

@@ -148,6 +148,11 @@ public:
   Pixel::Format GetPixelFormat() const;
 
   /**
+   * @copydoc Dali::Texture::IsAlphaPreMultiplied()
+   */
+  bool IsAlphaPreMultiplied() const;
+
+  /**
    * @copydoc Dali::Integration::GetTextureResourceId()
    */
   uint32_t GetResourceId() const;
@@ -166,6 +171,11 @@ public:
    * @copydoc Dali::Integration::SetTexturePixelFormat()
    */
   void SetPixelFormat(Pixel::Format format);
+
+  /**
+   * @copydoc Dali::Integration::SetTextureAlphaPreMultiplied()
+   */
+  void SetAlphaPreMultiplied(bool preMultiplied);
 
   /**
    * @brief Determine if the texture is a native image
@@ -236,6 +246,7 @@ private:                                    // data
   Pixel::Format           mFormat;      ///< Pixel format
   uint32_t                mResourceId;
   bool                    mUseUploadedParameter : 1; ///< Whether ths texture size and format depend on uploaded image or not.
+  bool                    mPreMultiplied : 1;        ///< Whether the texture colors are pre-multiplied by alpha. Event-side metadata only.
 
 #if defined(GPU_MEMORY_PROFILE_ENABLED)
 public:

@@ -68,6 +68,16 @@ DALI_CORE_API void SetTextureSize(Dali::Texture texture, uint16_t width, uint16_
  */
 DALI_CORE_API void SetTexturePixelFormat(Dali::Texture texture, Dali::Pixel::Format format);
 
+/**
+ * @brief Set whether the colors of texture have been multiplied by the alpha value.
+ * For textures whose content is produced without Upload(), such as resource id textures
+ * or frame buffer attachments. @see Dali::Texture::IsAlphaPreMultiplied()
+ *
+ * @param[in,out] texture The texture to mark
+ * @param[in] preMultiplied True if the texture holds pre-multiplied colors
+ */
+DALI_CORE_API void SetTextureAlphaPreMultiplied(Dali::Texture texture, bool preMultiplied);
+
 namespace TextureContextTypeHint
 {
 /**

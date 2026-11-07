@@ -1547,6 +1547,23 @@ int UtcDaliTextureSetPixelFormat(void)
   END_TEST;
 }
 
+int UtcDaliTextureSetAlphaPreMultiplied(void)
+{
+  TestApplication application;
+
+  // A resource id texture's content is produced without Upload(), so the flag is set directly.
+  Texture texture = Dali::Integration::NewTextureWithResourceId(TextureType::TEXTURE_2D, 11u);
+  DALI_TEST_CHECK(!texture.IsAlphaPreMultiplied());
+
+  Dali::Integration::SetTextureAlphaPreMultiplied(texture, true);
+  DALI_TEST_CHECK(texture.IsAlphaPreMultiplied());
+
+  Dali::Integration::SetTextureAlphaPreMultiplied(texture, false);
+  DALI_TEST_CHECK(!texture.IsAlphaPreMultiplied());
+
+  END_TEST;
+}
+
 int UtcDaliTextureContextLoss(void)
 {
   tet_infoline("UtcDaliTextureContextLoss\n");
@@ -1953,6 +1970,44 @@ int UtcDaliTextureGetPixelFormat(void)
 
   texture = CreateTexture(TextureType::TEXTURE_2D, Pixel::CHROMINANCE_U, width, height);
   DALI_TEST_EQUALS(texture.GetPixelFormat(), Pixel::CHROMINANCE_U, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliTextureIsAlphaPreMultiplied(void)
+{
+  TestApplication application;
+  uint32_t        width(4);
+  uint32_t        height(4);
+
+  Texture texture = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
+  DALI_TEST_CHECK(!texture.IsAlphaPreMultiplied());
+
+  // The flag is recorded from the uploaded pixel data.
+  uint32_t  bufferSize(width * height * 4u);
+  uint8_t*  buffer            = reinterpret_cast<uint8_t*>(malloc(bufferSize));
+  PixelData premultipliedData = PixelData::New(buffer, bufferSize, width, height, width, Pixel::RGBA8888, PixelData::FREE, true);
+  DALI_TEST_CHECK(texture.Upload(premultipliedData));
+  DALI_TEST_CHECK(texture.IsAlphaPreMultiplied());
+
+  // An upload to a mipmap level other than the base level does not change the flag.
+  uint32_t  mipmapBufferSize(2u * 2u * 4u);
+  uint8_t*  mipmapBuffer       = reinterpret_cast<uint8_t*>(malloc(mipmapBufferSize));
+  PixelData straightMipmapData = PixelData::New(mipmapBuffer, mipmapBufferSize, 2u, 2u, Pixel::RGBA8888, PixelData::FREE);
+  DALI_TEST_CHECK(texture.Upload(straightMipmapData, 0u, 1u, 0u, 0u, 2u, 2u));
+  DALI_TEST_CHECK(texture.IsAlphaPreMultiplied());
+
+  // The last upload to the base level wins.
+  buffer                 = reinterpret_cast<uint8_t*>(malloc(bufferSize));
+  PixelData straightData = PixelData::New(buffer, bufferSize, width, height, Pixel::RGBA8888, PixelData::FREE);
+  DALI_TEST_CHECK(texture.Upload(straightData));
+  DALI_TEST_CHECK(!texture.IsAlphaPreMultiplied());
+
+  // UploadSubPixelData records the flag the same way.
+  buffer            = reinterpret_cast<uint8_t*>(malloc(bufferSize));
+  premultipliedData = PixelData::New(buffer, bufferSize, width, height, width, Pixel::RGBA8888, PixelData::FREE, true);
+  DALI_TEST_CHECK(DevelTexture::UploadSubPixelData(texture, premultipliedData, 0u, 0u, width / 2u, height / 2u));
+  DALI_TEST_CHECK(texture.IsAlphaPreMultiplied());
 
   END_TEST;
 }

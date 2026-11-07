@@ -306,7 +306,8 @@ Texture::Texture(TextureType::Type type, Pixel::Format format, ImageDimensions s
   mType(type),
   mFormat(format),
   mResourceId(0u),
-  mUseUploadedParameter(mSize.GetWidth() == 0u && mSize.GetHeight() == 0u && mFormat == Pixel::INVALID)
+  mUseUploadedParameter(mSize.GetWidth() == 0u && mSize.GetHeight() == 0u && mFormat == Pixel::INVALID),
+  mPreMultiplied(false)
 #if defined(GPU_MEMORY_PROFILE_ENABLED)
   ,
   mMemoryInfo()
@@ -322,7 +323,8 @@ Texture::Texture(NativeImageInterfacePtr nativeImageInterface)
   mType(TextureType::TEXTURE_2D),
   mFormat(Pixel::RGB888),
   mResourceId(0u),
-  mUseUploadedParameter(false)
+  mUseUploadedParameter(false),
+  mPreMultiplied(false)
 #if defined(GPU_MEMORY_PROFILE_ENABLED)
   ,
   mMemoryInfo(new TextureMemoryInfo(static_cast<Dali::Integration::TextureContextTypeHint::Type>(Dali::Integration::TextureContextTypeHint::UNKNOWN + 1), "(NativeImage. Size could be changed)", mSize.GetWidth(), mSize.GetHeight(), 4)) // Most of NativeImage texture use 4 byte per pixels. Let we assume the data size maximize.
@@ -338,7 +340,8 @@ Texture::Texture(TextureType::Type type, uint32_t resourceId)
   mType(type),
   mFormat(Pixel::INVALID),
   mResourceId(resourceId),
-  mUseUploadedParameter(true)
+  mUseUploadedParameter(true),
+  mPreMultiplied(false)
 #if defined(GPU_MEMORY_PROFILE_ENABLED)
   ,
   mMemoryInfo(new TextureMemoryInfo(static_cast<Dali::Integration::TextureContextTypeHint::Type>(Dali::Integration::TextureContextTypeHint::UNKNOWN + 2), "(FastTrack)", 0, 0, 0)) // We cannot know the size of reouceId using case. But just insert info to the queue.
@@ -547,6 +550,12 @@ bool Texture::UploadSubPixelData(PixelDataPtr pixelData,
               mFormat = pixelDataFormat;
             }
 
+            // Only the base level describes how the whole texture is to be interpreted.
+            if(mipmap == 0u)
+            {
+              mPreMultiplied = pixelData->IsAlphaPreMultiplied();
+            }
+
 #if defined(GPU_MEMORY_PROFILE_ENABLED)
             if(mMemoryInfo)
             {
@@ -627,6 +636,11 @@ Pixel::Format Texture::GetPixelFormat() const
   return mFormat;
 }
 
+bool Texture::IsAlphaPreMultiplied() const
+{
+  return mPreMultiplied;
+}
+
 uint32_t Texture::GetResourceId() const
 {
   return mResourceId;
@@ -653,6 +667,11 @@ void Texture::SetPixelFormat(Pixel::Format format)
   {
     Render::SetTextureFormatMessage(GetEventThreadServices(), mTextureKey, mFormat);
   }
+}
+
+void Texture::SetAlphaPreMultiplied(bool preMultiplied)
+{
+  mPreMultiplied = preMultiplied;
 }
 
 bool Texture::IsNative() const
