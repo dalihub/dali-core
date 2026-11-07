@@ -127,6 +127,22 @@ TypeRegistration::TypeRegistration(Dali::String name, const std::type_info& base
   mName = ToDaliString(impl->Register(ToStdString(std::move(name)), baseType, f, false));
 }
 
+TypeRegistration::TypeRegistration(Dali::String name, Dali::String baseTypeName, TypeInfo::CreateFunction f)
+: mReference(Internal::TypeRegistry::Get())
+{
+  Internal::TypeRegistry* impl = Internal::TypeRegistry::Get();
+
+  mName = ToDaliString(impl->Register(ToStdString(std::move(name)), std::string(), ToStdString(std::move(baseTypeName)), f, false));
+}
+
+TypeRegistration::TypeRegistration(Dali::String name, Dali::String objectTypeName, Dali::String baseTypeName, TypeInfo::CreateFunction f)
+: mReference(Internal::TypeRegistry::Get())
+{
+  Internal::TypeRegistry* impl = Internal::TypeRegistry::Get();
+
+  mName = ToDaliString(impl->Register(ToStdString(std::move(name)), ToStdString(std::move(objectTypeName)), ToStdString(std::move(baseTypeName)), f, false));
+}
+
 const Dali::String& TypeRegistration::RegisteredName() const
 {
   return mName;

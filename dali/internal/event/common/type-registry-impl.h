@@ -146,6 +146,20 @@ public:
   std::string Register(std::string uniqueTypeName, std::string uniqueObjectTypeName, const std::type_info& baseTypeInfo, Dali::TypeInfo::CreateFunction createInstance, bool callCreateOnInit, const Dali::PropertyDetails* defaultProperties = nullptr, Property::Index defaultPropertyCount = 0);
 
   /**
+   * Register a type with every participant referenced by name
+   *
+   * @param [in] uniqueTypeName Name for the type to be registered
+   * @param [in] uniqueObjectTypeName Name for the object type to be registered, if different from uniqueTypeName (may be empty)
+   * @param [in] baseTypeName Name its base class is registered under
+   * @param [in] createInstance Instance creation function
+   * @param [in] callCreateOnInit If true call createInstance on DALi initialisation
+   * @param [in] defaultProperties the table of default property metadata
+   * @param [in] defaultPropertyCount count of default properties
+   * @return the name of the registered type.
+   */
+  std::string Register(std::string uniqueTypeName, std::string uniqueObjectTypeName, std::string baseTypeName, Dali::TypeInfo::CreateFunction createInstance, bool callCreateOnInit, const Dali::PropertyDetails* defaultProperties = nullptr, Property::Index defaultPropertyCount = 0);
+
+  /**
    * @copydoc CSharpTypeRegistry::TypeRegistration( const std::string&, const std::type_info&, TypeInfo::CreateFunction );
    */
   void Register(std::string name, const std::type_info& baseTypeInfo, Dali::CSharpTypeInfo::CreateFunction createInstance);

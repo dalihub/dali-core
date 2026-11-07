@@ -29,6 +29,7 @@
 #include <dali/public-api/math/compile-time-math.h>
 #include <dali/public-api/object/property.h>
 #include <dali/public-api/object/ref-object.h>
+#include <dali/public-api/object/type-info-id.h>
 #include <dali/public-api/render-tasks/render-task.h>
 
 namespace DALI_NAMESPACE
@@ -271,6 +272,36 @@ public:
   virtual Extension* GetExtension()
   {
     return nullptr;
+  }
+
+  /**
+   * @brief Returns the type to resolve to when this implementation's own type is not registered.
+   *
+   * The type registry resolves the owning actor's TypeInfo from the RTTI of its
+   * CustomActorImpl. When the most-derived implementation class has not registered
+   * itself with the type registry, resolution falls back to the type identified
+   * here, so the registered properties, signals and actions of that ancestor stay
+   * available on the instance. When this returns an invalid TypeInfoId, or the
+   * identified type is not registered either, an unregistered implementation
+   * resolves to the plain CustomActor type.
+   *
+   * A framework base class typically overrides this to return its own registered
+   * type (via DALI_TYPE_ID); every unregistered subclass then inherits the
+   * declaration, and the most-derived override wins. The declaration has no
+   * effect when the implementation's own type is registered.
+   *
+   * Only the identifier's name is used for the lookup: its last "::"-separated
+   * component must match the registered type name, so a namespace-qualified
+   * spelling resolves the same type as the plain class name.
+   *
+   * The default implementation returns an invalid TypeInfoId (no fallback).
+   *
+   * @SINCE_3_0.0
+   * @return A TypeInfoId naming a type-registered ancestor class, or an invalid TypeInfoId if none is declared
+   */
+  virtual TypeInfoId GetTypeRegistrationFallback() const
+  {
+    return TypeInfoId();
   }
 
   /**

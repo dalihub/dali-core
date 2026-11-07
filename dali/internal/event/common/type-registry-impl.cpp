@@ -18,6 +18,9 @@
 // CLASS HEADER
 #include <dali/internal/event/common/type-registry-impl.h>
 
+// EXTERNAL INCLUDES
+#include <string_view>
+
 // INTERNAL INCLUDES
 #include <dali/devel-api/object/type-registry.h>
 #include <dali/integration-api/debug.h>
@@ -178,6 +181,17 @@ std::string TypeRegistry::Register(std::string                    uniqueTypeName
 {
   std::string baseTypeName = DemangleClassName(baseTypeInfo.name());
 
+  return Register(std::move(uniqueTypeName), std::move(uniqueObjectTypeName), std::move(baseTypeName), createInstance, callCreateOnInit, defaultProperties, defaultPropertyCount);
+}
+
+std::string TypeRegistry::Register(std::string                    uniqueTypeName,
+                                   std::string                    uniqueObjectTypeName,
+                                   std::string                    baseTypeName,
+                                   Dali::TypeInfo::CreateFunction createInstance,
+                                   bool                           callCreateOnInit,
+                                   const Dali::PropertyDetails*   defaultProperties,
+                                   Property::Index                defaultPropertyCount)
+{
   Internal::TypeInfo* typeInfo(new Internal::TypeInfo(uniqueTypeName, baseTypeName, createInstance, defaultProperties, defaultPropertyCount));
 
   if(!mRegistryLut.Register(ConstString(uniqueTypeName), TypeInfoPointer(typeInfo)))
@@ -436,7 +450,26 @@ TypeRegistry::TypeInfoPointer TypeRegistry::GetTypeInfo(const Dali::BaseObject* 
     type                                = GetTypeInfo(typeid(custom));
     if(!type)
     {
-      // the most derived type is a descendant of custom actor but has not registered itself
+      // the most derived type has not registered itself; try the registered ancestor its
+      // implementation declares (CustomActorImpl::GetTypeRegistrationFallback override),
+      // so that ancestor's properties, actions and signals stay available on the instance
+      const Dali::TypeInfoId fallbackId = custom.GetTypeRegistrationFallback();
+      if(fallbackId.IsValid())
+      {
+        // the LUTs are keyed by unqualified class names, so strip any namespace
+        // qualification the DALI_TYPE_ID spelling carried
+        std::string_view fallbackName(fallbackId.GetName());
+        const size_t     lastSeparator = fallbackName.rfind("::");
+        if(lastSeparator != std::string_view::npos)
+        {
+          fallbackName.remove_prefix(lastSeparator + 2);
+        }
+        type = GetTypeInfo(ToDaliStringView(fallbackName));
+      }
+    }
+    if(!type)
+    {
+      // no (registered) fallback declared either,
       // so we'll just treat it as a custom actor for now so it "inherits" all of actors properties, actions and signals
       type = GetTypeInfo(typeid(Dali::Internal::CustomActor));
     }

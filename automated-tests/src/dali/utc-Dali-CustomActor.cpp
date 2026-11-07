@@ -2869,3 +2869,102 @@ int UtcDaliSizeNegotiatedActorNoCustomActorImpl(void)
   DALI_TEST_EQUALS(derived.RelayoutDependentOnChildren(), false, TEST_LOCATION);
   END_TEST;
 }
+
+namespace
+{
+namespace FallbackTest
+{
+/**
+ * Declares itself as the type-registration fallback for its unregistered subclasses;
+ * registered below with one event-side property. The namespace-qualified DALI_TYPE_ID
+ * spelling exercises the qualifier-stripping in the registry's fallback resolution.
+ */
+struct FallbackDeclaringCustomActor : public Impl::UnregisteredCustomActor
+{
+  Dali::TypeInfoId GetTypeRegistrationFallback() const override
+  {
+    return DALI_TYPE_ID(FallbackTest::FallbackDeclaringCustomActor);
+  }
+};
+
+/// Unregistered subclass: inherits the fallback its base declared.
+struct FallbackInheritingCustomActor : public FallbackDeclaringCustomActor
+{
+};
+
+/// Unregistered subclass that overrides the fallback with a type that is itself unregistered.
+struct FallbackOverwritingCustomActor : public FallbackDeclaringCustomActor
+{
+  Dali::TypeInfoId GetTypeRegistrationFallback() const override
+  {
+    return DALI_TYPE_ID(FallbackOverwritingCustomActor);
+  }
+};
+} // namespace FallbackTest
+
+int gFallbackPropertyValue = 0;
+
+void SetFallbackProperty(BaseObject* object, Property::Index index, const Property::Value& value)
+{
+  value.Get(gFallbackPropertyValue);
+}
+
+Property::Value GetFallbackProperty(BaseObject* object, Property::Index index)
+{
+  return Property::Value(gFallbackPropertyValue);
+}
+
+/**
+ * Registered lazily: a namespace-scope TypeRegistration would hold a TypeRegistry
+ * handle for the whole binary's lifetime and break the hard-coded reference-count
+ * checks in utc-Dali-TypeRegistry.cpp (move constructor/assignment tests).
+ */
+void EnsureFallbackDeclaringTypeRegistered()
+{
+  static TypeRegistration     fallbackDeclaringType(typeid(FallbackTest::FallbackDeclaringCustomActor), typeid(Dali::CustomActor), nullptr);
+  static PropertyRegistration fallbackDeclaringProperty(fallbackDeclaringType, "fallbackProperty", PROPERTY_REGISTRATION_START_INDEX, Property::INTEGER, SetFallbackProperty, GetFallbackProperty);
+}
+} // unnamed namespace
+
+int UtcDaliCustomActorImplTypeRegistrationFallbackP(void)
+{
+  TestApplication application; // Need the type registry
+  EnsureFallbackDeclaringTypeRegistered();
+
+  // A registered implementation resolves by its own exact type; its fallback declaration is inert.
+  FallbackTest::FallbackDeclaringCustomActor* baseImpl = new FallbackTest::FallbackDeclaringCustomActor;
+  CustomActor                                 base(*baseImpl);
+  DALI_TEST_EQUALS("FallbackDeclaringCustomActor", base.GetTypeName(), TEST_LOCATION);
+
+  // An unregistered subclass resolves through the fallback its base declared,
+  // instead of degrading to plain CustomActor.
+  FallbackTest::FallbackInheritingCustomActor* derivedImpl = new FallbackTest::FallbackInheritingCustomActor;
+  CustomActor                                  derived(*derivedImpl);
+  DALI_TEST_EQUALS("FallbackDeclaringCustomActor", derived.GetTypeName(), TEST_LOCATION);
+
+  // The fallback type's registered property dispatches on the unregistered subclass.
+  gFallbackPropertyValue = 0;
+  derived.SetProperty(PROPERTY_REGISTRATION_START_INDEX, 42);
+  DALI_TEST_EQUALS(42, gFallbackPropertyValue, TEST_LOCATION);
+  DALI_TEST_EQUALS(42, derived.GetProperty<int>(PROPERTY_REGISTRATION_START_INDEX), TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliCustomActorImplTypeRegistrationFallbackN(void)
+{
+  TestApplication application; // Need the type registry
+  EnsureFallbackDeclaringTypeRegistered();
+
+  // A declared fallback that is itself unregistered falls through to plain CustomActor.
+  FallbackTest::FallbackOverwritingCustomActor* impl = new FallbackTest::FallbackOverwritingCustomActor;
+  CustomActor                                   custom(*impl);
+  DALI_TEST_EQUALS("CustomActor", custom.GetTypeName(), TEST_LOCATION);
+
+  // The base type's registered property is not reachable on it.
+  gFallbackPropertyValue = 0;
+  custom.SetProperty(PROPERTY_REGISTRATION_START_INDEX, 42);
+  DALI_TEST_EQUALS(0, gFallbackPropertyValue, TEST_LOCATION);
+
+  END_TEST;
+}

@@ -4381,3 +4381,37 @@ int UtcDaliTypeRegistryRegistrationHandleObjectWithPropertyMetadataN(void)
 
   END_TEST;
 }
+
+int UtcDaliTypeRegistryNamedTypeRegistrationP(void)
+{
+  TestApplication application;
+
+  // Registration with every participant referenced by name: no std::type_info involved.
+  TypeRegistration namedType(Dali::String("NameBasedRegisteredType"), Dali::String("Actor"), nullptr);
+  DALI_TEST_EQUALS("NameBasedRegisteredType", namedType.RegisteredName(), TEST_LOCATION);
+
+  Dali::TypeInfo typeInfo = TypeRegistry::Get().GetTypeInfo("NameBasedRegisteredType");
+  DALI_TEST_CHECK(typeInfo);
+  DALI_TEST_CHECK(typeInfo.GetName() == "NameBasedRegisteredType");
+  DALI_TEST_CHECK(typeInfo.GetBaseName() == "Actor");
+
+  END_TEST;
+}
+
+int UtcDaliTypeRegistryNamedTypeRegistrationWithObjectNameP(void)
+{
+  TestApplication application;
+
+  TypeRegistration namedType(Dali::String("NameBasedHandleType"), Dali::String("NameBasedHandleTypeImpl"), Dali::String("Actor"), nullptr);
+  DALI_TEST_EQUALS("NameBasedHandleType", namedType.RegisteredName(), TEST_LOCATION);
+
+  // Found under the registered name, and under the alternative object name.
+  Dali::TypeInfo typeInfo = TypeRegistry::Get().GetTypeInfo("NameBasedHandleType");
+  DALI_TEST_CHECK(typeInfo);
+  Dali::TypeInfo byObjectName = TypeRegistry::Get().GetTypeInfo("NameBasedHandleTypeImpl");
+  DALI_TEST_CHECK(byObjectName);
+  DALI_TEST_CHECK(byObjectName.GetName() == "NameBasedHandleType");
+  DALI_TEST_CHECK(byObjectName.GetBaseName() == "Actor");
+
+  END_TEST;
+}
