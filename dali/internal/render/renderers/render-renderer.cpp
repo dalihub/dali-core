@@ -1357,6 +1357,8 @@ void Renderer::ClearPipelineCache(bool notifyToCache)
   {
     if(notifyToCache)
     {
+      // The cache's latest query may point at this renderer; forget it before releasing the pipeline.
+      mPipelineCache->InvalidateLatestQuery(this);
       mPipelineCache->ResetPipeline(mPipeline);
     }
     mPipelineCached = false;

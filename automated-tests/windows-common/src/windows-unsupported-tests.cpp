@@ -17,3 +17,8 @@ int UtcDaliCorePipelineCacheWithDynamicBlendTest(void)
 {
   return 0;
 }
+
+int UtcDaliCorePipelineCacheLatestQueryAfterRendererDestroyedTest(void)
+{
+  return 0;
+}

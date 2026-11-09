@@ -386,3 +386,105 @@ int UtcDaliCorePipelineCacheWithDynamicBlendTest(void)
   delete surface;
   END_TEST;
 }
+
+int UtcDaliCorePipelineCacheLatestQueryAfterRendererDestroyedTest(void)
+{
+  TestApplication application;
+  tet_infoline("Testing Dali::Internal::Render::PipelineCache latest query reuse after the querying renderer is destroyed");
+
+  using Dali::Internal::Render::PipelineCache;
+
+  // Pipeline cache must be initialized
+  DALI_TEST_EQUALS(gPipelineCache != 0, true, TEST_LOCATION);
+
+  // Test size of level0 nodes (should be 0, nothing added yet)
+  DALI_TEST_EQUALS(gPipelineCache->level0nodes.size(), 0, TEST_LOCATION);
+
+  // Create two renderers sharing the same geometry and program, with blending
+  // disabled, so that their queries are cached in the non-blending
+  // latest-query slot which survives across frames.
+  Geometry geometry = CreateQuadGeometry();
+  Shader   shader   = Shader::New("vertexSrc", "fragmentSrc");
+
+  Actor    actor    = Actor::New();
+  Renderer renderer = Renderer::New(geometry, shader);
+  renderer.SetProperty(Dali::Renderer::Property::BLEND_MODE, Dali::BlendMode::OFF);
+  actor.AddRenderer(renderer);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(400.0f, 400.0f));
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+  application.Render();
+
+  // 1 pipeline should be added
+  DALI_TEST_EQUALS(gPipelineCache->level0nodes.size(), 1, TEST_LOCATION);
+
+  // Add the second actor in a separate frame, so that both renderers are
+  // surely rendered and share the same pipeline cache entry.
+  Actor    actor1    = Actor::New();
+  Renderer renderer1 = Renderer::New(geometry, shader);
+  renderer1.SetProperty(Dali::Renderer::Property::BLEND_MODE, Dali::BlendMode::OFF);
+  actor1.AddRenderer(renderer1);
+  actor1.SetProperty(Actor::Property::SIZE, Vector2(400.0f, 400.0f));
+  application.GetScene().Add(actor1);
+
+  application.SendNotification();
+  application.Render();
+
+  // The query of the first renderer is cached as the latest query of the
+  // non-blending slot, and both renderers share the pipeline. (The second
+  // renderer reuses the cached pipeline without updating the cached query.)
+  DALI_TEST_EQUALS(gPipelineCache->level0nodes.size(), 1, TEST_LOCATION);
+  DALI_TEST_CHECK(gPipelineCache->mLatestResult[1].pipeline != nullptr);
+  DALI_TEST_EQUALS(gPipelineCache->level0nodes.front().level1nodes.front().noBlends.front().referenceCount, 2u, TEST_LOCATION);
+
+  // Remember the renderer whose query is cached as the latest query; it is
+  // the one being destroyed below.
+  auto* destroyedQueryRenderer = gPipelineCache->mLatestQuery[1].renderer;
+
+  // Destroy the first renderer only. Its query is the one cached as the
+  // latest query (the second renderer reused the cached pipeline, so the
+  // cached query was never updated). The destruction must invalidate the
+  // latest used slot referencing the destroyed renderer.
+  application.GetScene().Remove(actor);
+  actor.RemoveRenderer(renderer);
+  renderer.Reset();
+
+  // Render frames until the destroyed renderer releases its pipeline cache
+  // reference, i.e. until it is actually destroyed. The surviving renderer
+  // keeps rendering in every frame, so once the cached query refers to the
+  // destroyed renderer, reusing the latest bound pipeline compares against
+  // it. The comparison must not dereference the destroyed renderer. (This
+  // crashed before the latest used cache was invalidated on renderer
+  // destruction.)
+  bool rendererDestroyed = false;
+  for(int frame = 0; frame < 20 && !rendererDestroyed; ++frame)
+  {
+    // Force the surviving renderer to be redrawn in every frame.
+    actor1.SetProperty(Actor::Property::POSITION_X, 10.0f + frame);
+    application.SendNotification();
+    application.Render();
+
+    rendererDestroyed = (gPipelineCache->level0nodes.front().level1nodes.front().noBlends.front().referenceCount == 1u);
+  }
+  DALI_TEST_CHECK(rendererDestroyed);
+
+  // Render once more so that the surviving renderer definitely reuses the
+  // latest bound pipeline after the destruction.
+  actor1.SetProperty(Actor::Property::POSITION_X, 100.0f);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(gPipelineCache->level0nodes.size(), 1, TEST_LOCATION);
+  DALI_TEST_CHECK(gPipelineCache->mLatestResult[1].pipeline != nullptr);
+  DALI_TEST_EQUALS(gPipelineCache->level0nodes.front().level1nodes.front().noBlends.front().referenceCount, 1u, TEST_LOCATION);
+
+  // The slot referencing the destroyed renderer must have been invalidated
+  // on destruction and repopulated by the surviving renderer's own query.
+  // (This check makes the test fail deterministically on unfixed code even
+  // when the stale dereference above stays benign: unfixed code keeps the
+  // destroyed renderer's query in the slot.)
+  DALI_TEST_CHECK(gPipelineCache->mLatestQuery[1].renderer != destroyedQueryRenderer);
+
+  END_TEST;
+}
