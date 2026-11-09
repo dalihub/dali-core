@@ -222,12 +222,31 @@ public: // Resource lifecycle and rendering hooks, called by DALi internally
 
 protected:
   /**
+   * @brief Constructs the interface for a platform-specific implementation.
+   * @SINCE_3_0.1
+   */
+  NativeImageInterface() = default;
+
+  /**
    * @brief A reference counted object may only be deleted by calling Unreference().
    *
    * The implementation should destroy the NativeImage resources.
    * @SINCE_1_0.0
    */
   ~NativeImageInterface() override = default;
+
+private:
+  /**
+   * @brief Copy constructor is not supported.
+   * @SINCE_3_0.1
+   */
+  NativeImageInterface(const NativeImageInterface&) = delete;
+
+  /**
+   * @brief Copy assignment is not supported.
+   * @SINCE_3_0.1
+   */
+  NativeImageInterface& operator=(const NativeImageInterface&) = delete;
 };
 
 /**
