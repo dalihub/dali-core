@@ -80,6 +80,7 @@ public:
 
   /**
    * @brief Destructor.
+   * @SINCE_3_0.0
    */
   ~StringView();
 

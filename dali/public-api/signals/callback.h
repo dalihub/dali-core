@@ -61,6 +61,7 @@ namespace CallbackUtils
  * to the original type before calling it, so this cast is intentional.
  * There is no pointer to member type which is compatible with every other one (like void(*)() for
  * normal functions), so -Wcast-function-type is suppressed here only.
+ * @SINCE_3_0.0
  * @param[in] function The member function pointer to cast
  * @return The casted member function pointer
  */
@@ -129,7 +130,7 @@ public:
     // so the library containing the code has to be loaded, otherwise we crash boom bang
     if(callback.mImpl.mObjectPointer)
     {
-      using Dispatcher      = R (*)(CallbackBase&, Args...);
+      using Dispatcher = R (*)(CallbackBase&, Args...);
       // Cast through void(*)() which is compatible with every function type, to avoid -Wcast-function-type
       Dispatcher dispatcher = reinterpret_cast<Dispatcher>(reinterpret_cast<void (*)()>(callback.mImpl.mMemberFunctionDispatcher));
       returnVal             = (*dispatcher)(callback, args...);
@@ -161,7 +162,7 @@ public:
     // so the library containing the code has to be loaded, otherwise we crash boom bang
     if(callback.mImpl.mObjectPointer)
     {
-      using Dispatcher      = void (*)(CallbackBase&, Args...);
+      using Dispatcher = void (*)(CallbackBase&, Args...);
       // Cast through void(*)() which is compatible with every function type, to avoid -Wcast-function-type
       Dispatcher dispatcher = reinterpret_cast<Dispatcher>(reinterpret_cast<void (*)()>(callback.mImpl.mMemberFunctionDispatcher));
       (*dispatcher)(callback, args...);

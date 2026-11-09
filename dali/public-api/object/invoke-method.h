@@ -47,6 +47,7 @@ namespace DALI_NAMESPACE
  * types expected by the generated wrapper; C++ implicit conversions are not
  * applied at runtime. Trailing default parameters may be omitted when the
  * generated overload set is unambiguous.
+ * @SINCE_3_0.0
  */
 using InvokeArguments = Dali::Vector<Dali::Any>;
 
@@ -57,6 +58,7 @@ using InvokeArguments = Dali::Vector<Dali::Any>;
  * the returned value in this Dali::Any. Callers should use Dali::AnyCast with
  * the expected return type. For void methods, the result is reset to an empty
  * Dali::Any.
+ * @SINCE_3_0.0
  */
 using InvokeResult = Dali::Any;
 

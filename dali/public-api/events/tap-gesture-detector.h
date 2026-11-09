@@ -322,6 +322,7 @@ public: // Setters
   /**
    * @brief When set to true, all tap gestures will be received when multiple taps are supported by the gesture detector.
    *
+   * @SINCE_3_0.0
    * @param[in] receive The receiving all tap events flag
    * @pre The gesture detector has been initialized.
    * @note The default is false.

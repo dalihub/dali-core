@@ -103,6 +103,7 @@ public:
 
   /**
    * @brief Default constructor, creates an empty handle.
+   * @SINCE_3_0.0
    */
   FrameBuffer();
 

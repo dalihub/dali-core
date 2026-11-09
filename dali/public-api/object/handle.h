@@ -74,6 +74,7 @@ public:
 
   /**
    * @brief PropertySetSignal function prototype for signal handler. Called when a property is set on this object.
+   * @SINCE_3_0.0
    */
   using PropertySetSignalType = Signal<void(Handle handle, Property::Index index, const Property::Value& value)>;
 
@@ -287,6 +288,7 @@ public:
    * Saves automatic re-allocation of vectors for properties when we know in advance how many there
    * will be.
    *
+   * @SINCE_3_0.0
    * @param[in] propertyCount The total number of initial properties.
    */
   void ReserveCustomProperties(int propertyCount);
@@ -701,6 +703,7 @@ public:
    * Returns an object that can be assigned to or cast from, enabling
    * the indexed property to be either read or written.
    *
+   * @SINCE_3_0.0
    * @param[in] index The index of the property to access.
    * @return indirect value. Should have shorter scope than the handle
    */
@@ -712,6 +715,7 @@ public:
    * Returns an object that can be assigned to or cast from, enabling
    * the named property to be either read or written.
    *
+   * @SINCE_3_0.0
    * @param[in] name The name of the property to access.
    * @return indirect value. Should have shorter scope than the handle
    */

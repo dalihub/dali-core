@@ -205,6 +205,7 @@ public:
 
   /**
    * Class method to get the total currently allocated size of pixel buffers
+   * @SINCE_3_0.0
    */
   static uint32_t GetTotalAllocatedSize();
 

@@ -58,6 +58,7 @@ class DALI_CORE_API RotationGestureDetector : public GestureDetector
 public: // Typedefs
   /**
    * @brief Signal type.
+   * @SINCE_3_0.0
    */
   using DetectedSignalType = Signal<void(Actor, RotationGesture)>;
 

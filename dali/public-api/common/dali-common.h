@@ -168,6 +168,7 @@ public:
  *    if(!cond) { exit(EXIT_FAILURE); }
  * (which it is often equivalent to in effect).
  * It should not be used for simple parameter validation for instance.
+ * @SINCE_3_0.0
  */
 
 /**

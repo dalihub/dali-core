@@ -59,6 +59,7 @@
  * @code
  * namespace DALI_NAMESPACE { class Actor; }
  * @endcode
+ * @SINCE_3_0.0
  */
 #if DALI_TIZEN_NAMESPACE
 
@@ -73,6 +74,7 @@ namespace Dali
 
 /**
  * @brief Allows DALi to be reached as Dali:: as well as Tizen::Dali::.
+ * @SINCE_3_0.0
  */
 namespace Dali = Tizen::Dali;
 
@@ -96,6 +98,7 @@ namespace Tizen
 /**
  * @brief Allows DALi to be reached as Tizen::Dali:: as well as Dali::, so that
  * application code written against the Tizen API also builds for other targets.
+ * @SINCE_3_0.0
  */
 namespace Dali = ::Dali;
 } // namespace Tizen
