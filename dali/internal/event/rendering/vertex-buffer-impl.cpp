@@ -264,16 +264,15 @@ void VertexBuffer::Initialize(const Dali::Property::Map& formatMap)
       type = component.second.GetType();
     }
 
-    if((type == Property::NONE) ||
-       (type == Property::STRING) ||
-       (type == Property::ARRAY) ||
-       (type == Property::MAP))
+    uint32_t elementSize      = GetPropertyImplementationSize(type);
+    uint32_t elementAlignment = GetPropertyImplementationAlignment(type);
+
+    // Zero alignment means the type has no vertex-component representation:
+    // NONE/STRING/ARRAY/MAP/INSETS, or an out-of-range value cast from int.
+    if(DALI_UNLIKELY(elementAlignment == 0u))
     {
       DALI_ABORT("Property::Type not supported in VertexBuffer");
     }
-
-    uint32_t elementSize      = GetPropertyImplementationSize(type);
-    uint32_t elementAlignment = GetPropertyImplementationAlignment(type);
 
     // check if current alignment is compatible with new member
     if(uint32_t offset = currentAlignment % elementAlignment)
