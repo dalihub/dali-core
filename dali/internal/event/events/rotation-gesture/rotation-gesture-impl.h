@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/events/gesture-impl.h>
+#include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/events/rotation-gesture.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/object/base-object.h>
@@ -38,11 +39,22 @@ class RotationGesture final : public Gesture
 {
 public:
   /**
-   * @brief Default constructor
+   * @brief Creates an unreferenced implementation only for BaseHandle construction.
+   * @warning Pass the result directly to a BaseHandle-derived handle constructor.
+   * The constructor must acquire its first reference (the returned reference count is zero).
+   * Use New() when an IntrusivePtr owner is required.
    */
-  RotationGesture(GestureState state)
-  : Gesture(GestureType::ROTATION, state)
+  static DALI_INTERNAL RotationGesture* NewForBaseHandle(GestureState state)
   {
+    return new RotationGesture(state);
+  }
+
+  /**
+   * @brief Creates a reference-counted implementation.
+   */
+  static Dali::IntrusivePtr<RotationGesture> New(GestureState state)
+  {
+    return Dali::IntrusivePtr<RotationGesture>(new RotationGesture(state));
   }
 
   RotationGesture(const RotationGesture&)            = delete; ///< Deleted copy constructor
@@ -99,6 +111,15 @@ public:
   inline const Vector2& GetLocalCenterPoint() const
   {
     return mLocalCenterPoint;
+  }
+
+protected:
+  /**
+   * @brief Default constructor
+   */
+  RotationGesture(GestureState state)
+  : Gesture(GestureType::ROTATION, state)
+  {
   }
 
 private:

@@ -19,6 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/intrusive-ptr.h>
 #include <map>
 
 // INTERNAL INCLUDES
@@ -49,17 +50,12 @@ public:
   using Observer = RecognizerObserver<LongPressGestureEvent>;
 
   /**
-   * Constructor
-   * @param[in] observer   Used to send events to Core.
-   * @param[in] screenSize The size of the screen.
-   * @param[in] request    The long press gesture request, including the minimum holding time.
+   * @brief Creates a reference-counted implementation.
    */
-  LongPressGestureRecognizer(Observer& observer, Vector2 screenSize, const LongPressGestureRequest& request);
-
-  /**
-   * Virtual destructor.
-   */
-  ~LongPressGestureRecognizer() override;
+  static Dali::IntrusivePtr<LongPressGestureRecognizer> New(Observer& observer, Vector2 screenSize, const LongPressGestureRequest& request)
+  {
+    return Dali::IntrusivePtr<LongPressGestureRecognizer>(new LongPressGestureRecognizer(observer, screenSize, request));
+  }
 
 public:
   /**
@@ -81,6 +77,20 @@ public:
    * @copydoc Dali::Internal::GestureRecognizer::OnSequenceSourceChanged()
    */
   void OnSequenceSourceChanged() override;
+
+protected:
+  /**
+   * Constructor
+   * @param[in] observer   Used to send events to Core.
+   * @param[in] screenSize The size of the screen.
+   * @param[in] request    The long press gesture request, including the minimum holding time.
+   */
+  LongPressGestureRecognizer(Observer& observer, Vector2 screenSize, const LongPressGestureRequest& request);
+
+  /**
+   * Virtual destructor.
+   */
+  ~LongPressGestureRecognizer() override;
 
 private:
   /**

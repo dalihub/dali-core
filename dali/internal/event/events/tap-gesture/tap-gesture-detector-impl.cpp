@@ -266,7 +266,7 @@ void TapGestureDetector::EmitTapGestureSignal(Dali::Actor tappedActor, const Dal
     numberOfTaps = numberOfTaps == 0u ? mActiveProfile.maximumTaps : numberOfTaps;
     if(numberOfTaps >= mActiveProfile.minimumTaps)
     {
-      Internal::TapGesturePtr internalTap(new Internal::TapGesture(tap.GetState()));
+      Internal::TapGesturePtr internalTap(Internal::TapGesture::New(tap.GetState()));
       internalTap->SetTime(tap.GetTime());
       internalTap->SetNumberOfTouches(tap.GetNumberOfTouches());
       internalTap->SetScreenPoint(tap.GetScreenPoint());
@@ -416,7 +416,7 @@ void TapGestureDetector::ProcessTouchEvent(Scene& scene, const Integration::Touc
     FillRequest(request);
 
     Size size          = scene.GetSize();
-    mGestureRecognizer = new TapGestureRecognizer(*this, Vector2(size.width, size.height), request);
+    mGestureRecognizer = TapGestureRecognizer::New(*this, Vector2(size.width, size.height), request);
     ConsumeRecognizerUpdateRequired(); // The new recognizer already reflects the current settings.
   }
   else if(ConsumeRecognizerUpdateRequired())
@@ -447,7 +447,7 @@ void TapGestureDetector::Process(Scene& scene, const TapGestureEvent& tapEvent)
         feededActor->ScreenToLocal(*mRenderTask.Get(), actorCoords.x, actorCoords.y, tapEvent.point.x, tapEvent.point.y);
 
         SetDetected(true);
-        Internal::TapGesturePtr tap(new Internal::TapGesture(tapEvent.state));
+        Internal::TapGesturePtr tap(Internal::TapGesture::New(tapEvent.state));
         tap->SetTime(tapEvent.time);
         tap->SetNumberOfTaps(tapEvent.numberOfTaps);
         tap->SetNumberOfTouches(tapEvent.numberOfTouches);

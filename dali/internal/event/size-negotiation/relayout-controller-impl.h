@@ -19,6 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/intrusive-ptr.h>
 #include <cstdint>
 #include <memory> // for unique_ptr
 
@@ -49,16 +50,12 @@ class RelayoutController : public Dali::BaseObject
 {
 public:
   /**
-   * @brief Constructor.
-   * We should only create a unique instance.
-   * @param[in] controller to request a render from the RenderController if core is not processing events.
+   * @brief Creates a reference-counted implementation.
    */
-  RelayoutController(Integration::RenderController& controller);
-
-  /**
-   * Destructor
-   */
-  ~RelayoutController() override;
+  static Dali::IntrusivePtr<RelayoutController> New(Integration::RenderController& controller)
+  {
+    return Dali::IntrusivePtr<RelayoutController>(new RelayoutController(controller));
+  }
 
   /**
    * @brief Get the singleton of RelayoutController object.
@@ -145,6 +142,19 @@ public: // CALLBACKS
    * @param[in] object The object being destroyed
    */
   void OnObjectDestroyed(const Dali::RefObject* object);
+
+protected:
+  /**
+   * @brief Constructor.
+   * We should only create a unique instance.
+   * @param[in] controller to request a render from the RenderController if core is not processing events.
+   */
+  RelayoutController(Integration::RenderController& controller);
+
+  /**
+   * Destructor
+   */
+  ~RelayoutController() override;
 
 private:
   using RawActorOrderedSet = Dali::Integration::OrderedSet<Dali::Internal::Actor, false>; ///< Specialised container to find duplication list, and order

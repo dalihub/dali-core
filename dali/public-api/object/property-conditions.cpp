@@ -25,7 +25,7 @@
 namespace DALI_NAMESPACE
 {
 PropertyCondition::PropertyCondition()
-: BaseHandle(new Internal::PropertyCondition())
+: BaseHandle(Internal::PropertyCondition::NewForBaseHandle())
 {
 }
 

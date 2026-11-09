@@ -636,7 +636,7 @@ int UtcDaliGestureDetectorCancelProcessing(void)
   pinchDetector.DetectedSignal().Connect(&application, pFunctor);
 
   Dali::Integration::TouchEvent tp = GenerateSingleTouch(PointState::DOWN, Vector2(50.0f, 50.0f), 1, 100);
-  Internal::TouchEventPtr       touchEventImpl(new Internal::TouchEvent(100));
+  Internal::TouchEventPtr       touchEventImpl(Internal::TouchEvent::New(100));
   touchEventImpl->AddPoint(tp.GetPoint(0));
   touchEventImpl->SetRenderTask(task);
   Dali::TouchEvent touchEventHandle(touchEventImpl.Get());
@@ -655,7 +655,7 @@ int UtcDaliGestureDetectorCancelProcessing(void)
   tData.Reset();
 
   tp             = GenerateSingleTouch(PointState::UP, Vector2(50.0f, 50.0f), 1, 650);
-  touchEventImpl = new Internal::TouchEvent(650);
+  touchEventImpl = Internal::TouchEvent::New(650);
   touchEventImpl->AddPoint(tp.GetPoint(0));
   touchEventImpl->SetRenderTask(task);
   touchEventHandle = Dali::TouchEvent(touchEventImpl.Get());
@@ -673,7 +673,7 @@ int UtcDaliGestureDetectorCancelProcessing(void)
   longDetector.SetTouchesRequired(2, 2);
 
   tp             = GenerateDoubleTouch(PointState::DOWN, Vector2(2.0f, 20.0f), PointState::DOWN, Vector2(38.0f, 20.0f), 100);
-  touchEventImpl = new Internal::TouchEvent(100);
+  touchEventImpl = Internal::TouchEvent::New(100);
   touchEventImpl->AddPoint(tp.GetPoint(0));
   touchEventImpl->AddPoint(tp.GetPoint(1));
   touchEventImpl->SetRenderTask(task);
@@ -687,7 +687,7 @@ int UtcDaliGestureDetectorCancelProcessing(void)
   pinchDetector.CancelAllOtherGestureDetectors();
 
   tp             = GenerateDoubleTouch(PointState::MOTION, Vector2(10.0f, 20.0f), PointState::MOTION, Vector2(30.0f, 20.0f), 150);
-  touchEventImpl = new Internal::TouchEvent(150);
+  touchEventImpl = Internal::TouchEvent::New(150);
   touchEventImpl->AddPoint(tp.GetPoint(0));
   touchEventImpl->AddPoint(tp.GetPoint(1));
   touchEventImpl->SetRenderTask(task);
@@ -699,7 +699,7 @@ int UtcDaliGestureDetectorCancelProcessing(void)
   rotationDetector.HandleEvent(actor, touchEventHandle);
 
   tp             = GenerateDoubleTouch(PointState::MOTION, Vector2(10.0f, 20.0f), PointState::MOTION, Vector2(30.0f, 20.0f), 200);
-  touchEventImpl = new Internal::TouchEvent(200);
+  touchEventImpl = Internal::TouchEvent::New(200);
   touchEventImpl->AddPoint(tp.GetPoint(0));
   touchEventImpl->AddPoint(tp.GetPoint(1));
   touchEventImpl->SetRenderTask(task);
@@ -711,7 +711,7 @@ int UtcDaliGestureDetectorCancelProcessing(void)
   rotationDetector.HandleEvent(actor, touchEventHandle);
 
   tp             = GenerateDoubleTouch(PointState::MOTION, Vector2(10.0f, 20.0f), PointState::MOTION, Vector2(30.0f, 20.0f), 250);
-  touchEventImpl = new Internal::TouchEvent(250);
+  touchEventImpl = Internal::TouchEvent::New(250);
   touchEventImpl->AddPoint(tp.GetPoint(0));
   touchEventImpl->AddPoint(tp.GetPoint(1));
   touchEventImpl->SetRenderTask(task);
@@ -723,7 +723,7 @@ int UtcDaliGestureDetectorCancelProcessing(void)
   rotationDetector.HandleEvent(actor, touchEventHandle);
 
   tp             = GenerateDoubleTouch(PointState::MOTION, Vector2(10.0f, 20.0f), PointState::MOTION, Vector2(30.0f, 20.0f), 300);
-  touchEventImpl = new Internal::TouchEvent(300);
+  touchEventImpl = Internal::TouchEvent::New(300);
   touchEventImpl->AddPoint(tp.GetPoint(0));
   touchEventImpl->AddPoint(tp.GetPoint(1));
   touchEventImpl->SetRenderTask(task);
@@ -735,7 +735,7 @@ int UtcDaliGestureDetectorCancelProcessing(void)
   rotationDetector.HandleEvent(actor, touchEventHandle);
 
   tp             = GenerateDoubleTouch(PointState::UP, Vector2(10.0f, 20.0f), PointState::UP, Vector2(30.0f, 20.0f), 350);
-  touchEventImpl = new Internal::TouchEvent(350);
+  touchEventImpl = Internal::TouchEvent::New(350);
   touchEventImpl->AddPoint(tp.GetPoint(0));
   touchEventImpl->AddPoint(tp.GetPoint(1));
   touchEventImpl->SetRenderTask(task);
@@ -810,7 +810,7 @@ Actor AddDetachTestActor(TestApplication& application)
 
 void FeedDetachTestTouch(TestApplication& application, GestureDetector detector, Actor actor, PointState::Type state, uint32_t time, float separation = 0.0f)
 {
-  Internal::TouchEventPtr event(new Internal::TouchEvent(time));
+  Internal::TouchEventPtr event(Internal::TouchEvent::New(time));
   Integration::Point      point;
   point.SetState(state);
   point.SetDeviceId(0);

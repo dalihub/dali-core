@@ -46,11 +46,6 @@ public: // Creation
    */
   static PinchGestureDetectorPtr New();
 
-  /**
-   * Construct a new GestureDetector.
-   */
-  PinchGestureDetector();
-
 public:
   /**
    * Called by the PinchGestureProcessor when a pinch gesture event occurs within the bounds of our
@@ -81,6 +76,11 @@ public: // Signals
   static bool DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const Dali::String& signalName, FunctorDelegate* functor);
 
 protected:
+  /**
+   * Construct a new GestureDetector.
+   */
+  PinchGestureDetector();
+
   /**
    * A reference counted object may only be deleted by calling Unreference()
    */

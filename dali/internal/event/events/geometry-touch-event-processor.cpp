@@ -612,7 +612,7 @@ struct GeometryTouchEventProcessor::Impl
 
     processor.mStreamState.phase = GeometryTouchStreamPhase::FINISHING;
 
-    TouchEventPtr      interruptedEvent(new TouchEvent(0u));
+    TouchEventPtr      interruptedEvent(TouchEvent::New(0u));
     Integration::Point point;
     point.SetState(PointState::INTERRUPTED);
     interruptedEvent->AddPoint(point);
@@ -949,7 +949,7 @@ bool GeometryTouchEventProcessor::ProcessTouchEvent(const Integration::TouchEven
     {
       auto          initialCandidates = std::move(mStreamState.candidatesRootToFront);
       auto          initialBoundaries = std::move(mStreamState.touchPropagationBoundaries);
-      TouchEventPtr restartEvent(new TouchEvent(event.time));
+      TouchEventPtr restartEvent(TouchEvent::New(event.time));
       for(const auto& point : event.points)
       {
         restartEvent->AddPoint(point);
@@ -967,7 +967,7 @@ bool GeometryTouchEventProcessor::ProcessTouchEvent(const Integration::TouchEven
   ProcessTouchEventVariables localVars(*this, streamEnding);
 
   // 1) Hit testing and event construction.
-  localVars.touchEventImpl   = new TouchEvent(event.time);
+  localVars.touchEventImpl   = TouchEvent::New(event.time);
   localVars.touchEventHandle = Dali::TouchEvent(localVars.touchEventImpl.Get());
 
   DALI_LOG_INFO(gLogFilter, Debug::Concise, "\n");

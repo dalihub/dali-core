@@ -35,25 +35,6 @@ using WheelEventPtr = IntrusivePtr<WheelEvent>;
 class WheelEvent : public BaseObject
 {
 public:
-  // Construction & Destruction
-
-  /**
-   * @brief Default constructor
-   */
-  WheelEvent();
-
-  /**
-   * @brief Constructor.
-   *
-   * @param[in] type      The type of the wheel event
-   * @param[in] direction The direction of wheel rolling (0 = default vertical wheel, 1 = horizontal wheel)
-   * @param[in] modifiers Modifier keys pressed during the event (such as shift, alt and control)
-   * @param[in] point     The co-ordinates of the cursor relative to the top-left of the screen
-   * @param[in] delta     The offset of rolling (positive value means roll down or clockwise, and negative value means roll up or counter-clockwise)
-   * @param[in] timeStamp The time the wheel is being rolled
-   */
-  WheelEvent(Dali::WheelEvent::Type type, int32_t direction, uint32_t modifiers, Vector2 point, int32_t delta, uint32_t timeStamp);
-
   /**
    * Create a new WheelEvent.
    *
@@ -113,6 +94,26 @@ public:
    * @copydoc Dali::WheelEvent::GetTime()
    */
   uint32_t GetTime() const;
+
+protected:
+  // Construction & Destruction
+
+  /**
+   * @brief Default constructor
+   */
+  WheelEvent();
+
+  /**
+   * @brief Constructor.
+   *
+   * @param[in] type      The type of the wheel event
+   * @param[in] direction The direction of wheel rolling (0 = default vertical wheel, 1 = horizontal wheel)
+   * @param[in] modifiers Modifier keys pressed during the event (such as shift, alt and control)
+   * @param[in] point     The co-ordinates of the cursor relative to the top-left of the screen
+   * @param[in] delta     The offset of rolling (positive value means roll down or clockwise, and negative value means roll up or counter-clockwise)
+   * @param[in] timeStamp The time the wheel is being rolled
+   */
+  WheelEvent(Dali::WheelEvent::Type type, int32_t direction, uint32_t modifiers, Vector2 point, int32_t delta, uint32_t timeStamp);
 
 private:
   /**

@@ -36,17 +36,6 @@ using ObjectIter = ObjectContainer::Iterator;
  */
 class Constrainer : public Object, public Object::Observer
 {
-public:
-  /**
-   * Constructor.
-   */
-  Constrainer();
-
-  /**
-   * Virtual destructor.
-   */
-  ~Constrainer() override;
-
 public: // Object::Observer methods
   /**
    * @copydoc Object::Observer::SceneObjectAdded()
@@ -86,6 +75,16 @@ public:
   void Remove(Dali::Handle& target);
 
 protected:
+  /**
+   * Constructor.
+   */
+  Constrainer();
+
+  /**
+   * Virtual destructor.
+   */
+  ~Constrainer() override;
+
   /**
    * @brief Adds an object to the list of observed objects
    *

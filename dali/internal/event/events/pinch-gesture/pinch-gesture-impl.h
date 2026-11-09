@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/events/gesture-impl.h>
+#include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/events/pinch-gesture.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/object/base-object.h>
@@ -38,11 +39,22 @@ class PinchGesture final : public Gesture
 {
 public:
   /**
-   * @brief Default constructor
+   * @brief Creates an unreferenced implementation only for BaseHandle construction.
+   * @warning Pass the result directly to a BaseHandle-derived handle constructor.
+   * The constructor must acquire its first reference (the returned reference count is zero).
+   * Use New() when an IntrusivePtr owner is required.
    */
-  PinchGesture(GestureState state)
-  : Gesture(GestureType::PINCH, state)
+  static DALI_INTERNAL PinchGesture* NewForBaseHandle(GestureState state)
   {
+    return new PinchGesture(state);
+  }
+
+  /**
+   * @brief Creates a reference-counted implementation.
+   */
+  static Dali::IntrusivePtr<PinchGesture> New(GestureState state)
+  {
+    return Dali::IntrusivePtr<PinchGesture>(new PinchGesture(state));
   }
 
   PinchGesture(const PinchGesture&)            = delete; ///< Deleted copy constructor
@@ -116,6 +128,15 @@ public:
   inline const Vector2& GetLocalCenterPoint() const
   {
     return mLocalCenterPoint;
+  }
+
+protected:
+  /**
+   * @brief Default constructor
+   */
+  PinchGesture(GestureState state)
+  : Gesture(GestureType::PINCH, state)
+  {
   }
 
 private:

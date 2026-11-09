@@ -163,7 +163,7 @@ void PinchGestureDetector::ProcessTouchEvent(Scene& scene, const Integration::To
     FillRequest(request);
 
     Size size          = scene.GetSize();
-    mGestureRecognizer = new PinchGestureRecognizer(*this, Vector2(size.width, size.height), scene.GetDpi(), request);
+    mGestureRecognizer = PinchGestureRecognizer::New(*this, Vector2(size.width, size.height), scene.GetDpi(), request);
     ConsumeRecognizerUpdateRequired(); // The new recognizer already reflects the current settings.
   }
   else if(ConsumeRecognizerUpdateRequired())
@@ -178,7 +178,7 @@ void PinchGestureDetector::ProcessTouchEvent(Scene& scene, const Integration::To
 void PinchGestureDetector::EmitPinchSignal(Actor* actor, const PinchGestureEvent& pinchEvent, Vector2 localCenter)
 {
   SetDetected(true);
-  Internal::PinchGesturePtr pinch(new Internal::PinchGesture(pinchEvent.state));
+  Internal::PinchGesturePtr pinch(Internal::PinchGesture::New(pinchEvent.state));
   pinch->SetTime(pinchEvent.time);
 
   pinch->SetScale(pinchEvent.scale);

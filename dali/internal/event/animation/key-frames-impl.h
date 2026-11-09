@@ -109,6 +109,10 @@ public:
 private:
   Dali::Property::Type          mType{Property::NONE}; // Type of the specialization
   std::unique_ptr<KeyFrameSpec> mKeyFrames;            // Pointer to the specialized key frame object
+
+protected:
+  KeyFrames()           = default;
+  ~KeyFrames() override = default;
 };
 
 /**

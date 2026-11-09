@@ -102,7 +102,7 @@ Dali::Actor EmitHoverSignals(Dali::Actor actor, const Dali::HoverEvent& event)
 
 Dali::Actor AllocAndEmitHoverSignals(unsigned long time, Dali::Actor actor, const Integration::Point& point)
 {
-  HoverEventPtr    hoverEvent(new HoverEvent(time));
+  HoverEventPtr    hoverEvent(HoverEvent::New(time));
   Dali::HoverEvent hoverEventHandle(hoverEvent.Get());
 
   hoverEvent->AddPoint(point);
@@ -405,7 +405,7 @@ void ParentHoverEventProcessor::ProcessHoverEvent(const Integration::HoverEvent&
   DALI_TRACE_SCOPE(gTraceFilter, "DALI_PROCESS_HOVER_EVENT");
 
   ProcessHoverEventVariables localVars;
-  localVars.hoverEvent = new HoverEvent(event.time);
+  localVars.hoverEvent = HoverEvent::New(event.time);
 
   if(event.points[0].GetState() == PointState::INTERRUPTED)
   {

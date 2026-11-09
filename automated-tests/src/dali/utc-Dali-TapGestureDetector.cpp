@@ -1516,14 +1516,14 @@ int UtcDaliTapGestureHandleEvent(void)
   parentDetector.DetectedSignal().Connect(&application, pFunctor);
 
   Dali::Integration::TouchEvent tp = GenerateSingleTouch(PointState::DOWN, Vector2(50.0f, 50.0f), 1, 100);
-  Internal::TouchEventPtr       touchEventImpl(new Internal::TouchEvent(100));
+  Internal::TouchEventPtr       touchEventImpl(Internal::TouchEvent::New(100));
   touchEventImpl->AddPoint(tp.GetPoint(0));
   touchEventImpl->SetRenderTask(task);
   Dali::TouchEvent touchEventHandle(touchEventImpl.Get());
   parentDetector.HandleEvent(parentActor, touchEventHandle);
 
   tp             = GenerateSingleTouch(PointState::UP, Vector2(50.0f, 50.0f), 1, 150);
-  touchEventImpl = new Internal::TouchEvent(150);
+  touchEventImpl = Internal::TouchEvent::New(150);
   touchEventImpl->AddPoint(tp.GetPoint(0));
   touchEventImpl->SetRenderTask(task);
   touchEventHandle = Dali::TouchEvent(touchEventImpl.Get());
@@ -1546,7 +1546,7 @@ void FeedHandleEventTap(TapGestureDetector& detector, Actor& actor, Dali::Render
   auto feed = [&](PointState::Type state, uint32_t time)
   {
     Dali::Integration::TouchEvent tp = GenerateSingleTouch(state, Vector2(50.0f, 50.0f), 1, time);
-    Internal::TouchEventPtr       touchEventImpl(new Internal::TouchEvent(time));
+    Internal::TouchEventPtr       touchEventImpl(Internal::TouchEvent::New(time));
     touchEventImpl->AddPoint(tp.GetPoint(0));
     touchEventImpl->SetRenderTask(task);
     Dali::TouchEvent touchEventHandle(touchEventImpl.Get());
@@ -1924,7 +1924,7 @@ int UtcDaliTapGestureDetectorDeviceOptionsHandleEvent(void)
     for(PointState::Type state : {PointState::DOWN, PointState::UP})
     {
       Dali::Integration::TouchEvent tp = GenerateDeviceTapTouch(state, deviceClass, Device::Subclass::NONE, Dali::String(""), time);
-      Internal::TouchEventPtr       touchEventImpl(new Internal::TouchEvent(time));
+      Internal::TouchEventPtr       touchEventImpl(Internal::TouchEvent::New(time));
       touchEventImpl->AddPoint(tp.GetPoint(0));
       touchEventImpl->SetRenderTask(task);
       Dali::TouchEvent touchEventHandle(touchEventImpl.Get());

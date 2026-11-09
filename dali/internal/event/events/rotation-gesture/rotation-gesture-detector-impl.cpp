@@ -154,7 +154,7 @@ void RotationGestureDetector::ProcessTouchEvent(Scene& scene, const Integration:
     RotationGestureRequest request;
     FillRequest(request);
 
-    mGestureRecognizer = new RotationGestureRecognizer(*this, request);
+    mGestureRecognizer = RotationGestureRecognizer::New(*this, request);
     ConsumeRecognizerUpdateRequired(); // The new recognizer already reflects the current settings.
   }
   else if(ConsumeRecognizerUpdateRequired())
@@ -179,7 +179,7 @@ void RotationGestureDetector::EmitRotationSignal(
   Vector2                     localCenter)
 {
   SetDetected(true);
-  Internal::RotationGesturePtr rotation(new Internal::RotationGesture(rotationEvent.state));
+  Internal::RotationGesturePtr rotation(Internal::RotationGesture::New(rotationEvent.state));
   rotation->SetTime(rotationEvent.time);
   rotation->SetRotation(rotationEvent.rotation);
   rotation->SetScreenCenterPoint(rotationEvent.centerPoint);

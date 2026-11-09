@@ -143,6 +143,16 @@ public:
      */
     virtual ~Observer() = default;
   };
+  /**
+   * @brief Creates an unreferenced implementation only for BaseHandle construction.
+   * @warning Pass the result directly to a BaseHandle-derived handle constructor.
+   * The constructor must acquire its first reference (the returned reference count is zero).
+   * Use New() when an IntrusivePtr owner is required.
+   */
+  static DALI_INTERNAL Object* NewForBaseHandle()
+  {
+    return new Object(nullptr);
+  }
 
   /**
    * Creates a new object

@@ -41,7 +41,7 @@ Handle::Handle() = default;
 
 Handle Handle::New()
 {
-  return Handle(Internal::Object::New().Get());
+  return Handle(Internal::Object::NewForBaseHandle());
 }
 
 Handle::~Handle() = default;

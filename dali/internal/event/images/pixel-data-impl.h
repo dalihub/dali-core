@@ -57,29 +57,6 @@ public:
                           bool                             releaseAfterUpload,
                           bool                             preMultiplied);
 
-  /**
-   * @brief Constructor.
-   *
-   * @param [in] buffer             The raw pixel data.
-   * @param [in] bufferSize         The size of the buffer in bytes
-   * @param [in] width              Buffer width in pixels
-   * @param [in] height             Buffer height in pixels
-   * @param [in] stride             Buffer stride in pixels, 0 means the buffer is tightly packed
-   * @param [in] pixelFormat        The pixel format
-   * @param [in] releaseFunction    The function used to release the memory.
-   * @param [in] releaseAfterUpload Whether we release buffer after texture upload or not.
-   * @param [in] preMultiplied      Whether the colors are pre-multiplied by their alpha value.
-   */
-  PixelData(uint8_t*                         buffer,
-            uint32_t                         bufferSize,
-            uint32_t                         width,
-            uint32_t                         height,
-            uint32_t                         stride,
-            Pixel::Format                    pixelFormat,
-            Dali::PixelData::ReleaseFunction releaseFunction,
-            bool                             releaseAfterUpload,
-            bool                             preMultiplied);
-
 protected:
   /**
    * @brief Destructor.
@@ -161,6 +138,30 @@ public:
     return 0;
 #endif
   }
+
+protected:
+  /**
+   * @brief Constructor.
+   *
+   * @param [in] buffer             The raw pixel data.
+   * @param [in] bufferSize         The size of the buffer in bytes
+   * @param [in] width              Buffer width in pixels
+   * @param [in] height             Buffer height in pixels
+   * @param [in] stride             Buffer stride in pixels, 0 means the buffer is tightly packed
+   * @param [in] pixelFormat        The pixel format
+   * @param [in] releaseFunction    The function used to release the memory.
+   * @param [in] releaseAfterUpload Whether we release buffer after texture upload or not.
+   * @param [in] preMultiplied      Whether the colors are pre-multiplied by their alpha value.
+   */
+  PixelData(uint8_t*                         buffer,
+            uint32_t                         bufferSize,
+            uint32_t                         width,
+            uint32_t                         height,
+            uint32_t                         stride,
+            Pixel::Format                    pixelFormat,
+            Dali::PixelData::ReleaseFunction releaseFunction,
+            bool                             releaseAfterUpload,
+            bool                             preMultiplied);
 
 private:
   /*

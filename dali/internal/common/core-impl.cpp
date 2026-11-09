@@ -126,7 +126,7 @@ Core::Core(RenderController&            renderController,
 
   mObjectRegistry = ObjectRegistry::New();
 
-  mRelayoutController = IntrusivePtr<RelayoutController>(new RelayoutController(mRenderController));
+  mRelayoutController = IntrusivePtr<RelayoutController>(RelayoutController::New(mRenderController));
 
   mGestureEventProcessor = new GestureEventProcessor(*mUpdateManager, mRenderController);
 

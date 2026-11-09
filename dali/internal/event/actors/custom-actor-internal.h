@@ -40,6 +40,19 @@ public:
   static CustomActorPtr New(CustomActorImpl& extension);
 
   /**
+   * @brief Creates an unreferenced implementation only for BaseHandle construction.
+   * @warning Pass the result directly to a BaseHandle-derived handle constructor.
+   * The returned reference count is zero; the constructor must acquire its first reference.
+   * Use New() when an IntrusivePtr owner is required.
+   */
+  static DALI_INTERNAL CustomActor* NewForBaseHandle(CustomActorImpl& extension);
+
+  /**
+   * @brief Completes construction after the first owning reference has been acquired.
+   */
+  void InitializeExtension();
+
+  /**
    * Retrieve the custom actor implementation.
    * @return The implementation, or an invalid pointer if no implementation was set.
    */

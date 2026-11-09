@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/common/vector-wrapper.h>
+#include <dali/public-api/common/intrusive-ptr.h>
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/events/gesture-recognizer.h>
@@ -45,16 +46,12 @@ public:
   using Observer = RecognizerObserver<RotationGestureEvent>;
 
   /**
-   * Constructor
-   * @param[in] observer The observer to send gesture too when it's detected
-   * @param[in] request  The rotation gesture request carrying the recognition thresholds.
+   * @brief Creates a reference-counted implementation.
    */
-  RotationGestureRecognizer(Observer& observer, const RotationGestureRequest& request);
-
-  /**
-   * Virtual destructor.
-   */
-  ~RotationGestureRecognizer() override = default;
+  static Dali::IntrusivePtr<RotationGestureRecognizer> New(Observer& observer, const RotationGestureRequest& request)
+  {
+    return Dali::IntrusivePtr<RotationGestureRecognizer>(new RotationGestureRecognizer(observer, request));
+  }
 
 public:
   /**
@@ -109,6 +106,19 @@ public:
    * @param[in] value The number of touch events
    */
   void SetMinimumTouchEventsAfterStart(uint32_t value);
+
+protected:
+  /**
+   * Constructor
+   * @param[in] observer The observer to send gesture too when it's detected
+   * @param[in] request  The rotation gesture request carrying the recognition thresholds.
+   */
+  RotationGestureRecognizer(Observer& observer, const RotationGestureRequest& request);
+
+  /**
+   * Virtual destructor.
+   */
+  ~RotationGestureRecognizer() override = default;
 
 private:
   /**
