@@ -32,7 +32,6 @@
 #include <dali/internal/common/lockless-pointer-ring.h>
 #include <dali/internal/common/message-buffer.h>
 #include <dali/internal/common/message.h>
-#include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/render/common/performance-monitor.h>
 
 using std::vector;
@@ -216,8 +215,6 @@ uint32_t* MessageQueue::ReserveMessageSlot(uint32_t requestedSize)
   DALI_QB_SCOPE_TIMER(MQ_RESERVE_MESSAGE_SLOT);
 
   DALI_ASSERT_DEBUG(0 != requestedSize);
-
-  DALI_ASSERT_ALWAYS(EventThreadServices::IsEventThread() && "Message reserved from non-event thread! Messages may be lost or corrupted!");
 
   if(!mImpl->currentMessageBuffer)
   {
