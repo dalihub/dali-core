@@ -26,7 +26,6 @@ Assert-DaliPaths -Paths @(
 ) -Description "WindowsDependenciesSDK; run windows-dependencies\install.ps1 first"
 
 $Arguments = (Get-DaliCommonCMakeArguments -Context $Context -Configuration $Configuration) + @(
-  "-DDALI_API_MAJOR=2",
   "-DENABLE_PKG_CONFIGURE=OFF",
   "-DENABLE_LINK_TEST=OFF",
   "-DINSTALL_CMAKE_MODULES=ON",
@@ -42,7 +41,7 @@ Invoke-DaliCMakeProject `
 
 Install-DaliRuntimeScripts -Context $Context -Configuration $Configuration
 Assert-DaliPaths -Paths @(
-  (Join-Path $Context.InstallPrefix "bin\dali2-core.dll"),
-  (Join-Path $Context.InstallPrefix "share\dali2-core\dali2-core-config.cmake")
+  (Join-Path $Context.InstallPrefix "bin\dali3-core.dll"),
+  (Join-Path $Context.InstallPrefix "share\dali3-core\dali3-core-config.cmake")
 ) -Description "dali-core installation output"
 Write-Host "`ndali-core installed in $($Context.InstallPrefix)." -ForegroundColor Green
