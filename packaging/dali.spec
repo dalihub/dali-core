@@ -101,8 +101,6 @@ Integration development package for DALi 3D Engine - headers for integrating wit
 # Build
 ##############################
 %build
-# TODO: temporary fix => will remove after included in gcc_warning_sr_pkgs list in build.conf
-%{?gcc_unforce_options:%gcc_unforce_options}
 PREFIX="/usr"
 CXXFLAGS="$CXXFLAGS -Wall -g -Os -DNDEBUG -fPIC -fvisibility-inlines-hidden -fdata-sections -ffunction-sections "
 LDFLAGS="$LDFLAGS -Wl,--rpath=$PREFIX/lib -Wl,--as-needed -Wl,--gc-sections -lgcc_s -lgcc -Wl,-Bsymbolic-functions "
