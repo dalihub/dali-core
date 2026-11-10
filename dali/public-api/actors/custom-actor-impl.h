@@ -29,6 +29,7 @@
 #include <dali/public-api/math/compile-time-math.h>
 #include <dali/public-api/object/property.h>
 #include <dali/public-api/object/ref-object.h>
+#include <dali/public-api/object/type-info-id.h>
 #include <dali/public-api/render-tasks/render-task.h>
 
 namespace DALI_NAMESPACE
@@ -254,11 +255,13 @@ public:
 
   /**
    * @brief Set this CustomActor is transparent or not without any affection on the child Actors.
+   * @SINCE_3_0.0
    */
   void SetTransparent(bool transparent);
 
   /**
    * @brief Get this CustomActor is transparent or not.
+   * @SINCE_3_0.0
    */
   bool IsTransparent() const;
 
@@ -274,6 +277,36 @@ public:
   }
 
   /**
+   * @brief Returns the type to resolve to when this implementation's own type is not registered.
+   *
+   * The type registry resolves the owning actor's TypeInfo from the RTTI of its
+   * CustomActorImpl. When the most-derived implementation class has not registered
+   * itself with the type registry, resolution falls back to the type identified
+   * here, so the registered properties, signals and actions of that ancestor stay
+   * available on the instance. When this returns an invalid TypeInfoId, or the
+   * identified type is not registered either, an unregistered implementation
+   * resolves to the plain CustomActor type.
+   *
+   * A framework base class typically overrides this to return its own registered
+   * type (via DALI_TYPE_ID); every unregistered subclass then inherits the
+   * declaration, and the most-derived override wins. The declaration has no
+   * effect when the implementation's own type is registered.
+   *
+   * Only the identifier's name is used for the lookup: its last "::"-separated
+   * component must match the registered type name, so a namespace-qualified
+   * spelling resolves the same type as the plain class name.
+   *
+   * The default implementation returns an invalid TypeInfoId (no fallback).
+   *
+   * @SINCE_3_0.0
+   * @return A TypeInfoId naming a type-registered ancestor class, or an invalid TypeInfoId if none is declared
+   */
+  virtual TypeInfoId GetTypeRegistrationFallback() const
+  {
+    return TypeInfoId();
+  }
+
+  /**
    * @brief Queries whether the implementation has built-in touch handling even when Actor::TouchEventSignal() has no callbacks.
    *
    * Returning true makes the owning actor participate in touch hit testing and allows
@@ -281,6 +314,7 @@ public:
    *
    * The default implementation returns false.
    *
+   * @SINCE_3_0.0
    * @return True if the implementation has built-in touch handling, false otherwise
    */
   virtual bool HasIntrinsicTouchHandling() const;
@@ -294,6 +328,7 @@ public:
    *
    * The default implementation returns false.
    *
+   * @SINCE_3_0.0
    * @param[in] event The touch event
    * @return True if the event is consumed, false otherwise
    */
@@ -307,6 +342,7 @@ public:
    *
    * The default implementation returns false.
    *
+   * @SINCE_3_0.0
    * @return True if the implementation has built-in hover handling, false otherwise
    */
   virtual bool HasIntrinsicHoverHandling() const;
@@ -320,6 +356,7 @@ public:
    *
    * The default implementation returns false.
    *
+   * @SINCE_3_0.0
    * @param[in] event The hover event
    * @return True if the event is consumed, false otherwise
    */
@@ -333,6 +370,7 @@ public:
    *
    * The default implementation returns false.
    *
+   * @SINCE_3_0.0
    * @return True if the implementation has built-in wheel handling, false otherwise
    */
   virtual bool HasIntrinsicWheelHandling() const;
@@ -346,6 +384,7 @@ public:
    *
    * The default implementation returns false.
    *
+   * @SINCE_3_0.0
    * @param[in] event The wheel event
    * @return True if the event is consumed, false otherwise
    */
@@ -357,6 +396,7 @@ public:
    * This hook is called regardless of whether OnTouchEvent() or Actor::TouchEventSignal()
    * consumed the event. It does not affect the event's consumed state.
    *
+   * @SINCE_3_0.0
    * @param[in] event The touch event
    */
   virtual void OnFinalizeTouchEventDispatch(const TouchEvent& event);
@@ -367,6 +407,7 @@ public:
    * This hook is called regardless of whether OnHoverEvent() or Actor::HoverEventSignal()
    * consumed the event. It does not affect the event's consumed state.
    *
+   * @SINCE_3_0.0
    * @param[in] event The hover event
    */
   virtual void OnFinalizeHoverEventDispatch(const HoverEvent& event);
@@ -377,6 +418,7 @@ public:
    * This hook is called regardless of whether OnWheelEvent() or Actor::WheelEventSignal()
    * consumed the event. It does not affect the event's consumed state.
    *
+   * @SINCE_3_0.0
    * @param[in] event The wheel event
    */
   virtual void OnFinalizeWheelEventDispatch(const WheelEvent& event);

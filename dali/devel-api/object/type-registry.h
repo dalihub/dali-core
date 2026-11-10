@@ -287,6 +287,33 @@ public:
   TypeRegistration(Dali::String name, const std::type_info& baseType, TypeInfo::CreateFunction f);
 
   /**
+   * @brief Constructor registers the type under an explicit name, with the base referenced by name.
+   *
+   * Use this form when no std::type_info is available at the call site. The name
+   * must be unique for successful registration, and for a CustomActor type it must
+   * equal the implementation class's name (namespaces stripped) so instances can
+   * be recognised through their RTTI.
+   * @param[in] name The name the type is registered under
+   * @param[in] baseTypeName A name its registered base type resolves by
+   * @param[in] f registerType instance creation function
+   */
+  TypeRegistration(Dali::String name, Dali::String baseTypeName, TypeInfo::CreateFunction f);
+
+  /**
+   * @brief Constructor registers the type under an explicit name together with an alternative object name.
+   *
+   * The name-based equivalent of the two-type_info registration: the type is
+   * registered under @p name and additionally found by @p objectTypeName,
+   * typically the implementation class's name (namespaces stripped) so instances
+   * are recognised through their RTTI.
+   * @param[in] name The name the type is registered under
+   * @param[in] objectTypeName Alternative name the type is also found by
+   * @param[in] baseTypeName A name its registered base type resolves by
+   * @param[in] f registerType instance creation function
+   */
+  TypeRegistration(Dali::String name, Dali::String objectTypeName, Dali::String baseTypeName, TypeInfo::CreateFunction f);
+
+  /**
    * @brief The name the type is registered under (derived from type_info).
    *
    * @SINCE_1_0.0

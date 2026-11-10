@@ -42,16 +42,16 @@ struct PixelDataBuffer
   uint32_t height;
   uint32_t strideBytes;
 
-  PixelDataBuffer(uint8_t* buffer,
-                  uint32_t bufferSize,
-                  uint32_t width,
-                  uint32_t height,
-                  uint32_t strideBytes = 0)
-  : buffer(buffer),
-    bufferSize(bufferSize),
-    width(width),
-    height(height),
-    strideBytes(strideBytes)
+  PixelDataBuffer(uint8_t* initBuffer,
+                  uint32_t initBufferSize,
+                  uint32_t initWidth,
+                  uint32_t initHeight,
+                  uint32_t initStrideBytes = 0)
+  : buffer(initBuffer),
+    bufferSize(initBufferSize),
+    width(initWidth),
+    height(initHeight),
+    strideBytes(initStrideBytes)
   {
   }
 };

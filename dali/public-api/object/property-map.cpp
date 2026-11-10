@@ -23,6 +23,7 @@
 #include <algorithm> // for std::find_if
 #include <limits>
 #include <unordered_map>
+#include <utility>
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/common/vector-wrapper.h>
@@ -190,12 +191,21 @@ Property::Value& Property::Map::GetValue(SizeType position) const
 
   if(position < numStringKeys)
   {
-    return mImpl->mStringValueContainer[position].second;
+    // TODO : Remove const cast in future.
+    return const_cast<Property::Value&>(mImpl->mStringValueContainer[position].second);
   }
   else
   {
-    return mImpl->mIndexValueContainer[position - numStringKeys].second;
+    // TODO : Remove const cast in future.
+    return const_cast<Property::Value&>(mImpl->mIndexValueContainer[position - numStringKeys].second);
   }
+}
+
+Property::Value& Property::Map::GetValue(SizeType position)
+{
+  const auto& value = std::as_const(*this).GetValue(position);
+  mImpl->mHash      = ALWAYS_REHASH;
+  return const_cast<Property::Value&>(value);
 }
 
 Property::Key Property::Map::GetKeyAt(SizeType position) const
@@ -242,7 +252,7 @@ Property::Value* Property::Map::Find(Dali::StringView key) const
 {
   if(DALI_LIKELY(mImpl))
   {
-    for(auto&& iter : mImpl->mStringValueContainer)
+    for(const auto& iter : mImpl->mStringValueContainer)
     {
       if(key == iter.first)
       {
@@ -252,7 +262,8 @@ Property::Value* Property::Map::Find(Dali::StringView key) const
           // Recalculate hash always after now.
           mImpl->mHash = ALWAYS_REHASH;
         }
-        return &iter.second;
+        // TODO : Remove const cast and hash invalidation after the return type becomes const.
+        return const_cast<Property::Value*>(&iter.second);
       }
     }
   }
@@ -263,7 +274,7 @@ Property::Value* Property::Map::Find(Property::Index key) const
 {
   if(DALI_LIKELY(mImpl))
   {
-    for(auto&& iter : mImpl->mIndexValueContainer)
+    for(const auto& iter : mImpl->mIndexValueContainer)
     {
       if(iter.first == key)
       {
@@ -273,7 +284,8 @@ Property::Value* Property::Map::Find(Property::Index key) const
           // Recalculate hash always after now.
           mImpl->mHash = ALWAYS_REHASH;
         }
-        return &iter.second;
+        // TODO : Remove const cast and hash invalidation after the return type becomes const.
+        return const_cast<Property::Value*>(&iter.second);
       }
     }
   }
@@ -282,19 +294,20 @@ Property::Value* Property::Map::Find(Property::Index key) const
 
 Property::Value* Property::Map::Find(Property::Index indexKey, Dali::StringView stringKey) const
 {
-  Property::Value* valuePtr = Find(indexKey);
+  const Property::Value* valuePtr = Find(indexKey);
   if(!valuePtr)
   {
     valuePtr = Find(stringKey);
   }
-  return valuePtr;
+  // TODO : Remove const cast in future.
+  return const_cast<Property::Value*>(valuePtr);
 }
 
 Property::Value* Property::Map::Find(Dali::StringView key, Property::Type type) const
 {
   if(DALI_LIKELY(mImpl))
   {
-    for(auto&& iter : mImpl->mStringValueContainer)
+    for(const auto& iter : mImpl->mStringValueContainer)
     {
       if((iter.second.GetType() == type) && (key == iter.first))
       {
@@ -304,7 +317,8 @@ Property::Value* Property::Map::Find(Dali::StringView key, Property::Type type) 
           // Recalculate hash always after now.
           mImpl->mHash = ALWAYS_REHASH;
         }
-        return &iter.second;
+        // TODO : Remove const cast and hash invalidation after the return type becomes const.
+        return const_cast<Property::Value*>(&iter.second);
       }
     }
   }
@@ -315,7 +329,7 @@ Property::Value* Property::Map::Find(Property::Index key, Property::Type type) c
 {
   if(DALI_LIKELY(mImpl))
   {
-    for(auto&& iter : mImpl->mIndexValueContainer)
+    for(const auto& iter : mImpl->mIndexValueContainer)
     {
       if((iter.second.GetType() == type) && (iter.first == key))
       {
@@ -325,11 +339,62 @@ Property::Value* Property::Map::Find(Property::Index key, Property::Type type) c
           // Recalculate hash always after now.
           mImpl->mHash = ALWAYS_REHASH;
         }
-        return &iter.second;
+        // TODO : Remove const cast and hash invalidation after the return type becomes const.
+        return const_cast<Property::Value*>(&iter.second);
       }
     }
   }
   return nullptr; // Not found
+}
+
+Property::Value* Property::Map::Find(Dali::StringView key)
+{
+  const auto* value = std::as_const(*this).Find(key);
+  if(value)
+  {
+    mImpl->mHash = ALWAYS_REHASH;
+  }
+  return const_cast<Property::Value*>(value);
+}
+
+Property::Value* Property::Map::Find(Property::Index key)
+{
+  const auto* value = std::as_const(*this).Find(key);
+  if(value)
+  {
+    mImpl->mHash = ALWAYS_REHASH;
+  }
+  return const_cast<Property::Value*>(value);
+}
+
+Property::Value* Property::Map::Find(Property::Index indexKey, Dali::StringView stringKey)
+{
+  const auto* value = std::as_const(*this).Find(indexKey, stringKey);
+  if(value)
+  {
+    mImpl->mHash = ALWAYS_REHASH;
+  }
+  return const_cast<Property::Value*>(value);
+}
+
+Property::Value* Property::Map::Find(Dali::StringView key, Property::Type type)
+{
+  const auto* value = std::as_const(*this).Find(key, type);
+  if(value)
+  {
+    mImpl->mHash = ALWAYS_REHASH;
+  }
+  return const_cast<Property::Value*>(value);
+}
+
+Property::Value* Property::Map::Find(Property::Index key, Property::Type type)
+{
+  const auto* value = std::as_const(*this).Find(key, type);
+  if(value)
+  {
+    mImpl->mHash = ALWAYS_REHASH;
+  }
+  return const_cast<Property::Value*>(value);
 }
 
 void Property::Map::Clear()

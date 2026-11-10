@@ -63,12 +63,12 @@ public:
    * @brief Constructor.
    *
    * @SINCE_1_0.0
-   * @param[in] x x or width component
-   * @param[in] y y or height component
+   * @param[in] initX x or width component
+   * @param[in] initY y or height component
    */
-  explicit constexpr Vector2(float x, float y)
-  : x(x),
-    y(y)
+  explicit constexpr Vector2(float initX, float initY)
+  : x(initX),
+    y(initY)
   {
   }
 

@@ -41,37 +41,39 @@ KeyEvent::KeyEvent()
   isRepeat(false),
   interceptProcessed(false),
   windowId(0),
-  receiveTime(0)
+  receiveTime(0),
+  rawKeyCode(0)
 {
 }
 
-KeyEvent::KeyEvent(const Dali::String&    keyName,
-                   const Dali::String&    logicalKey,
-                   const Dali::String&    keyString,
-                   int32_t                keyCode,
-                   int32_t                keyModifier,
+KeyEvent::KeyEvent(const Dali::String&    initKeyName,
+                   const Dali::String&    initLogicalKey,
+                   const Dali::String&    initKeyString,
+                   int32_t                initKeyCode,
+                   int32_t                initKeyModifier,
                    uint32_t               timeStamp,
                    const State&           keyState,
-                   const Dali::String&    compose,
-                   const Dali::String&    deviceName,
-                   Device::Class::Type    deviceClass,
-                   Device::Subclass::Type deviceSubclass)
+                   const Dali::String&    initCompose,
+                   const Dali::String&    initDeviceName,
+                   Device::Class::Type    initDeviceClass,
+                   Device::Subclass::Type initDeviceSubclass)
 : Event(Key),
-  keyName(keyName),
-  logicalKey(logicalKey),
-  keyString(keyString),
-  keyCode(keyCode),
-  keyModifier(keyModifier),
+  keyName(initKeyName),
+  logicalKey(initLogicalKey),
+  keyString(initKeyString),
+  keyCode(initKeyCode),
+  keyModifier(initKeyModifier),
   time(timeStamp),
   state(keyState),
-  compose(compose),
-  deviceName(deviceName),
-  deviceClass(deviceClass),
-  deviceSubclass(deviceSubclass),
+  compose(initCompose),
+  deviceName(initDeviceName),
+  deviceClass(initDeviceClass),
+  deviceSubclass(initDeviceSubclass),
   isRepeat(false),
   interceptProcessed(false),
   windowId(0),
-  receiveTime(0)
+  receiveTime(0),
+  rawKeyCode(0)
 {
 }
 
@@ -91,7 +93,8 @@ KeyEvent::KeyEvent(const Dali::KeyEvent& keyEvent)
   isRepeat(keyEvent.IsRepeat()),
   interceptProcessed(GetImplementation(keyEvent).IsInterceptProcessed()),
   windowId(keyEvent.GetWindowId()),
-  receiveTime(keyEvent.GetReceiveTime())
+  receiveTime(keyEvent.GetReceiveTime()),
+  rawKeyCode(GetImplementation(keyEvent).GetRawKeyCode())
 {
 }
 
@@ -111,11 +114,18 @@ KeyEvent::KeyEvent(const KeyEvent& rhs)
   isRepeat(rhs.isRepeat),
   interceptProcessed(rhs.interceptProcessed),
   windowId(rhs.windowId),
-  receiveTime(rhs.receiveTime)
+  receiveTime(rhs.receiveTime),
+  rawKeyCode(rhs.rawKeyCode)
 {
 }
 
 KeyEvent::~KeyEvent() = default;
+
+Dali::KeyEvent NewKeyEvent(const KeyEvent& keyEvent)
+{
+  Internal::KeyEventPtr internal = Internal::KeyEvent::New(keyEvent.keyName, keyEvent.logicalKey, keyEvent.keyString, keyEvent.keyCode, keyEvent.rawKeyCode, keyEvent.keyModifier, keyEvent.time, static_cast<Dali::KeyEvent::State>(keyEvent.state), keyEvent.compose, keyEvent.deviceName, keyEvent.deviceClass, keyEvent.deviceSubclass);
+  return Dali::KeyEvent(internal.Get());
+}
 
 } // namespace Integration
 

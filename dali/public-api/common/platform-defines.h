@@ -23,6 +23,7 @@
  * flags), because public-api headers are also compiled by client applications:
  * the value must be identical in the DALi libraries and in every consumer, or a
  * type that embeds the value (e.g. Dali::String) breaks its binary layout.
+ * @SINCE_3_0.0
  */
 
 /**
@@ -34,6 +35,7 @@
  * keyed off compiler-intrinsic target macros and _DEBUG to stay consistent across
  * the library build and every client translation unit. All other toolchains
  * (Tizen/Ubuntu libstdc++, MinGW, MSVC release) use 32 bytes.
+ * @SINCE_3_0.0
  */
 #if defined(_MSC_VER) && defined(_DEBUG) && defined(_WIN64)
 #define DALI_STRING_STORAGE_SIZE 48

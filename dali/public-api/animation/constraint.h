@@ -131,7 +131,7 @@ public:
     Function(const T& object)
     : CallbackBase(reinterpret_cast<void*>(new T(object)), // copy the object
                    nullptr,                                // uses operator() instead of member function
-                   reinterpret_cast<CallbackBase::Dispatcher>(&FunctorDispatcher2<T, P&, const PropertyInputContainer&>::Dispatch),
+                   reinterpret_cast<CallbackBase::Dispatcher>(reinterpret_cast<void (*)()>(&FunctorDispatcher2<T, P&, const PropertyInputContainer&>::Dispatch)),
                    reinterpret_cast<CallbackBase::Destructor>(&Destroyer<T>::Delete)),
       mCopyConstructorDispatcher(reinterpret_cast<CopyConstructorDispatcher>(&ObjectCopyConstructorDispatcher<T>::Copy))
     {
@@ -153,8 +153,8 @@ public:
     template<class T>
     Function(const T& object, void (T::*memberFunction)(P&, const PropertyInputContainer&))
     : CallbackBase(reinterpret_cast<void*>(new T(object)), // copy the object
-                   reinterpret_cast<CallbackBase::MemberFunction>(memberFunction),
-                   reinterpret_cast<CallbackBase::Dispatcher>(&Dispatcher2<T, P&, const PropertyInputContainer&>::Dispatch),
+                   Internal::CallbackUtils::MemberFunctionCast<CallbackBase::MemberFunction>(memberFunction),
+                   reinterpret_cast<CallbackBase::Dispatcher>(reinterpret_cast<void (*)()>(&Dispatcher2<T, P&, const PropertyInputContainer&>::Dispatch)),
                    reinterpret_cast<CallbackBase::Destructor>(&Destroyer<T>::Delete)),
       mCopyConstructorDispatcher(reinterpret_cast<CopyConstructorDispatcher>(&ObjectCopyConstructorDispatcher<T>::Copy))
     {

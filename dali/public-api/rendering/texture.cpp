@@ -97,6 +97,11 @@ Pixel::Format Texture::GetPixelFormat() const
   return GetImplementation(*this).GetPixelFormat();
 }
 
+bool Texture::IsAlphaPreMultiplied() const
+{
+  return GetImplementation(*this).IsAlphaPreMultiplied();
+}
+
 Texture::Texture(Internal::Texture* pointer)
 : BaseHandle(pointer)
 {

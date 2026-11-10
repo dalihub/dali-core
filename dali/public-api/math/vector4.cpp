@@ -54,11 +54,11 @@ Vector4::Vector4(const Vector3& vec3)
 {
 }
 
-Vector4::Vector4(const Vector3& vec3, float w)
+Vector4::Vector4(const Vector3& vec3, float initW)
 : x(vec3.x),
   y(vec3.y),
   z(vec3.z),
-  w(w)
+  w(initW)
 {
 }
 

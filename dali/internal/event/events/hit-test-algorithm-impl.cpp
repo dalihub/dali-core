@@ -839,10 +839,10 @@ bool HitTestRenderTaskList(const Vector2&                                 sceneS
 
       if(hitCheck.GetPropagationType() == Integration::Scene::TouchPropagationType::GEOMETRY)
       {
-        std::vector<std::shared_ptr<HitResult>>::reverse_iterator endIter = hitResults.rend();
-        for(std::vector<std::shared_ptr<HitResult>>::reverse_iterator iter = hitResults.rbegin(); endIter != iter; ++iter)
+        std::vector<std::shared_ptr<HitResult>>::reverse_iterator hitResultEndIter = hitResults.rend();
+        for(std::vector<std::shared_ptr<HitResult>>::reverse_iterator hitResultIter = hitResults.rbegin(); hitResultEndIter != hitResultIter; ++hitResultIter)
         {
-          results.actorLists.push_back(iter->get()->mActor);
+          results.actorLists.push_back(hitResultIter->get()->mActor);
         }
       }
       isHitSucceeded = true;

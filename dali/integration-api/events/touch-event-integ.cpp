@@ -30,8 +30,8 @@ TouchEvent::TouchEvent()
 {
 }
 
-TouchEvent::TouchEvent(uint32_t time)
-: MultiPointEvent(Touch, time)
+TouchEvent::TouchEvent(uint32_t initTime)
+: MultiPointEvent(Touch, initTime)
 {
 }
 

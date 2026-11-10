@@ -62,7 +62,7 @@ KeyEventProcessor::~KeyEventProcessor() = default;
 
 void KeyEventProcessor::ProcessKeyEvent(const Integration::KeyEvent& event)
 {
-  KeyEventPtr keyEvent(new KeyEvent(event.keyName, event.logicalKey, event.keyString, event.keyCode, event.keyModifier, event.time, static_cast<Dali::KeyEvent::State>(event.state), event.compose, event.deviceName, event.deviceClass, event.deviceSubclass));
+  KeyEventPtr keyEvent(new KeyEvent(event.keyName, event.logicalKey, event.keyString, event.keyCode, event.rawKeyCode, event.keyModifier, event.time, static_cast<Dali::KeyEvent::State>(event.state), event.compose, event.deviceName, event.deviceClass, event.deviceSubclass));
   keyEvent->SetRepeat(event.isRepeat);
   keyEvent->SetInterceptProcessed(event.interceptProcessed);
   keyEvent->SetWindowId(event.windowId);

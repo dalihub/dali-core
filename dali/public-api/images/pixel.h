@@ -119,10 +119,10 @@ enum Format
 
   DEPTH_STENCIL, ///< Depth stencil 32-bit, 24 bit for depth, 8 bit for stencil. @SINCE_1_9.9
 
-  R11G11B10F, ///< Packed 32-bit, 11-11-10 unsigned floating point.
+  R11G11B10F, ///< Packed 32-bit, 11-11-10 unsigned floating point. @SINCE_2_0.28
 
-  CHROMINANCE_U, ///< Color depth 8-bit, chrominance U
-  CHROMINANCE_V  ///< Color depth 8-bit, chrominance V
+  CHROMINANCE_U, ///< Color depth 8-bit, chrominance U @SINCE_2_1.19
+  CHROMINANCE_V  ///< Color depth 8-bit, chrominance V @SINCE_2_1.19
   ///! Update LAST_VALID_PIXEL_FORMAT below if you add an enum value here.
 };
 
@@ -130,6 +130,7 @@ enum Format
  * @brief For asserting that a variable has a valid pixel format.
  *
  * Sync it to the first value above.
+ * @SINCE_3_0.0
  */
 const Format FIRST_VALID_PIXEL_FORMAT = A8;
 
@@ -137,6 +138,7 @@ const Format FIRST_VALID_PIXEL_FORMAT = A8;
  * @brief For asserting that a variable has a valid pixel format.
  *
  * Sync it to the last value above.
+ * @SINCE_3_0.0
  */
 const Format LAST_VALID_PIXEL_FORMAT = CHROMINANCE_V;
 

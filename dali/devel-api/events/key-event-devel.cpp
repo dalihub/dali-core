@@ -35,7 +35,7 @@ KeyEvent New(const Dali::String&          keyName,
              Device::Class::Type          deviceClass,
              Device::Subclass::Type       deviceSubclass)
 {
-  Internal::KeyEventPtr internal = Internal::KeyEvent::New(keyName, logicalKey, keyString, keyCode, keyModifier, timeStamp, keyState, compose, deviceName, deviceClass, deviceSubclass);
+  Internal::KeyEventPtr internal = Internal::KeyEvent::New(keyName, logicalKey, keyString, keyCode, 0, keyModifier, timeStamp, keyState, compose, deviceName, deviceClass, deviceSubclass);
 
   return KeyEvent(internal.Get());
 }

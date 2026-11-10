@@ -171,6 +171,7 @@ public: // Actor related
   /**
    * @brief The gesture is recognized by sending a Touch event to the actor.
    *
+   * @SINCE_3_0.0
    * @param actor The actor receiving touch events
    * @param touch The thouch event
    * @return If true , the gesture is being recognized.
@@ -179,6 +180,7 @@ public: // Actor related
 
   /**
    * @brief This method that cancels all other gesture detectors except the current gesture detector
+   * @SINCE_3_0.0
    */
   void CancelAllOtherGestureDetectors();
 

@@ -22,8 +22,8 @@ namespace DALI_NAMESPACE
 {
 namespace Internal
 {
-LongPressGestureEvent::LongPressGestureEvent(GestureState state)
-: GestureEvent(GestureType::LONG_PRESS, state),
+LongPressGestureEvent::LongPressGestureEvent(GestureState initState)
+: GestureEvent(GestureType::LONG_PRESS, initState),
   numberOfTouches(1)
 {
 }

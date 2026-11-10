@@ -30,7 +30,7 @@ PixelData PixelData::New(uint8_t*        buffer,
                          Pixel::Format   pixelFormat,
                          ReleaseFunction releaseFunction)
 {
-  IntrusivePtr<Internal::PixelData> internal = Internal::PixelData::New(buffer, bufferSize, width, height, 0, pixelFormat, releaseFunction, false);
+  IntrusivePtr<Internal::PixelData> internal = Internal::PixelData::New(buffer, bufferSize, width, height, 0, pixelFormat, releaseFunction, false, false);
   return PixelData(internal.Get());
 }
 
@@ -40,9 +40,10 @@ PixelData PixelData::New(uint8_t*        buffer,
                          uint32_t        height,
                          uint32_t        stride,
                          Pixel::Format   pixelFormat,
-                         ReleaseFunction releaseFunction)
+                         ReleaseFunction releaseFunction,
+                         bool            preMultiplied)
 {
-  IntrusivePtr<Internal::PixelData> internal = Internal::PixelData::New(buffer, bufferSize, width, height, stride, pixelFormat, releaseFunction, false);
+  IntrusivePtr<Internal::PixelData> internal = Internal::PixelData::New(buffer, bufferSize, width, height, stride, pixelFormat, releaseFunction, false, preMultiplied);
   return PixelData(internal.Get());
 }
 
@@ -81,6 +82,11 @@ Pixel::Format PixelData::GetPixelFormat() const
 uint32_t PixelData::GetStrideBytes() const
 {
   return GetImplementation(*this).GetStrideBytes();
+}
+
+bool PixelData::IsAlphaPreMultiplied() const
+{
+  return GetImplementation(*this).IsAlphaPreMultiplied();
 }
 
 uint32_t PixelData::GetTotalAllocatedSize()

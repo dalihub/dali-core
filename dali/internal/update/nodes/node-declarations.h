@@ -58,9 +58,9 @@ struct NodeDepthPair
 {
   Node*    node;
   uint32_t sortedDepth;
-  NodeDepthPair(Node* node, uint32_t sortedDepth)
-  : node(node),
-    sortedDepth(sortedDepth)
+  NodeDepthPair(Node* initNode, uint32_t initSortedDepth)
+  : node(initNode),
+    sortedDepth(initSortedDepth)
   {
   }
 };

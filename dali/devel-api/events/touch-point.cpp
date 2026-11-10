@@ -20,17 +20,17 @@
 
 namespace DALI_NAMESPACE
 {
-TouchPoint::TouchPoint(int32_t id, PointState::Type state, float screenX, float screenY)
+TouchPoint::TouchPoint(int32_t id, PointState::Type initState, float screenX, float screenY)
 : deviceId(id),
-  state(state),
+  state(initState),
   local(screenX, screenY),
   screen(screenX, screenY)
 {
 }
 
-TouchPoint::TouchPoint(int32_t id, PointState::Type state, float screenX, float screenY, float localX, float localY)
+TouchPoint::TouchPoint(int32_t id, PointState::Type initState, float screenX, float screenY, float localX, float localY)
 : deviceId(id),
-  state(state),
+  state(initState),
   local(localX, localY),
   screen(screenX, screenY)
 {

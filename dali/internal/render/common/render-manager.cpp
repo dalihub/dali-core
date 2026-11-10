@@ -171,18 +171,18 @@ DALI_INIT_TIME_CHECKER_FILTER_WITH_DEFAULT_THRESHOLD(gTimeCheckerFilter, DALI_RE
  */
 struct RenderManager::Impl
 {
-  Impl(Graphics::Controller& graphicsController)
-  : graphicsController(graphicsController),
-    renderAlgorithms(graphicsController),
+  Impl(Graphics::Controller& initGraphicsController)
+  : graphicsController(initGraphicsController),
+    renderAlgorithms(initGraphicsController),
     programController(),
-    terminatedNativeDrawManager(graphicsController)
+    terminatedNativeDrawManager(initGraphicsController)
 #if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
     ,
     containerRemovedFlags(ContainerRemovedFlagBits::NOTHING)
 #endif
   {
-    uniformBufferManager = std::make_unique<Render::UniformBufferManager>(&graphicsController);
-    pipelineCache        = std::make_unique<Render::PipelineCache>(graphicsController);
+    uniformBufferManager = std::make_unique<Render::UniformBufferManager>(&initGraphicsController);
+    pipelineCache        = std::make_unique<Render::PipelineCache>(initGraphicsController);
   }
 
   ~Impl()

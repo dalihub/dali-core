@@ -212,6 +212,33 @@ public:
   Pixel::Format GetPixelFormat() const;
 
   /**
+   * @brief Sets whether the buffer holds pre-multiplied pixels: pixels whose color
+   * components have already been multiplied by their alpha value.
+   *
+   * Call this after filling the buffer with pre-multiplied pixels, so that the PixelData
+   * made from this buffer carries the right interpretation of its colors. An image
+   * operation that pre-multiplies the buffer sets the flag by itself.
+   *
+   * This is metadata describing how the pixels are to be interpreted: setting it does
+   * not change them. A newly created PixelBuffer reports false.
+   *
+   * @SINCE_3_0.0
+   * @param[in] preMultiplied Whether the buffer holds pre-multiplied pixels
+   */
+  void SetAlphaPreMultiplied(bool preMultiplied);
+
+  /**
+   * @brief Returns whether the buffer holds pre-multiplied pixels.
+   *
+   * This reports what SetAlphaPreMultiplied() declared, or what an image operation
+   * applied; the pixels themselves are not inspected.
+   *
+   * @SINCE_3_0.0
+   * @return true if the colors are pre-multiplied by their alpha value
+   */
+  bool IsAlphaPreMultiplied() const;
+
+  /**
    * @DEPRECATED_2_5.47 Use the free function PixelBufferOperations::ApplyGaussianBlur() instead.
    *
    * @brief Applies a Gaussian blur to this pixel buffer with the given radius.

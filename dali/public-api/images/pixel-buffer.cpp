@@ -96,6 +96,16 @@ Pixel::Format PixelBuffer::GetPixelFormat() const
   return GetImplementation(*this).GetPixelFormat();
 }
 
+void PixelBuffer::SetAlphaPreMultiplied(bool preMultiplied)
+{
+  GetImplementation(*this).SetPreMultiplied(preMultiplied);
+}
+
+bool PixelBuffer::IsAlphaPreMultiplied() const
+{
+  return GetImplementation(*this).IsAlphaPreMultiplied();
+}
+
 bool PixelBuffer::ApplyGaussianBlur(float blurRadius)
 {
   auto gaussianBlurFunction = Internal::PixelBuffer::GetGaussianBlurFunction();

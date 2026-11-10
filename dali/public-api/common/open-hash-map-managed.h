@@ -39,9 +39,9 @@ namespace DALI_NAMESPACE
  */
 enum class EntryState : uint8_t
 {
-  EMPTY,    ///< Slot has never been occupied.
-  OCCUPIED, ///< Slot contains a live key-value pair.
-  TOMBSTONE ///< Slot was occupied but has been erased.
+  EMPTY,    ///< Slot has never been occupied. @SINCE_2_5.20
+  OCCUPIED, ///< Slot contains a live key-value pair. @SINCE_2_5.20
+  TOMBSTONE ///< Slot was occupied but has been erased. @SINCE_2_5.20
 };
 
 /**
