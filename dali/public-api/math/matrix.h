@@ -143,6 +143,7 @@ public:
 
   /**
    * @brief The identity matrix.
+   * @SINCE_3_0.0
    */
   static const Matrix IDENTITY;
 

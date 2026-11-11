@@ -38,11 +38,11 @@ struct DALI_CORE_API TimePeriod
    * @brief Creates a time period.
    *
    * @SINCE_1_0.0
-   * @param[in] durationSeconds The duration of the time period in seconds
+   * @param[in] initDurationSeconds The duration of the time period in seconds
    */
-  explicit constexpr TimePeriod(float durationSeconds)
+  explicit constexpr TimePeriod(float initDurationSeconds)
   : delaySeconds(0.f),
-    durationSeconds(durationSeconds)
+    durationSeconds(initDurationSeconds)
   {
   }
 
@@ -50,12 +50,12 @@ struct DALI_CORE_API TimePeriod
    * @brief Creates a time period.
    *
    * @SINCE_1_0.0
-   * @param[in] delaySeconds A delay before the time period in seconds
-   * @param[in] durationSeconds The duration of the time period in seconds
+   * @param[in] initDelaySeconds A delay before the time period in seconds
+   * @param[in] initDurationSeconds The duration of the time period in seconds
    */
-  constexpr TimePeriod(float delaySeconds, float durationSeconds)
-  : delaySeconds(delaySeconds),
-    durationSeconds(durationSeconds)
+  constexpr TimePeriod(float initDelaySeconds, float initDurationSeconds)
+  : delaySeconds(initDelaySeconds),
+    durationSeconds(initDurationSeconds)
   {
   }
 

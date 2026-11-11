@@ -412,6 +412,7 @@ struct RemoveReference
 /**
  * @brief Specialization to remove lvalue reference.
  *
+ * @SINCE_3_0.0
  * @tparam Type The referenced type
  */
 template<typename Type>
@@ -423,6 +424,7 @@ struct RemoveReference<Type&>
 /**
  * @brief Specialization to remove rvalue reference.
  *
+ * @SINCE_3_0.0
  * @tparam Type The referenced type
  */
 template<typename Type>
@@ -457,6 +459,7 @@ struct RemoveCV
 /**
  * @brief Specialization to remove const qualifier.
  *
+ * @SINCE_3_0.0
  * @tparam Type The const-qualified type
  */
 template<typename Type>
@@ -468,6 +471,7 @@ struct RemoveCV<const Type>
 /**
  * @brief Specialization to remove volatile qualifier.
  *
+ * @SINCE_3_0.0
  * @tparam Type The volatile-qualified type
  */
 template<typename Type>
@@ -479,6 +483,7 @@ struct RemoveCV<volatile Type>
 /**
  * @brief Specialization to remove both const and volatile qualifiers.
  *
+ * @SINCE_3_0.0
  * @tparam Type The const-volatile-qualified type
  */
 template<typename Type>
@@ -540,6 +545,7 @@ struct AddLValueReference
  * @brief Specialization that doesn't add reference to void.
  *
  * Void cannot have a reference type, so it remains void.
+ * @SINCE_3_0.0
  */
 template<>
 struct AddLValueReference<void>
@@ -551,6 +557,7 @@ struct AddLValueReference<void>
  * @brief Specialization that doesn't add reference to const void.
  *
  * Const void cannot have a reference type.
+ * @SINCE_3_0.0
  */
 template<>
 struct AddLValueReference<const void>

@@ -842,10 +842,10 @@ std::size_t Renderer::BuildUniformIndexMap(const SceneGraph::NodeDataProvider& n
     {
       const auto& nodeMapContainer = uniformMapNode.GetUniformMapContainer();
 
-      for(const auto& uniformMap : nodeMapContainer)
+      for(const auto& nodeUniformMap : nodeMapContainer)
       {
-        const auto& uniformName      = uniformMap.first;
-        const auto& propertyMappings = uniformMap.second;
+        const auto& uniformName      = nodeUniformMap.first;
+        const auto& propertyMappings = nodeUniformMap.second;
 
         bool found(false);
         for(uint32_t i = 0; i < mapCount; ++i)

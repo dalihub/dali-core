@@ -254,8 +254,6 @@ using ChildOrderChangedSignalType = Signal<void(Actor, Actor)>; ///< Used when t
 
 using OnRelayoutSignalType = Signal<void(Actor)>; ///< Called when the actor is relaid out.
 
-using OnSceneVisibilityChangedSignalType = Actor::OnSceneVisibilityChangedSignalType; ///< Temporary compatibility alias.
-
 /**
  * @brief This signal is emitted when an actor's children change their sibling order
  *
@@ -283,11 +281,6 @@ DALI_CORE_API ChildOrderChangedSignalType& ChildOrderChangedSignal(Actor actor);
  * @pre The Actor has been initialized.
  */
 DALI_CORE_API OnRelayoutSignalType& OnRelayoutSignal(Actor actor);
-
-/**
- * @deprecated Use Actor::OnSceneVisibilityChangedSignal() instead.
- */
-DALI_CORE_API OnSceneVisibilityChangedSignalType& OnSceneVisibilityChangedSignal(Actor actor);
 
 /**
  * @brief This is used when the parent actor wants to listen to gesture events.
@@ -437,11 +430,6 @@ DALI_CORE_API Matrix GetWorldTransform(Actor actor);
  * @return The world color multiplier
  */
 DALI_CORE_API Vector4 GetWorldColorMultiplier(Actor actor);
-
-/**
- * @deprecated Use Actor::IsOnSceneVisible() instead.
- */
-DALI_CORE_API bool IsOnSceneVisible(Actor actor);
 
 /**
  * Rotate the actor look at specific position.

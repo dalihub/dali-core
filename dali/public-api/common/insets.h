@@ -67,16 +67,16 @@ struct DALI_CORE_API Insets
    * @brief Constructor.
    *
    * @SINCE_2_5.38
-   * @param[in] start  Start inset
-   * @param[in] end    End inset
-   * @param[in] top    Top inset
-   * @param[in] bottom Bottom inset
+   * @param[in] initStart  Start inset
+   * @param[in] initEnd    End inset
+   * @param[in] initTop    Top inset
+   * @param[in] initBottom Bottom inset
    */
-  constexpr Insets(float start, float end, float top, float bottom)
-  : start(start),
-    end(end),
-    top(top),
-    bottom(bottom)
+  constexpr Insets(float initStart, float initEnd, float initTop, float initBottom)
+  : start(initStart),
+    end(initEnd),
+    top(initTop),
+    bottom(initBottom)
   {
   }
 

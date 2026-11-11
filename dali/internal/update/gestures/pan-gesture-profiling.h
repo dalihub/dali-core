@@ -31,12 +31,12 @@ struct PanGestureProfiling
 {
   struct Position
   {
-    Position(unsigned int time, Vector2 position, Vector2 displacement, Vector2 velocity, GestureState state)
-    : time(time),
-      position(position),
-      displacement(displacement),
-      velocity(velocity),
-      state(state)
+    Position(unsigned int initTime, Vector2 initPosition, Vector2 initDisplacement, Vector2 initVelocity, GestureState initState)
+    : time(initTime),
+      position(initPosition),
+      displacement(initDisplacement),
+      velocity(initVelocity),
+      state(initState)
     {
     }
 

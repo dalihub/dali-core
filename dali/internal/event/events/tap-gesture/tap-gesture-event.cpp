@@ -25,8 +25,8 @@ namespace DALI_NAMESPACE
 {
 namespace Internal
 {
-TapGestureEvent::TapGestureEvent(GestureState state)
-: GestureEvent(GestureType::TAP, state),
+TapGestureEvent::TapGestureEvent(GestureState initState)
+: GestureEvent(GestureType::TAP, initState),
   numberOfTaps(1),
   numberOfTouches(1),
   maximumMultiTapInterval(Integration::DEFAULT_TAP_GESTURE_MAXIMUM_MULTI_TAP_INTERVAL)

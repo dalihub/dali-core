@@ -223,8 +223,8 @@ void ProcessTasks(RenderTaskList::RenderTaskContainer& taskContainer,
   bool isFirstRenderTask = true;
 
   // Retrieve size of Scene and default camera position to update viewport of each RenderTask if the RenderTask uses ViewportGuideNode.
-  RenderTaskList::RenderTaskContainer::Iterator iter                  = taskContainer.Begin();
-  RenderTask&                                   defaultRenderTask     = **iter;
+  RenderTaskList::RenderTaskContainer::Iterator defaultTaskIter       = taskContainer.Begin();
+  RenderTask&                                   defaultRenderTask     = **defaultTaskIter;
   const Camera&                                 defaultCamera         = defaultRenderTask.GetCamera();
   auto                                          defaultRootNode       = defaultRenderTask.GetSourceNode();
   Vector3                                       defaultCameraPosition = Vector3::ZERO;

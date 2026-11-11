@@ -372,33 +372,33 @@ public:
 private:
   struct RegisteredProperty
   {
-    RegisteredProperty(Property::Type propType, ConstString propName, Property::Index basePropertyIndex, int32_t componentIndex)
+    RegisteredProperty(Property::Type propType, ConstString propName, Property::Index initBasePropertyIndex, int32_t initComponentIndex)
     : type(propType),
       setFunc(nullptr),
       getFunc(nullptr),
       name(propName),
-      basePropertyIndex(basePropertyIndex),
-      componentIndex(componentIndex)
+      basePropertyIndex(initBasePropertyIndex),
+      componentIndex(initComponentIndex)
     {
     }
 
-    RegisteredProperty(Property::Type propType, Dali::TypeInfo::SetPropertyFunction set, Dali::TypeInfo::GetPropertyFunction get, ConstString propName, Property::Index basePropertyIndex, int componentIndex)
+    RegisteredProperty(Property::Type propType, Dali::TypeInfo::SetPropertyFunction set, Dali::TypeInfo::GetPropertyFunction get, ConstString propName, Property::Index initBasePropertyIndex, int initComponentIndex)
     : type(propType),
       setFunc(set),
       getFunc(get),
       name(propName),
-      basePropertyIndex(basePropertyIndex),
-      componentIndex(componentIndex)
+      basePropertyIndex(initBasePropertyIndex),
+      componentIndex(initComponentIndex)
     {
     }
 
-    RegisteredProperty(Property::Type propType, Dali::CSharpTypeInfo::SetPropertyFunction set, Dali::CSharpTypeInfo::GetPropertyFunction get, ConstString propName, Property::Index basePropertyIndex, int componentIndex)
+    RegisteredProperty(Property::Type propType, Dali::CSharpTypeInfo::SetPropertyFunction set, Dali::CSharpTypeInfo::GetPropertyFunction get, ConstString propName, Property::Index initBasePropertyIndex, int initComponentIndex)
     : type(propType),
       cSharpSetFunc(set),
       cSharpGetFunc(get),
       name(propName),
-      basePropertyIndex(basePropertyIndex),
-      componentIndex(componentIndex)
+      basePropertyIndex(initBasePropertyIndex),
+      componentIndex(initComponentIndex)
     {
     }
 

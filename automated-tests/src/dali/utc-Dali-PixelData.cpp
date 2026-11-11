@@ -323,3 +323,32 @@ int UtcDaliPixelDataNewPixelDataWithReleaseAfterUpload(void)
 
   END_TEST;
 }
+
+int UtcDaliPixelDataAlphaPreMultiplied(void)
+{
+  TestApplication application;
+
+  uint32_t width      = 10u;
+  uint32_t height     = 10u;
+  uint32_t bufferSize = width * height * Pixel::GetBytesPerPixel(Pixel::RGBA8888);
+
+  uint8_t*  buffer        = new uint8_t[bufferSize];
+  PixelData preMultiplied = PixelData::New(buffer, bufferSize, width, height, 0u, Pixel::RGBA8888, PixelData::DELETE_ARRAY, true);
+  DALI_TEST_CHECK(preMultiplied);
+  DALI_TEST_EQUALS(preMultiplied.IsAlphaPreMultiplied(), true, TEST_LOCATION);
+
+  buffer             = new uint8_t[bufferSize];
+  PixelData straight = PixelData::New(buffer, bufferSize, width, height, 0u, Pixel::RGBA8888, PixelData::DELETE_ARRAY, false);
+  DALI_TEST_EQUALS(straight.IsAlphaPreMultiplied(), false, TEST_LOCATION);
+
+  // The overloads that don't state the flag report straight alpha
+  buffer             = new uint8_t[bufferSize];
+  PixelData unstated = PixelData::New(buffer, bufferSize, width, height, Pixel::RGBA8888, PixelData::DELETE_ARRAY);
+  DALI_TEST_EQUALS(unstated.IsAlphaPreMultiplied(), false, TEST_LOCATION);
+
+  buffer                   = new uint8_t[bufferSize];
+  PixelData unstatedStride = PixelData::New(buffer, bufferSize, width, height, 0u, Pixel::RGBA8888, PixelData::DELETE_ARRAY);
+  DALI_TEST_EQUALS(unstatedStride.IsAlphaPreMultiplied(), false, TEST_LOCATION);
+
+  END_TEST;
+}

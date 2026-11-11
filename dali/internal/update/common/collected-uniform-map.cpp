@@ -46,10 +46,10 @@ void CollectedUniformMap::AddMappings(const UniformMap& uniformMap)
   {
     auto& uniformMapContainer = uniformMap.GetUniformMapContainer();
 
-    for(const auto& uniformMap : uniformMapContainer)
+    for(const auto& uniformMapItem : uniformMapContainer)
     {
-      const auto& uniformName      = uniformMap.first;
-      const auto& propertyMappings = uniformMap.second;
+      const auto& uniformName      = uniformMapItem.first;
+      const auto& propertyMappings = uniformMapItem.second;
 
       bool found = false;
 

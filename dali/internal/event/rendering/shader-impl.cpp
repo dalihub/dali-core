@@ -104,27 +104,27 @@ void GetShaderData(const Property::Map& shaderMap, Dali::String& vertexShader, D
   renderPassTag = DEFAULT_RENDER_PASS_TAG;
   name          = DEFAULT_SHADER_NAME;
 
-  if(Property::Value* value = shaderMap.Find("vertex"))
+  if(const Property::Value* value = shaderMap.Find("vertex"))
   {
     vertexShader = value->Get<Dali::String>();
   }
 
-  if(Property::Value* value = shaderMap.Find("fragment"))
+  if(const Property::Value* value = shaderMap.Find("fragment"))
   {
     fragmentShader = value->Get<Dali::String>();
   }
 
-  if(Property::Value* value = shaderMap.Find("renderPassTag"))
+  if(const Property::Value* value = shaderMap.Find("renderPassTag"))
   {
     renderPassTag = static_cast<uint32_t>(value->Get<int32_t>());
   }
 
-  if(Property::Value* value = shaderMap.Find("name"))
+  if(const Property::Value* value = shaderMap.Find("name"))
   {
     name = value->Get<Dali::String>();
   }
 
-  if(Property::Value* value = shaderMap.Find("hints"))
+  if(const Property::Value* value = shaderMap.Find("hints"))
   {
     int32_t hintInteger = 0;
     if(value->Get(hintInteger))

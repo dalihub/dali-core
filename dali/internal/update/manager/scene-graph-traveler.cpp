@@ -85,8 +85,8 @@ SceneGraph::Node* SceneGraphTraveler::FindNode(uint32_t id)
       {
         uint32_t iterateNodeId = iterateNode->GetId();
 
-        auto iter = mTravledNodeMap.find(iterateNodeId);
-        if(iter != mTravledNodeMap.end())
+        auto cachedIter = mTravledNodeMap.find(iterateNodeId);
+        if(cachedIter != mTravledNodeMap.end())
         {
           isNodeUnderRootNode = true;
           break;

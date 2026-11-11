@@ -30,8 +30,8 @@ HoverEvent::HoverEvent()
 {
 }
 
-HoverEvent::HoverEvent(uint32_t time)
-: MultiPointEvent(Hover, time)
+HoverEvent::HoverEvent(uint32_t initTime)
+: MultiPointEvent(Hover, initTime)
 {
 }
 

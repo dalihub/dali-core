@@ -24,8 +24,8 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
-#include <dali/integration-api/pixel-data-integ.h>
 #include <dali/integration-api/trace.h>
+#include <dali/internal/event/images/pixel-data-impl.h>
 
 namespace DALI_NAMESPACE
 {
@@ -119,27 +119,17 @@ Dali::PixelData PixelBuffer::Convert(PixelBuffer& pixelBuffer, bool releaseAfter
 #if defined(DEBUG_ENABLED)
   gPixelBufferAllocationTotal -= pixelBuffer.mBufferSize;
 #endif
-  Dali::PixelData pixelData;
-  if(releaseAfterUpload)
-  {
-    pixelData = Dali::Integration::NewPixelDataWithReleaseAfterUpload(pixelBuffer.mBuffer,
-                                                                      pixelBuffer.mBufferSize,
-                                                                      pixelBuffer.mWidth,
-                                                                      pixelBuffer.mHeight,
-                                                                      pixelBuffer.mStrideBytes,
-                                                                      pixelBuffer.mPixelFormat,
-                                                                      Dali::PixelData::FREE);
-  }
-  else
-  {
-    pixelData = Dali::PixelData::New(pixelBuffer.mBuffer,
-                                     pixelBuffer.mBufferSize,
-                                     pixelBuffer.mWidth,
-                                     pixelBuffer.mHeight,
-                                     pixelBuffer.mStrideBytes,
-                                     pixelBuffer.mPixelFormat,
-                                     Dali::PixelData::FREE);
-  }
+  PixelDataPtr    internal = PixelData::New(pixelBuffer.mBuffer,
+                                            pixelBuffer.mBufferSize,
+                                            pixelBuffer.mWidth,
+                                            pixelBuffer.mHeight,
+                                            pixelBuffer.mStrideBytes,
+                                            pixelBuffer.mPixelFormat,
+                                            Dali::PixelData::FREE,
+                                            releaseAfterUpload,
+                                            pixelBuffer.mPreMultiplied);
+  Dali::PixelData pixelData(internal.Get());
+
   pixelBuffer.mBuffer      = nullptr;
   pixelBuffer.mWidth       = 0;
   pixelBuffer.mHeight      = 0;
@@ -203,7 +193,7 @@ Dali::PixelData PixelBuffer::CreatePixelData() const
     DALI_TRACE_END(gTraceFilter, "DALI_PIXEL_BUFFER_CREATE_PIXEL_DATA");
   }
 
-  Dali::PixelData pixelData = Dali::PixelData::New(destBuffer, mBufferSize, mWidth, mHeight, mStrideBytes, mPixelFormat, Dali::PixelData::FREE);
+  Dali::PixelData pixelData = Dali::PixelData::New(destBuffer, mBufferSize, mWidth, mHeight, mStrideBytes, mPixelFormat, Dali::PixelData::FREE, mPreMultiplied);
   return pixelData;
 }
 

@@ -50,6 +50,11 @@ void SetTexturePixelFormat(Dali::Texture texture, Dali::Pixel::Format format)
   GetImplementation(texture).SetPixelFormat(format);
 }
 
+void SetTextureAlphaPreMultiplied(Dali::Texture texture, bool preMultiplied)
+{
+  GetImplementation(texture).SetAlphaPreMultiplied(preMultiplied);
+}
+
 bool TextureUploadWithContent(Dali::Texture texture, Dali::PixelData pixelData, Dali::String content, TextureContextTypeHint::Type typeHint, bool updateContextOnly, bool keepPreviousContext)
 {
   if(pixelData)

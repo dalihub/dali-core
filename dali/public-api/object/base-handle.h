@@ -203,6 +203,7 @@ public:
    * hidden by derived classes, InvokeMethod follows runtime registry dispatch
    * and may not match C++ static dispatch through a base-typed handle.
    *
+   * @SINCE_3_0.0
    * @note This API is intended for ABI-tolerant dynamic dispatch of selected
    * public API methods. It is not a general C++ reflection system, and it only
    * works for methods that have generated TypeRegistry wrappers.

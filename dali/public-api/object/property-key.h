@@ -46,8 +46,8 @@ struct DALI_CORE_API Property::Key
    */
   enum Type
   {
-    INDEX, ///< The key is a Property::Index
-    STRING ///< The key is a string
+    INDEX, ///< The key is a Property::Index @SINCE_1_2.7
+    STRING ///< The key is a string @SINCE_1_2.7
   } type;  ///< The type of the key
 
   Property::Index indexKey;  ///< The index key.

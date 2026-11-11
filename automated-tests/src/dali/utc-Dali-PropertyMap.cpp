@@ -22,6 +22,8 @@
 
 #include <iostream>
 #include <string>
+#include <type_traits>
+#include <utility>
 
 using namespace Dali;
 
@@ -309,8 +311,8 @@ int UtcDaliPropertyMapConstOperator(void)
 int UtcDaliPropertyMapGetValue(void)
 {
   Property::Map map;
-  map["hello"]                = 1;
-  map["world"]                = 2;
+  map["hello"]                           = 1;
+  map["world"]                           = 2;
   map[Actor::Property::COLOR_MULTIPLIER] = Color::MAGENTA;
 
   Property::Value& value = map.GetValue(0);
@@ -340,8 +342,8 @@ int UtcDaliPropertyMapGetValue(void)
 int UtcDaliPropertyMapGetKeyAt(void)
 {
   Property::Map map;
-  map["hello"]                = 1;
-  map["world"]                = 2;
+  map["hello"]                           = 1;
+  map["world"]                           = 2;
   map[Actor::Property::COLOR_MULTIPLIER] = Color::MAGENTA;
 
   DALI_TEST_CHECK(map.GetKeyAt(0) == "hello");
@@ -365,8 +367,8 @@ int UtcDaliPropertyMapGetKeyAt(void)
 int UtcDaliPropertyMapGetKeyValue(void)
 {
   Property::Map map;
-  map["hello"]                = 1;
-  map["world"]                = 2;
+  map["hello"]                           = 1;
+  map["world"]                           = 2;
   map[Actor::Property::COLOR_MULTIPLIER] = Color::MAGENTA;
 
   DALI_TEST_CHECK(map.GetKeyValue(0).first == "hello");
@@ -1163,5 +1165,144 @@ int UtcDaliPropertyMapEqualFloatType(void)
   map2.Remove("6");
   DALI_TEST_CHECK(map1 == map2);
 
+  END_TEST;
+}
+
+int UtcDaliPropertyMapConstLookup(void)
+{
+  Property::Map map;
+  map.Insert("string", 1);
+  map.Insert(7, 2);
+  map.Insert("string", "typed string");
+  map.Insert(7, "typed index");
+  const Property::Map& read = map;
+
+  // TODO : Change the constness of GetValue() and Find() to return const references/pointers later.
+  // static_assert(std::is_same_v<decltype(read.GetValue(0u)), const Property::Value&>);
+  static_assert(std::is_same_v<decltype(map.GetValue(0u)), Property::Value&>);
+  // static_assert(std::is_same_v<decltype(read.Find("string")), const Property::Value*>);
+  // static_assert(std::is_same_v<decltype(read.Find(7)), const Property::Value*>);
+  // static_assert(std::is_same_v<decltype(read.Find(7, "string")), const Property::Value*>);
+  // static_assert(std::is_same_v<decltype(read.Find("string", Property::INTEGER)), const Property::Value*>);
+  // static_assert(std::is_same_v<decltype(read.Find(7, Property::INTEGER)), const Property::Value*>);
+  static_assert(std::is_same_v<decltype(map.Find("string")), Property::Value*>);
+  static_assert(std::is_same_v<decltype(map.Find(7)), Property::Value*>);
+  static_assert(std::is_same_v<decltype(map.Find(7, "string")), Property::Value*>);
+  static_assert(std::is_same_v<decltype(map.Find("string", Property::INTEGER)), Property::Value*>);
+  static_assert(std::is_same_v<decltype(map.Find(7, Property::INTEGER)), Property::Value*>);
+
+  const auto originalHash = read.GetHash();
+  DALI_TEST_EQUALS(read.GetValue(0u).Get<int>(), 1, TEST_LOCATION);
+  DALI_TEST_EQUALS(read.GetValue(2u).Get<int>(), 2, TEST_LOCATION);
+  DALI_TEST_EQUALS(read.Find("string")->Get<int>(), 1, TEST_LOCATION);
+  DALI_TEST_EQUALS(read.Find(7)->Get<int>(), 2, TEST_LOCATION);
+  DALI_TEST_EQUALS(read.Find(7, "string")->Get<int>(), 2, TEST_LOCATION);
+  DALI_TEST_EQUALS(read.Find(8, "string")->Get<int>(), 1, TEST_LOCATION);
+  DALI_TEST_EQUALS(read.Find("string", Property::STRING)->Get<Dali::String>(), Dali::String("typed string"), TEST_LOCATION);
+  DALI_TEST_EQUALS(read.Find(7, Property::STRING)->Get<Dali::String>(), Dali::String("typed index"), TEST_LOCATION);
+  DALI_TEST_CHECK(read.Find("missing") == nullptr);
+  DALI_TEST_CHECK(read.Find(8) == nullptr);
+  DALI_TEST_CHECK(read.Find(8, "missing") == nullptr);
+  DALI_TEST_CHECK(read.Find("string", Property::VECTOR2) == nullptr);
+  DALI_TEST_CHECK(read.Find(7, Property::VECTOR2) == nullptr);
+  DALI_TEST_EQUALS(read.GetHash(), originalHash, TEST_LOCATION);
+
+  const Property::Map empty;
+  DALI_TEST_CHECK(empty.Find("missing") == nullptr);
+  DALI_TEST_CHECK(empty.Find(8) == nullptr);
+  DALI_TEST_CHECK(empty.Find(8, "missing") == nullptr);
+  DALI_TEST_CHECK(empty.Find("missing", Property::INTEGER) == nullptr);
+  DALI_TEST_CHECK(empty.Find(8, Property::INTEGER) == nullptr);
+  END_TEST;
+}
+
+int UtcDaliPropertyMapMutableGetValueHash(void)
+{
+  Property::Map map;
+  map.Insert("string", 1);
+  map.Insert(7, 2);
+  const auto originalHash = map.GetHash();
+
+  Property::Value& stringValue = map.GetValue(0u);
+  stringValue                  = 3;
+  Property::Map expected;
+  expected.Insert("string", 3);
+  expected.Insert(7, 2);
+  DALI_TEST_CHECK(map.GetHash() != originalHash);
+  DALI_TEST_EQUALS(map.GetHash(), expected.GetHash(), TEST_LOCATION);
+
+  stringValue        = 4;
+  expected["string"] = 4;
+  DALI_TEST_EQUALS(map.GetHash(), expected.GetHash(), TEST_LOCATION);
+  Property::Value& indexValue = map.GetValue(1u);
+  indexValue                  = 5;
+  expected[7]                 = 5;
+  DALI_TEST_EQUALS(map.GetHash(), expected.GetHash(), TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliPropertyMapMutableFindHash(void)
+{
+  for(int lookup = 0; lookup < 5; ++lookup)
+  {
+    Property::Map map;
+    map.Insert("string", 1);
+    map.Insert(7, 2);
+    const auto       originalHash = map.GetHash();
+    Property::Value* value        = nullptr;
+    Property::Value* missing      = nullptr;
+    switch(lookup)
+    {
+      case 0:
+      {
+        value   = map.Find("string");
+        missing = map.Find("missing");
+        break;
+      }
+      case 1:
+      {
+        value   = map.Find(7);
+        missing = map.Find(8);
+        break;
+      }
+      case 2:
+      {
+        value   = map.Find(7, "string");
+        missing = map.Find(8, "missing");
+        break;
+      }
+      case 3:
+      {
+        value   = map.Find("string", Property::INTEGER);
+        missing = map.Find("string", Property::STRING);
+        break;
+      }
+      default:
+      {
+        value   = map.Find(7, Property::INTEGER);
+        missing = map.Find(7, Property::STRING);
+        break;
+      }
+    }
+    DALI_TEST_CHECK(value != nullptr);
+    DALI_TEST_CHECK(missing == nullptr);
+    *value = 3;
+    Property::Map expected;
+    const bool    stringLookup = lookup == 0 || lookup == 3;
+    expected.Insert("string", stringLookup ? 3 : 1);
+    expected.Insert(7, stringLookup ? 2 : 3);
+    DALI_TEST_CHECK(map.GetHash() != originalHash);
+    DALI_TEST_EQUALS(map.GetHash(), expected.GetHash(), TEST_LOCATION);
+    *value = 4;
+    if(stringLookup)
+    {
+      expected["string"] = 4;
+    }
+    else
+    {
+      expected[7] = 4;
+    }
+    DALI_TEST_EQUALS(map.GetHash(), expected.GetHash(), TEST_LOCATION);
+  }
   END_TEST;
 }

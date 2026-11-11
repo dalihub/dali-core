@@ -244,6 +244,7 @@ protected: // for Derived classes
    * It will be used when we want to keep the mData integrity.
    *
    * Does not call destructors on objects held.
+   * @SINCE_3_0.0
    * @param[in] newData new data address to be replaced
    */
   void Replace(void* newData) noexcept;

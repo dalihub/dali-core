@@ -63,18 +63,6 @@ DALI_CORE_API PixelData CreatePixelData(PixelBuffer pixelBuffer);
  */
 DALI_CORE_API bool GetMetadata(PixelBuffer pixelBuffer, Property::Map& metadata);
 
-/**
- * @brief Returns whether the given pixel buffer is pre-multiplied or not.
- *
- * @note This only reports whether a pre-multiplication operation has been applied to the
- * pixel buffer. A buffer the application filled with pre-multiplied pixels itself is not
- * reported as pre-multiplied.
- *
- * @param[in] pixelBuffer The pixel buffer to query
- * @return true if alpha is pre-multiplied
- */
-DALI_CORE_API bool IsAlphaPreMultiplied(PixelBuffer pixelBuffer);
-
 } // namespace DevelPixelBuffer
 
 } //namespace DALI_NAMESPACE

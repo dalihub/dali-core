@@ -1208,12 +1208,12 @@ bool PanGesture::NewAlgorithm(unsigned int lastVSyncTime, unsigned int nextVSync
 
     if(!justStarted)
     {
-      float outputTimeGranularity(GetDivisibleTimeDifference(nextVSyncTime, lastVSyncTime, 1.0f, OUTPUT_TIME_DIFFERENCE));
+      float smoothingTimeGranularity(GetDivisibleTimeDifference(nextVSyncTime, lastVSyncTime, 1.0f, OUTPUT_TIME_DIFFERENCE));
       if(mSmoothingMode == SMOOTHING_MULTI_TAP)
       {
         // Perform Multi-tap Smoothing.
         RelativeVectors blank;
-        InterpolatePoint(mPredictionHistory, nextVSyncTime, nextVSyncTime, mMultiTapSmoothingRange, targetPoint, blank, static_cast<int>(outputTimeGranularity), true); // truncated
+        InterpolatePoint(mPredictionHistory, nextVSyncTime, nextVSyncTime, mMultiTapSmoothingRange, targetPoint, blank, static_cast<int>(smoothingTimeGranularity), true); // truncated
       }
       else
       {
@@ -1231,9 +1231,9 @@ bool PanGesture::NewAlgorithm(unsigned int lastVSyncTime, unsigned int nextVSync
         #########################################################################################*/
 
       targetPoint.local.displacement  = targetPoint.local.position - mLastGesture.local.position;
-      targetPoint.local.velocity      = targetPoint.local.displacement / outputTimeGranularity;
+      targetPoint.local.velocity      = targetPoint.local.displacement / smoothingTimeGranularity;
       targetPoint.screen.displacement = targetPoint.screen.position - mLastGesture.screen.position;
-      targetPoint.screen.velocity     = targetPoint.screen.displacement / outputTimeGranularity;
+      targetPoint.screen.velocity     = targetPoint.screen.displacement / smoothingTimeGranularity;
     }
 
     /*#########################################################################################

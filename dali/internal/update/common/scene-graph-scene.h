@@ -56,9 +56,9 @@ class Node;
 
 struct DirtyRectKey
 {
-  DirtyRectKey(const Node* node, Render::RendererKey renderer)
-  : node(node),
-    renderer(renderer)
+  DirtyRectKey(const Node* initNode, Render::RendererKey initRenderer)
+  : node(initNode),
+    renderer(initRenderer)
   {
   }
 
@@ -105,8 +105,8 @@ struct DirtyRectKey
 
 struct DirtyRectValue
 {
-  DirtyRectValue(BoundsInteger& rect)
-  : rect(rect),
+  DirtyRectValue(BoundsInteger& initRect)
+  : rect(initRect),
     visited(true)
   {
   }

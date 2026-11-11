@@ -45,16 +45,6 @@ OnRelayoutSignalType& OnRelayoutSignal(Actor actor)
   return GetImplementation(actor).OnRelayoutSignal();
 }
 
-OnSceneVisibilityChangedSignalType& OnSceneVisibilityChangedSignal(Actor actor)
-{
-  return GetImplementation(actor).OnSceneVisibilityChangedSignal();
-}
-
-bool IsOnSceneVisible(Actor actor)
-{
-  return GetImplementation(actor).IsOnSceneVisible();
-}
-
 void SetNeedGesturePropagation(Actor actor, bool propagation)
 {
   return GetImplementation(actor).SetNeedGesturePropagation(propagation);

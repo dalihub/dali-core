@@ -45,6 +45,7 @@ public:
    * @param [in] pixelFormat      The pixel format
    * @param [in] releaseFunction  The function used to release the memory.
    * @param [in] releaseAfterUpload Whether we release buffer after texture upload or not.
+   * @param [in] preMultiplied    Whether the colors are pre-multiplied by their alpha value.
    */
   static PixelDataPtr New(uint8_t*                         buffer,
                           uint32_t                         bufferSize,
@@ -53,7 +54,8 @@ public:
                           uint32_t                         stride,
                           Pixel::Format                    pixelFormat,
                           Dali::PixelData::ReleaseFunction releaseFunction,
-                          bool                             releaseAfterUpload);
+                          bool                             releaseAfterUpload,
+                          bool                             preMultiplied);
 
   /**
    * @brief Constructor.
@@ -66,6 +68,7 @@ public:
    * @param [in] pixelFormat        The pixel format
    * @param [in] releaseFunction    The function used to release the memory.
    * @param [in] releaseAfterUpload Whether we release buffer after texture upload or not.
+   * @param [in] preMultiplied      Whether the colors are pre-multiplied by their alpha value.
    */
   PixelData(uint8_t*                         buffer,
             uint32_t                         bufferSize,
@@ -74,7 +77,8 @@ public:
             uint32_t                         stride,
             Pixel::Format                    pixelFormat,
             Dali::PixelData::ReleaseFunction releaseFunction,
-            bool                             releaseAfterUpload);
+            bool                             releaseAfterUpload,
+            bool                             preMultiplied);
 
 protected:
   /**
@@ -142,6 +146,11 @@ public:
   uint32_t GetStrideBytes() const;
 
   /**
+   * @copydoc Dali::PixelData::IsAlphaPreMultiplied()
+   */
+  bool IsAlphaPreMultiplied() const;
+
+  /**
    * Class method to get the total currently allocated size of pixel buffers
    */
   static uint32_t GetTotalAllocatedSize()
@@ -174,6 +183,8 @@ private:
   Dali::PixelData::ReleaseFunction mReleaseFunction; ///< Function for releasing memory
 
   const bool mReleaseAfterUpload;
+
+  const bool mPreMultiplied : 1; ///< PreMultiplied
 
 #if defined(DEBUG_ENABLED)
   static uint32_t gPixelDataAllocationTotal;

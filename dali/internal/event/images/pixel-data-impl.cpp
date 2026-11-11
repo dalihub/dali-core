@@ -40,7 +40,8 @@ PixelData::PixelData(uint8_t*                         buffer,
                      uint32_t                         strideBytes,
                      Pixel::Format                    pixelFormat,
                      Dali::PixelData::ReleaseFunction releaseFunction,
-                     bool                             releaseAfterUpload)
+                     bool                             releaseAfterUpload,
+                     bool                             preMultiplied)
 : mBuffer(buffer),
   mBufferSize(bufferSize),
   mWidth(width),
@@ -48,7 +49,8 @@ PixelData::PixelData(uint8_t*                         buffer,
   mStrideBytes(strideBytes),
   mPixelFormat(pixelFormat),
   mReleaseFunction(releaseFunction),
-  mReleaseAfterUpload(releaseAfterUpload)
+  mReleaseAfterUpload(releaseAfterUpload),
+  mPreMultiplied(preMultiplied)
 {
   DALI_LOG_INFO(gPixelDataLogFilter, Debug::Concise, "Allocated PixelData of size %u\n", bufferSize);
 #if defined(DEBUG_ENABLED)
@@ -68,9 +70,10 @@ PixelDataPtr PixelData::New(uint8_t*                         buffer,
                             uint32_t                         strideBytes,
                             Pixel::Format                    pixelFormat,
                             Dali::PixelData::ReleaseFunction releaseFunction,
-                            bool                             releaseAfterUpload)
+                            bool                             releaseAfterUpload,
+                            bool                             preMultiplied)
 {
-  return new PixelData(buffer, bufferSize, width, height, strideBytes, pixelFormat, releaseFunction, releaseAfterUpload);
+  return new PixelData(buffer, bufferSize, width, height, strideBytes, pixelFormat, releaseFunction, releaseAfterUpload, preMultiplied);
 }
 
 uint32_t PixelData::GetWidth() const
@@ -126,6 +129,11 @@ Dali::Integration::PixelDataBuffer PixelData::GetPixelDataBuffer() const
 uint32_t PixelData::GetStrideBytes() const
 {
   return mStrideBytes;
+}
+
+bool PixelData::IsAlphaPreMultiplied() const
+{
+  return mPreMultiplied;
 }
 
 } // namespace Internal
