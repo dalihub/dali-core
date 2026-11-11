@@ -57,7 +57,7 @@ void EmitPinchSignal(
   Vector2                         localCenter,
   GestureState                    state)
 {
-  Internal::PinchGesturePtr pinch(new Internal::PinchGesture(state));
+  Internal::PinchGesturePtr pinch(Internal::PinchGesture::New(state));
   pinch->SetTime(pinchEvent.time);
 
   pinch->SetScale(pinchEvent.scale);
@@ -290,7 +290,7 @@ void PinchGestureProcessor::AddGestureDetector(PinchGestureDetector* gestureDete
     FillRequest(request);
 
     Size size          = scene.GetSize();
-    mGestureRecognizer = new PinchGestureRecognizer(*this, Vector2(size.width, size.height), scene.GetDpi(), request);
+    mGestureRecognizer = PinchGestureRecognizer::New(*this, Vector2(size.width, size.height), scene.GetDpi(), request);
   }
 }
 

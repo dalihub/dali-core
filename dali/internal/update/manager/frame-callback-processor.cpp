@@ -88,7 +88,7 @@ void FrameCallbackProcessor::AddFrameCallback(OwnerPointer<FrameCallback>& frame
   {
     if(!mGlobalTraveler)
     {
-      mGlobalTraveler = new GlobalSceneGraphTraveler(mUpdateManager);
+      mGlobalTraveler = GlobalSceneGraphTraveler::New(mUpdateManager);
     }
     frameCallback->ConnectToSceneGraph(mUpdateManager, mTransformManager, mGlobalTraveler);
   }
@@ -219,7 +219,7 @@ SceneGraphTravelerPtr FrameCallbackProcessor::GetSceneGraphTraveler(Node* rootNo
   }
 
   // Create new traveler and keep it.
-  return (mRootNodeTravelerMap.insert({rootNode, new SceneGraphTraveler(mUpdateManager, *rootNode)})).first->second;
+  return (mRootNodeTravelerMap.insert({rootNode, SceneGraphTraveler::New(mUpdateManager, *rootNode)})).first->second;
 }
 
 } // namespace SceneGraph

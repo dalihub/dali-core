@@ -36,40 +36,6 @@ class KeyEvent : public BaseObject
 {
 public:
   /**
-   * @brief Default constructor.
-   */
-  KeyEvent();
-
-  /**
-   * @brief Constructor.
-   *
-   * @param[in]  keyName         The name of the key pressed or command from the IMF, if later then the some following parameters will be needed.
-   * @param[in]  logicalKey      The logical key symbol (eg. shift + 1 == "exclamation")
-   * @param[in]  keyString       The string of input characters or key pressed
-   * @param[in]  keyCode         The unique key code for the key pressed.
-   * @param[in]  rawKeyCode      The raw platform key code, or zero if unavailable
-   * @param[in]  keyModifier     The key modifier for special keys like shift and alt
-   * @param[in]  timeStamp       The time (in ms) that the key event occurred.
-   * @param[in]  keyState        The state of the key event.
-   * @param[in]  compose         The key compose
-   * @param[in]  deviceName      The name of device the key event originated from
-   * @param[in]  deviceClass     The class of device the key event originated from
-   * @param[in]  deviceSubclass  The subclass of device the key event originated from
-   */
-  KeyEvent(const Dali::String&          keyName,
-           const Dali::String&          logicalKey,
-           const Dali::String&          keyString,
-           int32_t                      keyCode,
-           uint32_t                     rawKeyCode,
-           int32_t                      keyModifier,
-           uint32_t                     timeStamp,
-           const Dali::KeyEvent::State& keyState,
-           const Dali::String&          compose,
-           const Dali::String&          deviceName,
-           const Device::Class::Type    deviceClass,
-           const Device::Subclass::Type deviceSubclass);
-
-  /**
    * Create a new default KeyEvent.
    * @return A smart-pointer to the newly allocated KeyEvent.
    */
@@ -292,6 +258,41 @@ public:
    * @param[in] receiveTime The time when the key event was received.
    */
   void SetReceiveTime(uint32_t receiveTime);
+
+protected:
+  /**
+   * @brief Default constructor.
+   */
+  KeyEvent();
+
+  /**
+   * @brief Constructor.
+   *
+   * @param[in]  keyName         The name of the key pressed or command from the IMF, if later then the some following parameters will be needed.
+   * @param[in]  logicalKey      The logical key symbol (eg. shift + 1 == "exclamation")
+   * @param[in]  keyString       The string of input characters or key pressed
+   * @param[in]  keyCode         The unique key code for the key pressed.
+   * @param[in]  rawKeyCode      The raw platform key code, or zero if unavailable
+   * @param[in]  keyModifier     The key modifier for special keys like shift and alt
+   * @param[in]  timeStamp       The time (in ms) that the key event occurred.
+   * @param[in]  keyState        The state of the key event.
+   * @param[in]  compose         The key compose
+   * @param[in]  deviceName      The name of device the key event originated from
+   * @param[in]  deviceClass     The class of device the key event originated from
+   * @param[in]  deviceSubclass  The subclass of device the key event originated from
+   */
+  KeyEvent(const Dali::String&          keyName,
+           const Dali::String&          logicalKey,
+           const Dali::String&          keyString,
+           int32_t                      keyCode,
+           uint32_t                     rawKeyCode,
+           int32_t                      keyModifier,
+           uint32_t                     timeStamp,
+           const Dali::KeyEvent::State& keyState,
+           const Dali::String&          compose,
+           const Dali::String&          deviceName,
+           const Device::Class::Type    deviceClass,
+           const Device::Subclass::Type deviceSubclass);
 
 private:
   /**

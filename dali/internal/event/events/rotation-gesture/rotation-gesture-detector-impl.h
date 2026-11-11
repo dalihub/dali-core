@@ -45,12 +45,6 @@ public: // Creation
    * @return A smart-pointer to the newly allocated detector.
    */
   static RotationGestureDetectorPtr New();
-
-  /**
-   * Construct a new GestureDetector.
-   */
-  RotationGestureDetector();
-
   // Not copyable
 
   RotationGestureDetector(const RotationGestureDetector&)                = delete; ///< Deleted copy constructor
@@ -86,6 +80,11 @@ public: // Signals
   static bool DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const Dali::String& signalName, FunctorDelegate* functor);
 
 protected:
+  /**
+   * Construct a new GestureDetector.
+   */
+  RotationGestureDetector();
+
   /**
    * A reference counted object may only be deleted by calling Unreference()
    */

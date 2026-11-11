@@ -175,6 +175,10 @@ protected:
   Scene*             mScene;
   Integration::Point mTriggerPoint;   ///< Touch point that triggered the gesture.
   GestureInputSource mSequenceSource; ///< Input device that started the current sequence.
+
+private:
+  GestureRecognizer(const GestureRecognizer&)            = delete;
+  GestureRecognizer& operator=(const GestureRecognizer&) = delete;
 };
 
 using GestureRecognizerPtr = IntrusivePtr<GestureRecognizer>;

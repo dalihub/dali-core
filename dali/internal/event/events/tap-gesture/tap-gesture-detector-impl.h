@@ -56,12 +56,6 @@ public: // Creation
    */
   static TapGestureDetectorPtr New(uint32_t tapsRequired);
 
-  /**
-   * Construct a new GestureDetector with the specified parameters.
-   * @param[in]  tapsRequired     The number of taps required.
-   */
-  TapGestureDetector(uint32_t tapsRequired);
-
 public:
   /**
    * @copydoc Dali::TapGestureDetector::SetTouchesRequired(uint32_t)
@@ -164,6 +158,12 @@ public: // Signals
   static bool DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const Dali::String& signalName, FunctorDelegate* functor);
 
 protected:
+  /**
+   * Construct a new GestureDetector with the specified parameters.
+   * @param[in]  tapsRequired     The number of taps required.
+   */
+  TapGestureDetector(uint32_t tapsRequired);
+
   /**
    * A reference counted object may only be deleted by calling Unreference()
    */

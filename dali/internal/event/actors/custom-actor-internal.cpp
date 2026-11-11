@@ -30,10 +30,21 @@ CustomActorPtr CustomActor::New(CustomActorImpl& extension)
   CustomActorPtr actor(new CustomActor(*CreateNode(), extension));
 
   // Second-phase construction
-  extension.Initialize(*actor);
-  actor->Initialize();
+  actor->InitializeExtension();
 
   return actor;
+}
+
+CustomActor* CustomActor::NewForBaseHandle(CustomActorImpl& extension)
+{
+  return new CustomActor(*CreateNode(), extension);
+}
+
+void CustomActor::InitializeExtension()
+{
+  DALI_ASSERT_DEBUG(ReferenceCount() > 0 && "CustomActor initialization requires an owning reference");
+  mImpl->Initialize(*this);
+  Initialize();
 }
 
 CustomActor::CustomActor(const SceneGraph::Node& node, CustomActorImpl& extension)

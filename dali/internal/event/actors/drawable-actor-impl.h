@@ -35,20 +35,22 @@ class DrawableActor : public Actor
 {
 public:
   /**
-   * @brief Constructor of DrawableActor
-   *
-   * @param[in] node the scenegraph Node object
-   * @param[in] renderCallback the CallbackBase object to draw through
-   */
-  explicit DrawableActor(const Internal::SceneGraph::Node& node, RenderCallbackPtr renderCallback);
-
-  /**
    * @brief Creates new instance of the DrawableActor implementation
    *
    * @param[in] renderCallback A valid CallbackBase object to draw through
    * @return managed pointer to the DrawableActor implementation
    */
   static DrawableActorPtr New(RenderCallbackPtr renderCallback);
+
+protected:
+  /**
+   * @brief Constructor of DrawableActor
+   *
+   * @param[in] node the scenegraph Node object
+   * @param[in] renderCallback the CallbackBase object to draw through
+   */
+  explicit DrawableActor(const Internal::SceneGraph::Node& node, RenderCallbackPtr renderCallback);
+  ~DrawableActor() override = default;
 
 private:
   Dali::Renderer mRenderer; //< Drawable renderer with callback attached

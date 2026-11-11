@@ -192,7 +192,7 @@ std::string TypeRegistry::Register(std::string                    uniqueTypeName
                                    const Dali::PropertyDetails*   defaultProperties,
                                    Property::Index                defaultPropertyCount)
 {
-  Internal::TypeInfo* typeInfo(new Internal::TypeInfo(uniqueTypeName, baseTypeName, createInstance, defaultProperties, defaultPropertyCount));
+  auto typeInfo = Internal::TypeInfo::New(uniqueTypeName, baseTypeName, createInstance, defaultProperties, defaultPropertyCount);
 
   if(!mRegistryLut.Register(ConstString(uniqueTypeName), TypeInfoPointer(typeInfo)))
   {
@@ -239,7 +239,7 @@ void TypeRegistry::Register(std::string uniqueTypeName, const std::type_info& ba
 {
   std::string baseTypeName = DemangleClassName(baseTypeInfo.name());
 
-  if(!mRegistryLut.Register(ConstString(uniqueTypeName), TypeRegistry::TypeInfoPointer(new Internal::TypeInfo(uniqueTypeName, baseTypeName, createInstance))))
+  if(!mRegistryLut.Register(ConstString(uniqueTypeName), TypeRegistry::TypeInfoPointer(Internal::TypeInfo::New(uniqueTypeName, baseTypeName, createInstance))))
   {
     DALI_LOG_ERROR("Duplicate name in TypeRegistry for '%s'\n", +uniqueTypeName.c_str());
     DALI_ASSERT_ALWAYS(!"Duplicate type name in Type Registration");

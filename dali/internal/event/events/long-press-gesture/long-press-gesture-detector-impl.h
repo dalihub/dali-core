@@ -63,18 +63,6 @@ public: // Creation
    */
   static LongPressGestureDetectorPtr New(unsigned int minTouches, unsigned int maxTouches);
 
-  /**
-   * Construct a new GestureDetector.
-   */
-  LongPressGestureDetector();
-
-  /**
-   * Create a new gesture detector with the specified minimum and maximum touches.
-   * @param[in]  minTouches  The minimum number of touches required.
-   * @param[in]  maxTouches  The maximum number of touches required.
-   */
-  LongPressGestureDetector(unsigned int minTouches, unsigned int maxTouches);
-
 public:
   /**
    * @copydoc Dali::LongPressGestureDetector::SetTouchesRequired(unsigned int)
@@ -168,6 +156,18 @@ public: // Signals
   static bool DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const Dali::String& signalName, FunctorDelegate* functor);
 
 protected:
+  /**
+   * Construct a new GestureDetector.
+   */
+  LongPressGestureDetector();
+
+  /**
+   * Create a new gesture detector with the specified minimum and maximum touches.
+   * @param[in]  minTouches  The minimum number of touches required.
+   * @param[in]  maxTouches  The maximum number of touches required.
+   */
+  LongPressGestureDetector(unsigned int minTouches, unsigned int maxTouches);
+
   /**
    * A reference counted object may only be deleted by calling Unreference()
    */

@@ -81,7 +81,7 @@ ShaderDataPtr ShaderFactory::Load(std::string_view vertexSource, std::string_vie
   if(shaderData.Get() == nullptr)
   {
     // Allocate the structure that returns the loaded shader:
-    shaderData = new ShaderData(vertexSource, fragmentSource, hints, renderPassTag, name);
+    shaderData = ShaderData::New(vertexSource, fragmentSource, hints, renderPassTag, name);
     shaderData->SetHashValue(shaderHash);
 
     if(DALI_UNLIKELY(mTotalStringCachedShadersCount >= MAXIMUM_STRING_SHADER_DATA_CACHE_CLEAN_THRESHOLD))

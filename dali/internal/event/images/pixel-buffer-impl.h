@@ -93,25 +93,6 @@ public:
    */
   static Dali::PixelData Convert(PixelBuffer& pixelBuffer, bool releaseAfterUpload);
 
-  /**
-   * @brief Constructor.
-   *
-   * @warning The buffer must have been allocated with malloc(). @see New()
-   *
-   * @param [in] buffer           The raw pixel data, allocated with malloc()
-   * @param [in] bufferSize       The size of the buffer in bytes
-   * @param [in] width            Buffer width in pixels
-   * @param [in] height           Buffer height in pixels
-   * @param [in] strideBytes      Buffer stride in bytes, 0 means the buffer is tightly packed
-   * @param [in] pixelFormat      The pixel format
-   */
-  PixelBuffer(uint8_t*      buffer,
-              uint32_t      bufferSize,
-              uint32_t      width,
-              uint32_t      height,
-              uint32_t      strideBytes,
-              Pixel::Format pixelFormat);
-
 protected:
   /**
    * @brief Destructor.
@@ -259,6 +240,26 @@ public: // Image operations registered by the platform layer
    * @brief Gets the registered resize operation, or nullptr if none is registered.
    */
   static Dali::Integration::PixelBufferResizeFunction GetResizeFunction();
+
+protected:
+  /**
+   * @brief Constructor.
+   *
+   * @warning The buffer must have been allocated with malloc(). @see New()
+   *
+   * @param [in] buffer           The raw pixel data, allocated with malloc()
+   * @param [in] bufferSize       The size of the buffer in bytes
+   * @param [in] width            Buffer width in pixels
+   * @param [in] height           Buffer height in pixels
+   * @param [in] strideBytes      Buffer stride in bytes, 0 means the buffer is tightly packed
+   * @param [in] pixelFormat      The pixel format
+   */
+  PixelBuffer(uint8_t*      buffer,
+              uint32_t      bufferSize,
+              uint32_t      width,
+              uint32_t      height,
+              uint32_t      strideBytes,
+              Pixel::Format pixelFormat);
 
 private:
   /*

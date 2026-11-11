@@ -53,25 +53,11 @@ public:
   using RemoveAction = Dali::Constraint::RemoveAction;
 
   /**
-   * Constructor.
-   * @param[in] object The property owning object.
-   * @param[in] messageController Used to send messages to the update-thread.
-   * @param[in] targetPropertyIndex The index of the property being constrained.
-   * @param[in] sources The sources of the input properties.
-   */
-  ConstraintBase(Object& object, Property::Index targetPropertyIndex, SourceContainer& sources);
-
-  /**
    * Clone this constraint for another object.
    * @param[in]  object  The object to clone this constraint for
    * @return A new constraint.
    */
   ConstraintBase* Clone(Object& object);
-
-  /**
-   * Virtual destructor.
-   */
-  ~ConstraintBase() override;
 
   /**
    * Adds a constraint source to the constraint
@@ -162,6 +148,21 @@ public:
    * @copydoc Dali::Constraint::GetSourceAt()
    */
   Dali::ConstraintSource GetSourceAt(uint32_t index) const;
+
+protected:
+  /**
+   * Constructor.
+   * @param[in] object The property owning object.
+   * @param[in] messageController Used to send messages to the update-thread.
+   * @param[in] targetPropertyIndex The index of the property being constrained.
+   * @param[in] sources The sources of the input properties.
+   */
+  ConstraintBase(Object& object, Property::Index targetPropertyIndex, SourceContainer& sources);
+
+  /**
+   * Virtual destructor.
+   */
+  ~ConstraintBase() override;
 
 private: // Object::Observer methods
   /**

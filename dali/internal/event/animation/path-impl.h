@@ -42,11 +42,6 @@ public:
    */
   static Path* New();
 
-  /**
-   * Constructor
-   */
-  Path();
-
 protected:
   /**
    * virtual destructor
@@ -182,6 +177,12 @@ public:
   {
     mControlPoint = p;
   }
+
+protected:
+  /**
+   * Constructor
+   */
+  Path();
 
 private:
   /**

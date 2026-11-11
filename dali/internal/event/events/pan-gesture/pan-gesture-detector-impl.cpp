@@ -492,7 +492,7 @@ void PanGestureDetector::ProcessTouchEvent(Scene& scene, const Integration::Touc
     FillRequest(request);
 
     Size size          = scene.GetSize();
-    mGestureRecognizer = new PanGestureRecognizer(*this, Vector2(size.width, size.height), request);
+    mGestureRecognizer = PanGestureRecognizer::New(*this, Vector2(size.width, size.height), request);
     ConsumeRecognizerUpdateRequired(); // The new recognizer already reflects the current settings.
   }
   else if(ConsumeRecognizerUpdateRequired())
@@ -509,7 +509,7 @@ void PanGestureDetector::ProcessTouchEvent(Scene& scene, const Integration::Touc
 void PanGestureDetector::Process(Scene& scene, const PanGestureEvent& panEvent)
 {
   GestureRecognizerPtr recognizer(mGestureRecognizer);
-  GestureState state = panEvent.state;
+  GestureState         state = panEvent.state;
   if(state == GestureState::CONTINUING &&
      (panEvent.numberOfTouches < mActiveProfile.minimumTouches || panEvent.numberOfTouches > mActiveProfile.maximumTouches))
   {
@@ -696,7 +696,7 @@ void PanGestureDetector::EmitPanSignal(Actor*                 actor,
                                        Scene&                 scene)
 {
   SetDetected(true);
-  Internal::PanGesturePtr pan(new Internal::PanGesture(state));
+  Internal::PanGesturePtr pan(Internal::PanGesture::New(state));
 
   pan->SetTime(panEvent.time);
 

@@ -305,7 +305,7 @@ void LongPressGestureDetector::ProcessTouchEvent(Scene& scene, const Integration
     FillRequest(request);
 
     Size size          = scene.GetSize();
-    mGestureRecognizer = new LongPressGestureRecognizer(*this, Vector2(size.width, size.height), request);
+    mGestureRecognizer = LongPressGestureRecognizer::New(*this, Vector2(size.width, size.height), request);
     ConsumeRecognizerUpdateRequired(); // The new recognizer already reflects the current settings.
   }
   else if(ConsumeRecognizerUpdateRequired())
@@ -385,7 +385,7 @@ void LongPressGestureDetector::Process(Scene& scene, const LongPressGestureEvent
 void LongPressGestureDetector::EmitLongPressSignal(Actor* actor, const LongPressGestureEvent& longPressEvent, Vector2 localPoint)
 {
   SetDetected(true);
-  Internal::LongPressGesturePtr longPress(new Internal::LongPressGesture(longPressEvent.state));
+  Internal::LongPressGesturePtr longPress(Internal::LongPressGesture::New(longPressEvent.state));
   longPress->SetTime(longPressEvent.time);
   longPress->SetNumberOfTouches(longPressEvent.numberOfTouches);
   longPress->SetScreenPoint(longPressEvent.point);
