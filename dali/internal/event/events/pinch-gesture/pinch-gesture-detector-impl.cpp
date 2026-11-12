@@ -102,38 +102,18 @@ bool PinchGestureDetector::DoConnectSignal(BaseObject* object, ConnectionTracker
   return connected;
 }
 
-void PinchGestureDetector::OnActorAttach(Actor& actor)
-{
-  DALI_LOG_INFO(gLogFilter, Debug::General, "PinchGestureDetector attach actor(%d)\n", actor.GetId());
-  if(actor.OnScene() && actor.GetScene().IsGeometryHittestEnabled())
-  {
-    actor.TouchEventSignal().Connect(this, &PinchGestureDetector::OnTouchEvent);
-  }
-}
-
 void PinchGestureDetector::OnActorDetach(Actor& actor)
 {
   DALI_LOG_INFO(gLogFilter, Debug::General, "PinchGestureDetector detach actor(%d)\n", actor.GetId());
-  if(actor.OnScene() && actor.GetScene().IsGeometryHittestEnabled())
+  if(mGestureRecognizer && (mAttachedActors.empty() || mFeededActor.GetActor() == &actor))
   {
-    actor.TouchEventSignal().Disconnect(this, &PinchGestureDetector::OnTouchEvent);
-
-    if(mGestureRecognizer && (mAttachedActors.empty() || mFeededActor.GetActor() == &actor))
-    {
-      ResetRecognition();
-    }
+    ResetRecognition();
   }
 }
 
 void PinchGestureDetector::OnActorDestroyed(Object& object)
 {
   // Do nothing
-}
-
-bool PinchGestureDetector::OnTouchEvent(Dali::Actor actor, Dali::TouchEvent touch)
-{
-  Dali::PinchGestureDetector handle = Dali::PinchGestureDetector(this); ///< Keep reference until HandleEvent finished.
-  return HandleEvent(actor, touch);
 }
 
 void PinchGestureDetector::CancelProcessing()
@@ -155,24 +135,19 @@ void PinchGestureDetector::FillRequest(PinchGestureRequest& request) const
   request.deviceThresholds             = pinchGestureProcessor.GetDeviceThresholds();
 }
 
-void PinchGestureDetector::ProcessTouchEvent(Scene& scene, const Integration::TouchEvent& event)
+GestureRecognizerPtr PinchGestureDetector::CreateGestureRecognizer(Scene& scene)
 {
-  if(!mGestureRecognizer)
-  {
-    PinchGestureRequest request;
-    FillRequest(request);
+  PinchGestureRequest request;
+  FillRequest(request);
+  const Size size = scene.GetSize();
+  return PinchGestureRecognizer::New(*this, Vector2(size.width, size.height), scene.GetDpi(), request);
+}
 
-    Size size          = scene.GetSize();
-    mGestureRecognizer = PinchGestureRecognizer::New(*this, Vector2(size.width, size.height), scene.GetDpi(), request);
-    ConsumeRecognizerUpdateRequired(); // The new recognizer already reflects the current settings.
-  }
-  else if(ConsumeRecognizerUpdateRequired())
-  {
-    PinchGestureRequest request;
-    FillRequest(request);
-    mGestureRecognizer->Update(request);
-  }
-  mGestureRecognizer->SendEvent(scene, event);
+void PinchGestureDetector::UpdateGestureRecognizer(GestureRecognizer& recognizer)
+{
+  PinchGestureRequest request;
+  FillRequest(request);
+  recognizer.Update(request);
 }
 
 void PinchGestureDetector::EmitPinchSignal(Actor* actor, const PinchGestureEvent& pinchEvent, Vector2 localCenter)

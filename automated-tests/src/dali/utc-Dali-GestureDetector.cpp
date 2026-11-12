@@ -1366,3 +1366,226 @@ int UtcDaliGestureDetachPreservesParentRecognition(void)
   DALI_TEST_EQUALS(longPressSignals, 1u, TEST_LOCATION);
   END_TEST;
 }
+
+namespace
+{
+void CheckGeometryBridgeSignalOrder(bool publicConsumes)
+{
+  TestApplication application;
+  application.GetScene().SetGeometryHittestEnabled(true);
+  Actor parent = AddDetachTestActor(application);
+  Actor actor  = AddDetachTestActor(application);
+  parent.Add(actor);
+  application.SendNotification();
+  application.Render();
+
+  std::vector<uint32_t> trace;
+  uint32_t              parentDown        = 0u;
+  uint32_t              parentUp          = 0u;
+  uint32_t              parentInterrupted = 0u;
+  parent.TouchEventSignal().Connect(&application, [&](Actor, const TouchEvent& touch)
+  {
+    if(touch.GetState(0) == PointState::DOWN)
+    {
+      ++parentDown;
+    }
+    else if(touch.GetState(0) == PointState::UP)
+    {
+      ++parentUp;
+    }
+    else if(touch.GetState(0) == PointState::INTERRUPTED)
+    {
+      ++parentInterrupted;
+    }
+    return false;
+  });
+  actor.TouchEventSignal().Connect(&application, [&](Actor, const TouchEvent& touch)
+  {
+    if(touch.GetState(0) == PointState::UP)
+    {
+      trace.push_back(1u);
+    }
+    return publicConsumes;
+  });
+  TapGestureDetector first = TapGestureDetector::New();
+  first.Attach(actor);
+  first.DetectedSignal().Connect(&application, [&](Actor, const TapGesture&)
+  {
+    trace.push_back(2u);
+  });
+  actor.TouchEventSignal().Connect(&application, [&](Actor, const TouchEvent& touch)
+  {
+    if(touch.GetState(0) == PointState::UP)
+    {
+      trace.push_back(3u);
+    }
+    return false;
+  });
+  TapGestureDetector second = TapGestureDetector::New();
+  second.Attach(actor);
+  second.DetectedSignal().Connect(&application, [&](Actor, const TapGesture&)
+  {
+    trace.push_back(4u);
+  });
+  actor.TouchEventSignal().Connect(&application, [&](Actor, const TouchEvent& touch)
+  {
+    if(touch.GetState(0) == PointState::UP)
+    {
+      trace.push_back(5u);
+    }
+    return false;
+  });
+
+  TestGenerateTap(application, 20.0f, 20.0f, 100u);
+  const std::vector<uint32_t> expected{1u, 2u, 3u, 4u, 5u};
+  DALI_TEST_CHECK(trace == expected);
+  DALI_TEST_EQUALS(actor.TouchEventSignal().GetConnectionCount(), 5u, TEST_LOCATION);
+  DALI_TEST_EQUALS(parentDown, publicConsumes ? 0u : 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(parentUp, 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(parentInterrupted, publicConsumes ? 0u : 1u, TEST_LOCATION);
+}
+} // namespace
+
+int UtcDaliGestureGeometryBridgeSignalOrderAndLateConsume(void)
+{
+  CheckGeometryBridgeSignalOrder(false);
+  END_TEST;
+}
+
+int UtcDaliGestureGeometryBridgePublicConsumeStillCallsDetectors(void)
+{
+  CheckGeometryBridgeSignalOrder(true);
+  END_TEST;
+}
+
+int UtcDaliGestureGeometryBridgePendingActorLifecycle(void)
+{
+  TestApplication application;
+  application.GetScene().SetGeometryHittestEnabled(true);
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
+  TapGestureDetector detector = TapGestureDetector::New();
+  uint32_t           signals  = 0u;
+  detector.DetectedSignal().Connect(&application, [&](Actor, const TapGesture&)
+  {
+    ++signals;
+  });
+  detector.Attach(actor);
+  detector.Attach(actor);
+  DALI_TEST_EQUALS(detector.GetAttachedActorCount(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.TouchEventSignal().GetConnectionCount(), 0u, TEST_LOCATION);
+  application.GetScene().Add(actor);
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(actor.TouchEventSignal().GetConnectionCount(), 1u, TEST_LOCATION);
+  TestGenerateTap(application, 20.0f, 20.0f, 100u);
+  DALI_TEST_EQUALS(signals, 1u, TEST_LOCATION);
+
+  actor.Unparent();
+  application.SendNotification();
+  application.Render();
+  application.GetScene().Add(actor);
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(actor.TouchEventSignal().GetConnectionCount(), 1u, TEST_LOCATION);
+  TestGenerateTap(application, 20.0f, 20.0f, 700u);
+  DALI_TEST_EQUALS(signals, 2u, TEST_LOCATION);
+  detector.DetachAll();
+  DALI_TEST_EQUALS(actor.TouchEventSignal().GetConnectionCount(), 0u, TEST_LOCATION);
+  TestGenerateTap(application, 20.0f, 20.0f, 1300u);
+  DALI_TEST_EQUALS(signals, 2u, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliGestureGeometryBridgeDetachLaterSlotDuringSignal(void)
+{
+  TestApplication application;
+  application.GetScene().SetGeometryHittestEnabled(true);
+  Actor              actor  = AddDetachTestActor(application);
+  TapGestureDetector first  = TapGestureDetector::New();
+  TapGestureDetector second = TapGestureDetector::New();
+  first.Attach(actor);
+  second.Attach(actor);
+  uint32_t firstSignals  = 0u;
+  uint32_t secondSignals = 0u;
+  first.DetectedSignal().Connect(&application, [&](Actor, const TapGesture&)
+  {
+    ++firstSignals;
+    second.DetachAll();
+  });
+  second.DetectedSignal().Connect(&application, [&](Actor, const TapGesture&)
+  {
+    ++secondSignals;
+  });
+  TestGenerateTap(application, 20.0f, 20.0f, 100u);
+  DALI_TEST_EQUALS(firstSignals, 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(secondSignals, 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.TouchEventSignal().GetConnectionCount(), 1u, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliGestureGeometryBridgeReleaseHandleDuringSignal(void)
+{
+  TestApplication application;
+  application.GetScene().SetGeometryHittestEnabled(true);
+  Actor              actor    = AddDetachTestActor(application);
+  TapGestureDetector detector = TapGestureDetector::New();
+  detector.Attach(actor);
+  uint32_t signals = 0u;
+  detector.DetectedSignal().Connect(&application, [&](Actor, const TapGesture&)
+  {
+    ++signals;
+    detector.DetachAll();
+    detector.Reset();
+  });
+  TestGenerateTap(application, 20.0f, 20.0f, 100u);
+  DALI_TEST_EQUALS(signals, 1u, TEST_LOCATION);
+  DALI_TEST_CHECK(!detector);
+  DALI_TEST_EQUALS(actor.TouchEventSignal().GetConnectionCount(), 0u, TEST_LOCATION);
+  TestGenerateTap(application, 20.0f, 20.0f, 700u);
+  DALI_TEST_EQUALS(signals, 1u, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliGestureGeometryBridgePreservesDoubleTap(void)
+{
+  TestApplication application;
+  application.GetScene().SetGeometryHittestEnabled(true);
+  Actor              actor    = AddDetachTestActor(application);
+  TapGestureDetector detector = TapGestureDetector::New(2u);
+  detector.Attach(actor);
+  uint32_t signals = 0u;
+  detector.DetectedSignal().Connect(&application, [&](Actor, const TapGesture& gesture)
+  {
+    ++signals;
+    DALI_TEST_EQUALS(gesture.GetNumberOfTaps(), 2u, TEST_LOCATION);
+  });
+  TestGenerateTap(application, 20.0f, 20.0f, 100u);
+  DALI_TEST_EQUALS(signals, 0u, TEST_LOCATION);
+  TestGenerateTap(application, 20.0f, 20.0f, 200u);
+  DALI_TEST_EQUALS(signals, 1u, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliGestureGeometryBridgeOffTouchConsumeKeepsRecognition(void)
+{
+  TestApplication application;
+  application.GetScene().SetGeometryHittestEnabled(false);
+  Actor actor = AddDetachTestActor(application);
+  actor.TouchEventSignal().Connect(&application, [](Actor, const TouchEvent&)
+  {
+    return true;
+  });
+  TapGestureDetector detector = TapGestureDetector::New();
+  detector.Attach(actor);
+  uint32_t signals = 0u;
+  detector.DetectedSignal().Connect(&application, [&](Actor, const TapGesture&)
+  {
+    ++signals;
+  });
+  TestGenerateTap(application, 20.0f, 20.0f, 100u);
+  DALI_TEST_EQUALS(signals, 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.TouchEventSignal().GetConnectionCount(), 1u, TEST_LOCATION);
+  END_TEST;
+}

@@ -93,11 +93,6 @@ private:
 
 private: // GestureDetector overrides
   /**
-   * @copydoc Dali::Internal::GestureDetector::OnActorAttach(Actor&)
-   */
-  void OnActorAttach(Actor& actor) override;
-
-  /**
    * @copydoc Dali::Internal::GestureDetector::OnActorDetach(Actor&)
    */
   void OnActorDetach(Actor& actor) override;
@@ -108,11 +103,6 @@ private: // GestureDetector overrides
   void OnActorDestroyed(Object& object) override;
 
   /**
-   * @copydoc Dali::Internal::GestureDetector::OnTouchEvent(Dali::Actor, Dali::TouchEvent)
-   */
-  bool OnTouchEvent(Dali::Actor actor, Dali::TouchEvent touch) override;
-
-  /**
    * Fills the request for the detector-owned recognizer used by HandleEvent(): this detector's own
    * settings plus the application-wide recognition thresholds.
    * @param[out] request The request to fill
@@ -120,9 +110,14 @@ private: // GestureDetector overrides
   void FillRequest(PinchGestureRequest& request) const;
 
   /**
-   * @copydoc Dali::Internal::GestureDetector::ProcessTouchEvent(Scene&, const Integration::TouchEvent&)
+   * @copydoc Dali::Internal::GestureDetector::CreateGestureRecognizer(Scene&)
    */
-  void ProcessTouchEvent(Scene& scene, const Integration::TouchEvent& event) override;
+  GestureRecognizerPtr CreateGestureRecognizer(Scene& scene) override;
+
+  /**
+   * @copydoc Dali::Internal::GestureDetector::UpdateGestureRecognizer(GestureRecognizer&)
+   */
+  void UpdateGestureRecognizer(GestureRecognizer& recognizer) override;
 
   /**
    * @copydoc Dali::Internal::GestureDetector::CheckGestureDetector(const GestureEvent*, Actor*, RenderTaskPtr)

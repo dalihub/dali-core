@@ -100,33 +100,13 @@ bool RotationGestureDetector::DoConnectSignal(BaseObject* object, ConnectionTrac
   return connected;
 }
 
-void RotationGestureDetector::OnActorAttach(Actor& actor)
-{
-  DALI_LOG_INFO(gLogFilter, Debug::General, "RotationGestureDetector attach actor(%d)\n", actor.GetId());
-  if(actor.OnScene() && actor.GetScene().IsGeometryHittestEnabled())
-  {
-    actor.TouchEventSignal().Connect(this, &RotationGestureDetector::OnTouchEvent);
-  }
-}
-
 void RotationGestureDetector::OnActorDetach(Actor& actor)
 {
   DALI_LOG_INFO(gLogFilter, Debug::General, "RotationGestureDetector detach actor(%d)\n", actor.GetId());
-  if(actor.OnScene() && actor.GetScene().IsGeometryHittestEnabled())
+  if(mGestureRecognizer && (mAttachedActors.empty() || mFeededActor.GetActor() == &actor))
   {
-    actor.TouchEventSignal().Disconnect(this, &RotationGestureDetector::OnTouchEvent);
-
-    if(mGestureRecognizer && (mAttachedActors.empty() || mFeededActor.GetActor() == &actor))
-    {
-      ResetRecognition();
-    }
+    ResetRecognition();
   }
-}
-
-bool RotationGestureDetector::OnTouchEvent(Dali::Actor actor, Dali::TouchEvent touch)
-{
-  Dali::RotationGestureDetector handle = Dali::RotationGestureDetector(this); ///< Keep reference until HandleEvent finished.
-  return HandleEvent(actor, touch);
 }
 
 void RotationGestureDetector::CancelProcessing()
@@ -147,23 +127,18 @@ void RotationGestureDetector::FillRequest(RotationGestureRequest& request) const
   request.deviceThresholds             = rotationGestureProcessor.GetDeviceThresholds();
 }
 
-void RotationGestureDetector::ProcessTouchEvent(Scene& scene, const Integration::TouchEvent& event)
+GestureRecognizerPtr RotationGestureDetector::CreateGestureRecognizer(Scene& /*scene*/)
 {
-  if(!mGestureRecognizer)
-  {
-    RotationGestureRequest request;
-    FillRequest(request);
+  RotationGestureRequest request;
+  FillRequest(request);
+  return RotationGestureRecognizer::New(*this, request);
+}
 
-    mGestureRecognizer = RotationGestureRecognizer::New(*this, request);
-    ConsumeRecognizerUpdateRequired(); // The new recognizer already reflects the current settings.
-  }
-  else if(ConsumeRecognizerUpdateRequired())
-  {
-    RotationGestureRequest request;
-    FillRequest(request);
-    mGestureRecognizer->Update(request);
-  }
-  mGestureRecognizer->SendEvent(scene, event);
+void RotationGestureDetector::UpdateGestureRecognizer(GestureRecognizer& recognizer)
+{
+  RotationGestureRequest request;
+  FillRequest(request);
+  recognizer.Update(request);
 }
 
 /**
