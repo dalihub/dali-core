@@ -148,7 +148,7 @@ public:
    * @brief Queries whether there are any connected slots.
    *
    * @SINCE_1_0.0
-   * @return True if there are any slots connected to the signal
+   * @return True if no slots are connected to the signal
    */
   bool Empty() const
   {

@@ -116,6 +116,51 @@ BaseSignal::~BaseSignal()
   delete mCacheImpl;
 }
 
+void BaseSignal::EmitInternal(EmitInvoker invoker, void* functor)
+{
+  // Guards against nested Emit() calls
+  EmitGuard guard(mEmittingFlag);
+  if(guard.ErrorOccurred())
+  {
+    return;
+  }
+
+  // Guards against calling CleanupConnections if the signal is deleted during emission
+  bool signalDeleted{false};
+  mSignalDeleted = &signalDeleted;
+
+  // Snapshot tail so connections added during emit are not emitted
+  auto emitEnd = mEmitTail;
+
+  auto nodeIndex = mEmitHead;
+  while(nodeIndex != SignalConnectionNode::INVALID_INDEX)
+  {
+    auto*         node      = mPool.IndexToNode(nodeIndex);
+    auto          nextIndex = node->mEmitNext;
+    CallbackBase* callback(node->connection.GetCallback());
+    if(callback)
+    {
+      invoker(functor, *callback);
+      if(DALI_UNLIKELY(signalDeleted))
+      {
+        // Previously, we'd have emitted to remaining connections after this
+        // but now we stop as soon as the signal has been deleted.
+        guard.mFlag = nullptr;
+        return;
+      }
+    }
+    if(nodeIndex == emitEnd)
+    {
+      break;
+    }
+    nodeIndex = nextIndex;
+  }
+
+  // Cleanup NULL values from Connection container
+  CleanupConnections();
+  mSignalDeleted = nullptr;
+}
+
 void BaseSignal::OnConnect(CallbackBase* callback)
 {
   DALI_ASSERT_ALWAYS(nullptr != callback && "Invalid member function pointer passed to Connect()");
