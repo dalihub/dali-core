@@ -26,27 +26,27 @@ namespace DALI_NAMESPACE
 {
 
 Property::Key::Key(const Dali::String& key)
-: type(Key::STRING),
+: type(Key::Type::STRING),
   indexKey(Property::INVALID_INDEX),
   stringKey(key)
 {
 }
 
 Property::Key::Key(const Dali::StringView& key)
-: type(Key::STRING),
+: type(Key::Type::STRING),
   indexKey(Property::INVALID_INDEX),
   stringKey(key)
 {
 }
 
 Property::Key::Key(Property::Index key)
-: type(Key::INDEX),
+: type(Key::Type::INDEX),
   indexKey(key)
 {
 }
 
 Property::Key::Key(const char* key)
-: type(Key::STRING),
+: type(Key::Type::STRING),
   indexKey(Property::INVALID_INDEX),
   stringKey(key)
 {
@@ -55,7 +55,7 @@ Property::Key::Key(const char* key)
 bool Property::Key::operator==(const Dali::StringView& rhs) const
 {
   bool result = false;
-  if(type == Key::STRING)
+  if(type == Key::Type::STRING)
   {
     result = (stringKey == Dali::StringView(rhs.Data(), rhs.Size()));
   }
@@ -70,7 +70,7 @@ bool Property::Key::operator==(const char* rhs) const
 bool Property::Key::operator==(Property::Index rhs) const
 {
   bool result = false;
-  if(type == Key::INDEX)
+  if(type == Key::Type::INDEX)
   {
     result = (indexKey == rhs);
   }
@@ -80,11 +80,11 @@ bool Property::Key::operator==(Property::Index rhs) const
 bool Property::Key::operator==(const Key& rhs) const
 {
   bool result = false;
-  if(type == Key::STRING && rhs.type == Key::STRING)
+  if(type == Key::Type::STRING && rhs.type == Key::Type::STRING)
   {
     result = (stringKey == rhs.stringKey);
   }
-  else if(type == Key::INDEX && rhs.type == Key::INDEX)
+  else if(type == Key::Type::INDEX && rhs.type == Key::Type::INDEX)
   {
     result = (indexKey == rhs.indexKey);
   }
@@ -113,7 +113,7 @@ bool Property::Key::operator!=(const Key& rhs) const
 
 std::ostream& operator<<(std::ostream& stream, const Property::Key& key)
 {
-  if(key.type == Property::Key::INDEX)
+  if(key.type == Property::Key::Type::INDEX)
   {
     stream << key.indexKey;
   }

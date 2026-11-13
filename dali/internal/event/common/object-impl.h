@@ -72,7 +72,7 @@ public:
   KeyRef(const Property::Key& key)
   : mType(key.type)
   {
-    if(mType == Property::Key::STRING)
+    if(mType == Property::Key::Type::STRING)
     {
       mString = ConstString(key.stringKey);
     }
@@ -82,12 +82,12 @@ public:
     }
   }
   KeyRef(ConstString str)
-  : mType(Property::Key::STRING)
+  : mType(Property::Key::Type::STRING)
   {
     mString = str;
   }
   KeyRef(Property::Index index)
-  : mType(Property::Key::INDEX)
+  : mType(Property::Key::Type::INDEX)
   {
     mIndex = index;
   }

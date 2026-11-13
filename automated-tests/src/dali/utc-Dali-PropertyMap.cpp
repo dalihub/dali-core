@@ -771,12 +771,12 @@ int UtcDaliPropertyMapOstream03(void)
 int UtcDaliPropertyKeyConstructorP(void)
 {
   Property::Key key1("aKey");
-  DALI_TEST_EQUALS(key1.type, Property::Key::STRING, TEST_LOCATION);
+  DALI_TEST_EQUALS(key1.type, Property::Key::Type::STRING, TEST_LOCATION);
   DALI_TEST_EQUALS(key1.stringKey, "aKey", TEST_LOCATION);
   DALI_TEST_EQUALS(key1.indexKey, Property::INVALID_INDEX, TEST_LOCATION);
 
   Property::Key key2(Actor::Property::COLOR_MULTIPLIER);
-  DALI_TEST_EQUALS(key2.type, Property::Key::INDEX, TEST_LOCATION);
+  DALI_TEST_EQUALS(key2.type, Property::Key::Type::INDEX, TEST_LOCATION);
   DALI_TEST_EQUALS(key2.indexKey, (Dali::Property::Index)Actor::Property::COLOR_MULTIPLIER, TEST_LOCATION);
   END_TEST;
 }

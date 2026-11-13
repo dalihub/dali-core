@@ -137,7 +137,7 @@ Actor NewActor(const Property::Map& map)
     for(Property::Map::SizeType i = 0, mapCount = map.Count(); i < mapCount; ++i)
     {
       const KeyValuePair pair(map.GetKeyValue(i));
-      if(pair.first.type == Property::Key::INDEX)
+      if(pair.first.type == Property::Key::Type::INDEX)
       {
         continue;
       }
@@ -220,7 +220,7 @@ void NewAnimation(const Property::Map& map, Dali::AnimationData& outputAnimation
   for(Property::Map::SizeType i = 0, animationMapCount = map.Count(); i < animationMapCount; ++i)
   {
     const KeyValuePair pair(map.GetKeyValue(i));
-    if(pair.first.type == Property::Key::INDEX)
+    if(pair.first.type == Property::Key::Type::INDEX)
     {
       continue; // We don't consider index keys.
     }
@@ -304,7 +304,7 @@ void NewAnimation(const Property::Map& map, Dali::AnimationData& outputAnimation
       for(Property::Map::SizeType j = 0; j < timeMap.Count(); ++j)
       {
         const KeyValuePair timePair(timeMap.GetKeyValue(j));
-        if(timePair.first.type == Property::Key::INDEX)
+        if(timePair.first.type == Property::Key::Type::INDEX)
         {
           continue;
         }
