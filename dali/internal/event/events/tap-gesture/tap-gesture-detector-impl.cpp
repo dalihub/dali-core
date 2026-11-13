@@ -332,43 +332,27 @@ void TapGestureDetector::OnActorAttach(Actor& actor)
 {
   CheckMinMaxTapsRequired(mDefaultProfile);
   DALI_LOG_INFO(gLogFilter, Debug::General, "TapGestureDetector attach actor(%d)\n", actor.GetId());
-
-  if(actor.OnScene() && actor.GetScene().IsGeometryHittestEnabled())
-  {
-    actor.TouchEventSignal().Connect(this, &TapGestureDetector::OnTouchEvent);
-  }
 }
 
 void TapGestureDetector::OnActorDetach(Actor& actor)
 {
   DALI_LOG_INFO(gLogFilter, Debug::General, "TapGestureDetector detach actor(%d)\n", actor.GetId());
-  if(actor.OnScene() && actor.GetScene().IsGeometryHittestEnabled())
+  // A completed tap may belong to a different actor than the current input.
+  if(mAttachedActors.empty() || (mTappedActor && &GetImplementation(mTappedActor) == &actor))
   {
-    actor.TouchEventSignal().Disconnect(this, &TapGestureDetector::OnTouchEvent);
+    ResetPendingTap();
+  }
 
-    // A completed tap may belong to a different actor than the current input.
-    if(mAttachedActors.empty() || (mTappedActor && &GetImplementation(mTappedActor) == &actor))
-    {
-      ResetPendingTap();
-    }
-
-    if(mGestureRecognizer &&
-       (mAttachedActors.empty() || mFeededActor.GetActor() == &actor || mCurrentTapActor.GetActor() == &actor))
-    {
-      ResetRecognition();
-    }
+  if(mGestureRecognizer &&
+     (mAttachedActors.empty() || mFeededActor.GetActor() == &actor || mCurrentTapActor.GetActor() == &actor))
+  {
+    ResetRecognition();
   }
 }
 
 void TapGestureDetector::OnActorDestroyed(Object& object)
 {
   // Do nothing
-}
-
-bool TapGestureDetector::OnTouchEvent(Dali::Actor actor, Dali::TouchEvent touch)
-{
-  Dali::TapGestureDetector handle = Dali::TapGestureDetector(this); ///< Keep reference until HandleEvent finished.
-  return HandleEvent(actor, touch);
 }
 
 bool TapGestureDetector::CheckGestureDetector(const GestureEvent* gestureEvent, Actor* actor, RenderTaskPtr renderTask)
@@ -408,24 +392,19 @@ void TapGestureDetector::FillRequest(TapGestureRequest& request) const
   request.deviceThresholds        = tapGestureProcessor.GetDeviceThresholds();
 }
 
-void TapGestureDetector::ProcessTouchEvent(Scene& scene, const Integration::TouchEvent& event)
+GestureRecognizerPtr TapGestureDetector::CreateGestureRecognizer(Scene& scene)
 {
-  if(!mGestureRecognizer)
-  {
-    TapGestureRequest request;
-    FillRequest(request);
+  TapGestureRequest request;
+  FillRequest(request);
+  const Size size = scene.GetSize();
+  return TapGestureRecognizer::New(*this, Vector2(size.width, size.height), request);
+}
 
-    Size size          = scene.GetSize();
-    mGestureRecognizer = TapGestureRecognizer::New(*this, Vector2(size.width, size.height), request);
-    ConsumeRecognizerUpdateRequired(); // The new recognizer already reflects the current settings.
-  }
-  else if(ConsumeRecognizerUpdateRequired())
-  {
-    TapGestureRequest request;
-    FillRequest(request);
-    mGestureRecognizer->Update(request);
-  }
-  mGestureRecognizer->SendEvent(scene, event);
+void TapGestureDetector::UpdateGestureRecognizer(GestureRecognizer& recognizer)
+{
+  TapGestureRequest request;
+  FillRequest(request);
+  recognizer.Update(request);
 }
 
 void TapGestureDetector::Process(Scene& scene, const TapGestureEvent& tapEvent)

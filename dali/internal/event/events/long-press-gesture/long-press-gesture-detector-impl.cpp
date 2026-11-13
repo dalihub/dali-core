@@ -225,39 +225,19 @@ bool LongPressGestureDetector::DoConnectSignal(BaseObject* object, ConnectionTra
   return connected;
 }
 
-void LongPressGestureDetector::OnActorAttach(Actor& actor)
-{
-  DALI_LOG_INFO(gLogFilter, Debug::General, "LongPressGestureDetector attach actor(%d)\n", actor.GetId());
-  if(actor.OnScene() && actor.GetScene().IsGeometryHittestEnabled())
-  {
-    actor.TouchEventSignal().Connect(this, &LongPressGestureDetector::OnTouchEvent);
-  }
-}
-
 void LongPressGestureDetector::OnActorDetach(Actor& actor)
 {
   DALI_LOG_INFO(gLogFilter, Debug::General, "LongPressGestureDetector detach actor(%d)\n", actor.GetId());
-  if(actor.OnScene() && actor.GetScene().IsGeometryHittestEnabled())
+  if(mGestureRecognizer &&
+     (mAttachedActors.empty() || mFeededActor.GetActor() == &actor || mCurrentLongPressActor.GetActor() == &actor))
   {
-    actor.TouchEventSignal().Disconnect(this, &LongPressGestureDetector::OnTouchEvent);
-
-    if(mGestureRecognizer &&
-       (mAttachedActors.empty() || mFeededActor.GetActor() == &actor || mCurrentLongPressActor.GetActor() == &actor))
-    {
-      ResetRecognition();
-    }
+    ResetRecognition();
   }
 }
 
 void LongPressGestureDetector::OnActorDestroyed(Object& object)
 {
   // Do nothing
-}
-
-bool LongPressGestureDetector::OnTouchEvent(Dali::Actor actor, Dali::TouchEvent touch)
-{
-  Dali::LongPressGestureDetector handle = Dali::LongPressGestureDetector(this); ///< Keep reference until HandleEvent finished.
-  return HandleEvent(actor, touch);
 }
 
 uint32_t LongPressGestureDetector::GetMinimumHoldingTime() const
@@ -297,24 +277,19 @@ void LongPressGestureDetector::FillRequest(LongPressGestureRequest& request) con
   request.deviceThresholds   = mGestureEventProcessor.GetLongPressGestureProcessor().GetDeviceThresholds();
 }
 
-void LongPressGestureDetector::ProcessTouchEvent(Scene& scene, const Integration::TouchEvent& event)
+GestureRecognizerPtr LongPressGestureDetector::CreateGestureRecognizer(Scene& scene)
 {
-  if(!mGestureRecognizer)
-  {
-    LongPressGestureRequest request;
-    FillRequest(request);
+  LongPressGestureRequest request;
+  FillRequest(request);
+  const Size size = scene.GetSize();
+  return LongPressGestureRecognizer::New(*this, Vector2(size.width, size.height), request);
+}
 
-    Size size          = scene.GetSize();
-    mGestureRecognizer = LongPressGestureRecognizer::New(*this, Vector2(size.width, size.height), request);
-    ConsumeRecognizerUpdateRequired(); // The new recognizer already reflects the current settings.
-  }
-  else if(ConsumeRecognizerUpdateRequired())
-  {
-    LongPressGestureRequest request;
-    FillRequest(request);
-    mGestureRecognizer->Update(request);
-  }
-  mGestureRecognizer->SendEvent(scene, event);
+void LongPressGestureDetector::UpdateGestureRecognizer(GestureRecognizer& recognizer)
+{
+  LongPressGestureRequest request;
+  FillRequest(request);
+  recognizer.Update(request);
 }
 
 void LongPressGestureDetector::Process(Scene& scene, const LongPressGestureEvent& longPressEvent)

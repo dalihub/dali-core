@@ -304,39 +304,19 @@ const SceneGraph::PanGesture& PanGestureDetector::GetPanGestureSceneObject() con
   return static_cast<const SceneGraph::PanGesture&>(*mSceneObject);
 }
 
-void PanGestureDetector::OnActorAttach(Actor& actor)
-{
-  DALI_LOG_INFO(gLogFilter, Debug::General, "PanGestureDetector attach actor(%d)\n", actor.GetId());
-  if(actor.OnScene() && actor.GetScene().IsGeometryHittestEnabled())
-  {
-    actor.TouchEventSignal().Connect(this, &PanGestureDetector::OnTouchEvent);
-  }
-}
-
 void PanGestureDetector::OnActorDetach(Actor& actor)
 {
   DALI_LOG_INFO(gLogFilter, Debug::General, "PanGestureDetector detach actor(%d)\n", actor.GetId());
-  if(actor.OnScene() && actor.GetScene().IsGeometryHittestEnabled())
+  if(mGestureRecognizer &&
+     (mAttachedActors.empty() || mFeededActor.GetActor() == &actor || mCurrentPanActor.GetActor() == &actor))
   {
-    actor.TouchEventSignal().Disconnect(this, &PanGestureDetector::OnTouchEvent);
-
-    if(mGestureRecognizer &&
-       (mAttachedActors.empty() || mFeededActor.GetActor() == &actor || mCurrentPanActor.GetActor() == &actor))
-    {
-      ResetRecognition();
-    }
+    ResetRecognition();
   }
 }
 
 void PanGestureDetector::OnActorDestroyed(Object& object)
 {
   // Do nothing
-}
-
-bool PanGestureDetector::OnTouchEvent(Dali::Actor actor, Dali::TouchEvent touch)
-{
-  Dali::PanGestureDetector handle = Dali::PanGestureDetector(this); ///< Keep reference until HandleEvent finished.
-  return HandleEvent(actor, touch);
 }
 
 void PanGestureDetector::SetDefaultProperty(Property::Index index, const Property::Value& property)
@@ -484,26 +464,19 @@ void PanGestureDetector::FillRequest(PanGestureRequest& request) const
   request.deviceThresholds  = panGestureProcessor.GetDeviceThresholds();
 }
 
-void PanGestureDetector::ProcessTouchEvent(Scene& scene, const Integration::TouchEvent& event)
+GestureRecognizerPtr PanGestureDetector::CreateGestureRecognizer(Scene& scene)
 {
-  if(!mGestureRecognizer)
-  {
-    PanGestureRequest request;
-    FillRequest(request);
+  PanGestureRequest request;
+  FillRequest(request);
+  const Size size = scene.GetSize();
+  return PanGestureRecognizer::New(*this, Vector2(size.width, size.height), request);
+}
 
-    Size size          = scene.GetSize();
-    mGestureRecognizer = PanGestureRecognizer::New(*this, Vector2(size.width, size.height), request);
-    ConsumeRecognizerUpdateRequired(); // The new recognizer already reflects the current settings.
-  }
-  else if(ConsumeRecognizerUpdateRequired())
-  {
-    PanGestureRequest request;
-    FillRequest(request);
-    mGestureRecognizer->Update(request);
-  }
-  // A signal callback may detach the actor and release the detector's recognizer.
-  GestureRecognizerPtr recognizer(mGestureRecognizer);
-  recognizer->SendEvent(scene, event);
+void PanGestureDetector::UpdateGestureRecognizer(GestureRecognizer& recognizer)
+{
+  PanGestureRequest request;
+  FillRequest(request);
+  recognizer.Update(request);
 }
 
 void PanGestureDetector::Process(Scene& scene, const PanGestureEvent& panEvent)
