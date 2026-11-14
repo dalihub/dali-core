@@ -53,7 +53,7 @@ OPTION(ENABLE_TRACE          "Enable Trace" OFF)
 OPTION(ENABLE_PKG_CONFIGURE  "Use pkgconfig" ON)
 OPTION(ENABLE_LINK_TEST      "Enable the link test" ON)
 OPTION(ENABLE_LOW_SPEC_MEMORY_MANAGEMENT "Enable Memory management for low spec devices" OFF)
-OPTION(ENABLE_GPU_MEMORY_PROFILE "Enable GPU memory profiling" OFF)
+OPTION(ENABLE_GPU_MEMORY_PROFILE "Enable GPU memory profiling by default when the environment variable is unset" OFF)
 OPTION(ENABLE_TIZEN_NAMESPACE "Publish DALi under the Tizen top level namespace" OFF)
 
 IF( WIN32 ) # WIN32 includes x64 as well according to the cmake doc.
@@ -117,6 +117,7 @@ ENDIF()
 IF( ENABLE_GPU_MEMORY_PROFILE )
   ADD_DEFINITIONS("-DGPU_MEMORY_PROFILE_ENABLED")
 ENDIF()
+
 
 # Deployment folder should come from spec file or command line:
 SET( PREFIX ${CMAKE_INSTALL_PREFIX})

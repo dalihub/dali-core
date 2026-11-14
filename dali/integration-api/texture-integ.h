@@ -27,6 +27,12 @@
 namespace DALI_NAMESPACE::Integration
 {
 /**
+ * @brief Whether texture GPU memory profiling was enabled at first use.
+ * @return True if profiling is enabled, false otherwise. The environment variable overrides the build default.
+ */
+DALI_CORE_API bool IsGpuMemoryProfileEnabled();
+
+/**
  * @brief Create new Dali::Texture with resourceId that Graphics::Controller can use.
  *
  * @param[in] type The type of the texture

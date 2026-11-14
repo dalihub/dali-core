@@ -23,9 +23,30 @@
 #include <dali/public-api/dali-core.h>
 #include <test-native-image.h>
 
+#include <cstdlib>
+
 using namespace Dali;
 
 #include <mesh-builder.h>
+
+namespace
+{
+void SetGpuMemoryProfileEnvironment(const char* value)
+{
+#if defined(_MSC_VER)
+  _putenv_s("DALI_GPU_MEMORY_PROFILE_ENABLED", value ? value : "");
+#else
+  if(value)
+  {
+    setenv("DALI_GPU_MEMORY_PROFILE_ENABLED", value, 1);
+  }
+  else
+  {
+    unsetenv("DALI_GPU_MEMORY_PROFILE_ENABLED");
+  }
+#endif
+}
+} // namespace
 
 void texture_set_startup(void)
 {
@@ -2252,5 +2273,33 @@ int UtcDaliTextureDestructWorkerThreadN(void)
   // Always success
   DALI_TEST_CHECK(true);
 
+  END_TEST;
+}
+
+int UtcDaliTextureGpuMemoryProfileEnvironmentP0(void)
+{
+  tet_infoline("Check the DALI_GPU_MEMORY_PROFILE_ENABLED environment variable is set to 0, and not be changed even if environment variable is set to 1");
+  SetGpuMemoryProfileEnvironment("0");
+  TestApplication application;
+  DALI_TEST_CHECK(!Integration::IsGpuMemoryProfileEnabled());
+  SetGpuMemoryProfileEnvironment("1");
+  DALI_TEST_CHECK(!Integration::IsGpuMemoryProfileEnabled());
+  auto*     pixels  = static_cast<unsigned char*>(std::calloc(64u, 1u));
+  PixelData data    = PixelData::New(pixels, 64u, 4u, 4u, Pixel::RGBA8888, PixelData::FREE);
+  Texture   texture = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 4u, 4u);
+  DALI_TEST_CHECK(Integration::TextureUploadWithContent(texture, data, "Disabled profile", Integration::TextureContextTypeHint::STANDARD_IMAGE));
+  SetGpuMemoryProfileEnvironment(nullptr);
+  END_TEST;
+}
+
+int UtcDaliTextureGpuMemoryProfileEnvironmentP1(void)
+{
+  tet_infoline("Check the DALI_GPU_MEMORY_PROFILE_ENABLED environment variable is set to 1, and not be changed even if environment variable is set to 0");
+  SetGpuMemoryProfileEnvironment("1");
+  TestApplication application;
+  DALI_TEST_CHECK(Integration::IsGpuMemoryProfileEnabled());
+  SetGpuMemoryProfileEnvironment("0");
+  DALI_TEST_CHECK(Integration::IsGpuMemoryProfileEnabled());
+  SetGpuMemoryProfileEnvironment(nullptr);
   END_TEST;
 }

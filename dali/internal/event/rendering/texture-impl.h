@@ -31,10 +31,7 @@
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/rendering/texture.h>
 
-#if defined(GPU_MEMORY_PROFILE_ENABLED)
-#include <memory> ///< for std::unique_ptr
 #include <string>
-#endif
 
 namespace DALI_NAMESPACE
 {
@@ -48,6 +45,8 @@ using ImageDimensions = Dali::Uint16Pair;
 class Texture : public BaseObject, public EventThreadServicesHolder
 {
 public:
+  struct TextureMemoryInfo; // Used by the profiling registry in the implementation.
+
   /**
    * @brief Create a new Texture.
    *
@@ -86,6 +85,11 @@ public:
    * @copydoc Dali::Texture::Upload()
    */
   bool Upload(PixelDataPtr pixelData, std::string context, Integration::TextureContextTypeHint::Type typeHint, bool updateContextOnly = false, bool keepPreviousContext = false);
+
+  /**
+   * @brief Preserve content-only upload semantics without creating a profiling string.
+   */
+  bool UploadWithoutContent(PixelDataPtr pixelData, bool updateContextOnly);
 
   /**
    * @copydoc Dali::Texture::Upload()
@@ -247,14 +251,6 @@ private:                                    // data
   uint32_t                mResourceId;
   bool                    mUseUploadedParameter : 1; ///< Whether ths texture size and format depend on uploaded image or not.
   bool                    mPreMultiplied : 1;        ///< Whether the texture colors are pre-multiplied by alpha. Event-side metadata only.
-
-#if defined(GPU_MEMORY_PROFILE_ENABLED)
-public:
-  struct TextureMemoryInfo; // Keep it as public, to allow to access at unnamed namespace
-
-private:
-  std::unique_ptr<TextureMemoryInfo> mMemoryInfo;
-#endif
 };
 
 } // namespace Internal

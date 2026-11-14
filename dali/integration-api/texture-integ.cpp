@@ -18,12 +18,45 @@
 // FILE HEADER
 #include <dali/integration-api/texture-integ.h>
 
+// EXTERNAL INCLUDES
+#include <cstdlib>
+
 // INTERNAL INCLUDES
 #include <dali/integration-api/string-utils.h>
 #include <dali/internal/event/rendering/texture-impl.h>
 
 namespace DALI_NAMESPACE::Integration
 {
+bool IsGpuMemoryProfileEnabled()
+{
+  static const bool enabled = []
+  {
+#if defined(_MSC_VER)
+    char*       value  = nullptr;
+    std::size_t length = 0u;
+    if(_dupenv_s(&value, &length, "DALI_GPU_MEMORY_PROFILE_ENABLED") == 0 && value != nullptr)
+    {
+      const bool enabled = value[0] == '1' && value[1] == '\0';
+      std::free(value);
+      return enabled;
+    }
+#else
+    const char* value = std::getenv("DALI_GPU_MEMORY_PROFILE_ENABLED");
+    if(value != nullptr)
+    {
+      return value[0] == '1' && value[1] == '\0';
+    }
+#endif
+#if defined(GPU_MEMORY_PROFILE_ENABLED)
+    // Keep the old behavior for backward compatibility, but it is recommended to use the environment variable instead.
+    return true;
+#else
+    return false;
+#endif
+  }();
+  return enabled;
+}
+
 Dali::Texture NewTextureWithResourceId(Dali::TextureType::Type type, uint32_t resourceId)
 {
   Internal::TexturePtr texture = Internal::Texture::New(type, resourceId);
@@ -57,16 +90,12 @@ void SetTextureAlphaPreMultiplied(Dali::Texture texture, bool preMultiplied)
 
 bool TextureUploadWithContent(Dali::Texture texture, Dali::PixelData pixelData, Dali::String content, TextureContextTypeHint::Type typeHint, bool updateContextOnly, bool keepPreviousContext)
 {
-  if(pixelData)
+  Internal::PixelData* internalPixelData = pixelData ? &GetImplementation(pixelData) : nullptr;
+  if(DALI_UNLIKELY(IsGpuMemoryProfileEnabled()))
   {
-    Internal::PixelData& internalPixelData = GetImplementation(pixelData);
-    return GetImplementation(texture).Upload(&internalPixelData, Integration::ToStdString(std::move(content)), typeHint, updateContextOnly, keepPreviousContext);
+    return GetImplementation(texture).Upload(internalPixelData, Integration::ToStdString(std::move(content)), typeHint, updateContextOnly, keepPreviousContext);
   }
-  else
-  {
-    return GetImplementation(texture).Upload(nullptr, Integration::ToStdString(std::move(content)), typeHint, updateContextOnly, keepPreviousContext);
-    ;
-  }
+  return GetImplementation(texture).UploadWithoutContent(internalPixelData, updateContextOnly);
 }
 
 } //namespace DALI_NAMESPACE::Integration

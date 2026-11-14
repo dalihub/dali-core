@@ -108,6 +108,7 @@ SET(TC_SOURCES
         utc-Dali-TapGestureDetector.cpp
         utc-Dali-TapGestureRecognizer.cpp
         utc-Dali-Texture.cpp
+        utc-Dali-TextureGpuMemoryProfile.cpp
         utc-Dali-TextureSet.cpp
         utc-Dali-Thread.cpp
         utc-Dali-ThreadPool.cpp

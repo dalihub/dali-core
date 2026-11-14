@@ -24,10 +24,8 @@
 #include <dali/internal/render/renderers/render-frame-buffer.h>
 #include <dali/internal/update/manager/update-manager.h>
 
-#if defined(GPU_MEMORY_PROFILE_ENABLED)
 #include <dali/internal/event/images/pixel-data-impl.h>
 #include <dali/internal/event/rendering/texture-impl.h>
-#endif
 
 namespace DALI_NAMESPACE
 {
@@ -79,12 +77,13 @@ void FrameBuffer::AttachColorTexture(TexturePtr texture, uint32_t mipmapLevel, u
   }
   else
   {
-#if defined(GPU_MEMORY_PROFILE_ENABLED)
-    auto typeHint = static_cast<Dali::Integration::TextureContextTypeHint::Type>(static_cast<int>(Dali::Integration::TextureContextTypeHint::FBO_ATTACHED_COLOR_TEXTURE) + mColorAttachmentCount);
+    if(DALI_UNLIKELY(Dali::Integration::IsGpuMemoryProfileEnabled()))
+    {
+      auto typeHint = static_cast<Dali::Integration::TextureContextTypeHint::Type>(static_cast<int>(Dali::Integration::TextureContextTypeHint::FBO_ATTACHED_COLOR_TEXTURE) + mColorAttachmentCount);
 
-    // Use previous context if it was exist. Else, just notify it is color attachment.
-    texture->Upload(nullptr, "FrameBuffer::ColorAttachment", typeHint, true, true);
-#endif
+      // Use previous context if it was exist. Else, just notify it is color attachment.
+      texture->Upload(nullptr, "FrameBuffer::ColorAttachment", typeHint, true, true);
+    }
     mColor[mColorAttachmentCount] = texture;
     ++mColorAttachmentCount;
 
@@ -101,12 +100,13 @@ void FrameBuffer::AttachDepthTexture(TexturePtr texture, uint32_t mipmapLevel)
   }
   else
   {
-#if defined(GPU_MEMORY_PROFILE_ENABLED)
-    auto typeHint = Dali::Integration::TextureContextTypeHint::FBO_ATTACHED_DEPTH_TEXTURE;
+    if(DALI_UNLIKELY(Dali::Integration::IsGpuMemoryProfileEnabled()))
+    {
+      auto typeHint = Dali::Integration::TextureContextTypeHint::FBO_ATTACHED_DEPTH_TEXTURE;
 
-    // Use previous context if it was exist. Else, just notify it is depth attachment.
-    texture->Upload(nullptr, "FrameBuffer::DepthAttachment", typeHint, true, true);
-#endif
+      // Use previous context if it was exist. Else, just notify it is depth attachment.
+      texture->Upload(nullptr, "FrameBuffer::DepthAttachment", typeHint, true, true);
+    }
     mDepth = texture;
     Render::AttachDepthTextureMessage(GetEventThreadServices(), *mRenderObject, texture->GetRenderTextureKey(), mipmapLevel);
   }
@@ -121,12 +121,13 @@ void FrameBuffer::AttachDepthStencilTexture(TexturePtr texture, unsigned int mip
   }
   else
   {
-#if defined(GPU_MEMORY_PROFILE_ENABLED)
-    auto typeHint = Dali::Integration::TextureContextTypeHint::FBO_ATTACHED_DEPTH_STENCIL_TEXTURE;
+    if(DALI_UNLIKELY(Dali::Integration::IsGpuMemoryProfileEnabled()))
+    {
+      auto typeHint = Dali::Integration::TextureContextTypeHint::FBO_ATTACHED_DEPTH_STENCIL_TEXTURE;
 
-    // Use previous context if it was exist. Else, just notify it is depth stencil attachment.
-    texture->Upload(nullptr, "FrameBuffer::DepthStencilAttachment", typeHint, true, true);
-#endif
+      // Use previous context if it was exist. Else, just notify it is depth stencil attachment.
+      texture->Upload(nullptr, "FrameBuffer::DepthStencilAttachment", typeHint, true, true);
+    }
     mStencil = texture;
     Render::AttachDepthStencilTextureMessage(GetEventThreadServices(), *mRenderObject, texture->GetRenderTextureKey(), mipmapLevel);
   }
