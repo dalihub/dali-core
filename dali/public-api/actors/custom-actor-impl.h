@@ -176,7 +176,7 @@ public:
    * @param[in] index The animatable property index
    * @param[in] state Current animation state
    */
-  virtual void OnAnimateAnimatableProperty(Animation& animation, Property::Index index, Dali::Animation::State state)
+  virtual void OnAnimateAnimatableProperty([[maybe_unused]] Animation& animation, [[maybe_unused]] Property::Index index, [[maybe_unused]] Dali::Animation::State state)
   {
   }
 
@@ -187,7 +187,7 @@ public:
    * @param[in] index The animatable property index
    * @param[in] applied Whether it is applied or not.
    */
-  virtual void OnConstraintAnimatableProperty(Constraint& constraint, Property::Index index, bool applied)
+  virtual void OnConstraintAnimatableProperty([[maybe_unused]] Constraint& constraint, [[maybe_unused]] Property::Index index, [[maybe_unused]] bool applied)
   {
   }
 

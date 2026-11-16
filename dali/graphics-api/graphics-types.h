@@ -1634,7 +1634,7 @@ struct DefaultDeleter
    * as an argument.
    */
   template<class P, template<typename> typename U>
-  DefaultDeleter(const U<P>& deleter)
+  DefaultDeleter([[maybe_unused]] const U<P>& deleter)
   {
     deleteFunction = [](T* object)
     { U<P>()(static_cast<P*>(object)); };

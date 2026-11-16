@@ -66,7 +66,7 @@ public:
    * @param[in] addonName Name of AddOn
    * @param[in] version Version of AddOn
    */
-  explicit AddOnBinder(const char* addonName, uint32_t version = 0u)
+  explicit AddOnBinder(const char* addonName, [[maybe_unused]] uint32_t version = 0u)
   {
     mAddOnManager = Dali::Integration::AddOnManager::Get();
     if(mAddOnManager)
@@ -85,7 +85,7 @@ public:
    * @param[in] libraryName Name of the library to load addon from.
    * @param[in] version Version of AddOn
    */
-  explicit AddOnBinder(const char* addonName, const char* libraryName, uint32_t version = 0u)
+  explicit AddOnBinder(const char* addonName, const char* libraryName, [[maybe_unused]] uint32_t version = 0u)
   {
     mAddOnManager = Dali::Integration::AddOnManager::Get();
     if(mAddOnManager)
