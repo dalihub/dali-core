@@ -1,5 +1,5 @@
-#ifndef DALI_SIGNAL_CONNECTION_POOL_H
-#define DALI_SIGNAL_CONNECTION_POOL_H
+#ifndef DALI_INTERNAL_SIGNAL_CONNECTION_POOL_H
+#define DALI_INTERNAL_SIGNAL_CONNECTION_POOL_H
 
 /*
  * Copyright (c) 2026 Samsung Electronics Co., Ltd.
@@ -20,21 +20,17 @@
 
 // EXTERNAL INCLUDES
 #include <cstdint>
-#include <cstdlib> // for malloc/free
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/common/dali-namespace.h>
 #include <dali/public-api/signals/signal-slot-connections.h>
 
 namespace DALI_NAMESPACE
 {
 class ConnectionTrackerInterface;
 
-/**
- * @addtogroup dali_core_signals
- * @{
- */
-
+namespace Internal
+{
 /**
  * @brief Wraps a SignalConnection with emission-order linked list indices.
  *
@@ -42,9 +38,7 @@ class ConnectionTrackerInterface;
  * guarantee that callbacks fire in connection order. The pool allocates
  * nodes; the linked list determines iteration order during Emit().
  *
- * Uses uint32_t indices instead of pointers to reduce memory footprint:
- *
- * @SINCE_2_5.17
+ * Uses uint32_t indices instead of pointers to reduce memory footprint.
  */
 struct SignalConnectionNode
 {
@@ -62,10 +56,10 @@ struct SignalConnectionNode
 
   ~SignalConnectionNode() = default;
 
-  SignalConnectionNode(const SignalConnectionNode&)            = delete; ///< @SINCE_2_5.17
-  SignalConnectionNode& operator=(const SignalConnectionNode&) = delete; ///< @SINCE_2_5.17
-  SignalConnectionNode(SignalConnectionNode&&)                 = delete; ///< @SINCE_2_5.17
-  SignalConnectionNode& operator=(SignalConnectionNode&&)      = delete; ///< @SINCE_2_5.17
+  SignalConnectionNode(const SignalConnectionNode&)            = delete;
+  SignalConnectionNode& operator=(const SignalConnectionNode&) = delete;
+  SignalConnectionNode(SignalConnectionNode&&)                 = delete;
+  SignalConnectionNode& operator=(SignalConnectionNode&&)      = delete;
 
   SignalConnection connection;               ///< The signal connection (owned)
   uint32_t         mEmitNext{INVALID_INDEX}; ///< Index of next node in emission-order list
@@ -79,8 +73,6 @@ struct SignalConnectionNode
  * an array of SignalConnection slots. Blocks are chained in allocation order
  * and never move once allocated, so pointers to slots are stable for the
  * lifetime of the pool.
- *
- * @SINCE_2_5.17
  */
 struct SignalConnectionBlock
 {
@@ -90,7 +82,6 @@ struct SignalConnectionBlock
 
   /**
    * @brief Access the slot array that follows this header in memory.
-   * @SINCE_2_5.17
    * @return Pointer to the first SignalConnectionNode slot
    */
   SignalConnectionNode* Slots()
@@ -100,7 +91,6 @@ struct SignalConnectionBlock
 
   /**
    * @brief Access the slot array (const).
-   * @SINCE_2_5.17
    * @return Const pointer to the first SignalConnectionNode slot
    */
   const SignalConnectionNode* Slots() const
@@ -117,14 +107,14 @@ struct SignalConnectionBlock
  * in capacity (2, 4, 8, 16, ...) following the FixedSizeMemoryPool pattern.
  * Existing blocks never move, so slot pointers are stable for the pool's lifetime.
  *
- * @SINCE_2_5.17
+ * BaseSignal keeps this pool in storage of a fixed size inside its frozen layout;
+ * base-signal.cpp asserts that the pool still fits.
  */
-class DALI_CORE_API SignalConnectionPool
+class SignalConnectionPool
 {
 public:
   /**
    * @brief Constructor.
-   * @SINCE_2_5.17
    */
   SignalConnectionPool() = default;
 
@@ -133,15 +123,13 @@ public:
    *
    * The caller (BaseSignal) must disconnect and free all live connections
    * before destruction. The pool destructor only frees raw block memory.
-   *
-   * @SINCE_2_5.17
    */
   ~SignalConnectionPool();
 
-  SignalConnectionPool(const SignalConnectionPool&)            = delete; ///< Deleted copy constructor @SINCE_2_5.17
-  SignalConnectionPool(SignalConnectionPool&&)                 = delete; ///< Deleted move constructor @SINCE_2_5.17
-  SignalConnectionPool& operator=(const SignalConnectionPool&) = delete; ///< Deleted copy assignment @SINCE_2_5.17
-  SignalConnectionPool& operator=(SignalConnectionPool&&)      = delete; ///< Deleted move assignment @SINCE_2_5.17
+  SignalConnectionPool(const SignalConnectionPool&)            = delete; ///< Deleted copy constructor
+  SignalConnectionPool(SignalConnectionPool&&)                 = delete; ///< Deleted move constructor
+  SignalConnectionPool& operator=(const SignalConnectionPool&) = delete; ///< Deleted copy assignment
+  SignalConnectionPool& operator=(SignalConnectionPool&&)      = delete; ///< Deleted move assignment
 
   /**
    * @brief Allocate a node and construct a SignalConnection with a callback.
@@ -149,7 +137,6 @@ public:
    * Recycles from the free list if available, otherwise allocates from the
    * current block (growing the pool if necessary).
    *
-   * @SINCE_2_5.17
    * @param[in] callback The callback to store (takes ownership)
    * @return Pointer to the constructed node (stable for pool lifetime)
    */
@@ -158,7 +145,6 @@ public:
   /**
    * @brief Allocate a node and construct a SignalConnection with tracker and callback.
    *
-   * @SINCE_2_5.17
    * @param[in] tracker The connection tracker
    * @param[in] callback The callback to store (takes ownership)
    * @return Pointer to the constructed node (stable for pool lifetime)
@@ -168,14 +154,12 @@ public:
   /**
    * @brief Free a node. Destructs the SignalConnectionNode and adds the slot to the free list.
    *
-   * @SINCE_2_5.17
    * @param[in] node Pointer to the node to free
    */
   void Free(SignalConnectionNode* node);
 
   /**
    * @brief Get the first block in the chain (for iteration).
-   * @SINCE_2_5.17
    * @return Pointer to the first block, or nullptr if empty
    */
   SignalConnectionBlock* GetFirstBlock() const
@@ -185,7 +169,6 @@ public:
 
   /**
    * @brief Get the number of blocks allocated.
-   * @SINCE_2_5.17
    * @return The block count
    */
   uint32_t GetBlockCount() const
@@ -195,33 +178,29 @@ public:
 
   /**
    * @brief Convert a global node index to a node pointer.
-   * @SINCE_2_5.17
-   * @param[in] index The node index (0xFFFF = null)
+   * @param[in] index The node index (SignalConnectionNode::INVALID_INDEX = null)
    * @return Pointer to the node, or nullptr if index is invalid
    */
   SignalConnectionNode* IndexToNode(uint32_t index) const;
 
   /**
    * @brief Convert a node pointer to its global index.
-   * @SINCE_2_5.17
    * @param[in] node Pointer to the node
-   * @return The node's index, or 0xFFFF if not found
+   * @return The node's index, or SignalConnectionNode::INVALID_INDEX if not found
    */
   uint32_t NodeToIndex(const SignalConnectionNode* node) const;
 
 private:
   /**
    * @brief Allocate a new block with double the previous capacity.
-   * @SINCE_2_5.17
    */
-  DALI_INTERNAL void AllocateBlock();
+  void AllocateBlock();
 
   /**
    * @brief Allocate raw memory from the pool (free list or current block).
-   * @SINCE_2_5.17
    * @return Pointer to raw memory for one SignalConnection
    */
-  DALI_INTERNAL void* AllocateRaw();
+  void* AllocateRaw();
 
   SignalConnectionBlock* mFirstBlock{nullptr};   ///< Head of block chain
   SignalConnectionBlock* mCurrentBlock{nullptr}; ///< Block being filled
@@ -229,9 +208,8 @@ private:
   uint32_t               mBlockCount{0};         ///< Number of blocks allocated
 };
 
-/**
- * @}
- */
+} // namespace Internal
+
 } //namespace DALI_NAMESPACE
 
-#endif // DALI_SIGNAL_CONNECTION_POOL_H
+#endif // DALI_INTERNAL_SIGNAL_CONNECTION_POOL_H
