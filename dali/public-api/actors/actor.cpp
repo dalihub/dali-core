@@ -462,19 +462,9 @@ void Actor::SetColorMultiplier(const Vector4& multiplier)
   GetImplementation(*this).SetProperty(Actor::Property::COLOR_MULTIPLIER, multiplier);
 }
 
-void Actor::SetColor(const Vector4& color)
-{
-  SetColorMultiplier(color);
-}
-
 Vector4 Actor::GetColorMultiplier() const
 {
   return GetImplementation(*this).GetColorMultiplier();
-}
-
-Vector4 Actor::GetColor() const
-{
-  return GetColorMultiplier();
 }
 
 Vector4 Actor::GetCurrentColorMultiplier() const
@@ -482,19 +472,9 @@ Vector4 Actor::GetCurrentColorMultiplier() const
   return GetImplementation(*this).GetCurrentColorMultiplier();
 }
 
-Vector4 Actor::GetCurrentColor() const
-{
-  return GetCurrentColorMultiplier();
-}
-
 void Actor::SetColorMultiplierRed(float red)
 {
   GetImplementation(*this).SetProperty(Actor::Property::COLOR_MULTIPLIER_RED, red);
-}
-
-void Actor::SetColorRed(float red)
-{
-  SetColorMultiplierRed(red);
 }
 
 float Actor::GetColorMultiplierRed() const
@@ -502,19 +482,9 @@ float Actor::GetColorMultiplierRed() const
   return GetImplementation(*this).GetColorMultiplierRed();
 }
 
-float Actor::GetColorRed() const
-{
-  return GetColorMultiplierRed();
-}
-
 void Actor::SetColorMultiplierGreen(float green)
 {
   GetImplementation(*this).SetProperty(Actor::Property::COLOR_MULTIPLIER_GREEN, green);
-}
-
-void Actor::SetColorGreen(float green)
-{
-  SetColorMultiplierGreen(green);
 }
 
 float Actor::GetColorMultiplierGreen() const
@@ -522,19 +492,9 @@ float Actor::GetColorMultiplierGreen() const
   return GetImplementation(*this).GetColorMultiplierGreen();
 }
 
-float Actor::GetColorGreen() const
-{
-  return GetColorMultiplierGreen();
-}
-
 void Actor::SetColorMultiplierBlue(float blue)
 {
   GetImplementation(*this).SetProperty(Actor::Property::COLOR_MULTIPLIER_BLUE, blue);
-}
-
-void Actor::SetColorBlue(float blue)
-{
-  SetColorMultiplierBlue(blue);
 }
 
 float Actor::GetColorMultiplierBlue() const
@@ -542,19 +502,9 @@ float Actor::GetColorMultiplierBlue() const
   return GetImplementation(*this).GetColorMultiplierBlue();
 }
 
-float Actor::GetColorBlue() const
-{
-  return GetColorMultiplierBlue();
-}
-
 void Actor::SetColorMultiplierAlpha(float alpha)
 {
   GetImplementation(*this).SetProperty(Actor::Property::COLOR_MULTIPLIER_ALPHA, alpha);
-}
-
-void Actor::SetColorAlpha(float alpha)
-{
-  SetColorMultiplierAlpha(alpha);
 }
 
 float Actor::GetColorMultiplierAlpha() const
@@ -562,19 +512,9 @@ float Actor::GetColorMultiplierAlpha() const
   return GetImplementation(*this).GetColorMultiplierAlpha();
 }
 
-float Actor::GetColorAlpha() const
-{
-  return GetColorMultiplierAlpha();
-}
-
 Vector4 Actor::GetWorldColorMultiplier() const
 {
   return GetImplementation(*this).GetWorldColorMultiplier();
-}
-
-Vector4 Actor::GetWorldColor() const
-{
-  return GetWorldColorMultiplier();
 }
 
 Matrix Actor::GetWorldMatrix() const
