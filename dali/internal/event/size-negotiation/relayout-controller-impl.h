@@ -30,7 +30,7 @@
 #include <dali/integration-api/ordered-set.h>
 #include <dali/internal/common/memory-pool-object-allocator.h>
 #include <dali/internal/event/size-negotiation/memory-pool-relayout-container.h>
-#include <dali/public-api/object/base-object.h>
+#include <dali/public-api/object/ref-object.h>
 
 namespace DALI_NAMESPACE
 {
@@ -46,7 +46,7 @@ namespace Internal
  * The requests are actioned on at the end of the frame where all actors that have made a request are
  * resized.
  */
-class RelayoutController : public Dali::BaseObject
+class RelayoutController : public Dali::RefObject
 {
 public:
   /**
