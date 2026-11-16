@@ -46,6 +46,15 @@ class DALI_CORE_API IndirectValue
 {
 public:
   /**
+   * @brief Destructor.
+   *
+   * Defined by the library, not inline, so that the library keeps control of the
+   * destruction of the temporaries that Handle::operator[] returns.
+   * @SINCE_3_0.1
+   */
+  ~IndirectValue();
+
+  /**
    * @brief Assignment operator
    *
    * @SINCE_1_9.27
