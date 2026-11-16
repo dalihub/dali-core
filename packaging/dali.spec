@@ -101,6 +101,10 @@ Integration development package for DALi 3D Engine - headers for integrating wit
 # Build
 ##############################
 %build
+# Keep shadow diagnostics enabled independently of the build server policy.
+export CFLAGS="${CFLAGS:-%optflags} -Werror=shadow"
+export CXXFLAGS="${CXXFLAGS:-%optflags} -Werror=shadow"
+
 PREFIX="/usr"
 CXXFLAGS="$CXXFLAGS -Wall -g -Os -DNDEBUG -fPIC -fvisibility-inlines-hidden -fdata-sections -ffunction-sections "
 LDFLAGS="$LDFLAGS -Wl,--rpath=$PREFIX/lib -Wl,--as-needed -Wl,--gc-sections -lgcc_s -lgcc -Wl,-Bsymbolic-functions "
