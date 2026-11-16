@@ -727,7 +727,7 @@ struct VoidFunctorDispatcher1
    * @param[in] callback The callback information
    * @param[in] param1 The first parameter to pass to the real member function
    */
-  static void Dispatch(CallbackBase& callback, P1 param1)
+  static void Dispatch(CallbackBase& callback, [[maybe_unused]] P1 param1)
   {
     // "downcast" the object and function type back to the correct ones
     T* object               = reinterpret_cast<T*>(callback.mImpl.mObjectPointer);
@@ -754,7 +754,7 @@ struct VoidFunctorDispatcher2
    * @param[in] param1 The first parameter to pass to the real member function
    * @param[in] param2 The second parameter to pass to the real member function
    */
-  static void Dispatch(CallbackBase& callback, P1 param1, P2 param2)
+  static void Dispatch(CallbackBase& callback, [[maybe_unused]] P1 param1, [[maybe_unused]] P2 param2)
   {
     // "downcast" the object and function type back to the correct ones
     T* object               = reinterpret_cast<T*>(callback.mImpl.mObjectPointer);
@@ -782,7 +782,7 @@ struct VoidFunctorDispatcher3
    * @param[in] param2 The second parameter to pass to the real member function
    * @param[in] param3 The third parameter to pass to the real member function
    */
-  static void Dispatch(CallbackBase& callback, P1 param1, P2 param2, P3 param3)
+  static void Dispatch(CallbackBase& callback, [[maybe_unused]] P1 param1, [[maybe_unused]] P2 param2, [[maybe_unused]] P3 param3)
   {
     // "downcast" the object and function type back to the correct ones
     T* object               = reinterpret_cast<T*>(callback.mImpl.mObjectPointer);
@@ -836,7 +836,7 @@ struct VoidFunctorDispatcherReturn1
    * @param[in] param1 The first parameter to pass to the real member function
    * @return The return value from the function
    */
-  static R Dispatch(CallbackBase& callback, P1 param1)
+  static R Dispatch(CallbackBase& callback, [[maybe_unused]] P1 param1)
   {
     // "downcast" the object and function type back to the correct ones
     T* object               = reinterpret_cast<T*>(callback.mImpl.mObjectPointer);
@@ -865,7 +865,7 @@ struct VoidFunctorDispatcherReturn2
    * @param[in] param2 The second parameter to pass to the real member function
    * @return The return value from the function
    */
-  static R Dispatch(CallbackBase& callback, P1 param1, P2 param2)
+  static R Dispatch(CallbackBase& callback, [[maybe_unused]] P1 param1, [[maybe_unused]] P2 param2)
   {
     // "downcast" the object and function type back to the correct ones
     T* object               = reinterpret_cast<T*>(callback.mImpl.mObjectPointer);
@@ -895,7 +895,7 @@ struct VoidFunctorDispatcherReturn3
    * @param[in] param3 The third parameter to pass to the real member function
    * @return The return value from the function
    */
-  static R Dispatch(CallbackBase& callback, P1 param1, P2 param2, P3 param3)
+  static R Dispatch(CallbackBase& callback, [[maybe_unused]] P1 param1, [[maybe_unused]] P2 param2, [[maybe_unused]] P3 param3)
   {
     // "downcast" the object and function type back to the correct ones
     T* object               = reinterpret_cast<T*>(callback.mImpl.mObjectPointer);

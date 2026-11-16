@@ -349,7 +349,7 @@ inline T DownCast(BaseHandle handle)
  * @param[in] rhs nullptr
  * @return True if the handle is empty
  */
-inline bool operator==(const BaseHandle& lhs, decltype(nullptr) rhs)
+inline bool operator==(const BaseHandle& lhs, [[maybe_unused]] decltype(nullptr) rhs)
 {
   return lhs.GetObjectPtr() == nullptr;
 }
@@ -361,7 +361,7 @@ inline bool operator==(const BaseHandle& lhs, decltype(nullptr) rhs)
  * @param[in] rhs A handle to compare
  * @return True if the handle is empty
  */
-inline bool operator==(decltype(nullptr) lhs, const BaseHandle& rhs)
+inline bool operator==([[maybe_unused]] decltype(nullptr) lhs, const BaseHandle& rhs)
 {
   return rhs.GetObjectPtr() == nullptr;
 }
@@ -373,7 +373,7 @@ inline bool operator==(decltype(nullptr) lhs, const BaseHandle& rhs)
  * @param[in] rhs nullptr
  * @return True if the handle is not empty
  */
-inline bool operator!=(const BaseHandle& lhs, decltype(nullptr) rhs)
+inline bool operator!=(const BaseHandle& lhs, [[maybe_unused]] decltype(nullptr) rhs)
 {
   return lhs.GetObjectPtr() != nullptr;
 }
@@ -385,7 +385,7 @@ inline bool operator!=(const BaseHandle& lhs, decltype(nullptr) rhs)
  * @param[in] rhs A handle to compare
  * @return True if the handle is not empty
  */
-inline bool operator!=(decltype(nullptr) lhs, const BaseHandle& rhs)
+inline bool operator!=([[maybe_unused]] decltype(nullptr) lhs, const BaseHandle& rhs)
 {
   return rhs.GetObjectPtr() != nullptr;
 }
@@ -397,7 +397,7 @@ inline bool operator!=(decltype(nullptr) lhs, const BaseHandle& rhs)
  * @param[in] rhs nullptr
  * @return False
  */
-inline bool operator<(const BaseHandle& lhs, decltype(nullptr) rhs)
+inline bool operator<([[maybe_unused]] const BaseHandle& lhs, [[maybe_unused]] decltype(nullptr) rhs)
 {
   return false;
 }
@@ -409,7 +409,7 @@ inline bool operator<(const BaseHandle& lhs, decltype(nullptr) rhs)
  * @param[in] rhs A handle to compare
  * @return True if the handle is not empty
  */
-inline bool operator<(decltype(nullptr) lhs, const BaseHandle& rhs)
+inline bool operator<([[maybe_unused]] decltype(nullptr) lhs, const BaseHandle& rhs)
 {
   return rhs.GetObjectPtr() != nullptr;
 }

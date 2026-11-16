@@ -388,7 +388,7 @@ inline bool operator!=(T* lhs, IntrusivePtr<U> const& rhs)
  * @return True if the pointers is nullptr
  */
 template<typename T>
-inline bool operator==(IntrusivePtr<T> const& lhs, decltype(nullptr) rhs)
+inline bool operator==(IntrusivePtr<T> const& lhs, [[maybe_unused]] decltype(nullptr) rhs)
 {
   return lhs.Get() == nullptr;
 }
@@ -402,7 +402,7 @@ inline bool operator==(IntrusivePtr<T> const& lhs, decltype(nullptr) rhs)
  * @return True if the pointers is not nullptr
  */
 template<typename T>
-inline bool operator!=(IntrusivePtr<T> const& lhs, decltype(nullptr) rhs)
+inline bool operator!=(IntrusivePtr<T> const& lhs, [[maybe_unused]] decltype(nullptr) rhs)
 {
   return lhs.Get() != nullptr;
 }
@@ -416,7 +416,7 @@ inline bool operator!=(IntrusivePtr<T> const& lhs, decltype(nullptr) rhs)
  * @return True if the pointers is nullptr
  */
 template<typename T>
-inline bool operator==(decltype(nullptr) lhs, IntrusivePtr<T> const& rhs)
+inline bool operator==([[maybe_unused]] decltype(nullptr) lhs, IntrusivePtr<T> const& rhs)
 {
   return nullptr == rhs.Get();
 }
@@ -430,7 +430,7 @@ inline bool operator==(decltype(nullptr) lhs, IntrusivePtr<T> const& rhs)
  * @return True if the pointers is not nullptr
  */
 template<typename T>
-inline bool operator!=(decltype(nullptr) lhs, IntrusivePtr<T> const& rhs)
+inline bool operator!=([[maybe_unused]] decltype(nullptr) lhs, IntrusivePtr<T> const& rhs)
 {
   return nullptr != rhs.Get();
 }
@@ -486,7 +486,7 @@ inline bool operator<(IntrusivePtr<T> const& lhs, U* rhs)
  * @return True if the pointers point of rhs is bigger than lhs
  */
 template<typename T>
-inline bool operator<(decltype(nullptr) lhs, IntrusivePtr<T> const& rhs)
+inline bool operator<([[maybe_unused]] decltype(nullptr) lhs, IntrusivePtr<T> const& rhs)
 {
   // Do not use less operator with nullptr. It will make compile error over gcc-14.
   return nullptr != rhs.Get();
@@ -501,7 +501,7 @@ inline bool operator<(decltype(nullptr) lhs, IntrusivePtr<T> const& rhs)
  * @return True if the pointers point of rhs is bigger than lhs
  */
 template<typename T>
-inline bool operator<(IntrusivePtr<T> const& lhs, decltype(nullptr) rhs)
+inline bool operator<([[maybe_unused]] IntrusivePtr<T> const& lhs, [[maybe_unused]] decltype(nullptr) rhs)
 {
   // Do not use less operator with nullptr. It will make compile error over gcc-14.
   return false;
