@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/update/manager/scene-graph-traveler-interface.h>
+#include <dali/public-api/common/intrusive-ptr.h>
 
 namespace DALI_NAMESPACE
 {
@@ -34,6 +35,21 @@ class GlobalSceneGraphTraveler : public SceneGraphTravelerInterface
 {
 public:
   /**
+   * @brief Creates a reference-counted implementation.
+   */
+  static Dali::IntrusivePtr<GlobalSceneGraphTraveler> New(SceneGraph::UpdateManager& updateManager)
+  {
+    return Dali::IntrusivePtr<GlobalSceneGraphTraveler>(new GlobalSceneGraphTraveler(updateManager));
+  }
+
+public: // From SceneGraphTravelerInterface
+  /**
+   * @copydoc Dali::Internal::SceneGraphTravelerInterface::FindNode()
+   */
+  SceneGraph::Node* FindNode(uint32_t id) override;
+
+protected:
+  /**
    * @brief Construct
    * @param[in] updateManager The update manager.
    */
@@ -45,12 +61,6 @@ public:
   ~GlobalSceneGraphTraveler() override
   {
   }
-
-public: // From SceneGraphTravelerInterface
-  /**
-   * @copydoc Dali::Internal::SceneGraphTravelerInterface::FindNode()
-   */
-  SceneGraph::Node* FindNode(uint32_t id) override;
 };
 
 } // namespace Internal

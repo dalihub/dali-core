@@ -656,6 +656,19 @@ void PipelineCache::ResetPipeline(PipelineCachePtr pipelineCache)
   pipelineCache->referenceCount--;
 }
 
+void PipelineCache::InvalidateLatestQuery(const Renderer* renderer)
+{
+  for(int latestUsedCacheIndex = 0; latestUsedCacheIndex < 2; ++latestUsedCacheIndex)
+  {
+    // A non-null pipeline means the slot was populated together with its query.
+    if(mLatestResult[latestUsedCacheIndex].pipeline != nullptr &&
+       mLatestQuery[latestUsedCacheIndex].renderer == renderer)
+    {
+      mLatestResult[latestUsedCacheIndex].pipeline = nullptr;
+    }
+  }
+}
+
 void PipelineCache::ProgramDestroyed(const Program* program)
 {
   // Remove latest used pipeline cache infomation.

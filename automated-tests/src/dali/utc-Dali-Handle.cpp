@@ -2610,3 +2610,16 @@ int UtcDaliHandleIndexOperatorNegative02(void)
 
   END_TEST;
 }
+
+int UtcDaliHandleFactoryReleasesLastReference(void)
+{
+  TestApplication application;
+  Handle          handle = Handle::New();
+  DALI_TEST_EQUALS(handle.GetBaseObject().ReferenceCount(), 1, TEST_LOCATION);
+
+  WeakHandle<Handle> weak(handle);
+  DALI_TEST_CHECK(weak.GetHandle());
+  handle.Reset();
+  DALI_TEST_CHECK(!weak.GetHandle());
+  END_TEST;
+}

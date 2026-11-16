@@ -67,11 +67,6 @@ public:
                       ScenePolicyFlagBits flags = ScenePolicyFlagBits::NONE);
 
   /**
-   * virtual destructor
-   */
-  ~Scene() override;
-
-  /**
    * @copydoc Dali::Integration::Scene::Add
    */
   void Add(Actor& actor);
@@ -472,6 +467,12 @@ public:
    * @return The default camera actor.
    */
   CameraActor& GetDefaultCameraActor() const override;
+
+protected:
+  /**
+   * virtual destructor
+   */
+  ~Scene() override;
 
 private:
   // Constructor

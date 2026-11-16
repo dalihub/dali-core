@@ -25,7 +25,7 @@ namespace DevelPinchGesture
 {
 PinchGesture New(GestureState state)
 {
-  return PinchGesture(new Internal::PinchGesture(state));
+  return PinchGesture(Internal::PinchGesture::NewForBaseHandle(state));
 }
 
 } // namespace DevelPinchGesture

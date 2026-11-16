@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/integration-api/events/point.h>
+#include <dali/public-api/common/intrusive-ptr.h>
 #include <cstdint>
 
 // INTERNAL INCLUDES
@@ -48,17 +49,12 @@ public:
   using Observer = RecognizerObserver<TapGestureEvent>;
 
   /**
-   * Constructor
-   * @param[in]  observer    Used to send events to Core.
-   * @param[in]  screenSize  The size of the screen.
-   * @param[in]  request     The tap gesture request. The recognition thresholds are taken from it.
+   * @brief Creates a reference-counted implementation.
    */
-  TapGestureRecognizer(Observer& observer, Vector2 screenSize, const TapGestureRequest& request);
-
-  /**
-   * Virtual destructor.
-   */
-  ~TapGestureRecognizer() override;
+  static Dali::IntrusivePtr<TapGestureRecognizer> New(Observer& observer, Vector2 screenSize, const TapGestureRequest& request)
+  {
+    return Dali::IntrusivePtr<TapGestureRecognizer>(new TapGestureRecognizer(observer, screenSize, request));
+  }
 
 public:
   /**
@@ -84,6 +80,20 @@ public:
    * @copydoc Dali::Internal::GestureRecognizer::OnSequenceSourceChanged()
    */
   void OnSequenceSourceChanged() override;
+
+protected:
+  /**
+   * Constructor
+   * @param[in]  observer    Used to send events to Core.
+   * @param[in]  screenSize  The size of the screen.
+   * @param[in]  request     The tap gesture request. The recognition thresholds are taken from it.
+   */
+  TapGestureRecognizer(Observer& observer, Vector2 screenSize, const TapGestureRequest& request);
+
+  /**
+   * Virtual destructor.
+   */
+  ~TapGestureRecognizer() override;
 
 private:
   /**

@@ -1,6 +1,33 @@
-# dali2 is the same code built a second time under the dali2 name, for
-# applications that still use it. To drop it, remove the "with dali2" blocks.
-%bcond_without dali2
+# This source builds DALi 3 (dali3). On Tizen 10.1 and 11, where applications
+# are still moving from DALi 2.x, it also produces the DALi 2.x package names
+# (dali2, dali2-devel, dali2-integration-devel) as alias packages: links to
+# the dali3 files plus the Provides that 2.x binaries and specs depend on. A
+# binary built against 2.x loads the dali3 library through the link, and a
+# project linked against the alias records the dali3 SONAME, so it becomes a
+# dali3 binary without a source change. On Tizen 10.0 and below the real DALi
+# 2.x is installed from its own source, so the aliases must never be built
+# there. --with/--without dali2_aliases overrides the default for a local
+# build.
+#
+# Nested %if, not %elif: Tizen's rpm (4.14) predates %elif and silently
+# skips such a branch.
+%define legacy_tizen (0%{?tizen_version_major} < 10 || (0%{?tizen_version_major} == 10 && 0%{?tizen_version_minor} == 0))
+%if %{legacy_tizen}
+%bcond_with    dali2_aliases
+%else
+%bcond_without dali2_aliases
+%endif
+%if %{with dali2_aliases} && %{legacy_tizen}
+%{error:Tizen <= 10.0 ships the real DALi 2.x; dali2 aliases must not be built there}
+%endif
+
+# rpm derives no Provides from a symbolic link, so the alias packages declare
+# the ELF ones themselves. 64-bit ELF provides carry a suffix.
+%if "%{__isa_bits}" == "64"
+%define elf_suffix ()(64bit)
+%else
+%define elf_suffix %{nil}
+%endif
 
 Name:       dali3
 Summary:    DALi 3D Engine
@@ -55,35 +82,38 @@ Requires:   %{name}-devel = %{version}-%{release}
 %description integration-devel
 Integration development package for DALi 3D Engine - headers for integrating with an adaptor/platform abstraction library.
 
-%if %{with dali2}
+%if %{with dali2_aliases}
 ##############################
-# dali2
+# DALi 2.x names (aliases)
 ##############################
 %package -n dali2
-Summary:    DALi 3D Engine
+Summary:    DALi 2.x library name for the DALi 3D Engine
 Group:      System/Libraries
+Requires:   %{name} = %{version}-%{release}
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
+Provides:   libdali2-core.so.2%{elf_suffix}
 
 %description -n dali2
-DALi 3D Engine - the same code as %{name}, under the dali2 name
+libdali2-core.so.2 as a link to the dali3 library, for binaries built against DALi 2.x. Goes away once the applications have moved to dali3.
 
 %package -n dali2-devel
-Summary:    Development components for DALi 3D Engine
+Summary:    DALi 2.x development names for the DALi 3D Engine
 Group:      Development/Building
 Requires:   dali2 = %{version}-%{release}
+Requires:   %{name}-devel = %{version}-%{release}
 
 %description -n dali2-devel
-Development components for DALi 3D Engine - public headers and package config
+include/dali, dali2-core.pc and dali-invoke-method-generator as links to their dali3 counterparts, so that a project written for DALi 2.x builds unchanged and links against dali3.
 
 %package -n dali2-integration-devel
-Summary:    Integration development package for DALi 3D Engine
+Summary:    DALi 2.x integration development name for the DALi 3D Engine
 Group:      Development/Building
-Requires:   dali2 = %{version}-%{release}
 Requires:   dali2-devel = %{version}-%{release}
+Requires:   %{name}-integration-devel = %{version}-%{release}
 
 %description -n dali2-integration-devel
-Integration development package for DALi 3D Engine - headers for integrating with an adaptor/platform abstraction library.
+Name-only package: the integration headers are reached through the include/dali link of dali2-devel.
 %endif
 
 ##############################
@@ -92,15 +122,14 @@ Integration development package for DALi 3D Engine - headers for integrating wit
 %prep
 %setup -q
 
-%define dev_include_path %{_includedir}
-%if %{with dali2}
-%define dali2_build_dir %{_builddir}/%{name}-%{version}/_build/dali2
-%endif
-
 ##############################
 # Build
 ##############################
 %build
+# Keep shadow diagnostics enabled independently of the build server policy.
+export CFLAGS="${CFLAGS:-%optflags} -Werror=shadow"
+export CXXFLAGS="${CXXFLAGS:-%optflags} -Werror=shadow"
+
 PREFIX="/usr"
 CXXFLAGS="$CXXFLAGS -Wall -g -Os -DNDEBUG -fPIC -fvisibility-inlines-hidden -fdata-sections -ffunction-sections "
 LDFLAGS="$LDFLAGS -Wl,--rpath=$PREFIX/lib -Wl,--as-needed -Wl,--gc-sections -lgcc_s -lgcc -Wl,-Bsymbolic-functions "
@@ -130,7 +159,7 @@ export CFLAGS;
 export CXXFLAGS;
 export LDFLAGS;
 
-cmake \
+cmake . \
 %if 0%{?enable_debug}
       -DCMAKE_BUILD_TYPE=Debug \
 %endif
@@ -145,37 +174,12 @@ cmake \
 %if 0%{?enable_tizen_namespace}
       -DENABLE_TIZEN_NAMESPACE=ON \
 %endif
+      -DDALI_LEGACY_ALIASES=%{?with_dali2_aliases:ON}%{!?with_dali2_aliases:OFF} \
       -DCMAKE_INSTALL_PREFIX=%{_prefix} \
       -DCMAKE_INSTALL_LIBDIR=%{_libdir} \
       -DCMAKE_INSTALL_INCLUDEDIR=%{_includedir}
 
 make %{?jobs:-j%jobs}
-
-%if %{with dali2}
-# Keep the options the same as dali3 above; only DALI_API_MAJOR differs.
-# -S and -B are required: a plain source path would reuse the dali3 in-source cache.
-cmake -S . -B %{dali2_build_dir} \
-%if 0%{?enable_debug}
-      -DCMAKE_BUILD_TYPE=Debug \
-%endif
-      -DDALI_API_MAJOR=2 \
-      -DENABLE_TRACE=ON \
-      -DENABLE_BACKTRACE=ON \
-%if 0%{?enable_low_spec_memory_management}
-      -DENABLE_LOW_SPEC_MEMORY_MANAGEMENT=ON \
-%endif
-%if 0%{?enable_gpu_memory_profile}
-      -DENABLE_GPU_MEMORY_PROFILE=ON \
-%endif
-%if 0%{?enable_tizen_namespace}
-      -DENABLE_TIZEN_NAMESPACE=ON \
-%endif
-      -DCMAKE_INSTALL_PREFIX=%{_prefix} \
-      -DCMAKE_INSTALL_LIBDIR=%{_libdir} \
-      -DCMAKE_INSTALL_INCLUDEDIR=%{_includedir}
-
-make -C %{dali2_build_dir} %{?jobs:-j%jobs}
-%endif
 
 ##############################
 # Installation
@@ -183,47 +187,44 @@ make -C %{dali2_build_dir} %{?jobs:-j%jobs}
 %install
 rm -rf %{buildroot}
 cd build/tizen
-
-_saved_dir=$(pwd)
-cd %{_builddir}/%{name}-%{version}/build/tizen
 %make_install
-cd "$_saved_dir"
-
-%if %{with dali2}
-cd %{dali2_build_dir}
-%make_install
-%endif
 
 ##############################
-# Post Install
+# Scriptlets
 ##############################
 %post
 /sbin/ldconfig
 exit 0
 
-%if %{with dali2}
-%post -n dali2
-/sbin/ldconfig
-exit 0
-%endif
-
-##############################
-# Post Uninstall
-##############################
 %postun
 /sbin/ldconfig
 exit 0
 
-%if %{with dali2}
+%if %{with dali2_aliases}
+%post -n dali2
+/sbin/ldconfig
+exit 0
+
 %postun -n dali2
 /sbin/ldconfig
 exit 0
+
 %endif
 
 ##############################
 # Files in Binary Packages
 ##############################
-
+# The Lua scriptlet runs up to the next section, so nothing but %files may
+# follow it. Every earlier package (DALi 2.x and dali3 3.0.0 alike) installed
+# include/dali as a real directory; rpm cannot replace a directory with a
+# link, so the alias package clears it before the transaction unpacks.
+%if %{with dali2_aliases}
+%pretrans -n dali2-devel -p <lua>
+local path = "%{_includedir}/dali"
+if posix.stat(path, "type") == "directory" then
+  os.execute("rm -rf '" .. path .. "'")
+end
+%endif
 %files
 %if 0%{?enable_dali_smack_rules}
 %manifest dali.manifest-smack
@@ -236,19 +237,18 @@ exit 0
 
 %files devel
 %defattr(-,root,root,-)
-%{_bindir}/dali-invoke-method-generator
+%{_bindir}/dali3-invoke-method-generator
 %{_libdir}/pkgconfig/dali3-core.pc
-%{dev_include_path}/dali/public-api/*
-%{dev_include_path}/dali/doc/*
+%{_includedir}/dali3/dali/public-api/*
+%{_includedir}/dali3/dali/doc/*
 
 %files integration-devel
 %defattr(-,root,root,-)
-%{dev_include_path}/dali/devel-api/*
-%{_includedir}/dali/integration-api/*
-%{_includedir}/dali/graphics-api/*
+%{_includedir}/dali3/dali/devel-api/*
+%{_includedir}/dali3/dali/integration-api/*
+%{_includedir}/dali3/dali/graphics-api/*
 
-%if %{with dali2}
-# Both builds install the same headers and tools, so dali2 shares them with dali3.
+%if %{with dali2_aliases}
 %files -n dali2
 %if 0%{?enable_dali_smack_rules}
 %manifest dali.manifest-smack
@@ -256,19 +256,16 @@ exit 0
 %manifest dali.manifest
 %endif
 %defattr(-,root,root,-)
-%{_libdir}/libdali2-core.so*
+%{_libdir}/libdali2-core.so.2
 %license LICENSE
 
 %files -n dali2-devel
 %defattr(-,root,root,-)
 %{_bindir}/dali-invoke-method-generator
+%{_libdir}/libdali2-core.so
 %{_libdir}/pkgconfig/dali2-core.pc
-%{dev_include_path}/dali/public-api/*
-%{dev_include_path}/dali/doc/*
+%{_includedir}/dali
 
 %files -n dali2-integration-devel
 %defattr(-,root,root,-)
-%{dev_include_path}/dali/devel-api/*
-%{_includedir}/dali/integration-api/*
-%{_includedir}/dali/graphics-api/*
 %endif

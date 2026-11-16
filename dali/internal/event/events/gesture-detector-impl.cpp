@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <algorithm>
+#include <utility>
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
@@ -107,6 +108,7 @@ void GestureDetector::Attach(Actor& actor)
       actor.GetGestureData().AddGestureDetector(*this);
       // Notification for derived classes
       OnActorAttach(actor);
+      ConnectGeometryTouchBridge(actor);
     }
     else
     {
@@ -141,6 +143,7 @@ void GestureDetector::SceneObjectAdded(Object& object)
 
       // Notification for derived classes
       OnActorAttach(actor);
+      ConnectGeometryTouchBridge(actor);
     }
     else
     {
@@ -188,7 +191,7 @@ void GestureDetector::Detach(Actor& actor)
       mAttachedActors.erase(match);
 
       // Notification for derived classes
-      OnActorDetach(actor);
+      DisconnectGeometryTouchBridge(actor);
 
       // Unregister from gesture event processor if we do not have any actors
       if(mAttachedActors.empty())
@@ -207,7 +210,7 @@ void GestureDetector::DetachAll()
 {
   if(!mPendingAttachActors.empty())
   {
-    GestureDetectorActorContainer pendingActors(mPendingAttachActors);
+    GestureDetectorActorContainer pendingActors(std::move(mPendingAttachActors));
 
     mPendingAttachActors.clear();
 
@@ -225,7 +228,7 @@ void GestureDetector::DetachAll()
 
   if(!mAttachedActors.empty())
   {
-    GestureDetectorActorContainer attachedActors(mAttachedActors);
+    GestureDetectorActorContainer attachedActors(std::move(mAttachedActors));
 
     // Clear mAttachedActors before we call OnActorDetach in case derived classes call a method which manipulates mAttachedActors.
     mAttachedActors.clear();
@@ -241,7 +244,7 @@ void GestureDetector::DetachAll()
       actor->GetGestureData().RemoveGestureDetector(*this);
 
       // Notification for derived classes
-      OnActorDetach(*actor);
+      DisconnectGeometryTouchBridge(*actor);
     }
 
     // Guard to allow handle destruction after Core has been destroyed
@@ -423,6 +426,51 @@ void GestureDetector::ObjectDestroyed(Object& object)
       }
     }
   }
+}
+
+void GestureDetector::ConnectGeometryTouchBridge(Actor& actor)
+{
+  if(actor.OnScene() && actor.GetScene().IsGeometryHittestEnabled())
+  {
+    actor.TouchEventSignal().Connect(this, &GestureDetector::OnTouchEvent);
+  }
+}
+
+void GestureDetector::DisconnectGeometryTouchBridge(Actor& actor)
+{
+  if(actor.OnScene() && actor.GetScene().IsGeometryHittestEnabled())
+  {
+    actor.TouchEventSignal().Disconnect(this, &GestureDetector::OnTouchEvent);
+    OnActorDetach(actor);
+  }
+}
+
+void GestureDetector::OnActorAttach(Actor& /*actor*/)
+{
+}
+
+bool GestureDetector::OnTouchEvent(Dali::Actor actor, Dali::TouchEvent touch)
+{
+  // A callback may detach the actor and release the last application handle.
+  GestureDetectorPtr guard(this);
+  return HandleEvent(actor, touch);
+}
+
+void GestureDetector::ProcessTouchEvent(Scene& scene, const Integration::TouchEvent& event)
+{
+  if(!mGestureRecognizer)
+  {
+    mGestureRecognizer = CreateGestureRecognizer(scene);
+    ConsumeRecognizerUpdateRequired(); // The new recognizer already reflects the current settings.
+  }
+  else if(ConsumeRecognizerUpdateRequired())
+  {
+    UpdateGestureRecognizer(*mGestureRecognizer);
+  }
+
+  // A signal callback may detach the actor and replace the detector's recognizer.
+  GestureRecognizerPtr recognizer(mGestureRecognizer);
+  recognizer->SendEvent(scene, event);
 }
 
 Actor* GestureDetector::GetCurrentGesturedActor()

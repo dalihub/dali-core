@@ -19,6 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/intrusive-ptr.h>
 #include <cstdint> // for uint32_t
 
 // INTERNAL INCLUDES
@@ -45,20 +46,20 @@ using TouchEventPtr = IntrusivePtr<TouchEvent>;
 class TouchEvent : public BaseObject
 {
 public:
-  // Construction & Destruction
-
   /**
-   * @brief Default constructor
+   * @brief Creates a reference-counted implementation.
    */
-  TouchEvent() = default;
-
-  /**
-   * @brief Constructor
-   * @param[in]  time  The time the event occurred
-   */
-  TouchEvent(uint32_t time)
-  : mTime(time)
+  static Dali::IntrusivePtr<TouchEvent> New(uint32_t time)
   {
+    return Dali::IntrusivePtr<TouchEvent>(new TouchEvent(time));
+  }
+
+  /**
+   * @brief Creates a reference-counted implementation.
+   */
+  static Dali::IntrusivePtr<TouchEvent> New()
+  {
+    return Dali::IntrusivePtr<TouchEvent>(new TouchEvent());
   }
 
   /**
@@ -221,6 +222,23 @@ public:
    * @copydoc Dali::TouchEvent::SetLocalPosition()
    */
   void SetLocalPosition(uint32_t point, const Vector2& localPosition);
+
+protected:
+  // Construction & Destruction
+
+  /**
+   * @brief Default constructor
+   */
+  TouchEvent() = default;
+
+  /**
+   * @brief Constructor
+   * @param[in]  time  The time the event occurred
+   */
+  TouchEvent(uint32_t time)
+  : mTime(time)
+  {
+  }
 
 private:
   /**

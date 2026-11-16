@@ -197,13 +197,27 @@ private:
   void ObjectDestroyed(Object& object) override;
 
   /**
-   * For use in derived classes, called after an actor is attached.
-   * @param[in]  actor  The actor that is being attached.
+   * @brief Connects the Geometry touch callback after type-specific attach validation.
+   * @param[in] actor The attached actor
    */
-  virtual void OnActorAttach(Actor& actor) = 0;
+  void ConnectGeometryTouchBridge(Actor& actor);
 
   /**
-   * For use in derived classes, called after an actor is detached.
+   * @brief Disconnects the Geometry touch callback before type-specific detach cleanup.
+   * @param[in] actor The detached actor
+   */
+  void DisconnectGeometryTouchBridge(Actor& actor);
+
+  /**
+   * For use in derived classes, called after an actor is attached, before the Geometry bridge is connected.
+   * The default implementation does nothing.
+   * @param[in]  actor  The actor that is being attached.
+   */
+  virtual void OnActorAttach(Actor& actor);
+
+  /**
+   * For use in derived classes, called after an on-scene Geometry actor is disconnected.
+   * The actor has already been removed from the attached actor list.
    * @param[in] actor The actor that is being detached.
    */
   virtual void OnActorDetach(Actor& actor) = 0;
@@ -219,19 +233,32 @@ private:
   /**
    * @brief Callback for TouchEventSignal signal
    *
-   * @param actor The actor
-   * @param touch The touch event that has occurred
+   * @param[in] actor The actor
+   * @param[in] touch The touch event that has occurred
+   * @return Whether recognition consumed the touch event without requesting propagation
    */
-  virtual bool OnTouchEvent(Dali::Actor actor, Dali::TouchEvent touch) = 0;
+  bool OnTouchEvent(Dali::Actor actor, Dali::TouchEvent touch);
 
   /**
-   * @brief Delivers touch events to each detector.
-   * This is an API that is called by FeedTouch and recognizes gestures directly from the Detector without going through the Reconizer.
+   * @brief Creates or refreshes the detector-owned recognizer and delivers a touch event.
    *
-   * @param scene The scene
-   * @param event The touch event that has occurred
+   * @param[in] scene The scene
+   * @param[in] event The touch event that has occurred
    */
-  virtual void ProcessTouchEvent(Scene& scene, const Integration::TouchEvent& event) = 0;
+  void ProcessTouchEvent(Scene& scene, const Integration::TouchEvent& event);
+
+  /**
+   * @brief Creates a recognizer using this detector's current recognition settings.
+   * @param[in] scene The scene receiving the touch event
+   * @return The new recognizer
+   */
+  virtual GestureRecognizerPtr CreateGestureRecognizer(Scene& scene) = 0;
+
+  /**
+   * @brief Updates the recognizer using this detector's current recognition settings.
+   * @param[in] recognizer The recognizer to update
+   */
+  virtual void UpdateGestureRecognizer(GestureRecognizer& recognizer) = 0;
 
   /**
    * @brief Clears the detector.

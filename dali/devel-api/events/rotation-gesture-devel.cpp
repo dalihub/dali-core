@@ -25,7 +25,7 @@ namespace DevelRotationGesture
 {
 RotationGesture New(GestureState state)
 {
-  return RotationGesture(new Internal::RotationGesture(state));
+  return RotationGesture(Internal::RotationGesture::NewForBaseHandle(state));
 }
 
 } // namespace DevelRotationGesture

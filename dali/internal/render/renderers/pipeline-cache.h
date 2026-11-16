@@ -262,6 +262,16 @@ public:
   void ResetPipeline(PipelineCachePtr pipelineCache);
 
   /**
+   * @brief Drop the latest-query slots that were filled by the given renderer.
+   *
+   * mLatestQuery holds a raw pointer to the renderer that filled it, so the
+   * renderer must call this before it goes away.
+   *
+   * @param[in] renderer The renderer whose latest query should be forgotten
+   */
+  void InvalidateLatestQuery(const Renderer* renderer);
+
+  /**
    * @brief Check if dynamic blending is enabled
    * @return True if dynamic blending is enabled, false otherwise
    */

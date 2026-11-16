@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/events/gesture-impl.h>
+#include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/events/tap-gesture.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/object/base-object.h>
@@ -38,11 +39,22 @@ class TapGesture final : public Gesture
 {
 public:
   /**
-   * @brief Default constructor
+   * @brief Creates an unreferenced implementation only for BaseHandle construction.
+   * @warning Pass the result directly to a BaseHandle-derived handle constructor.
+   * The constructor must acquire its first reference (the returned reference count is zero).
+   * Use New() when an IntrusivePtr owner is required.
    */
-  TapGesture(GestureState state)
-  : Gesture(GestureType::TAP, state)
+  static DALI_INTERNAL TapGesture* NewForBaseHandle(GestureState state)
   {
+    return new TapGesture(state);
+  }
+
+  /**
+   * @brief Creates a reference-counted implementation.
+   */
+  static Dali::IntrusivePtr<TapGesture> New(GestureState state)
+  {
+    return Dali::IntrusivePtr<TapGesture>(new TapGesture(state));
   }
 
   TapGesture(const TapGesture&)            = delete; ///< Deleted copy constructor
@@ -116,6 +128,15 @@ public:
   inline const Vector2& GetLocalPoint() const
   {
     return mLocalPoint;
+  }
+
+protected:
+  /**
+   * @brief Default constructor
+   */
+  TapGesture(GestureState state)
+  : Gesture(GestureType::TAP, state)
+  {
   }
 
 private:

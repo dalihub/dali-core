@@ -19,8 +19,10 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/intrusive-ptr.h>
 #include <string>
 #include <string_view>
+#include <utility>
 
 // INTERNAL INCLUDES
 #include <dali/graphics-api/graphics-types.h>
@@ -56,63 +58,27 @@ class ShaderData : public Dali::RefObject
 {
 public:
   /**
-   * Constructor
-   * @param[in] vertexSource   Source code for vertex program
-   * @param[in] fragmentSource Source code for fragment program
-   * @param[in] hints          Hints for rendering
-   * @param[in] renderPassTag  RenderPassTag to match shader data and render task.
-   * @param[in] name           Shader name for debug.
+   * @brief Creates a reference-counted implementation.
    */
-  ShaderData(std::string vertexSource, std::string fragmentSource, const Dali::Shader::Hint::Value hints, uint32_t renderPassTag, std::string_view name)
-  : mShaderHash(-1),
-    mVertexShader(StringToVector(vertexSource)),
-    mFragmentShader(StringToVector(fragmentSource)),
-    mHints(hints),
-    mRenderPassTag(renderPassTag),
-    mName(name)
+  static Dali::IntrusivePtr<ShaderData> New(std::vector<char>& vertexSource, std::vector<char>& fragmentSource, const Dali::Shader::Hint::Value hints, uint32_t renderPassTag, std::string_view name)
   {
-    UpdateShaderVersion(mVertexShader, mVertexShaderVersion);
-    UpdateShaderVersion(mFragmentShader, mFragmentShaderVersion);
+    return Dali::IntrusivePtr<ShaderData>(new ShaderData(vertexSource, fragmentSource, hints, renderPassTag, name));
   }
 
   /**
-   * Constructor
-   * @param[in] vertexSource   Source code for vertex program
-   * @param[in] fragmentSource Source code for fragment program
-   * @param[in] hints          Hints for rendering
-   * @param[in] renderPassTag  RenderPassTag to match shader data and render task.
-   * @param[in] name           Shader name for debug.
+   * @brief Creates a reference-counted implementation.
    */
-  ShaderData(std::string_view vertexSource, std::string_view fragmentSource, const Dali::Shader::Hint::Value hints, uint32_t renderPassTag, std::string_view name)
-  : mShaderHash(-1),
-    mVertexShader(StringToVector(vertexSource)),
-    mFragmentShader(StringToVector(fragmentSource)),
-    mHints(hints),
-    mRenderPassTag(renderPassTag),
-    mName(name)
+  static Dali::IntrusivePtr<ShaderData> New(std::string_view vertexSource, std::string_view fragmentSource, const Dali::Shader::Hint::Value hints, uint32_t renderPassTag, std::string_view name)
   {
-    UpdateShaderVersion(mVertexShader, mVertexShaderVersion);
-    UpdateShaderVersion(mFragmentShader, mFragmentShaderVersion);
+    return Dali::IntrusivePtr<ShaderData>(new ShaderData(vertexSource, fragmentSource, hints, renderPassTag, name));
   }
 
   /**
-   * Creates a shader data containing binary content
-   * @param[in] vertexSource   Source code for vertex program
-   * @param[in] fragmentSource Source code for fragment program
-   * @param[in] hints          Hints for rendering
-   * @param[in] renderPassTag  RenderPassTag to match shader data and render task.
-   * @param[in] name Shader name for debug.
+   * @brief Creates a reference-counted implementation.
    */
-  ShaderData(std::vector<char>& vertexSource, std::vector<char>& fragmentSource, const Dali::Shader::Hint::Value hints, uint32_t renderPassTag, std::string_view name)
-  : mShaderHash(-1),
-    mVertexShader(vertexSource),
-    mFragmentShader(fragmentSource),
-    mHints(hints),
-    mRenderPassTag(renderPassTag),
-    mName(name)
+  static Dali::IntrusivePtr<ShaderData> New(std::string vertexSource, std::string fragmentSource, const Dali::Shader::Hint::Value hints, uint32_t renderPassTag, std::string_view name)
   {
-    UpdateShaderVersion(mVertexShader, mVertexShaderVersion);
-    UpdateShaderVersion(mFragmentShader, mFragmentShaderVersion);
+    return Dali::IntrusivePtr<ShaderData>(new ShaderData(std::move(vertexSource), std::move(fragmentSource), hints, renderPassTag, name));
   }
 
   /**
@@ -243,11 +209,72 @@ public: // API
     return mFragmentShaderVersion;
   }
 
-private:                                        // Not implemented
-  ShaderData(const ShaderData& other);          ///< no copying of this object
-  ShaderData& operator=(const ShaderData& rhs); ///< no copying of this object
+protected:
+  /**
+   * Constructor
+   * @param[in] vertexSource   Source code for vertex program
+   * @param[in] fragmentSource Source code for fragment program
+   * @param[in] hints          Hints for rendering
+   * @param[in] renderPassTag  RenderPassTag to match shader data and render task.
+   * @param[in] name           Shader name for debug.
+   */
+  ShaderData(std::string vertexSource, std::string fragmentSource, const Dali::Shader::Hint::Value hints, uint32_t renderPassTag, std::string_view name)
+  : mShaderHash(-1),
+    mVertexShader(StringToVector(vertexSource)),
+    mFragmentShader(StringToVector(fragmentSource)),
+    mHints(hints),
+    mRenderPassTag(renderPassTag),
+    mName(name)
+  {
+    UpdateShaderVersion(mVertexShader, mVertexShaderVersion);
+    UpdateShaderVersion(mFragmentShader, mFragmentShaderVersion);
+  }
+
+  /**
+   * Constructor
+   * @param[in] vertexSource   Source code for vertex program
+   * @param[in] fragmentSource Source code for fragment program
+   * @param[in] hints          Hints for rendering
+   * @param[in] renderPassTag  RenderPassTag to match shader data and render task.
+   * @param[in] name           Shader name for debug.
+   */
+  ShaderData(std::string_view vertexSource, std::string_view fragmentSource, const Dali::Shader::Hint::Value hints, uint32_t renderPassTag, std::string_view name)
+  : mShaderHash(-1),
+    mVertexShader(StringToVector(vertexSource)),
+    mFragmentShader(StringToVector(fragmentSource)),
+    mHints(hints),
+    mRenderPassTag(renderPassTag),
+    mName(name)
+  {
+    UpdateShaderVersion(mVertexShader, mVertexShaderVersion);
+    UpdateShaderVersion(mFragmentShader, mFragmentShaderVersion);
+  }
+
+  /**
+   * Creates a shader data containing binary content
+   * @param[in] vertexSource   Source code for vertex program
+   * @param[in] fragmentSource Source code for fragment program
+   * @param[in] hints          Hints for rendering
+   * @param[in] renderPassTag  RenderPassTag to match shader data and render task.
+   * @param[in] name Shader name for debug.
+   */
+  ShaderData(std::vector<char>& vertexSource, std::vector<char>& fragmentSource, const Dali::Shader::Hint::Value hints, uint32_t renderPassTag, std::string_view name)
+  : mShaderHash(-1),
+    mVertexShader(vertexSource),
+    mFragmentShader(fragmentSource),
+    mHints(hints),
+    mRenderPassTag(renderPassTag),
+    mName(name)
+  {
+    UpdateShaderVersion(mVertexShader, mVertexShaderVersion);
+    UpdateShaderVersion(mFragmentShader, mFragmentShaderVersion);
+  }
 
 private:
+  // Not implemented
+  ShaderData(const ShaderData& other)          = delete;
+  ShaderData& operator=(const ShaderData& rhs) = delete;
+
   /**
    * Updates shader version.
    */

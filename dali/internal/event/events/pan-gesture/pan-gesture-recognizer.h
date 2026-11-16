@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/common/vector-wrapper.h>
+#include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/math/vector2.h>
 #include <cstdint> // uint32_t
 
@@ -48,17 +49,12 @@ public:
   using Observer = RecognizerObserver<PanGestureEvent>;
 
   /**
-   * Constructor
-   * @param[in] observer   Used to send events to Core.
-   * @param[in] screenSize The size of the screen.
-   * @param[in] request    The details of the request, including the recognition thresholds.
+   * @brief Creates a reference-counted implementation.
    */
-  PanGestureRecognizer(Observer& observer, Vector2 screenSize, const PanGestureRequest& request);
-
-  /**
-   * Virtual destructor.
-   */
-  ~PanGestureRecognizer() override;
+  static Dali::IntrusivePtr<PanGestureRecognizer> New(Observer& observer, Vector2 screenSize, const PanGestureRequest& request)
+  {
+    return Dali::IntrusivePtr<PanGestureRecognizer>(new PanGestureRecognizer(observer, screenSize, request));
+  }
 
 public:
   /**
@@ -92,6 +88,20 @@ public:
    * @copydoc Dali::Internal::GestureRecognizer::OnSequenceSourceChanged()
    */
   void OnSequenceSourceChanged() override;
+
+protected:
+  /**
+   * Constructor
+   * @param[in] observer   Used to send events to Core.
+   * @param[in] screenSize The size of the screen.
+   * @param[in] request    The details of the request, including the recognition thresholds.
+   */
+  PanGestureRecognizer(Observer& observer, Vector2 screenSize, const PanGestureRequest& request);
+
+  /**
+   * Virtual destructor.
+   */
+  ~PanGestureRecognizer() override;
 
 private:
   /**

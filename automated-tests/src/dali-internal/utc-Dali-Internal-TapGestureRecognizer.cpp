@@ -122,7 +122,7 @@ int UtcDaliTapGestureRecognizerUpdateAppliesMaximumHoldingTime(void)
   Internal::TapGestureRequest request;
   request.maximumHoldingTime = DEFAULT_HOLDING_TIME;
 
-  Internal::GestureRecognizerPtr recognizer = new Internal::TapGestureRecognizer(observer, Vector2(480.0f, 800.0f), request);
+  Internal::GestureRecognizerPtr recognizer = Internal::TapGestureRecognizer::New(observer, Vector2(480.0f, 800.0f), request);
 
   // A 200ms hold is shorter than 330ms: one tap is emitted.
   SendTap(*recognizer, sceneImpl, TOUCH_POSITION, TOUCH_POSITION, 1000u, 200u);
@@ -157,7 +157,7 @@ int UtcDaliTapGestureRecognizerUpdateAppliesMaximumMotionDistance(void)
   Internal::TapGestureRequest request;
   request.maximumMotionDistance = DEFAULT_MOTION_DISTANCE;
 
-  Internal::GestureRecognizerPtr recognizer = new Internal::TapGestureRecognizer(observer, Vector2(480.0f, 800.0f), request);
+  Internal::GestureRecognizerPtr recognizer = Internal::TapGestureRecognizer::New(observer, Vector2(480.0f, 800.0f), request);
 
   // Moving 25px between down and up exceeds 20px: the tap is cancelled.
   const Vector2 movedPosition(TOUCH_POSITION.x + 25.0f, TOUCH_POSITION.y);
@@ -188,7 +188,7 @@ int UtcDaliTapGestureRecognizerUpdateAppliesMaximumMultiTapInterval(void)
   Internal::TapGestureRequest request;
   request.maximumMultiTapInterval = DEFAULT_MULTI_TAP_INTERVAL;
 
-  Internal::GestureRecognizerPtr recognizer = new Internal::TapGestureRecognizer(observer, Vector2(480.0f, 800.0f), request);
+  Internal::GestureRecognizerPtr recognizer = Internal::TapGestureRecognizer::New(observer, Vector2(480.0f, 800.0f), request);
 
   // Two taps 200ms apart fall inside the 330ms interval: the second tap reports 2 taps.
   SendTap(*recognizer, sceneImpl, TOUCH_POSITION, TOUCH_POSITION, 1000u, 50u);
@@ -222,7 +222,7 @@ int UtcDaliTapGestureRecognizerConstructedFromRequestThresholds(void)
   Internal::TapGestureRequest request;
   request.maximumHoldingTime = 100u;
 
-  Internal::GestureRecognizerPtr recognizer = new Internal::TapGestureRecognizer(observer, Vector2(480.0f, 800.0f), request);
+  Internal::GestureRecognizerPtr recognizer = Internal::TapGestureRecognizer::New(observer, Vector2(480.0f, 800.0f), request);
 
   SendTap(*recognizer, sceneImpl, TOUCH_POSITION, TOUCH_POSITION, 1000u, 200u);
   DALI_TEST_EQUALS(observer.CountState(GestureState::STARTED), 0u, TEST_LOCATION);
@@ -243,7 +243,7 @@ int UtcDaliTapGestureRecognizerCapturesSequenceSourceWithoutMouseButton(void)
   TestTapObserver    observer(&GetImplementation(actor));
 
   Internal::TapGestureRequest    request;
-  Internal::GestureRecognizerPtr recognizer = new Internal::TapGestureRecognizer(observer, Vector2(480.0f, 800.0f), request);
+  Internal::GestureRecognizerPtr recognizer = Internal::TapGestureRecognizer::New(observer, Vector2(480.0f, 800.0f), request);
 
   // A remote that reports no mouse button: the trigger-point snapshot stays unset (its guard is
   // unchanged) but the sequence source is captured from the DOWN regardless.

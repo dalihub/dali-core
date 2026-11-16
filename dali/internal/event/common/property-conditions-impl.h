@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/object/property-conditions.h>
 #include <dali/public-api/object/property-value.h>
@@ -50,14 +51,23 @@ public:
   };
 
   /**
-   * Constructor
+   * @brief Creates an unreferenced implementation only for BaseHandle construction.
+   * @warning Pass the result directly to a BaseHandle-derived handle constructor.
+   * The constructor must acquire its first reference (the returned reference count is zero).
+   * Use New() when an IntrusivePtr owner is required.
    */
-  PropertyCondition();
+  static DALI_INTERNAL PropertyCondition* NewForBaseHandle()
+  {
+    return new PropertyCondition();
+  }
 
   /**
-   * Virtual destructor
+   * @brief Creates a reference-counted implementation.
    */
-  ~PropertyCondition() override;
+  static Dali::IntrusivePtr<PropertyCondition> New()
+  {
+    return Dali::IntrusivePtr<PropertyCondition>(new PropertyCondition());
+  }
 
 private:
   // Not implemented
@@ -69,6 +79,17 @@ private:
 public:
   Type                type;      ///< The condition Type.
   Dali::Vector<float> arguments; ///< The condition Arguments.
+
+protected:
+  /**
+   * Constructor
+   */
+  PropertyCondition();
+
+  /**
+   * Virtual destructor
+   */
+  ~PropertyCondition() override;
 };
 
 } // namespace Internal

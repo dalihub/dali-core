@@ -21,6 +21,11 @@
 // EXTERNAL INCLUDES
 #include <algorithm>
 
+#ifdef TRACE_ENABLED
+#include <chrono>
+#include <string_view>
+#endif
+
 // INTERNAL INCLUDES
 #include <dali/graphics-api/graphics-controller.h>
 #include <dali/integration-api/core.h>
@@ -71,6 +76,84 @@ DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_PERFORMANCE_MARKER, false);
 
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gCoreFilter = Debug::Filter::New(Debug::Concise, false, "LOG_CORE");
+#endif
+
+#ifdef TRACE_ENABLED
+/**
+ * The names and elapsed times of the processors run in one Core::RunProcessors() call.
+ * Only the first MAX_RECORDS processors are recorded individually; the rest are summed up.
+ */
+struct ProcessorTimeRecords
+{
+  static constexpr uint32_t MAX_RECORDS = 10u;
+
+  struct Record
+  {
+    std::string_view name;
+    uint64_t         elapsedNs{0u};
+  };
+
+  Record   records[MAX_RECORDS];
+  uint32_t count{0u};             ///< Number of processors run, which may exceed MAX_RECORDS
+  uint64_t overflowElapsedNs{0u}; ///< Total elapsed time of the processors beyond MAX_RECORDS
+};
+
+uint64_t GetNanoseconds()
+{
+  // Get the time of a monotonic clock since its epoch.
+  auto epoch = std::chrono::steady_clock::now().time_since_epoch();
+
+  auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(epoch);
+
+  return static_cast<uint64_t>(duration.count());
+}
+
+/**
+ * Runs the processor and records its name and elapsed time.
+ * The name is taken before Process() because the processor may be unregistered and destroyed during Process().
+ * The name is not copied: Processor::GetProcessorName() guarantees it outlives the processor.
+ */
+void RunProcessorWithTimeRecord(Dali::Integration::Processor* processor, bool postProcessor, ProcessorTimeRecords& timeRecords)
+{
+  const std::string_view name = processor->GetProcessorName();
+
+  const uint64_t start = GetNanoseconds();
+  processor->Process(postProcessor);
+  const uint64_t end = GetNanoseconds();
+
+  if(timeRecords.count < ProcessorTimeRecords::MAX_RECORDS)
+  {
+    timeRecords.records[timeRecords.count] = {name, end - start};
+  }
+  else
+  {
+    timeRecords.overflowElapsedNs += end - start;
+  }
+  ++timeRecords.count;
+}
+
+/**
+ * Appends the time records to the trace message. e.g. "[ProcessorA:0.5ms, ProcessorB:1.2ms, +3 more:0.3ms]"
+ */
+void AppendTimeRecords(std::ostringstream& oss, const ProcessorTimeRecords& timeRecords)
+{
+  const uint32_t recorded = std::min(timeRecords.count, ProcessorTimeRecords::MAX_RECORDS);
+
+  oss << "[";
+  for(uint32_t i = 0u; i < recorded; ++i)
+  {
+    if(i != 0u)
+    {
+      oss << ", ";
+    }
+    oss << timeRecords.records[i].name << ":" << static_cast<float>(timeRecords.records[i].elapsedNs) / 1000000.0f << "ms";
+  }
+  if(timeRecords.count > recorded)
+  {
+    oss << ", +" << (timeRecords.count - recorded) << " more:" << static_cast<float>(timeRecords.overflowElapsedNs) / 1000000.0f << "ms";
+  }
+  oss << "]";
+}
 #endif
 } // namespace
 
@@ -126,7 +209,7 @@ Core::Core(RenderController&            renderController,
 
   mObjectRegistry = ObjectRegistry::New();
 
-  mRelayoutController = IntrusivePtr<RelayoutController>(new RelayoutController(mRenderController));
+  mRelayoutController = IntrusivePtr<RelayoutController>(RelayoutController::New(mRenderController));
 
   mGestureEventProcessor = new GestureEventProcessor(*mUpdateManager, mRenderController);
 
@@ -567,8 +650,24 @@ void Core::RunProcessors()
     return;
   }
 
-  DALI_TRACE_MARK_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_CORE_RUN_PROCESSORS", [&](std::ostringstream& oss)
+  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_CORE_RUN_PROCESSORS", [&](std::ostringstream& oss)
   { oss << "[once:" << mProcessorsOnce[mProcessorOnceIndex].Count() << ", count:" << mProcessors.Count() << "]"; });
+
+#ifdef TRACE_ENABLED
+  ProcessorTimeRecords timeRecords;
+#endif
+
+  auto runProcessor = [&](Integration::Processor* processor)
+  {
+#ifdef TRACE_ENABLED
+    if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+    {
+      RunProcessorWithTimeRecord(processor, false, timeRecords);
+      return;
+    }
+#endif
+    processor->Process(false);
+  };
 
   if(mProcessorsOnce[mProcessorOnceIndex].Count() != 0)
   {
@@ -588,7 +687,7 @@ void Core::RunProcessors()
       {
         if(!mProcessorUnregistered)
         {
-          processor->Process(false);
+          runProcessor(processor);
         }
         else
         {
@@ -597,7 +696,7 @@ void Core::RunProcessors()
           auto iter = std::find(mProcessorsOnce[currentIndex].Begin(), mProcessorsOnce[currentIndex].End(), processor);
           if(iter != mProcessorsOnce[currentIndex].End())
           {
-            processor->Process(false);
+            runProcessor(processor);
           }
         }
       }
@@ -621,11 +720,7 @@ void Core::RunProcessors()
       {
         if(!mProcessorUnregistered)
         {
-          DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_CORE_RUN_PROCESSOR", [&](std::ostringstream& oss)
-          { oss << "[" << processor->GetProcessorName() << "]"; });
-          processor->Process(false);
-          DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_CORE_RUN_PROCESSOR", [&](std::ostringstream& oss)
-          { oss << "[END]"; }); // Do not use "processor" variable. It may be unregistered during Process()
+          runProcessor(processor);
         }
         else
         {
@@ -634,16 +729,15 @@ void Core::RunProcessors()
           auto iter = std::find(mProcessors.Begin(), mProcessors.End(), processor);
           if(iter != mProcessors.End())
           {
-            DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_CORE_RUN_PROCESSOR", [&](std::ostringstream& oss)
-            { oss << "[" << processor->GetProcessorName() << "]"; });
-            processor->Process(false);
-            DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_CORE_RUN_PROCESSOR", [&](std::ostringstream& oss)
-            { oss << "[END]"; }); // Do not use "processor" variable. It may be unregistered during Process()
+            runProcessor(processor);
           }
         }
       }
     }
   }
+
+  DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_CORE_RUN_PROCESSORS", [&](std::ostringstream& oss)
+  { AppendTimeRecords(oss, timeRecords); });
 }
 
 void Core::RunPostProcessors()
@@ -653,8 +747,24 @@ void Core::RunPostProcessors()
     return;
   }
 
-  DALI_TRACE_MARK_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_CORE_RUN_POST_PROCESSORS", [&](std::ostringstream& oss)
+  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_CORE_RUN_POST_PROCESSORS", [&](std::ostringstream& oss)
   { oss << "[once:" << mPostProcessorsOnce[mPostProcessorOnceIndex].Count() << ", count:" << mPostProcessors.Count() << "]"; });
+
+#ifdef TRACE_ENABLED
+  ProcessorTimeRecords timeRecords;
+#endif
+
+  auto runProcessor = [&](Integration::Processor* processor)
+  {
+#ifdef TRACE_ENABLED
+    if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+    {
+      RunProcessorWithTimeRecord(processor, true, timeRecords);
+      return;
+    }
+#endif
+    processor->Process(true);
+  };
 
   if(mPostProcessorsOnce[mPostProcessorOnceIndex].Count() != 0)
   {
@@ -674,7 +784,7 @@ void Core::RunPostProcessors()
       {
         if(!mPostProcessorUnregistered)
         {
-          processor->Process(true);
+          runProcessor(processor);
         }
         else
         {
@@ -683,7 +793,7 @@ void Core::RunPostProcessors()
           auto iter = std::find(mPostProcessorsOnce[currentIndex].Begin(), mPostProcessorsOnce[currentIndex].End(), processor);
           if(iter != mPostProcessorsOnce[currentIndex].End())
           {
-            processor->Process(true);
+            runProcessor(processor);
           }
         }
       }
@@ -707,11 +817,7 @@ void Core::RunPostProcessors()
       {
         if(!mPostProcessorUnregistered)
         {
-          DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_CORE_RUN_POST_PROCESSOR", [&](std::ostringstream& oss)
-          { oss << "[" << processor->GetProcessorName() << "]"; });
-          processor->Process(true);
-          DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_CORE_RUN_POST_PROCESSOR", [&](std::ostringstream& oss)
-          { oss << "[END]"; }); // Do not use "processor" variable. It may be unregistered during Process()
+          runProcessor(processor);
         }
         else
         {
@@ -720,16 +826,15 @@ void Core::RunPostProcessors()
           auto iter = std::find(mPostProcessors.Begin(), mPostProcessors.End(), processor);
           if(iter != mPostProcessors.End())
           {
-            DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_CORE_RUN_POST_PROCESSOR", [&](std::ostringstream& oss)
-            { oss << "[" << processor->GetProcessorName() << "]"; });
-            processor->Process(true);
-            DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_CORE_RUN_POST_PROCESSOR", [&](std::ostringstream& oss)
-            { oss << "[END]"; }); // Do not use "processor" variable. It may be unregistered during Process()
+            runProcessor(processor);
           }
         }
       }
     }
   }
+
+  DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_CORE_RUN_POST_PROCESSORS", [&](std::ostringstream& oss)
+  { AppendTimeRecords(oss, timeRecords); });
 }
 
 PlatformAbstraction& Core::GetPlatform()

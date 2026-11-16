@@ -382,7 +382,7 @@ void GeometryTouchStreamRouter::EmitSceneTouchEvent(const Integration::TouchEven
     return;
   }
 
-  TouchEventPtr sceneEvent(new TouchEvent(touchEvent.time));
+  TouchEventPtr sceneEvent(TouchEvent::New(touchEvent.time));
   for(const auto& rawPoint : touchEvent.points)
   {
     Integration::Point scenePoint(rawPoint);

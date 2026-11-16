@@ -19,6 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/intrusive-ptr.h>
 #include <cstdint> // for uint32_t
 
 // INTERNAL INCLUDES
@@ -41,18 +42,21 @@ using HoverEventPtr = IntrusivePtr<HoverEvent>;
 class HoverEvent : public BaseObject
 {
 public:
-  // Construction & Destruction
+  /**
+   * @brief Creates a reference-counted implementation.
+   */
+  static Dali::IntrusivePtr<HoverEvent> New(uint32_t time)
+  {
+    return Dali::IntrusivePtr<HoverEvent>(new HoverEvent(time));
+  }
 
   /**
-   * @brief Default constructor
+   * @brief Creates a reference-counted implementation.
    */
-  HoverEvent();
-
-  /**
-   * @brief Constructor
-   * @param[in]  time  The time the event occurred
-   */
-  HoverEvent(uint32_t time);
+  static Dali::IntrusivePtr<HoverEvent> New()
+  {
+    return Dali::IntrusivePtr<HoverEvent>(new HoverEvent());
+  }
 
   /**
    * @brief Clones the HoverEvent object.
@@ -157,6 +161,20 @@ public:
    * @param[in]  point  The point to add to the hover event.
    */
   void AddPoint(const Integration::Point& point);
+
+protected:
+  // Construction & Destruction
+
+  /**
+   * @brief Default constructor
+   */
+  HoverEvent();
+
+  /**
+   * @brief Constructor
+   * @param[in]  time  The time the event occurred
+   */
+  HoverEvent(uint32_t time);
 
 private:
   /**

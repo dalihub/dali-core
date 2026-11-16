@@ -19,6 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/intrusive-ptr.h>
 #include <string>
 
 // INTERNAL INCLUDES
@@ -51,25 +52,20 @@ class TypeInfo : public BaseObject
 {
 public:
   /**
-   * Create TypeInfo
-   * @param [name] the registered name
-   * @param [baseName] the base type registered name
-   * @param [creator] the creator function for this type
+   * @brief Creates a reference-counted implementation.
    */
-  TypeInfo(const std::string& name, const std::string& baseName, Dali::TypeInfo::CreateFunction creator, const Dali::PropertyDetails* defaultProperties, Property::Index defaultPropertyCount);
+  static Dali::IntrusivePtr<TypeInfo> New(const std::string& name, const std::string& baseName, Dali::CSharpTypeInfo::CreateFunction creator)
+  {
+    return Dali::IntrusivePtr<TypeInfo>(new TypeInfo(name, baseName, creator));
+  }
 
   /**
-   * Create TypeInfo for a csharp object
-   * @param [name] the registered name
-   * @param [baseName] the base type registered name
-   * @param [creator] the creator function for this type
+   * @brief Creates a reference-counted implementation.
    */
-  TypeInfo(const std::string& name, const std::string& baseName, Dali::CSharpTypeInfo::CreateFunction creator);
-
-  /**
-   * Destructor
-   */
-  ~TypeInfo() override;
+  static Dali::IntrusivePtr<TypeInfo> New(const std::string& name, const std::string& baseName, Dali::TypeInfo::CreateFunction creator, const Dali::PropertyDetails* defaultProperties, Property::Index defaultPropertyCount)
+  {
+    return Dali::IntrusivePtr<TypeInfo>(new TypeInfo(name, baseName, creator, defaultProperties, defaultPropertyCount));
+  }
 
   /**
    * @copydoc Dali::TypeInfo::GetName
@@ -368,6 +364,28 @@ public:
    * @return The current value of the property.
    */
   Property::Value GetProperty(const BaseObject* object, const std::string& name) const;
+
+protected:
+  /**
+   * Create TypeInfo
+   * @param [name] the registered name
+   * @param [baseName] the base type registered name
+   * @param [creator] the creator function for this type
+   */
+  TypeInfo(const std::string& name, const std::string& baseName, Dali::TypeInfo::CreateFunction creator, const Dali::PropertyDetails* defaultProperties, Property::Index defaultPropertyCount);
+
+  /**
+   * Create TypeInfo for a csharp object
+   * @param [name] the registered name
+   * @param [baseName] the base type registered name
+   * @param [creator] the creator function for this type
+   */
+  TypeInfo(const std::string& name, const std::string& baseName, Dali::CSharpTypeInfo::CreateFunction creator);
+
+  /**
+   * Destructor
+   */
+  ~TypeInfo() override;
 
 private:
   struct RegisteredProperty

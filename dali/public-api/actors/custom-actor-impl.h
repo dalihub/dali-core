@@ -73,14 +73,6 @@ class DALI_CORE_API CustomActorImpl : public Dali::RefObject
 public:
   class Extension; ///< Forward declare future extension interface
 
-protected:
-  /**
-   * @brief Virtual destructor
-   * @SINCE_1_0.0
-   */
-  ~CustomActorImpl() override;
-
-public:
   /**
    * @brief Used by derived CustomActorImpl instances, to access the public Actor interface.
    *
@@ -422,15 +414,7 @@ public:
    * @param[in] event The wheel event
    */
   virtual void OnFinalizeWheelEventDispatch(const WheelEvent& event);
-
-protected: // For derived classes
-  /**
-   * @brief Creates a CustomActorImpl.
-   * @SINCE_2_4.36
-   */
-  CustomActorImpl();
-
-public: // Not intended for application developers
+  // Not intended for application developers
   /**
    * @brief Initializes a CustomActor.
    * @SINCE_1_0.0
@@ -451,7 +435,31 @@ public: // Not intended for application developers
    */
   Internal::CustomActor* GetOwner() const;
 
+protected:
+  /**
+   * @brief Virtual destructor
+   * @SINCE_1_0.0
+   */
+  ~CustomActorImpl() override;
+  // For derived classes
+  /**
+   * @brief Creates a CustomActorImpl.
+   * @SINCE_2_4.36
+   */
+  CustomActorImpl();
+
 private:
+  /**
+   * @brief Copying implementations is not supported.
+   * @SINCE_3_0.1
+   */
+  CustomActorImpl(const CustomActorImpl&) = delete;
+  /**
+   * @brief Copy assignment is not supported.
+   * @SINCE_3_0.1
+   */
+  CustomActorImpl& operator=(const CustomActorImpl&) = delete;
+
   Internal::CustomActor* mOwner; ///< Internal owner of this custom actor implementation
 };
 

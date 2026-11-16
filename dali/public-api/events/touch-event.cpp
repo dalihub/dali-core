@@ -29,7 +29,7 @@ namespace DALI_NAMESPACE
 {
 TouchEvent TouchEvent::New(uint32_t time)
 {
-  Internal::TouchEventPtr internal(new Internal::TouchEvent(time));
+  Internal::TouchEventPtr internal(Internal::TouchEvent::New(time));
 
   return TouchEvent(internal.Get());
 }

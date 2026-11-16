@@ -3,6 +3,8 @@ exec_prefix=@EXEC_PREFIX@
 apiversion=@DALI_VERSION@
 libdir=@LIB_DIR@
 includedir=@DEV_INCLUDE_PATH@
+bindir=@BIN_DIR@
+invoke_method_generator=${bindir}/@INVOKE_METHOD_GENERATOR_NAME@
 
 Name: DALi 3D Engine
 Description: Cross platform 3D Engine

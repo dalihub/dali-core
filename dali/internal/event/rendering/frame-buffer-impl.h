@@ -60,11 +60,6 @@ public:
   static FrameBufferPtr New(uint32_t width, uint32_t height, Mask attachments);
 
   /**
-   * A reference counted object may only be deleted by calling Unreference()
-   */
-  ~FrameBuffer() override;
-
-  /**
    * @brief Get the FrameBuffer render object
    *
    * @return the FrameBuffer render object
@@ -176,7 +171,14 @@ public:
     return mAttachments;
   }
 
-private: // implementation
+protected:
+  /**
+   * A reference counted object may only be deleted by calling Unreference()
+   */
+  ~FrameBuffer() override;
+
+private:
+  // implementation
   /**
    * Constructor
    * @param[in] width       The width of the FrameBuffer
@@ -189,8 +191,7 @@ private: // implementation
    * Second stage initialization of the Texture
    */
   void Initialize();
-
-private: // unimplemented methods
+  // unimplemented methods
   FrameBuffer()                              = delete;
   FrameBuffer(const FrameBuffer&)            = delete;
   FrameBuffer& operator=(const FrameBuffer&) = delete;
