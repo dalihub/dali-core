@@ -72,6 +72,11 @@ public:
     UNKNOWN_ERROR = ERROR_MAX,
   };
 
+  // ============================================================
+  // ABI-frozen virtual API.
+  // WARNING: Do NOT add, reorder, remove, or change signatures.
+  // ============================================================
+
 public: // Image queries, usable by applications
   /**
    * @brief Returns the width of the NativeImage.
@@ -209,11 +214,21 @@ public: // Resource lifecycle and rendering hooks, called by DALi internally
    */
   virtual void PostRender() = 0;
 
+  // Extension: keep this the last virtual of the class
+
   /**
    * @brief Retrieves the extension for the interface.
    *
+   * The protected destructor below only overrides a RefObject slot and
+   * introduces none, so this is the LAST virtual of this class: the final
+   * slot of the frozen vtable. Keep it last. The set of virtual hooks above
+   * is final: NO virtual may be added anywhere in this class, not even
+   * appended after this one, because the appended slot would collide with
+   * the first own virtual of any implementation binary that has not been
+   * rebuilt. Any new hook goes on the Extension interface returned here.
+   *
    * @SINCE_1_0.0
-   * @return The extension if available, NULL otherwise
+   * @return The extension if available, nullptr otherwise
    */
   virtual Extension* GetExtension()
   {

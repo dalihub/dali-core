@@ -73,13 +73,12 @@ class DALI_CORE_API CustomActorImpl : public Dali::RefObject
 public:
   class Extension; ///< Forward declare future extension interface
 
-  /**
-   * @brief Used by derived CustomActorImpl instances, to access the public Actor interface.
-   *
-   * @SINCE_1_0.0
-   * @return A pointer to self, or an uninitialized pointer if the CustomActorImpl is not owned.
-   */
-  CustomActor Self() const;
+  // ============================================================
+  // ABI-frozen virtual API.
+  // WARNING: Do NOT add, reorder, remove, or change signatures.
+  // ============================================================
+
+  // Scene lifecycle
 
   /**
    * @brief Called after the actor has been connected to the Scene.
@@ -127,6 +126,8 @@ public:
    */
   virtual void OnSceneDisconnection() = 0;
 
+  // Children
+
   /**
    * @brief Called after a child has been added to the owning actor.
    *
@@ -142,6 +143,8 @@ public:
    * @param[in] child The child being removed
    */
   virtual void OnChildRemove(Actor& child) = 0;
+
+  // Properties and size
 
   /**
    * @brief Called when the owning actor property is set.
@@ -191,6 +194,8 @@ public:
   {
   }
 
+  // Off-screen rendering
+
   /**
    * @brief Retrieves the off-screen RenderTasks associated with the Actor.
    * This method returns the internal RenderTasks held by the Actor. This tasks are
@@ -208,65 +213,7 @@ public:
    */
   virtual void GetOffScreenRenderTasks(Dali::Vector<Dali::RenderTask>& tasks, bool isForward) = 0;
 
-  /**
-   * @brief Register OffScreenRenderableType of this Actor.
-   * This method is called by child class to set type itself.
-   *
-   * @SINCE_2_4.17
-   * @param[in] offScreenRenderableType OffScreenRenderableType for this Actor.
-   * It could be one of NONE, FORWARD, BACKWARD, and BOTH.
-   * @note Each FORWARD / BACKWARD type could be added maxium 15 times.
-   * @post Call UnregisterOffScreenRenderableType() to unregister the type.
-   */
-  void RegisterOffScreenRenderableType(OffScreenRenderable::Type offScreenRenderableType);
-
-  /**
-   * @brief Unregister OffScreenRenderableType of this Actor.
-   * This method is called by child class to set type itself.
-   *
-   * @SINCE_2_4.17
-   * @param[in] offScreenRenderableType OffScreenRenderableType for this Actor.
-   * It could be one of NONE, FORWARD, BACKWARD, and BOTH.
-   * @pre Call RegisterOffScreenRenderableType() before unregister the type.
-   */
-  void UnregisterOffScreenRenderableType(OffScreenRenderable::Type offScreenRenderableType);
-
-  /**
-   * @brief Retrieves OffScreenRenderableType of this Actor.
-   *
-   * @SINCE_2_3.43
-   * @return OffScreenRenderableType for this Actor.
-   */
-  OffScreenRenderable::Type GetOffScreenRenderableType();
-
-  /**
-   * @brief Requests RenderTask reordering when the offscreen properties of this Actor are changed.
-   * @SINCE_2_3.43
-   */
-  void RequestRenderTaskReorder();
-
-  /**
-   * @brief Set this CustomActor is transparent or not without any affection on the child Actors.
-   * @SINCE_3_0.0
-   */
-  void SetTransparent(bool transparent);
-
-  /**
-   * @brief Get this CustomActor is transparent or not.
-   * @SINCE_3_0.0
-   */
-  bool IsTransparent() const;
-
-  /**
-   * @brief Retrieves the extension for this control.
-   *
-   * @SINCE_1_0.0
-   * @return The extension if available, NULL otherwise
-   */
-  virtual Extension* GetExtension()
-  {
-    return nullptr;
-  }
+  // Type registration
 
   /**
    * @brief Returns the type to resolve to when this implementation's own type is not registered.
@@ -297,6 +244,8 @@ public:
   {
     return TypeInfoId();
   }
+
+  // Input events
 
   /**
    * @brief Queries whether the implementation has built-in touch handling even when Actor::TouchEventSignal() has no callbacks.
@@ -414,7 +363,98 @@ public:
    * @param[in] event The wheel event
    */
   virtual void OnFinalizeWheelEventDispatch(const WheelEvent& event);
-  // Not intended for application developers
+
+  // Extension: keep this the last virtual of the class
+
+  /**
+   * @brief Retrieves the extension for this control.
+   *
+   * The protected destructor below only overrides a RefObject slot and
+   * introduces none, so this is the LAST virtual of this class: the final
+   * slot of the frozen vtable. Keep it last. The set of virtual hooks above
+   * is final: NO virtual may be added anywhere in this class, not even
+   * appended after this one, because the appended slot would collide with
+   * the first own virtual of any subclass binary that has not been rebuilt.
+   * Any new hook goes on the Extension interface returned here.
+   *
+   * @SINCE_1_0.0
+   * @return The extension if available, nullptr otherwise
+   */
+  virtual Extension* GetExtension()
+  {
+    return nullptr;
+  }
+
+  // ============================================================
+  // Non-virtual API.
+  // Outside the virtual freeze above: it occupies no vtable slot and adds
+  // no data member, so new non-virtual members may be added here.
+  // ============================================================
+
+  // Handle access
+
+  /**
+   * @brief Used by derived CustomActorImpl instances, to access the public Actor interface.
+   *
+   * @SINCE_1_0.0
+   * @return A pointer to self, or an uninitialized pointer if the CustomActorImpl is not owned.
+   */
+  CustomActor Self() const;
+
+  // Off-screen rendering
+
+  /**
+   * @brief Register OffScreenRenderableType of this Actor.
+   * This method is called by child class to set type itself.
+   *
+   * @SINCE_2_4.17
+   * @param[in] offScreenRenderableType OffScreenRenderableType for this Actor.
+   * It could be one of NONE, FORWARD, BACKWARD, and BOTH.
+   * @note Each FORWARD / BACKWARD type could be added maxium 15 times.
+   * @post Call UnregisterOffScreenRenderableType() to unregister the type.
+   */
+  void RegisterOffScreenRenderableType(OffScreenRenderable::Type offScreenRenderableType);
+
+  /**
+   * @brief Unregister OffScreenRenderableType of this Actor.
+   * This method is called by child class to set type itself.
+   *
+   * @SINCE_2_4.17
+   * @param[in] offScreenRenderableType OffScreenRenderableType for this Actor.
+   * It could be one of NONE, FORWARD, BACKWARD, and BOTH.
+   * @pre Call RegisterOffScreenRenderableType() before unregister the type.
+   */
+  void UnregisterOffScreenRenderableType(OffScreenRenderable::Type offScreenRenderableType);
+
+  /**
+   * @brief Retrieves OffScreenRenderableType of this Actor.
+   *
+   * @SINCE_2_3.43
+   * @return OffScreenRenderableType for this Actor.
+   */
+  OffScreenRenderable::Type GetOffScreenRenderableType();
+
+  /**
+   * @brief Requests RenderTask reordering when the offscreen properties of this Actor are changed.
+   * @SINCE_2_3.43
+   */
+  void RequestRenderTaskReorder();
+
+  // Transparency
+
+  /**
+   * @brief Set this CustomActor is transparent or not without any affection on the child Actors.
+   * @SINCE_3_0.0
+   */
+  void SetTransparent(bool transparent);
+
+  /**
+   * @brief Get this CustomActor is transparent or not.
+   * @SINCE_3_0.0
+   */
+  bool IsTransparent() const;
+
+public: // Not intended for application developers
   /**
    * @brief Initializes a CustomActor.
    * @SINCE_1_0.0
@@ -441,6 +481,7 @@ protected:
    * @SINCE_1_0.0
    */
   ~CustomActorImpl() override;
+
   // For derived classes
   /**
    * @brief Creates a CustomActorImpl.
@@ -454,6 +495,7 @@ private:
    * @SINCE_3_0.1
    */
   CustomActorImpl(const CustomActorImpl&) = delete;
+
   /**
    * @brief Copy assignment is not supported.
    * @SINCE_3_0.1

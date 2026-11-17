@@ -91,6 +91,11 @@ public:
    * should change this value to the desired one. The PropertyInputContainer is a const reference to the property inputs
    * added to the Constraint in the order they were added via AddSource().
    *
+   * @note Applications instantiate this template inline through Constraint::New(), so its
+   * layout is compiled into application binaries and the library reads it back. DALI_INTERNAL
+   * does not change that: it only affects exported symbols, and a template has none.
+   * See the WARNING on the data member below.
+   *
    * @SINCE_1_0.0
    * @tparam P The property type to constrain
    */
@@ -262,6 +267,12 @@ public:
 
     // Data
 
+    // ABI-frozen layout.
+    // WARNING: Do NOT add, reorder, or remove data members, and do NOT change
+    // what the constructors store. Constraint::New() constructs this object
+    // inline in application code; the library then reads it in Clone(),
+    // Execute() and delete at the offsets of ITS OWN header, so the two must
+    // agree. The CallbackBase part of the same layout is frozen in callback.h.
     CopyConstructorDispatcher mCopyConstructorDispatcher; ///< Function to call to copy the stored object
   };
 

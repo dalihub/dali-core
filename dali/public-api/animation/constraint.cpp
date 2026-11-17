@@ -29,6 +29,13 @@
 
 namespace DALI_NAMESPACE
 {
+// The layout of Constraint::Function<P> is compiled into applications (see the WARNING in constraint.h).
+// Its union holds a pointer to member function, whose size is ABI-specific, so only the Itanium ABI is checked.
+#ifndef _MSC_VER
+static_assert(sizeof(void*) != 8 || sizeof(Constraint::Function<float>) == 56, "Constraint::Function layout is ABI-frozen");
+static_assert(sizeof(void*) != 4 || sizeof(Constraint::Function<float>) == 28, "Constraint::Function layout is ABI-frozen");
+#endif
+
 namespace // unnamed namespace
 {
 template<class P>
