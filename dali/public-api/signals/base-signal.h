@@ -20,13 +20,11 @@
 
 // EXTERNAL INCLUDES
 #include <cstdint> // for uint32_t
-#include <list>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/signals/callback.h>
 #include <dali/public-api/signals/connection-tracker-interface.h>
-#include <dali/public-api/signals/signal-connection-pool.h>
 #include <dali/public-api/signals/signal-slot-connections.h>
 
 namespace DALI_NAMESPACE
@@ -132,38 +130,6 @@ public:
   }
 
   // Templated Emit functions for the Signal implementations
-
-  /**
-   * @brief Used to guard against nested Emit() calls.
-   * @SINCE_1_0.0
-   */
-  struct DALI_CORE_API EmitGuard
-  {
-    /**
-     * @brief Creates the guard.
-     *
-     * @SINCE_1_0.0
-     * @param[in,out] flag This flag will be set to true during Emit() calls
-     */
-    EmitGuard(bool& flag);
-
-    /**
-     * @brief Non-virtual destructor.
-     *
-     * @SINCE_1_0.0
-     */
-    ~EmitGuard();
-
-    /**
-     * @brief Determines if an error occurred.
-     *
-     * @SINCE_1_0.0
-     * @return True if an error occurred i.e. if Emit() was called during Emit()
-     */
-    bool ErrorOccurred();
-
-    bool* mFlag; ///< Pointer to the emit guard flag.
-  };
 
   /**
    * @brief Emits a signal with parameter pack.
@@ -280,50 +246,6 @@ private:
     (*static_cast<Functor*>(functor))(callback);
   }
 
-  /**
-   * @brief Helper to find whether a callback is connected.
-   *
-   * @SINCE_2_5.17
-   * @param[in] callback The call back object
-   * @return Pointer to the SignalConnectionNode, or nullptr if not found
-   */
-  SignalConnectionNode* FindCallback(CallbackBase* callback) noexcept;
-
-  /**
-   * @brief Deletes a connection by node pointer.
-   *
-   * @SINCE_2_5.17
-   * @param[in] node Pointer to the SignalConnectionNode to delete
-   */
-  void DeleteConnection(SignalConnectionNode* node);
-
-  /**
-   * @brief Helper to remove NULL items from pool, which is only safe at the end of Emit()
-   * i.e. not from methods which can be called during a signal Emit(), such as Disconnect().
-   * @SINCE_1_0.0
-   */
-  void CleanupConnections();
-
-  /**
-   * @brief Ensure the hash map cache exists and is populated (for large signals).
-   * @SINCE_2_5.17
-   */
-  void EnsureCache();
-
-  /**
-   * @brief Append a node to the tail of the emission-order linked list.
-   * @SINCE_2_5.17
-   * @param[in] node The node to append
-   */
-  DALI_INTERNAL void AppendToEmitList(SignalConnectionNode* node);
-
-  /**
-   * @brief Unlink a node from the emission-order linked list.
-   * @SINCE_2_5.17
-   * @param[in] node The node to unlink
-   */
-  DALI_INTERNAL void UnlinkFromEmitList(SignalConnectionNode* node);
-
   BaseSignal(const BaseSignal&)            = delete; ///< Deleted copy constructor, signals don't support copying. @SINCE_1_0.0
   BaseSignal(BaseSignal&&)                 = delete; ///< Deleted move constructor, signals don't support moving. @SINCE_1_9.25
   BaseSignal& operator=(const BaseSignal&) = delete; ///< Deleted copy assignment operator. @SINCE_1_0.0
@@ -331,16 +253,16 @@ private:
 
 private:
   struct DALI_INTERNAL Impl;
-  Impl*                mCacheImpl{nullptr}; ///< Lazy cache for large signals (N >= threshold).
+  struct DALI_INTERNAL Helper; ///< Library-side functions that work on the data members below
 
-private:
-  SignalConnectionPool mPool{};                                        ///< Chained-block pool for connection nodes
-  uint32_t             mEmitHead{SignalConnectionNode::INVALID_INDEX}; ///< Head of emission-order doubly-linked list (index)
-  uint32_t             mEmitTail{SignalConnectionNode::INVALID_INDEX}; ///< Tail of emission-order doubly-linked list (index)
-  uint32_t             mActiveCount{0};                                ///< Number of active connections
-  uint32_t             mNullCount{0};                                  ///< Slots nulled during emit, pending cleanup
-  bool                 mEmittingFlag{false};                           ///< Used to guard against nested Emit() calls.
-  bool*                mSignalDeleted{nullptr};                        ///< Used to guard against deletion during Emit() calls.
+  Impl*    mCacheImpl{nullptr};     ///< Lazy cache for large signals (N >= threshold).
+  void*    mPoolStorage[4];         ///< Storage for the library's connection pool (constructed by the constructor)
+  uint32_t mEmitHead;               ///< Head of emission-order doubly-linked list (index, set by the constructor)
+  uint32_t mEmitTail;               ///< Tail of emission-order doubly-linked list (index, set by the constructor)
+  uint32_t mActiveCount{0};         ///< Number of active connections
+  uint32_t mNullCount{0};           ///< Slots nulled during emit, pending cleanup
+  bool     mEmittingFlag{false};    ///< Used to guard against nested Emit() calls.
+  bool*    mSignalDeleted{nullptr}; ///< Used to guard against deletion during Emit() calls.
 };
 
 /**

@@ -16,9 +16,10 @@
  */
 
 // CLASS HEADER
-#include <dali/public-api/signals/signal-connection-pool.h>
+#include <dali/internal/event/common/signal-connection-pool.h>
 
 // EXTERNAL INCLUDES
+#include <cstdlib> // for malloc/free
 #include <cstring> // for memset
 #include <new>     // for placement new
 
@@ -27,6 +28,8 @@
 #include <dali/public-api/signals/connection-tracker-interface.h>
 
 namespace DALI_NAMESPACE
+{
+namespace Internal
 {
 SignalConnectionPool::~SignalConnectionPool()
 {
@@ -161,5 +164,7 @@ void SignalConnectionPool::Free(SignalConnectionNode* node)
   *reinterpret_cast<void**>(node) = mFreeHead;
   mFreeHead                       = node;
 }
+
+} // namespace Internal
 
 } //namespace DALI_NAMESPACE

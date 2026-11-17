@@ -23,16 +23,19 @@
 
 // INTERNAL INCLUDES
 #include <dali-test-suite-utils.h>
+#include <dali/internal/event/common/signal-connection-pool.h>
 #include <dali/public-api/dali-core.h>
 
 using namespace Dali;
+using Dali::Internal::SignalConnectionNode;
+using Dali::Internal::SignalConnectionPool;
 
-void utc_dali_signal_connection_pool_startup(void)
+void utc_dali_internal_signal_connection_pool_startup(void)
 {
   test_return_value = TET_UNDEF;
 }
 
-void utc_dali_signal_connection_pool_cleanup(void)
+void utc_dali_internal_signal_connection_pool_cleanup(void)
 {
   test_return_value = TET_PASS;
 }
