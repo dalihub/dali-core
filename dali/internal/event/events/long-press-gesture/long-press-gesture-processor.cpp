@@ -57,7 +57,7 @@ void EmitLongPressSignal(
   Vector2                         localPoint,
   GestureState                    state)
 {
-  Internal::LongPressGesturePtr longPress(new Internal::LongPressGesture(state));
+  Internal::LongPressGesturePtr longPress(Internal::LongPressGesture::New(state));
   longPress->SetTime(longPressEvent.time);
   longPress->SetNumberOfTouches(longPressEvent.numberOfTouches);
   longPress->SetScreenPoint(longPressEvent.point);
@@ -252,7 +252,7 @@ void LongPressGestureProcessor::AddGestureDetector(LongPressGestureDetector* ges
     FillRequest(request);
 
     Size size          = scene.GetSize();
-    mGestureRecognizer = new LongPressGestureRecognizer(*this, Vector2(size.width, size.height), request);
+    mGestureRecognizer = LongPressGestureRecognizer::New(*this, Vector2(size.width, size.height), request);
   }
   else
   {

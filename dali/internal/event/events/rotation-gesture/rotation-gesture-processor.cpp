@@ -57,7 +57,7 @@ void EmitRotationSignal(
   Vector2                         localCenter,
   GestureState                    state)
 {
-  Internal::RotationGesturePtr rotation(new Internal::RotationGesture(state));
+  Internal::RotationGesturePtr rotation(Internal::RotationGesture::New(state));
   rotation->SetTime(rotationEvent.time);
   rotation->SetRotation(rotationEvent.rotation);
   rotation->SetScreenCenterPoint(rotationEvent.centerPoint);
@@ -228,7 +228,7 @@ void RotationGestureProcessor::AddGestureDetector(RotationGestureDetector* gestu
     RotationGestureRequest request;
     FillRequest(request);
 
-    mGestureRecognizer = new RotationGestureRecognizer(*this, request);
+    mGestureRecognizer = RotationGestureRecognizer::New(*this, request);
   }
 }
 

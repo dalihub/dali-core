@@ -28,7 +28,6 @@ namespace DALI_NAMESPACE
 {
 namespace Internal
 {
-typedef IntrusivePtr<PathConstrainer> PathConstrainerPtr;
 
 /**
  * @brief Constraint functor to constraint properties to paths.

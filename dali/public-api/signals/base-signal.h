@@ -20,13 +20,11 @@
 
 // EXTERNAL INCLUDES
 #include <cstdint> // for uint32_t
-#include <list>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/signals/callback.h>
 #include <dali/public-api/signals/connection-tracker-interface.h>
-#include <dali/public-api/signals/signal-connection-pool.h>
 #include <dali/public-api/signals/signal-slot-connections.h>
 
 namespace DALI_NAMESPACE
@@ -82,6 +80,21 @@ namespace DALI_NAMESPACE
 class DALI_CORE_API BaseSignal : public SlotObserver
 {
 public:
+  // ============================================================
+  // ABI-frozen class layout.
+  // Applications create BaseSignal, directly or through the
+  // inline code of Dali::Signal, and the inline Empty() and
+  // GetConnectionCount() read mActiveCount, so the data members
+  // and the virtual functions are compiled into application
+  // binaries. New state goes into Impl (mCacheImpl).
+  // The emission loop is NOT inline: the Emit templates only pass
+  // a type-erased invoker to EmitInternal(), so fixes to emission
+  // reach applications without a rebuild.
+  // WARNING: Do NOT add, reorder, or remove data members or
+  // virtual functions, and do NOT move emission logic back into
+  // inline code.
+  // ============================================================
+
   /**
    * @brief Constructor.
    * @SINCE_1_0.0
@@ -98,7 +111,7 @@ public:
    * @brief Queries whether there are any connected slots.
    *
    * @SINCE_1_0.0
-   * @return True if there are any slots connected to the signal.
+   * @return True if no slots are connected to the signal.
    */
   bool Empty() const
   {
@@ -119,38 +132,6 @@ public:
   // Templated Emit functions for the Signal implementations
 
   /**
-   * @brief Used to guard against nested Emit() calls.
-   * @SINCE_1_0.0
-   */
-  struct DALI_CORE_API EmitGuard
-  {
-    /**
-     * @brief Creates the guard.
-     *
-     * @SINCE_1_0.0
-     * @param[in,out] flag This flag will be set to true during Emit() calls
-     */
-    EmitGuard(bool& flag);
-
-    /**
-     * @brief Non-virtual destructor.
-     *
-     * @SINCE_1_0.0
-     */
-    ~EmitGuard();
-
-    /**
-     * @brief Determines if an error occurred.
-     *
-     * @SINCE_1_0.0
-     * @return True if an error occurred i.e. if Emit() was called during Emit()
-     */
-    bool ErrorOccurred();
-
-    bool* mFlag; ///< Pointer to the emit guard flag.
-  };
-
-  /**
    * @brief Emits a signal with parameter pack.
    *
    * @SINCE_1_9.33
@@ -161,98 +142,20 @@ public:
   template<typename Ret, typename... Args>
   Ret EmitReturn(Args... args)
   {
-    Ret returnVal = Ret();
-
-    // Guards against nested Emit() calls
-    EmitGuard guard(mEmittingFlag);
-    if(guard.ErrorOccurred())
-    {
-      return returnVal;
-    }
-
-    // Guards against calling CleanupConnections if the signal is deleted during emission
-    bool signalDeleted{false};
-    mSignalDeleted = &signalDeleted;
-
-    // Snapshot tail so connections added during emit are not emitted
-    auto emitEnd = mEmitTail;
-
-    auto nodeIndex = mEmitHead;
-    while(nodeIndex != SignalConnectionNode::INVALID_INDEX)
-    {
-      auto*         node      = mPool.IndexToNode(nodeIndex);
-      auto          nextIndex = node->mEmitNext;
-      CallbackBase* callback(node->connection.GetCallback());
-      if(callback)
-      {
-        returnVal = CallbackBase::ExecuteReturn<Ret, Args...>(*callback, args...);
-        if(DALI_UNLIKELY(signalDeleted))
-        {
-          // Previously, we'd have emitted to remaining connections after this
-          // but now we stop as soon as the signal has been deleted.
-          guard.mFlag = nullptr;
-          return returnVal;
-        }
-      }
-      if(nodeIndex == emitEnd)
-      {
-        break;
-      }
-      nodeIndex = nextIndex;
-    }
-
-    // Cleanup NULL values from Connection container
-    CleanupConnections();
-    mSignalDeleted = nullptr;
-
+    Ret  returnVal = Ret();
+    auto invoke    = [&](CallbackBase& callback)
+    { returnVal = CallbackBase::ExecuteReturn<Ret, Args...>(callback, args...); };
+    EmitInternal(&InvokeEmitFunctor<decltype(invoke)>, &invoke);
     return returnVal;
   }
 
   template<typename Ret, typename... Args>
   Ret EmitReturnOr(Args... args)
   {
-    Ret returnVal = Ret();
-
-    // Guards against nested Emit() calls
-    EmitGuard guard(mEmittingFlag);
-    if(guard.ErrorOccurred())
-    {
-      return returnVal;
-    }
-
-    // Guards against calling CleanupConnections if the signal is deleted during emission
-    bool signalDeleted{false};
-    mSignalDeleted = &signalDeleted;
-
-    // Snapshot tail so connections added during emit are not emitted
-    auto emitEnd = mEmitTail;
-
-    auto nodeIndex = mEmitHead;
-    while(nodeIndex != SignalConnectionNode::INVALID_INDEX)
-    {
-      auto*         node      = mPool.IndexToNode(nodeIndex);
-      auto          nextIndex = node->mEmitNext;
-      CallbackBase* callback(node->connection.GetCallback());
-      if(callback)
-      {
-        returnVal |= CallbackBase::ExecuteReturn<Ret, Args...>(*callback, args...);
-        if(DALI_UNLIKELY(signalDeleted))
-        {
-          guard.mFlag = nullptr;
-          return returnVal;
-        }
-      }
-      if(nodeIndex == emitEnd)
-      {
-        break;
-      }
-      nodeIndex = nextIndex;
-    }
-
-    // Cleanup NULL values from Connection container
-    CleanupConnections();
-    mSignalDeleted = nullptr;
-
+    Ret  returnVal = Ret();
+    auto invoke    = [&](CallbackBase& callback)
+    { returnVal |= CallbackBase::ExecuteReturn<Ret, Args...>(callback, args...); };
+    EmitInternal(&InvokeEmitFunctor<decltype(invoke)>, &invoke);
     return returnVal;
   }
 
@@ -266,45 +169,9 @@ public:
   template<typename... Args>
   void Emit(Args... args)
   {
-    // Guards against nested Emit() calls
-    EmitGuard guard(mEmittingFlag);
-    if(guard.ErrorOccurred())
-    {
-      return;
-    }
-
-    // Guards against calling CleanupConnections if the signal is deleted during emission
-    bool signalDeleted{false};
-    mSignalDeleted = &signalDeleted;
-
-    // Snapshot tail so connections added during emit are not emitted
-    auto emitEnd = mEmitTail;
-
-    auto nodeIndex = mEmitHead;
-    while(nodeIndex != SignalConnectionNode::INVALID_INDEX)
-    {
-      auto*         node      = mPool.IndexToNode(nodeIndex);
-      auto          nextIndex = node->mEmitNext;
-      CallbackBase* callback(node->connection.GetCallback());
-      if(callback)
-      {
-        CallbackBase::Execute<Args...>(*callback, args...);
-        if(DALI_UNLIKELY(signalDeleted))
-        {
-          guard.mFlag = nullptr;
-          return;
-        }
-      }
-      if(nodeIndex == emitEnd)
-      {
-        break;
-      }
-      nodeIndex = nextIndex;
-    }
-
-    // Cleanup NULL values from Connection container
-    CleanupConnections();
-    mSignalDeleted = nullptr;
+    auto invoke = [&](CallbackBase& callback)
+    { CallbackBase::Execute<Args...>(callback, args...); };
+    EmitInternal(&InvokeEmitFunctor<decltype(invoke)>, &invoke);
   }
 
   // Connect / Disconnect function for use by Signal implementations
@@ -351,48 +218,33 @@ private: // SlotObserver interface, to be told when a slot disconnects
 
 private:
   /**
-   * @brief Helper to find whether a callback is connected.
+   * @brief Type-erased call of one connected callback, made by EmitInternal() for the Emit templates.
+   * @param[in] functor The lambda created by the Emit template
+   * @param[in] callback The connected callback to call
+   */
+  using EmitInvoker = void (*)(void* functor, CallbackBase& callback);
+
+  /**
+   * @brief Runs one emission: calls @p invoker once for every connected callback, in connection order.
    *
-   * @SINCE_2_5.17
-   * @param[in] callback The call back object
-   * @return Pointer to the SignalConnectionNode, or nullptr if not found
+   * The whole emission loop (nested Emit() guard, deletion check, cleanup) lives in the library,
+   * so the Emit templates compile no data member access into application code.
+   * @param[in] invoker Calls one callback with the arguments captured in @p functor
+   * @param[in] functor The lambda created by the Emit template
    */
-  SignalConnectionNode* FindCallback(CallbackBase* callback) noexcept;
+  void EmitInternal(EmitInvoker invoker, void* functor);
 
   /**
-   * @brief Deletes a connection by node pointer.
-   *
-   * @SINCE_2_5.17
-   * @param[in] node Pointer to the SignalConnectionNode to delete
+   * @brief Adapts the lambda of an Emit template to EmitInvoker.
+   * @tparam Functor The lambda type
+   * @param[in] functor The lambda
+   * @param[in] callback The connected callback to call
    */
-  void DeleteConnection(SignalConnectionNode* node);
-
-  /**
-   * @brief Helper to remove NULL items from pool, which is only safe at the end of Emit()
-   * i.e. not from methods which can be called during a signal Emit(), such as Disconnect().
-   * @SINCE_1_0.0
-   */
-  void CleanupConnections();
-
-  /**
-   * @brief Ensure the hash map cache exists and is populated (for large signals).
-   * @SINCE_2_5.17
-   */
-  void EnsureCache();
-
-  /**
-   * @brief Append a node to the tail of the emission-order linked list.
-   * @SINCE_2_5.17
-   * @param[in] node The node to append
-   */
-  DALI_INTERNAL void AppendToEmitList(SignalConnectionNode* node);
-
-  /**
-   * @brief Unlink a node from the emission-order linked list.
-   * @SINCE_2_5.17
-   * @param[in] node The node to unlink
-   */
-  DALI_INTERNAL void UnlinkFromEmitList(SignalConnectionNode* node);
+  template<typename Functor>
+  static void InvokeEmitFunctor(void* functor, CallbackBase& callback)
+  {
+    (*static_cast<Functor*>(functor))(callback);
+  }
 
   BaseSignal(const BaseSignal&)            = delete; ///< Deleted copy constructor, signals don't support copying. @SINCE_1_0.0
   BaseSignal(BaseSignal&&)                 = delete; ///< Deleted move constructor, signals don't support moving. @SINCE_1_9.25
@@ -401,16 +253,16 @@ private:
 
 private:
   struct DALI_INTERNAL Impl;
-  Impl*                mCacheImpl{nullptr}; ///< Lazy cache for large signals (N >= threshold).
+  struct DALI_INTERNAL Helper; ///< Library-side functions that work on the data members below
 
-private:
-  SignalConnectionPool mPool{};                                        ///< Chained-block pool for connection nodes
-  uint32_t             mEmitHead{SignalConnectionNode::INVALID_INDEX}; ///< Head of emission-order doubly-linked list (index)
-  uint32_t             mEmitTail{SignalConnectionNode::INVALID_INDEX}; ///< Tail of emission-order doubly-linked list (index)
-  uint32_t             mActiveCount{0};                                ///< Number of active connections
-  uint32_t             mNullCount{0};                                  ///< Slots nulled during emit, pending cleanup
-  bool                 mEmittingFlag{false};                           ///< Used to guard against nested Emit() calls.
-  bool*                mSignalDeleted{nullptr};                        ///< Used to guard against deletion during Emit() calls.
+  Impl*    mCacheImpl{nullptr};     ///< Lazy cache for large signals (N >= threshold).
+  void*    mPoolStorage[4];         ///< Storage for the library's connection pool (constructed by the constructor)
+  uint32_t mEmitHead;               ///< Head of emission-order doubly-linked list (index, set by the constructor)
+  uint32_t mEmitTail;               ///< Tail of emission-order doubly-linked list (index, set by the constructor)
+  uint32_t mActiveCount{0};         ///< Number of active connections
+  uint32_t mNullCount{0};           ///< Slots nulled during emit, pending cleanup
+  bool     mEmittingFlag{false};    ///< Used to guard against nested Emit() calls.
+  bool*    mSignalDeleted{nullptr}; ///< Used to guard against deletion during Emit() calls.
 };
 
 /**

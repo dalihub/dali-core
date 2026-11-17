@@ -27,7 +27,6 @@ namespace DALI_NAMESPACE
 {
 namespace Internal
 {
-typedef IntrusivePtr<LinearConstrainer> LinearConstrainerPtr;
 
 /**
  * @brief Constraint functor to constraint properties given a linear map.

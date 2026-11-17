@@ -701,7 +701,6 @@ bool HitTestRenderTask(std::vector<std::shared_ptr<HitResult>>& hitResultList,
   float projectedNearClippingDistance = nearClippingPlane / projectionFactor;
   float projectedFarClippingDistance  = farClippingPlane / projectionFactor;
 
-  Vector2 hitPosition;
   for(int32_t i = hitCommonInformation.layers.GetLayerCount() - 1; i >= 0; --i)
   {
     Layer* layer(hitCommonInformation.layers.GetLayer(i));

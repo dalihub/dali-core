@@ -45,6 +45,7 @@ SET( internal_src_files
   ${internal_src_dir}/event/common/property-notification-manager.cpp
   ${internal_src_dir}/event/common/property-helper.cpp
   ${internal_src_dir}/event/common/scene-impl.cpp
+  ${internal_src_dir}/event/common/signal-connection-pool.cpp
   ${internal_src_dir}/event/common/thread-local-storage.cpp
   ${internal_src_dir}/event/common/type-info-impl.cpp
   ${internal_src_dir}/event/common/type-registry-impl.cpp

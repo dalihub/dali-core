@@ -4,16 +4,27 @@ IF(POLICY CMP0177)
   CMAKE_POLICY(SET CMP0177 NEW) # install() DESTINATION paths are normalized.
 ENDIF()
 
-# API major version (Not DALi release version). It also names the library,
-# the pkg-config file and the CMake package: dali<major>-core.
-IF(NOT DALI_API_MAJOR)
-  SET(DALI_API_MAJOR 3)
-ENDIF()
+# API major version (Not DALi release version). It names the library, the
+# pkg-config file and the CMake package (dali<major>-core) and the install
+# layout (include/dali<major>, dali<major>-<tool>): everything this line
+# installs carries the major, so it can sit beside a DALi 2.x installed from
+# its own source. The 2.x names themselves are available as links through
+# DALI_LEGACY_ALIASES (see dali-legacy-aliases.cmake).
+SET(DALI_API_MAJOR 3)
 SET(name "dali${DALI_API_MAJOR}-core")
+SET(DALI_INCLUDE_SUBDIR "dali${DALI_API_MAJOR}")
+SET(DALI_TOOL_PREFIX "dali${DALI_API_MAJOR}-")
+SET(DALI_EXPORT_INCLUDE_DIR "include/${DALI_INCLUDE_SUBDIR}")
+INCLUDE(${CMAKE_CURRENT_SOURCE_DIR}/dali-legacy-aliases.cmake)
 
 SET(CMAKE_C_STANDARD 99)
 SET(CMAKE_CXX_STANDARD 17)
 PROJECT(${name})
+# Enable shadow errors for GNU builds; validate other compilers separately.
+IF(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+  ADD_COMPILE_OPTIONS(-Werror=shadow)
+ENDIF()
+
 SET(PKG_NAME ${name})
 
 SET(GCC_COMPILER_VERSION_REQUIRED "6")
@@ -125,6 +136,7 @@ ENDIF()
 IF( NOT INCLUDE_DIR )
   SET( INCLUDE_DIR ${PREFIX}/include )
 ENDIF()
+SET( INCLUDE_DIR ${INCLUDE_DIR}/${DALI_INCLUDE_SUBDIR} )
 
 # Set up the lib dir
 SET( LIB_DIR $ENV{libdir} )
@@ -149,6 +161,7 @@ IF( ENABLE_PKG_CONFIGURE )
   # Requires the following variables to be setup:
   # @PREFIX@ @EXEC_PREFIX@ @DALI_VERSION@ @LIB_DIR@ @DEV_INCLUDE_PATH@
   SET( DEV_INCLUDE_PATH ${INCLUDE_DIR} )
+  SET( INVOKE_METHOD_GENERATOR_NAME ${DALI_TOOL_PREFIX}invoke-method-generator )
   SET( CORE_PKG_CFG_FILE ${CMAKE_CURRENT_SOURCE_DIR}/${name}.pc )
   CONFIGURE_FILE( ${CMAKE_CURRENT_SOURCE_DIR}/dali-core.pc.in ${CORE_PKG_CFG_FILE} @ONLY )
 ENDIF()
@@ -299,7 +312,7 @@ ENDIF()
 TARGET_INCLUDE_DIRECTORIES(${name}
   PUBLIC
     $<BUILD_INTERFACE:${ROOT_SRC_DIR}>
-    $<INSTALL_INTERFACE:include>
+    $<INSTALL_INTERFACE:${DALI_EXPORT_INCLUDE_DIR}>
 )
 
 # pthread required due to gcc issue
@@ -347,6 +360,7 @@ IF( INSTALL_CMAKE_MODULES )
   FILE( WRITE ${CMAKE_CURRENT_BINARY_DIR}/${name}-config.cmake "
     include(CMakeFindDependencyMacro)
     include(\${CMAKE_CURRENT_LIST_DIR}/${name}-targets.cmake)
+    set(${name}_INVOKE_METHOD_GENERATOR \${CMAKE_CURRENT_LIST_DIR}/../../bin/${DALI_TOOL_PREFIX}invoke-method-generator)
   ")
   INSTALL( FILES ${CMAKE_CURRENT_BINARY_DIR}/${name}-config.cmake DESTINATION share/${name} )
 
@@ -370,7 +384,18 @@ IF( ENABLE_PKG_CONFIGURE )
   INSTALL( FILES ${CORE_PKG_CFG_FILE} DESTINATION ${LIB_DIR}/pkgconfig )
 ENDIF()
 
-INSTALL(PROGRAMS ${INVOKE_METHOD_GENERATOR} DESTINATION ${BIN_DIR} RENAME dali-invoke-method-generator)
+INSTALL(PROGRAMS ${INVOKE_METHOD_GENERATOR} DESTINATION ${BIN_DIR} RENAME ${DALI_TOOL_PREFIX}invoke-method-generator)
+
+# DALi 2.x names as links to the files above (DALI_LEGACY_ALIASES=ON only).
+dali_legacy_library_alias(${name} dali2-core 2)
+dali_legacy_include_alias(dali)
+dali_legacy_alias(${BIN_DIR}/dali-invoke-method-generator ${DALI_TOOL_PREFIX}invoke-method-generator)
+IF( ENABLE_PKG_CONFIGURE )
+  dali_legacy_pkgconfig_alias(${CORE_PKG_CFG_FILE} dali2-core)
+ENDIF()
+IF( INSTALL_CMAKE_MODULES )
+  dali_legacy_cmake_package_alias(${name} dali2-core "set(dali2-core_INVOKE_METHOD_GENERATOR \${${name}_INVOKE_METHOD_GENERATOR})")
+ENDIF()
 
 # macro for installing headers by replacing prefix. (TODO, investigate
 # if there is a CMAKE way of doing this automatically)
@@ -505,6 +530,7 @@ MESSAGE( STATUS "Scoped Lock backtrace: " ${ENABLE_LOCK_BACKTRACE} )
 MESSAGE( STATUS "Coverage:              " ${ENABLE_COVERAGE} )
 MESSAGE( STATUS "Trace:                 " ${ENABLE_TRACE} )
 MESSAGE( STATUS "Tizen namespace:       " ${ENABLE_TIZEN_NAMESPACE} )
+MESSAGE( STATUS "Legacy (dali2) aliases:" ${DALI_LEGACY_ALIASES} )
 MESSAGE( STATUS "Use pkg configure:     " ${ENABLE_PKG_CONFIGURE} )
 MESSAGE( STATUS "Enable link test:      " ${ENABLE_LINK_TEST} )
 MESSAGE( STATUS "Memory Management:     " ${ENABLE_LOW_SPEC_MEMORY_MANAGEMENT} )

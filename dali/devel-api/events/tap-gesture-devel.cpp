@@ -25,7 +25,7 @@ namespace DevelTapGesture
 {
 TapGesture New(GestureState state)
 {
-  return TapGesture(new Internal::TapGesture(state));
+  return TapGesture(Internal::TapGesture::NewForBaseHandle(state));
 }
 
 } // namespace DevelTapGesture

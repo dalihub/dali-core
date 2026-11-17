@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/common/vector-wrapper.h>
+#include <dali/public-api/common/intrusive-ptr.h>
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/events/gesture-recognizer.h>
@@ -45,18 +46,12 @@ public:
   using Observer = RecognizerObserver<PinchGestureEvent>;
 
   /**
-   * Constructor
-   * @param[in] observer   Used to send events to Core.
-   * @param[in] screenSize The size of the screen.
-   * @param[in] screenDpi  The dpi value of the screen, used when the request asks for the default distance.
-   * @param[in] request    The pinch gesture request carrying the recognition thresholds.
+   * @brief Creates a reference-counted implementation.
    */
-  PinchGestureRecognizer(Observer& observer, Vector2 screenSize, Vector2 screenDpi, const PinchGestureRequest& request);
-
-  /**
-   * Virtual destructor.
-   */
-  ~PinchGestureRecognizer() override;
+  static Dali::IntrusivePtr<PinchGestureRecognizer> New(Observer& observer, Vector2 screenSize, Vector2 screenDpi, const PinchGestureRequest& request)
+  {
+    return Dali::IntrusivePtr<PinchGestureRecognizer>(new PinchGestureRecognizer(observer, screenSize, screenDpi, request));
+  }
 
 public:
   void SetMinimumPinchDistance(float value);
@@ -92,6 +87,21 @@ public:
    * @copydoc Dali::Internal::GestureRecognizer::OnSequenceSourceChanged()
    */
   void OnSequenceSourceChanged() override;
+
+protected:
+  /**
+   * Constructor
+   * @param[in] observer   Used to send events to Core.
+   * @param[in] screenSize The size of the screen.
+   * @param[in] screenDpi  The dpi value of the screen, used when the request asks for the default distance.
+   * @param[in] request    The pinch gesture request carrying the recognition thresholds.
+   */
+  PinchGestureRecognizer(Observer& observer, Vector2 screenSize, Vector2 screenDpi, const PinchGestureRequest& request);
+
+  /**
+   * Virtual destructor.
+   */
+  ~PinchGestureRecognizer() override;
 
 private:
   /**

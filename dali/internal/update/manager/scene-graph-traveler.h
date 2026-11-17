@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
 #include <dali/devel-api/common/map-wrapper.h>
+#include <dali/public-api/common/intrusive-ptr.h>
 #else
 #include <unordered_map>
 #endif
@@ -42,16 +43,12 @@ class SceneGraphTraveler : public SceneGraphTravelerInterface, public SceneGraph
 {
 public:
   /**
-   * @brief Construct
-   * @param[in] updateManager The update manager.
-   * @param[in] rootNode The root node of this traveler. The traveler will find only under this rootNode.
+   * @brief Creates a reference-counted implementation.
    */
-  SceneGraphTraveler(SceneGraph::UpdateManager& updateManager, SceneGraph::Node& rootNode);
-
-  /**
-   * @brief Destructor
-   */
-  ~SceneGraphTraveler() override;
+  static Dali::IntrusivePtr<SceneGraphTraveler> New(SceneGraph::UpdateManager& updateManager, SceneGraph::Node& rootNode)
+  {
+    return Dali::IntrusivePtr<SceneGraphTraveler>(new SceneGraphTraveler(updateManager, rootNode));
+  }
 
 public:
   /**
@@ -77,6 +74,19 @@ public: // From SceneGraphTravelerInterface
    * @copydoc Dali::Internal::SceneGraphTravelerInterface::FindNode()
    */
   SceneGraph::Node* FindNode(uint32_t id) override;
+
+protected:
+  /**
+   * @brief Construct
+   * @param[in] updateManager The update manager.
+   * @param[in] rootNode The root node of this traveler. The traveler will find only under this rootNode.
+   */
+  SceneGraphTraveler(SceneGraph::UpdateManager& updateManager, SceneGraph::Node& rootNode);
+
+  /**
+   * @brief Destructor
+   */
+  ~SceneGraphTraveler() override;
 
 private: // From SceneGraph::PropertyOwner::Observer
   /**

@@ -45,6 +45,16 @@ class SceneGraphTravelerInterface : public Dali::RefObject
 {
 public:
   /**
+   * @brief Get SceneGraph::Node pointer from node id.
+   * The way of find & choose mechanism is depend on inherited class.
+   *
+   * @param[in] id The id of node what we want to find.
+   * @return Node pointer, or nullptr if we fail to find it.
+   */
+  virtual SceneGraph::Node* FindNode(uint32_t id) = 0;
+
+protected:
+  /**
    * @brief Construct
    * @param[in] updateManager The update manager.
    */
@@ -58,18 +68,12 @@ public:
    */
   virtual ~SceneGraphTravelerInterface() = default;
 
-public:
-  /**
-   * @brief Get SceneGraph::Node pointer from node id.
-   * The way of find & choose mechanism is depend on inherited class.
-   *
-   * @param[in] id The id of node what we want to find.
-   * @return Node pointer, or nullptr if we fail to find it.
-   */
-  virtual SceneGraph::Node* FindNode(uint32_t id) = 0;
-
 protected:
   SceneGraph::UpdateManager& mUpdateManager;
+
+private:
+  SceneGraphTravelerInterface(const SceneGraphTravelerInterface&)            = delete;
+  SceneGraphTravelerInterface& operator=(const SceneGraphTravelerInterface&) = delete;
 };
 
 } // namespace Internal

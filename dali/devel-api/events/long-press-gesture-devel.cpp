@@ -25,7 +25,7 @@ namespace DevelLongPressGesture
 {
 LongPressGesture New(GestureState state)
 {
-  return LongPressGesture(new Internal::LongPressGesture(state));
+  return LongPressGesture(Internal::LongPressGesture::NewForBaseHandle(state));
 }
 
 } // namespace DevelLongPressGesture

@@ -42,6 +42,8 @@ public:
 
   /**
    * @brief Get the name of this processor if we setup.
+   * @note The returned string must outlive this processor (e.g. a string literal),
+   * as it may be logged after the processor is unregistered and destroyed during Process().
    * @return The name of this processor.
    */
   virtual std::string_view GetProcessorName() const = 0;

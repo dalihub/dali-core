@@ -19,6 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/intrusive-ptr.h>
 #include <cstdint>
 #include <memory> // for unique_ptr
 
@@ -29,7 +30,7 @@
 #include <dali/integration-api/ordered-set.h>
 #include <dali/internal/common/memory-pool-object-allocator.h>
 #include <dali/internal/event/size-negotiation/memory-pool-relayout-container.h>
-#include <dali/public-api/object/base-object.h>
+#include <dali/public-api/object/ref-object.h>
 
 namespace DALI_NAMESPACE
 {
@@ -45,20 +46,16 @@ namespace Internal
  * The requests are actioned on at the end of the frame where all actors that have made a request are
  * resized.
  */
-class RelayoutController : public Dali::BaseObject
+class RelayoutController : public Dali::RefObject
 {
 public:
   /**
-   * @brief Constructor.
-   * We should only create a unique instance.
-   * @param[in] controller to request a render from the RenderController if core is not processing events.
+   * @brief Creates a reference-counted implementation.
    */
-  RelayoutController(Integration::RenderController& controller);
-
-  /**
-   * Destructor
-   */
-  ~RelayoutController() override;
+  static Dali::IntrusivePtr<RelayoutController> New(Integration::RenderController& controller)
+  {
+    return Dali::IntrusivePtr<RelayoutController>(new RelayoutController(controller));
+  }
 
   /**
    * @brief Get the singleton of RelayoutController object.
@@ -145,6 +142,19 @@ public: // CALLBACKS
    * @param[in] object The object being destroyed
    */
   void OnObjectDestroyed(const Dali::RefObject* object);
+
+protected:
+  /**
+   * @brief Constructor.
+   * We should only create a unique instance.
+   * @param[in] controller to request a render from the RenderController if core is not processing events.
+   */
+  RelayoutController(Integration::RenderController& controller);
+
+  /**
+   * Destructor
+   */
+  ~RelayoutController() override;
 
 private:
   using RawActorOrderedSet = Dali::Integration::OrderedSet<Dali::Internal::Actor, false>; ///< Specialised container to find duplication list, and order

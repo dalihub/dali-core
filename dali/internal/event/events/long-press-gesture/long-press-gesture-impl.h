@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/events/gesture-impl.h>
+#include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/events/long-press-gesture.h>
 #include <dali/public-api/math/vector2.h>
 
@@ -37,13 +38,22 @@ class LongPressGesture final : public Gesture
 {
 public:
   /**
-   * Default Constructor
-   * @param[in]  state  STARTED, when we detect a long press.
-   *                    FINISHED, when all touches are finished.
+   * @brief Creates an unreferenced implementation only for BaseHandle construction.
+   * @warning Pass the result directly to a BaseHandle-derived handle constructor.
+   * The constructor must acquire its first reference (the returned reference count is zero).
+   * Use New() when an IntrusivePtr owner is required.
    */
-  LongPressGesture(GestureState state)
-  : Gesture(GestureType::LONG_PRESS, state)
+  static DALI_INTERNAL LongPressGesture* NewForBaseHandle(GestureState state)
   {
+    return new LongPressGesture(state);
+  }
+
+  /**
+   * @brief Creates a reference-counted implementation.
+   */
+  static Dali::IntrusivePtr<LongPressGesture> New(GestureState state)
+  {
+    return Dali::IntrusivePtr<LongPressGesture>(new LongPressGesture(state));
   }
 
   LongPressGesture(const LongPressGesture&)            = delete; ///< Deleted copy constructor
@@ -100,6 +110,17 @@ public:
   inline const Vector2& GetLocalPoint() const
   {
     return mLocalPoint;
+  }
+
+protected:
+  /**
+   * Default Constructor
+   * @param[in]  state  STARTED, when we detect a long press.
+   *                    FINISHED, when all touches are finished.
+   */
+  LongPressGesture(GestureState state)
+  : Gesture(GestureType::LONG_PRESS, state)
+  {
   }
 
 private:

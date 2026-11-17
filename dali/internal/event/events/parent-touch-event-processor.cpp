@@ -100,7 +100,7 @@ Dali::Actor DispatchTouchToHierarchy(Dali::Actor actor, const Dali::TouchEvent& 
 
 Dali::Actor AllocateAndDispatchTouch(unsigned long time, Dali::Actor actor, const Integration::Point& point, RenderTaskPtr renderTask)
 {
-  TouchEventPtr    touchEvent(new TouchEvent(time));
+  TouchEventPtr    touchEvent(TouchEvent::New(time));
   Dali::TouchEvent touchEventHandle(touchEvent.Get());
   touchEvent->AddPoint(point);
   touchEvent->SetRenderTask(Dali::RenderTask(renderTask.Get()));
@@ -202,7 +202,7 @@ struct ParentTouchEventProcessor::Impl
     state.processor.mTouchDownConsumedActor.SetActor(nullptr);
 
     currentPoint.SetHitActor(Dali::Actor());
-    TouchEventPtr    touchEvent(new TouchEvent(event.time));
+    TouchEventPtr    touchEvent(TouchEvent::New(event.time));
     Dali::TouchEvent touchEventHandle(touchEvent.Get());
     touchEvent->AddPoint(currentPoint);
     state.processor.mScene.EmitTouchEventSignal(touchEventHandle);
@@ -396,7 +396,7 @@ bool ParentTouchEventProcessor::ProcessTouchEvent(const Integration::TouchEvent&
     return false;
   }
 
-  state.touchEventImpl   = new TouchEvent(event.time);
+  state.touchEventImpl   = TouchEvent::New(event.time);
   state.touchEventHandle = Dali::TouchEvent(state.touchEventImpl.Get());
 
   bool firstPoint = true;
@@ -458,7 +458,7 @@ void ParentTouchEventProcessor::OnObservedActorDisconnected(Actor* actor)
   point.SetState(PointState::INTERRUPTED);
   point.SetHitActor(Dali::Actor(actor));
 
-  TouchEventPtr touchEvent(new TouchEvent);
+  TouchEventPtr touchEvent(TouchEvent::New());
   touchEvent->AddPoint(point);
   Dali::TouchEvent touchEventHandle(touchEvent.Get());
 

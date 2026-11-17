@@ -27,7 +27,7 @@ namespace DALI_NAMESPACE
 {
 HoverEvent HoverEvent::New(uint32_t time)
 {
-  Internal::HoverEventPtr internal(new Internal::HoverEvent(time));
+  Internal::HoverEventPtr internal(Internal::HoverEvent::New(time));
 
   return HoverEvent(internal.Get());
 }

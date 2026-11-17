@@ -37,6 +37,7 @@ SET(TC_SOURCES
   utc-Dali-Internal-QueueBenchmark.cpp
   tct-Dali-internal-RayTest.cpp
   utc-Dali-Internal-RotationGesture.cpp
+  utc-Dali-Internal-SignalConnectionPool.cpp
   utc-Dali-Internal-String.cpp
   utc-Dali-Internal-Shader.cpp
   utc-Dali-Internal-TapGesture.cpp

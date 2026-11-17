@@ -70,8 +70,9 @@ const CustomActorImpl& CustomActor::GetImplementation() const
 }
 
 CustomActor::CustomActor(CustomActorImpl& implementation)
-: Actor(Internal::CustomActor::New(implementation).Get())
+: Actor(Internal::CustomActor::NewForBaseHandle(implementation))
 {
+  GetImpl(*this).InitializeExtension();
 }
 
 CustomActor::CustomActor(Internal::CustomActor* internal)

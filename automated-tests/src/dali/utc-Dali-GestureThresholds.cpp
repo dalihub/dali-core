@@ -400,7 +400,7 @@ int UtcDaliGestureThresholdsPanMinimumDistancePerDeviceHandleEvent(void)
     auto          feed = [&](PointState::Type state, const Vector2& position, uint32_t time)
     {
       Dali::Integration::TouchEvent tp = SingleTouch(state, position, deviceClass, time);
-      Internal::TouchEventPtr       touchEventImpl(new Internal::TouchEvent(time));
+      Internal::TouchEventPtr       touchEventImpl(Internal::TouchEvent::New(time));
       touchEventImpl->AddPoint(tp.GetPoint(0));
       touchEventImpl->SetRenderTask(task);
       Dali::TouchEvent touchEventHandle(touchEventImpl.Get());
@@ -569,7 +569,7 @@ struct LongPressStartedFunctor
 
 Internal::TouchEventPtr MakeInternalTouchEvent(const Dali::Integration::TouchEvent& touchEvent, Dali::RenderTask task)
 {
-  Internal::TouchEventPtr touchEventImpl(new Internal::TouchEvent(touchEvent.time));
+  Internal::TouchEventPtr touchEventImpl(Internal::TouchEvent::New(touchEvent.time));
   for(uint32_t i = 0u; i < touchEvent.GetPointCount(); ++i)
   {
     touchEventImpl->AddPoint(touchEvent.GetPoint(i));

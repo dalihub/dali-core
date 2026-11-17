@@ -414,7 +414,7 @@ void GeometryHoverEventProcessor::SendInterruptedHoverEvent(Actor* actor)
       point.SetState(PointState::INTERRUPTED);
       point.SetHitActor(Dali::Actor(actor));
 
-      HoverEventPtr hoverEvent(new HoverEvent(GetMilliSeconds()));
+      HoverEventPtr hoverEvent(HoverEvent::New(GetMilliSeconds()));
       hoverEvent->AddPoint(point);
 
       mProcessingHover = true;
@@ -439,7 +439,7 @@ void GeometryHoverEventProcessor::ProcessHoverEvent(const Integration::HoverEven
   mInvalidatedTargets.clear();
 
   ProcessHoverEventVariables localVars;
-  localVars.hoverEvent = new HoverEvent(event.time);
+  localVars.hoverEvent = HoverEvent::New(event.time);
 
   if(event.points[0].GetState() == PointState::INTERRUPTED)
   {
@@ -503,7 +503,7 @@ void GeometryHoverEventProcessor::OnObservedActorDisconnected(Actor* actor)
       point.SetState(PointState::INTERRUPTED);
       point.SetHitActor(Dali::Actor(actor));
 
-      HoverEventPtr hoverEvent(new HoverEvent(GetMilliSeconds()));
+      HoverEventPtr hoverEvent(HoverEvent::New(GetMilliSeconds()));
       hoverEvent->AddPoint(point);
 
       // Do not destroy an ActorObserver from inside its SceneObjectRemoved callback.

@@ -65,6 +65,7 @@ public:
     return new Constraint(object, targetIndex, sources, func);
   }
 
+protected:
   /**
    * Virtual destructor.
    */
@@ -237,6 +238,7 @@ public:
   /**
    * Virtual destructor.
    */
+protected:
   ~Constraint() override
   {
     // This is not responsible for removing constraints.

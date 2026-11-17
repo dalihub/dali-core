@@ -28,7 +28,7 @@ Dali::TouchEvent NewTouchEvent(uint32_t timeStamp, const TouchPoint& point)
 
 Dali::TouchEvent NewTouchEvent(uint32_t timeStamp, const Dali::Integration::Point& point)
 {
-  Internal::TouchEventPtr touchEventImpl(new Internal::TouchEvent(timeStamp));
+  Internal::TouchEventPtr touchEventImpl(Internal::TouchEvent::New(timeStamp));
   touchEventImpl->AddPoint(point);
   Dali::TouchEvent handle(touchEventImpl.Get());
   return handle;

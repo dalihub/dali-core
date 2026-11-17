@@ -75,6 +75,9 @@ Then run the following command to set up the build:
 
 If a Debug build is required, then add -DCMAKE_BUILD_TYPE=Debug
 
+To also install the DALi 2.x names as links to the dali3 files, add
+-DDALI_LEGACY_ALIASES=ON (see section 4).
+
 To build run:
 
          $ make install -j8
@@ -196,6 +199,10 @@ Useful options are:
 
 # Select the parallel build job count.
 .\build\windows\build.ps1 -Jobs 4
+
+# Do not install the DALi 2.x names (dali2-core.dll, dali2-core package);
+# they are installed by default as copies of the dali3 files (see section 4).
+.\build\windows\build.ps1 -NoLegacyAliases
 ```
 
 `-Clean` does not remove `WindowsDependenciesSDK`, `dali-env`, or another DALi
@@ -257,3 +264,37 @@ To build run:
 ```zsh
 % make install -j8
 ```
+
+## 4. Install layout and the DALi 2.x names
+
+DALi 3 installs under versioned names and paths, so that it can sit beside a
+DALi 2.x installed from its own source:
+
+| Item | DALi 3 | DALi 2.x |
+|---|---|---|
+| Libraries, pkg-config, CMake packages | `libdali3-core`, `dali3-core.pc`, `dali3-core` | `libdali2-core`, `dali2-core.pc`, `dali2-core` |
+| Headers | `include/dali3/dali/...` | `include/dali/...` |
+| Data | `share/dali3/` | `share/dali/` |
+| Tools | `dali3-invoke-method-generator`, `dali3-shader-generator` | `dali-invoke-method-generator`, `dali-shader-generator` |
+
+Applications still built against the 2.x names do not need to change.
+`-DDALI_LEGACY_ALIASES=ON` installs those names as links to the dali3 files
+(libraries, `include/<name>`, `share/dali`, tools, pkg-config and CMake package
+files). A binary built against 2.x loads the dali3 library through
+`libdali2-core.so.2`, and a project linked against the alias records the dali3
+SONAME, so it becomes a dali3 binary without a source change. The option is
+off by default, except on Windows, where applications still load the 2.x
+names: there it defaults to on and the files are copied instead of linked
+(`build.ps1 -NoLegacyAliases` or `-DDALI_LEGACY_ALIASES=OFF` turns it off).
+Every DALi repository has the same option, from its copy of
+`build/tizen/dali-legacy-aliases.cmake`.
+
+The Tizen packaging follows the Tizen version. Tizen 10.0 and below install the
+real DALi 2.x from its own source, so the spec never builds the aliases there.
+Tizen 10.1 and 11 build dali3 plus the alias packages under the 2.x package
+names (`dali2`, `dali2-devel`, ...) until the applications have moved to dali3;
+`--define "_without_dali2_aliases 1"` turns them off for a local build.
+
+Changes to this code go to `devel/master` only and flow down to the `tizen` and
+`tizen_10.1` branches; the DALi 3 repositories for Tizen 10.0 and below are
+merged from there as well.

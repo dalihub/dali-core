@@ -27,7 +27,7 @@ namespace DevelPanGesture
 {
 Dali::PanGesture New(GestureState state)
 {
-  return PanGesture(new Internal::PanGesture(state));
+  return PanGesture(Internal::PanGesture::NewForBaseHandle(state));
 }
 
 void SetTime(Dali::PanGesture& gesture, uint32_t time)

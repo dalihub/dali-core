@@ -37,12 +37,10 @@ namespace
 {
 const float ROTATION_EPSILON = 0.003f; // Deliberately large
 
-const uint32_t NUM_BYTES_IN_ROW_OF_3(3 * sizeof(float));
 const uint32_t NUM_BYTES_IN_ROW(4 * sizeof(float));
 const uint32_t NUM_BYTES_IN_MATRIX(16 * sizeof(float));
 const uint32_t ROW1_OFFSET(4);
 const uint32_t ROW2_OFFSET(8);
-const uint32_t ROW3_OFFSET(12);
 } // namespace
 
 namespace DALI_NAMESPACE

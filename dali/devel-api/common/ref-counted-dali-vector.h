@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-vector.h>
+#include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/object/ref-object.h>
 
 namespace DALI_NAMESPACE
@@ -38,10 +39,12 @@ class RefCountedVector : public RefObject
 {
 public:
   /**
-   * @brief Construct empty vector.
+   * @brief Creates a reference-counted implementation.
+   * @SINCE_3_0.0
    */
-  RefCountedVector()
+  static Dali::IntrusivePtr<RefCountedVector> New()
   {
+    return Dali::IntrusivePtr<RefCountedVector>(new RefCountedVector());
   }
 
   /**
@@ -54,11 +57,23 @@ public:
     return mVector;
   }
 
-  // Not copyable or movable
-  RefCountedVector(const RefCountedVector&)            = delete; ///< Deleted copy constructor
-  RefCountedVector(RefCountedVector&&)                 = delete; ///< Deleted move constructor
+private:
   RefCountedVector& operator=(const RefCountedVector&) = delete; ///< Deleted copy assignment operator
   RefCountedVector& operator=(RefCountedVector&&)      = delete; ///< Deleted move assignment operator
+
+protected:
+  /**
+   * @brief Construct empty vector.
+   */
+  RefCountedVector()
+  : mVector()
+  {
+  }
+
+private:
+  // Not copyable or movable
+  RefCountedVector(const RefCountedVector&) = delete; ///< Deleted copy constructor
+  RefCountedVector(RefCountedVector&&)      = delete; ///< Deleted move constructor
 
 protected:
   virtual ~RefCountedVector()

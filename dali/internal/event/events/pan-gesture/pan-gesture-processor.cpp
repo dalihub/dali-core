@@ -298,7 +298,7 @@ void PanGestureProcessor::AddGestureDetector(PanGestureDetector* gestureDetector
     FillRequest(request);
 
     Size size          = scene.GetSize();
-    mGestureRecognizer = new PanGestureRecognizer(*this, Vector2(size.width, size.height), request);
+    mGestureRecognizer = PanGestureRecognizer::New(*this, Vector2(size.width, size.height), request);
   }
   else
   {
@@ -560,7 +560,7 @@ void PanGestureProcessor::EmitPanSignal(Actor*                          actor,
 {
   if(actor && !gestureDetectors.empty())
   {
-    Internal::PanGesturePtr pan(new Internal::PanGesture(state));
+    Internal::PanGesturePtr pan(Internal::PanGesture::New(state));
 
     pan->SetTime(panEvent.time);
 

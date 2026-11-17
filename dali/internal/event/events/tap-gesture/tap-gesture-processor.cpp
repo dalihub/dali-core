@@ -58,7 +58,7 @@ void EmitTapSignal(
   const TapGestureEvent&          tapEvent,
   Vector2                         localPoint)
 {
-  Internal::TapGesturePtr tap(new Internal::TapGesture(tapEvent.state));
+  Internal::TapGesturePtr tap(Internal::TapGesture::New(tapEvent.state));
   tap->SetTime(tapEvent.time);
   tap->SetNumberOfTaps(tapEvent.numberOfTaps);
   tap->SetNumberOfTouches(tapEvent.numberOfTouches);
@@ -181,7 +181,7 @@ void TapGestureProcessor::AddGestureDetector(TapGestureDetector* gestureDetector
     FillRequest(request);
 
     Size size          = scene.GetSize();
-    mGestureRecognizer = new TapGestureRecognizer(*this, Vector2(size.width, size.height), request);
+    mGestureRecognizer = TapGestureRecognizer::New(*this, Vector2(size.width, size.height), request);
   }
   else
   {
