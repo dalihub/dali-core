@@ -21,6 +21,17 @@
 %{error:Tizen <= 10.0 ships the real DALi 2.x; dali2 aliases must not be built there}
 %endif
 
+# Temporary, for the Tizen Studio rootstrap. Its generator copies only the
+# files that the packages it names list themselves, and reaches a directory
+# link as an empty directory, so while the public rootstrap still names the
+# DALi 2.x packages and include paths the alias devel packages install real
+# copies of the headers under include/dali in place of the link; the adaptor
+# and ui specs carry the same switch. Remove this once the rootstrap names the
+# dali3 packages and include/dali3.
+%if %{with dali2_aliases}
+%bcond_without dali2_include_copy
+%endif
+
 # rpm derives no Provides from a symbolic link, so the alias packages declare
 # the ELF ones themselves. 64-bit ELF provides carry a suffix.
 %if "%{__isa_bits}" == "64"
@@ -191,6 +202,13 @@ rm -rf %{buildroot}
 cd build/tizen
 %make_install
 
+%if %{with dali2_include_copy}
+# include/dali: a copy of the dali3 headers in place of the link (see
+# dali2_include_copy above)
+rm %{buildroot}%{_includedir}/dali
+cp -a %{buildroot}%{_includedir}/dali3/dali %{buildroot}%{_includedir}/dali
+%endif
+
 ##############################
 # Scriptlets
 ##############################
@@ -219,13 +237,21 @@ exit 0
 # The Lua scriptlet runs up to the next section, so nothing but %files may
 # follow it. Every earlier package (DALi 2.x and dali3 3.0.0 alike) installed
 # include/dali as a real directory; rpm cannot replace a directory with a
-# link, so the alias package clears it before the transaction unpacks.
+# link, so the alias package clears it before the transaction unpacks. With
+# dali2_include_copy the package installs a directory again, and clears a
+# link left by an alias package built without the copy.
 %if %{with dali2_aliases}
 %pretrans -n dali2-devel -p <lua>
 local path = "%{_includedir}/dali"
+%if %{with dali2_include_copy}
+if posix.stat(path, "type") == "link" then
+  os.remove(path)
+end
+%else
 if posix.stat(path, "type") == "directory" then
   os.execute("rm -rf '" .. path .. "'")
 end
+%endif
 %endif
 %files
 %if 0%{?enable_dali_smack_rules}
@@ -266,8 +292,18 @@ end
 %{_bindir}/dali-invoke-method-generator
 %{_libdir}/libdali2-core.so
 %{_libdir}/pkgconfig/dali2-core.pc
+%if %{with dali2_include_copy}
+%{_includedir}/dali/public-api/*
+%{_includedir}/dali/doc/*
+%else
 %{_includedir}/dali
+%endif
 
 %files -n dali2-integration-devel
 %defattr(-,root,root,-)
+%if %{with dali2_include_copy}
+%{_includedir}/dali/devel-api/*
+%{_includedir}/dali/integration-api/*
+%{_includedir}/dali/graphics-api/*
+%endif
 %endif
