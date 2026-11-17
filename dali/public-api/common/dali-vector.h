@@ -207,7 +207,7 @@ public: // API
   ItemType& operator[](SizeType index)
   {
     // reuse the const version
-    return const_cast<ItemType&>(const_cast<const Vector<ItemType>&>(*this)[index]);
+    return const_cast<ItemType&>(const_cast<const Vector&>(*this)[index]);
   }
 
   /**
@@ -235,7 +235,7 @@ public: // API
   ItemType& Front()
   {
     // reuse the const version
-    return const_cast<ItemType&>(const_cast<const Vector<ItemType>&>(*this).Front());
+    return const_cast<ItemType&>(const_cast<const Vector&>(*this).Front());
   }
 
   /**
@@ -259,7 +259,7 @@ public: // API
   ItemType& Back()
   {
     // reuse the const version
-    return const_cast<ItemType&>(const_cast<const Vector<ItemType>&>(*this).Back());
+    return const_cast<ItemType&>(const_cast<const Vector&>(*this).Back());
   }
 
   /**
@@ -315,6 +315,7 @@ public: // API
    *
    * @SINCE_1_0.0
    * @param[in] element Element to be added
+   * @note \e element may refer to an element of this vector (e.g. PushBack(vector[0])).
    */
   void PushBack(const ItemType& element)
   {
@@ -323,6 +324,15 @@ public: // API
     const SizeType capacity = VectorBase::Capacity();
     if(newCount > capacity)
     {
+      if(DALI_UNLIKELY(IsInside(&element)))
+      {
+        // element lives in this vector and the reallocation below would invalidate it,
+        // so copy it out first.
+        ItemType copy(element);
+        PushBack(static_cast<ItemType&&>(copy));
+        return;
+      }
+
       // need more space
       Reserve(newCount << 1u); // reserve double the current count
     }
@@ -348,6 +358,7 @@ public: // API
    *
    * @SINCE_2_5.16
    * @param[in] element Element to be moved and added
+   * @note \e element may refer to an element of this vector; that element is left in a moved-from state.
    */
   void PushBack(ItemType&& element)
   {
@@ -356,6 +367,15 @@ public: // API
     const SizeType capacity = VectorBase::Capacity();
     if(newCount > capacity)
     {
+      if(DALI_UNLIKELY(IsInside(&element)))
+      {
+        // element lives in this vector and the reallocation below would invalidate it,
+        // so move it out first.
+        ItemType moved(static_cast<ItemType&&>(element));
+        PushBack(static_cast<ItemType&&>(moved));
+        return;
+      }
+
       // need more space
       Reserve(newCount << 1u); // reserve double the current count
     }
@@ -385,10 +405,20 @@ public: // API
    * @param[in] at Iterator where to insert the elements into the vector
    * @param[in] element An element to be added
    * @pre Iterator at must be in the vector's range ( Vector::Begin(), Vector::End() ).
+   * @note \e element may refer to an element of this vector (e.g. Insert(Begin(), vector[2])).
    */
   void Insert(Iterator at, const ItemType& element)
   {
     DALI_ASSERT_VECTOR((at <= End()) && (at >= Begin()) && "Iterator not inside vector");
+
+    if(DALI_UNLIKELY(InsertDisturbs(at, &element)))
+    {
+      // element lives in this vector and the reallocation or the shift below would
+      // invalidate it before it is copied in. Copy it out to a local first.
+      ItemType copy(element);
+      Insert(at, static_cast<ItemType&&>(copy));
+      return;
+    }
 
     const SizeType size    = sizeof(ItemType);
     uint8_t*       address = const_cast<uint8_t*>(reinterpret_cast<const uint8_t*>(&element));
@@ -412,15 +442,16 @@ public: // API
    * @param[in] at Iterator where to insert the element into the vector
    * @param[in] element An element to be moved and added
    * @pre Iterator at must be in the vector's range ( Vector::Begin(), Vector::End() ).
+   * @note \e element may refer to an element of this vector; that element is left in a moved-from state.
    */
   void Insert(Iterator at, ItemType&& element)
   {
     DALI_ASSERT_VECTOR((at <= End()) && (at >= Begin()) && "Iterator not inside vector");
 
-    // If element is inside this vector and at is at or before element's position,
-    // MoveItemInternal will shift (and destroy) element before we can move-construct
-    // from it. Move element out to a local first so the source is always valid.
-    if(DALI_UNLIKELY(&element >= Begin() && &element < End() && at <= &element))
+    // If element is inside this vector, a reallocation invalidates it, and when at is
+    // at or before its position the shift moves (and destroys) it before we can
+    // move-construct from it. Move element out to a local first so the source is always valid.
+    if(DALI_UNLIKELY(InsertDisturbs(at, &element)))
     {
       ItemType       temp(static_cast<ItemType&&>(element));
       const SizeType size    = sizeof(ItemType);
@@ -475,7 +506,7 @@ public: // API
       // Self insert case where the source range belongs to this vector.
       // Reserve may reallocate and invalidate the source pointers, so copy
       // the range into a temporary vector first.
-      Vector<ItemType> temporary;
+      Vector temporary;
       temporary.Insert(temporary.End(), from, to);
 
       VectorAlgorithms<BaseType, ItemType>::Insert(reinterpret_cast<uint8_t*>(at),
@@ -525,7 +556,7 @@ public: // API
       // Self insert case where the source range belongs to this vector.
       // Reserve may reallocate and invalidate the source pointers, so copy
       // the range into a temporary vector first.
-      Vector<ItemType> temporary;
+      Vector temporary;
       temporary.InsertMove(temporary.End(), from, to);
 
       VectorAlgorithms<BaseType, ItemType>::InsertMove(reinterpret_cast<uint8_t*>(at),
@@ -582,11 +613,12 @@ public: // API
   }
 
   /**
-   * @brief Resizes the vector. Does not change capacity.
+   * @brief Resizes the vector. The storage is reallocated only when it has to grow.
    *
    * @SINCE_1_0.0
    * @param[in] count Count to resize to
    * @param[in] item An item to insert to the new indices
+   * @note \e item may refer to an element of this vector (e.g. Resize(count, vector[0])).
    */
   void Resize(SizeType count, const ItemType& item)
   {
@@ -598,6 +630,15 @@ public: // API
     }
     else if(count > oldCount)
     {
+      if(DALI_UNLIKELY(IsInside(&item)))
+      {
+        // item lives in this vector and the reallocation below would invalidate it,
+        // so copy it out first.
+        ItemType copy(item);
+        Resize(count, copy);
+        return;
+      }
+
       // Grow: add new elements
       SizeType newItems = count - oldCount;
       Reserve(count);
@@ -644,6 +685,15 @@ public: // API
     }
     else if(count > oldCount)
     {
+      if(DALI_UNLIKELY(IsInside(&item)))
+      {
+        // item lives in this vector and the reallocation below would invalidate it,
+        // so move it out first.
+        ItemType moved(Dali::Move(item));
+        Resize(count, Dali::Move(moved));
+        return;
+      }
+
       SizeType newItems = count - oldCount;
       Reserve(count);
 
@@ -821,6 +871,27 @@ public: // API
     {
       VectorAlgorithms<BaseType, ItemType>::ShrinkToFit(sizeof(ItemType));
     }
+  }
+
+private:
+  /**
+   * @brief Checks whether an element lives inside this vector's storage.
+   *
+   * Such an element is invalidated by a reallocation and shifted by an insertion before it.
+   */
+  bool IsInside(const ItemType* element) const
+  {
+    return (element >= Begin()) && (element < End());
+  }
+
+  /**
+   * @brief Checks whether inserting one element at \e at would invalidate \e element
+   *        before it could be read: it lives inside this vector and either the storage
+   *        has to grow or it sits at or after the insertion point.
+   */
+  bool InsertDisturbs(ConstIterator at, const ItemType* element) const
+  {
+    return IsInside(element) && ((VectorBase::Count() + 1u > VectorBase::Capacity()) || (at <= element));
   }
 };
 
