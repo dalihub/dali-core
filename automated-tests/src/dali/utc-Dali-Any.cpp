@@ -20,6 +20,7 @@
 #include <stdlib.h>
 
 #include <iostream>
+#include <string>
 #include <vector>
 
 // Temp include
@@ -633,6 +634,40 @@ int UtcDaliAnyIsType(void)
   {
     tet_result(TET_FAIL);
   }
+
+  END_TEST;
+}
+
+int UtcDaliHashFNV1aKnownAnswer(void)
+{
+  TestApplication application;
+
+  tet_infoline("HashFNV1a and the ids built on it are an inline contract baked into applications: pin the known answers");
+
+  // Reference vectors from the FNV-1a specification.
+  DALI_TEST_EQUALS(HashFNV1a(""), 0x811c9dc5u, TEST_LOCATION);
+  DALI_TEST_EQUALS(HashFNV1a("a"), 0xe40c292cu, TEST_LOCATION);
+  DALI_TEST_EQUALS(HashFNV1a("foobar"), 0xbf9cf968u, TEST_LOCATION);
+
+  // Ids baked in at compile time by DALI_TYPE_ID.
+  constexpr TypeInfoId actorId = DALI_TYPE_ID(Dali::Actor);
+  DALI_TEST_EQUALS(actorId.GetId(), 0xa347c86au, TEST_LOCATION);
+  DALI_TEST_EQUALS(DALI_TYPE_ID(int).GetId(), HashFNV1a("int"), TEST_LOCATION);
+
+  // The runtime id Any derives from typeid() must agree with the compile-time one
+  // for a type whose demangled name carries no namespace.
+  Any intValue(42);
+  DALI_TEST_CHECK(intValue.GetType() == DALI_TYPE_ID(int));
+  DALI_TEST_EQUALS(intValue.GetType().GetId(), HashFNV1a("int"), TEST_LOCATION);
+
+  // A namespaced type demangles to the real namespace (Dali::Actor, or Tizen::Dali::Actor
+  // when DALi is built under the Tizen namespace), so pin the recipe id == HashFNV1a(name)
+  // rather than the compile-time id of the spelling "Dali::Actor".
+  Any         actorValue(Dali::Actor::New());
+  const char* actorName = actorValue.GetType().GetName();
+  DALI_TEST_CHECK(actorName != nullptr);
+  DALI_TEST_CHECK(std::string(actorName).find("Dali::Actor") != std::string::npos);
+  DALI_TEST_EQUALS(actorValue.GetType().GetId(), HashFNV1a(actorName), TEST_LOCATION);
 
   END_TEST;
 }

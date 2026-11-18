@@ -31,6 +31,11 @@ namespace DALI_NAMESPACE
  * @{
  */
 
+// ============================================================
+// Inline contract shared by applications and the library (both sides compile this).
+// WARNING: Do NOT change the algorithm, its constants, or the known answers below.
+// ============================================================
+
 /**
  * @brief Compile-time FNV-1a hash function for string literals.
  *
@@ -52,6 +57,12 @@ constexpr uint32_t HashFNV1a(const char* str, uint32_t hash = 0x811c9dc5)
 {
   return (*str) ? HashFNV1a(str + 1, (hash ^ static_cast<uint32_t>(static_cast<unsigned char>(*str))) * 0x01000193) : hash;
 }
+
+// Known answers from the FNV-1a specification: DALI_TYPE_ID bakes this hash into every
+// application at compile time, so a change to the algorithm must fail to compile here.
+static_assert(HashFNV1a("") == 0x811c9dc5u, "HashFNV1a is an inline contract baked into applications");
+static_assert(HashFNV1a("a") == 0xe40c292cu, "HashFNV1a is an inline contract baked into applications");
+static_assert(HashFNV1a("foobar") == 0xbf9cf968u, "HashFNV1a is an inline contract baked into applications");
 
 /**
  * @brief A lightweight type identifier that replaces std::type_info in public APIs.
@@ -83,6 +94,11 @@ constexpr uint32_t HashFNV1a(const char* str, uint32_t hash = 0x811c9dc5)
 class TypeInfoId
 {
 public:
+  // ============================================================
+  // Inline contract shared by applications and the library (both sides compile this).
+  // WARNING: Do NOT change the layout {uint32_t, const char*} or how operator== compares.
+  // ============================================================
+
   /**
    * @brief The underlying integer type used for the type identifier.
    * @SINCE_2_5.21
@@ -198,6 +214,10 @@ private:
   IdType      mId;   ///< FNV-1a hash of the type name (fast comparison)
   const char* mName; ///< Human-readable type name (for display and collision detection)
 };
+
+// The layout of TypeInfoId is compiled into applications (see the WARNING above).
+static_assert(sizeof(void*) != 8 || sizeof(TypeInfoId) == 16, "TypeInfoId layout is ABI-frozen");
+static_assert(sizeof(void*) != 4 || sizeof(TypeInfoId) == 8, "TypeInfoId layout is ABI-frozen");
 
 /**
  * @}

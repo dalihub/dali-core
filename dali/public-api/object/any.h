@@ -308,6 +308,11 @@ public:
 
   using DeleteFunc = void (*)(const AnyContainerBase*); // @DEPRECATED_2_5.47 will be private.
 
+  // ============================================================
+  // Inline contract shared by applications and the library (both sides compile this).
+  // WARNING: Do NOT change the layout {TypeInfoId, CloneFunc, DeleteFunc} of the containers below.
+  // ============================================================
+
   /**
    * @brief Base container to hold type for match verification and instance cloning function.
    *
@@ -488,6 +493,11 @@ private:
    * @return The demangled, human-readable type name
    */
   static DALI_CORE_API Dali::String DemangleTypeName(const char* mangledName);
+
+  // ============================================================
+  // Inline contract shared by applications and the library (both sides compile this).
+  // WARNING: Do NOT change how the id is derived; both sides must compute equal ids for one type.
+  // ============================================================
 
   /**
    * @brief Constructs a TypeInfoId from typeid(T), with proper demangling.
