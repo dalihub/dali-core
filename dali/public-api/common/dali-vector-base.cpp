@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <cstdlib> // malloc, realloc, free
 #include <cstring> // memcpy, memmove
+#include <memory>  // std::unique_ptr
 #include <utility> // std::swap
 
 // INTERNAL INCLUDES
@@ -37,9 +38,49 @@ constexpr SizeType METADATA_SIZE = sizeof(SizeType) * 2u; ///< [capacity][count]
 // The layout of VectorBase is compiled into applications (see the WARNING in dali-vector-base.h).
 static_assert(sizeof(VectorBase) == sizeof(void*), "VectorBase layout is ABI-frozen");
 
+struct FreeDeleter
+{
+  void operator()(SizeType* block) const
+  {
+    free(block);
+  }
+};
+
+using VectorBlock = std::unique_ptr<SizeType, FreeDeleter>;
+
 inline SizeType* MetadataOf(void* data)
 {
   return reinterpret_cast<SizeType*>(data) - 2u;
+}
+
+// Capacity() and SetCount() are exported. The library reads and writes the metadata
+// directly so that its own calls stay internal.
+inline SizeType CapacityOf(void* data)
+{
+  return data ? MetadataOf(data)[0] : 0u;
+}
+
+inline void SetCountOf(void* data, SizeType count)
+{
+  if(data)
+  {
+    MetadataOf(data)[1] = count;
+  }
+}
+
+VectorBlock AllocateBlock(SizeType capacity, SizeType count, SizeType elementSize)
+{
+  const SizeType allocationSize = METADATA_SIZE + capacity * elementSize;
+  VectorBlock    block{static_cast<SizeType*>(malloc(allocationSize))};
+  DALI_ASSERT_ALWAYS(block && "VectorBase - Memory allocation failed");
+
+#if defined(DEBUG_ENABLED)
+  // In a debug build this helps identify uninitialized elements.
+  memset(block.get(), 0xaa, allocationSize);
+#endif
+  block.get()[0] = capacity;
+  block.get()[1] = count;
+  return block;
 }
 
 } // namespace
@@ -55,43 +96,48 @@ void VectorBase::DestroyRange(uint8_t* first, uint8_t* last, const ElementOperat
   }
 }
 
-// Copy-constructs count elements at destination from source. The ranges must not overlap.
-void VectorBase::CopyConstructRange(uint8_t* destination, const uint8_t* source, SizeType count, const ElementOperations& operations)
+void VectorBase::CopyConstructRange(uint8_t* destination, const uint8_t* source, SizeType count, const ElementOperations& operations, bool repeatSource)
 {
+  const SizeType elementSize = operations.elementSize;
   if(operations.copyConstruct)
+  {
+    const SizeType sourceStride = repeatSource ? 0u : elementSize;
+    for(SizeType i = 0u; i < count; ++i)
+    {
+      operations.copyConstruct(destination + i * elementSize, source + i * sourceStride);
+    }
+  }
+  else if(repeatSource)
   {
     for(SizeType i = 0u; i < count; ++i)
     {
-      operations.copyConstruct(destination + i * operations.elementSize, source + i * operations.elementSize);
+      memcpy(destination + i * elementSize, source, elementSize);
     }
   }
   else
   {
-    memcpy(destination, source, count * operations.elementSize);
+    memcpy(destination, source, count * elementSize);
   }
 }
 
-// Move-constructs count elements at destination from source, leaving the sources moved-from.
-// The ranges must not overlap.
 void VectorBase::MoveConstructRange(uint8_t* destination, uint8_t* source, SizeType count, const ElementOperations& operations)
 {
+  const SizeType elementSize = operations.elementSize;
   if(operations.moveConstruct)
   {
     for(SizeType i = 0u; i < count; ++i)
     {
-      operations.moveConstruct(destination + i * operations.elementSize, source + i * operations.elementSize);
+      operations.moveConstruct(destination + i * elementSize, source + i * elementSize);
     }
   }
   else
   {
-    memcpy(destination, source, count * operations.elementSize);
+    memcpy(destination, source, count * elementSize);
   }
 }
 
-// Relocates count elements from source to destination: each is move-constructed at its new
-// address and destroyed at the old one. The ranges may overlap; the elements are processed from
-// the end when the destination lies above the source so that no element is overwritten before
-// it has been moved.
+// The ranges may overlap; the elements are processed from the end when the destination lies
+// above the source so that no element is overwritten before it has been moved.
 void VectorBase::RelocateRange(uint8_t* destination, uint8_t* source, SizeType count, const ElementOperations& operations)
 {
   if(!operations.moveConstruct)
@@ -141,19 +187,14 @@ VectorBase::~VectorBase() = default;
 
 VectorBase::SizeType VectorBase::Capacity() const
 {
-  SizeType capacity = 0u;
-  if(mData)
-  {
-    capacity = *(MetadataOf(mData));
-  }
-  return capacity;
+  return CapacityOf(mData);
 }
 
 void VectorBase::Release()
 {
   if(mData)
   {
-    free(reinterpret_cast<void*>(MetadataOf(mData)));
+    free(MetadataOf(mData));
     mData = nullptr;
   }
 }
@@ -161,44 +202,31 @@ void VectorBase::Release()
 void VectorBase::SetCount(SizeType count)
 {
   // someone can call Resize( 0u ) before ever populating the vector
-  if(mData)
-  {
-    *(MetadataOf(mData) + 1u) = count;
-  }
+  SetCountOf(mData, count);
 }
 
 void VectorBase::Reallocate(SizeType capacity, const ElementOperations& operations)
 {
-  const SizeType oldCount        = Count();
-  const SizeType wholeAllocation = METADATA_SIZE + capacity * operations.elementSize;
-  void*          wholeData       = malloc(wholeAllocation);
-  DALI_ASSERT_ALWAYS(wholeData && "VectorBase::Reallocate - Memory allocation failed");
+  const SizeType oldCount = Count();
+  VectorBlock    block    = AllocateBlock(capacity, oldCount, operations.elementSize);
+  uint8_t*       oldData  = reinterpret_cast<uint8_t*>(mData);
 
-#if defined(DEBUG_ENABLED)
-  // in debug build this will help identify a vector of uninitialized data
-  memset(wholeData, 0xaa, wholeAllocation);
-#endif
-  SizeType* metaData = reinterpret_cast<SizeType*>(wholeData);
-  *metaData++        = capacity;
-  *metaData++        = oldCount;
-
-  void* oldData = mData;
-  if(oldData)
+  if(oldCount > 0u)
   {
-    RelocateRange(reinterpret_cast<uint8_t*>(metaData), reinterpret_cast<uint8_t*>(oldData), oldCount, operations);
+    RelocateRange(reinterpret_cast<uint8_t*>(block.get() + 2u), oldData, oldCount, operations);
   }
 
   // Set the new data before releasing the old block.
-  mData = reinterpret_cast<void*>(metaData);
+  mData = block.release() + 2u;
   if(oldData)
   {
-    free(reinterpret_cast<void*>(MetadataOf(oldData)));
+    free(MetadataOf(oldData));
   }
 }
 
 void VectorBase::Reserve(SizeType count, const ElementOperations& operations)
 {
-  if(count > Capacity())
+  if(count > CapacityOf(mData))
   {
     Reallocate(count, operations);
   }
@@ -208,14 +236,16 @@ void VectorBase::ShrinkToFit(const ElementOperations& operations)
 {
   if(mData)
   {
-    const SizeType count = Count();
+    const SizeType count    = Count();
+    const SizeType capacity = CapacityOf(mData);
     if(count == 0u)
     {
-      Release();
+      free(MetadataOf(mData));
+      mData = nullptr;
     }
-    else if(count != Capacity())
+    else if(count != capacity)
     {
-      DALI_ASSERT_VECTOR(count < Capacity() && "Count is bigger than capacity!");
+      DALI_ASSERT_VECTOR(count < capacity && "Count is bigger than capacity!");
 
       if(operations.moveConstruct)
       {
@@ -226,12 +256,12 @@ void VectorBase::ShrinkToFit(const ElementOperations& operations)
         // Trivial elements keep their bytes, so shrink the block in place when the allocator can.
         // On failure the old block is still valid and mData still points into it.
         const SizeType wholeAllocation = METADATA_SIZE + count * operations.elementSize;
-        SizeType*      newMetaData     = reinterpret_cast<SizeType*>(realloc(reinterpret_cast<void*>(MetadataOf(mData)), wholeAllocation));
+        SizeType*      newMetaData     = static_cast<SizeType*>(realloc(MetadataOf(mData), wholeAllocation));
         DALI_ASSERT_ALWAYS(newMetaData && "VectorBase::ShrinkToFit - Memory allocation failed");
 
         *newMetaData++ = count;
         *newMetaData++ = count;
-        mData          = reinterpret_cast<void*>(newMetaData);
+        mData          = newMetaData;
       }
     }
   }
@@ -240,7 +270,7 @@ void VectorBase::ShrinkToFit(const ElementOperations& operations)
 void VectorBase::ShrinkToFitIfNeeded(const ElementOperations& operations)
 {
   // Run ShrinkToFit only if the capacity is much bigger than the count.
-  if(DALI_UNLIKELY(Count() * SHRINK_REQUIRED_RATIO < Capacity()))
+  if(DALI_UNLIKELY(Count() * SHRINK_REQUIRED_RATIO < CapacityOf(mData)))
   {
     ShrinkToFit(operations);
   }
@@ -252,26 +282,32 @@ void VectorBase::Clear(const ElementOperations& operations)
   {
     uint8_t* data = reinterpret_cast<uint8_t*>(mData);
     DestroyRange(data, data + Count() * operations.elementSize, operations);
-    SetCount(0u);
+    SetCountOf(mData, 0u);
   }
 }
 
 void VectorBase::Release(const ElementOperations& operations)
 {
-  Clear(operations);
-  Release();
+  if(mData)
+  {
+    uint8_t* data = reinterpret_cast<uint8_t*>(mData);
+    DestroyRange(data, data + Count() * operations.elementSize, operations);
+    free(MetadataOf(mData));
+    mData = nullptr;
+  }
 }
 
 void VectorBase::Replace(void* newData, const ElementOperations& operations) noexcept
 {
   if(mData)
   {
-    Clear(operations);
+    uint8_t* data = reinterpret_cast<uint8_t*>(mData);
+    DestroyRange(data, data + Count() * operations.elementSize, operations);
 
     // Set the new data before releasing the old block.
     SizeType* oldMetaData = MetadataOf(mData);
     mData                 = newData;
-    free(reinterpret_cast<void*>(oldMetaData));
+    free(oldMetaData);
   }
   else
   {
@@ -281,40 +317,22 @@ void VectorBase::Replace(void* newData, const ElementOperations& operations) noe
 
 void VectorBase::Copy(const VectorBase& vector, const ElementOperations& operations)
 {
-  const SizeType capacity = vector.Capacity();
+  const SizeType capacity = CapacityOf(vector.mData);
   const SizeType count    = vector.Count();
 
-  if(!operations.copyConstruct && !operations.destroy)
+  if(capacity == 0u)
   {
-    // Trivial elements: duplicate the block.
-    if(capacity == 0u)
-    {
-      Release();
-      return;
-    }
-
-    const SizeType wholeAllocation = METADATA_SIZE + capacity * operations.elementSize;
-    void*          wholeData       = malloc(wholeAllocation);
-    DALI_ASSERT_ALWAYS(wholeData && "VectorBase::Copy - Memory allocation failed");
-
-    SizeType* dstData = reinterpret_cast<SizeType*>(wholeData) + 2u;
-    memcpy(reinterpret_cast<void*>(dstData - 2u), reinterpret_cast<void*>(MetadataOf(vector.mData)), METADATA_SIZE + count * operations.elementSize);
-
-    Replace(reinterpret_cast<void*>(dstData), operations);
+    Release(operations);
     return;
   }
 
-  // Remove the old elements first.
-  Release(operations);
-  if(capacity > 0u)
-  {
-    Reallocate(capacity, operations);
-  }
+  // Build the copy first and replace the elements held so far only when it is complete.
+  VectorBlock block = AllocateBlock(capacity, count, operations.elementSize);
   if(count > 0u)
   {
-    CopyConstructRange(reinterpret_cast<uint8_t*>(mData), reinterpret_cast<const uint8_t*>(vector.mData), count, operations);
-    SetCount(count);
+    CopyConstructRange(reinterpret_cast<uint8_t*>(block.get() + 2u), reinterpret_cast<const uint8_t*>(vector.mData), count, operations);
   }
+  Replace(block.release() + 2u, operations);
 }
 
 void VectorBase::Swap(VectorBase& vector)
@@ -330,7 +348,7 @@ void VectorBase::Append(const void* element, bool move, const ElementOperations&
   const SizeType newCount    = count + 1u;
   const uint8_t* source      = reinterpret_cast<const uint8_t*>(element);
 
-  if(newCount > Capacity())
+  if(newCount > CapacityOf(mData))
   {
     // element may live inside this vector: find it again after the relocation.
     const uint8_t* data   = reinterpret_cast<const uint8_t*>(mData);
@@ -345,16 +363,21 @@ void VectorBase::Append(const void* element, bool move, const ElementOperations&
     }
   }
 
+  // A single element: call the operation directly to keep this frequent path short.
   uint8_t* destination = reinterpret_cast<uint8_t*>(mData) + count * elementSize;
-  if(move)
+  if(move && operations.moveConstruct)
   {
-    MoveConstructRange(destination, const_cast<uint8_t*>(source), 1u, operations);
+    operations.moveConstruct(destination, const_cast<uint8_t*>(source));
+  }
+  else if(!move && operations.copyConstruct)
+  {
+    operations.copyConstruct(destination, source);
   }
   else
   {
-    CopyConstructRange(destination, source, 1u, operations);
+    memcpy(destination, source, elementSize);
   }
-  SetCount(newCount);
+  SetCountOf(mData, newCount);
 }
 
 void VectorBase::AppendCopies(const void* element, SizeType count, const ElementOperations& operations)
@@ -369,7 +392,7 @@ void VectorBase::AppendCopies(const void* element, SizeType count, const Element
   const SizeType newCount    = oldCount + count;
   const uint8_t* source      = reinterpret_cast<const uint8_t*>(element);
 
-  if(newCount > Capacity())
+  if(newCount > CapacityOf(mData))
   {
     // element may live inside this vector: find it again after the relocation.
     const uint8_t* data   = reinterpret_cast<const uint8_t*>(mData);
@@ -385,11 +408,8 @@ void VectorBase::AppendCopies(const void* element, SizeType count, const Element
   }
 
   uint8_t* destination = reinterpret_cast<uint8_t*>(mData) + oldCount * elementSize;
-  for(SizeType i = 0u; i < count; ++i)
-  {
-    CopyConstructRange(destination + i * elementSize, source, 1u, operations);
-  }
-  SetCount(newCount);
+  CopyConstructRange(destination, source, count, operations, true);
+  SetCountOf(mData, newCount);
 }
 
 uint8_t* VectorBase::Insert(uint8_t* at, const uint8_t* from, const uint8_t* to, bool move, const ElementOperations& operations)
@@ -412,7 +432,7 @@ uint8_t* VectorBase::Insert(uint8_t* at, const uint8_t* from, const uint8_t* to,
   uint8_t* stash = nullptr;
   if(data && (from >= data) && (to <= data + count * elementSize))
   {
-    stash = reinterpret_cast<uint8_t*>(malloc(size));
+    stash = static_cast<uint8_t*>(malloc(size));
     DALI_ASSERT_ALWAYS(stash && "VectorBase::Insert - Memory allocation failed");
     if(move)
     {
@@ -424,7 +444,7 @@ uint8_t* VectorBase::Insert(uint8_t* at, const uint8_t* from, const uint8_t* to,
     }
   }
 
-  if(newCount > Capacity())
+  if(newCount > CapacityOf(mData))
   {
     // reserve enough space to store at least the next power of two elements of the new required size.
     Reallocate(NextPowerOfTwo(static_cast<uint32_t>(newCount)), operations);
@@ -450,23 +470,23 @@ uint8_t* VectorBase::Insert(uint8_t* at, const uint8_t* from, const uint8_t* to,
   {
     CopyConstructRange(position, from, insertCount, operations);
   }
-  SetCount(newCount);
+  SetCountOf(mData, newCount);
 
   return position;
 }
 
 uint8_t* VectorBase::Erase(uint8_t* first, uint8_t* last, const ElementOperations& operations)
 {
-  if(mData)
+  if(mData && first != last)
   {
     const SizeType elementSize = operations.elementSize;
-    const SizeType eraseCount  = static_cast<SizeType>(last - first) / elementSize;
-    uint8_t*       end         = reinterpret_cast<uint8_t*>(mData) + Count() * elementSize;
+    const SizeType count       = Count();
+    uint8_t*       end         = reinterpret_cast<uint8_t*>(mData) + count * elementSize;
 
     DestroyRange(first, last, operations);
     // Close the gap by shifting the tail down.
     RelocateRange(first, last, static_cast<SizeType>(end - last) / elementSize, operations);
-    SetCount(Count() - eraseCount);
+    SetCountOf(mData, count - static_cast<SizeType>(last - first) / elementSize);
   }
 
   return first;

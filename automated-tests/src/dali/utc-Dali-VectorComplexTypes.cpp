@@ -1693,3 +1693,90 @@ int UtcDaliVectorMoveOnlyResizeSelfRealloc(void)
 
   END_TEST;
 }
+
+namespace
+{
+struct StringElement
+{
+  std::string text;
+};
+
+// Reaches the element operations, which Vector keeps protected.
+class OperationsVector : public Vector<StringElement>
+{
+public:
+  void CopyThroughMoveOperations(const OperationsVector& source)
+  {
+    VectorBase::Copy(source, MoveOperations());
+  }
+};
+
+struct ClassNewElement
+{
+  ClassNewElement() = default;
+
+  explicit ClassNewElement(int elementValue)
+  : value(elementValue)
+  {
+  }
+
+  ClassNewElement(const ClassNewElement&) = default;
+
+  ~ClassNewElement()
+  {
+  }
+
+  static void* operator new(std::size_t size)
+  {
+    return ::operator new(size);
+  }
+
+  static void operator delete(void* pointer)
+  {
+    ::operator delete(pointer);
+  }
+
+  int value{0};
+};
+} // unnamed namespace
+
+int UtcDaliVectorCopyThroughMoveOperationsAsserts(void)
+{
+  tet_infoline("Copying through the operations of the move-only paths asserts instead of copying the bytes");
+
+  OperationsVector source;
+  source.PushBack(StringElement{"first"});
+  source.PushBack(StringElement{"second"});
+
+  OperationsVector target;
+  target.PushBack(StringElement{"kept"});
+
+  DALI_TEST_ASSERTION(target.CopyThroughMoveOperations(source), "cannot copy");
+
+  DALI_TEST_EQUALS(target.Count(), static_cast<VectorBase::SizeType>(1u), TEST_LOCATION);
+  DALI_TEST_CHECK(target[0].text == "kept");
+  DALI_TEST_EQUALS(source.Count(), static_cast<VectorBase::SizeType>(2u), TEST_LOCATION);
+  DALI_TEST_CHECK(source[1].text == "second");
+
+  END_TEST;
+}
+
+int UtcDaliVectorElementWithClassOperatorNew(void)
+{
+  tet_infoline("Elements are constructed with the global placement new even when the type declares its own operator new");
+
+  const ClassNewElement   fill(3);
+  Vector<ClassNewElement> vector;
+  vector.PushBack(ClassNewElement(1));
+  vector.Insert(vector.Begin(), ClassNewElement(2));
+  vector.Resize(4u, fill);
+  Vector<ClassNewElement> copy(vector);
+
+  DALI_TEST_EQUALS(copy.Count(), static_cast<VectorBase::SizeType>(4u), TEST_LOCATION);
+  DALI_TEST_EQUALS(copy[0].value, 2, TEST_LOCATION);
+  DALI_TEST_EQUALS(copy[1].value, 1, TEST_LOCATION);
+  DALI_TEST_EQUALS(copy[2].value, 3, TEST_LOCATION);
+  DALI_TEST_EQUALS(copy[3].value, 3, TEST_LOCATION);
+
+  END_TEST;
+}
