@@ -478,6 +478,11 @@ void RenderTask::SetViewportGuideActor(Actor* actor)
       AddResetterMessage(updateManager, resetter1);
       AddResetterMessage(updateManager, resetter2);
     }
+
+    if(mFrameBuffer)
+    {
+      MarkFrameBufferUpdatedMessage(eventThreadServices, *GetRenderTaskSceneObject());
+    }
   }
 }
 
@@ -501,6 +506,11 @@ void RenderTask::ResetViewportGuideActor()
     auto                 viewportSizeProperty     = const_cast<SceneGraph::AnimatableProperty<Vector2>*>(&renderTask->mViewportSize);
     BakeMessage<Vector2>(eventThreadServices, *renderTask, *viewportPositionProperty, mViewportPosition);
     BakeMessage<Vector2>(eventThreadServices, *renderTask, *viewportSizeProperty, mViewportSize);
+
+    if(mFrameBuffer)
+    {
+      MarkFrameBufferUpdatedMessage(eventThreadServices, *GetRenderTaskSceneObject());
+    }
   }
 }
 
@@ -529,6 +539,11 @@ void RenderTask::SetViewportPosition(const Vector2& value)
     auto                 renderTask               = const_cast<SceneGraph::RenderTask*>(GetRenderTaskSceneObject());
     auto                 viewportPositionProperty = const_cast<SceneGraph::AnimatableProperty<Vector2>*>(&renderTask->mViewportPosition);
     BakeMessage<Vector2>(eventThreadServices, *renderTask, *viewportPositionProperty, mViewportPosition);
+
+    if(mFrameBuffer)
+    {
+      MarkFrameBufferUpdatedMessage(eventThreadServices, *GetRenderTaskSceneObject());
+    }
   }
 }
 
@@ -552,6 +567,11 @@ void RenderTask::SetViewportSize(const Vector2& value)
     auto                 renderTask           = const_cast<SceneGraph::RenderTask*>(GetRenderTaskSceneObject());
     auto                 viewportSizeProperty = const_cast<SceneGraph::AnimatableProperty<Vector2>*>(&renderTask->mViewportSize);
     BakeMessage<Vector2>(eventThreadServices, *renderTask, *viewportSizeProperty, mViewportSize);
+
+    if(mFrameBuffer)
+    {
+      MarkFrameBufferUpdatedMessage(eventThreadServices, *GetRenderTaskSceneObject());
+    }
   }
 }
 
@@ -632,6 +652,11 @@ void RenderTask::SetClearColor(const Vector4& color)
       auto                 renderTask          = const_cast<SceneGraph::RenderTask*>(GetRenderTaskSceneObject());
       auto                 clearColorProperty  = const_cast<SceneGraph::AnimatableProperty<Vector4>*>(&renderTask->mClearColor);
       BakeMessage<Vector4>(eventThreadServices, *renderTask, *clearColorProperty, mClearColor);
+
+      if(mFrameBuffer)
+      {
+        MarkFrameBufferUpdatedMessage(eventThreadServices, *GetRenderTaskSceneObject());
+      }
     }
   }
 }

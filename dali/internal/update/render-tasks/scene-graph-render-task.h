@@ -368,6 +368,11 @@ public:
   void SetRenderPassTag(uint32_t renderPassTag);
 
   /**
+   * @brief Mark as frame buffer updated.
+   */
+  void MarkFrameBufferUpdated();
+
+  /**
    * @brief The render task will be destroyed.
    */
   void Destroy();

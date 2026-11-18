@@ -22,6 +22,7 @@
 #include <dali/internal/common/render-task-default-values.h>
 #include <dali/internal/render/common/render-instruction.h>
 #include <dali/internal/render/common/render-tracker.h>
+#include <dali/internal/render/renderers/render-frame-buffer.h>
 #include <dali/internal/update/controllers/render-manager-dispatcher.h>
 #include <dali/internal/update/nodes/node.h>
 #include <dali/public-api/math/matrix.h>
@@ -55,6 +56,8 @@ void RenderTask::Initialize(ResetterManager& resetterManager, RenderManagerDispa
 
 void RenderTask::SetSourceNode(Node* node)
 {
+  MarkFrameBufferUpdated();
+
   // Stop observing the old node (if we were)
   if(mSourceNode)
   {
@@ -82,6 +85,8 @@ Node* RenderTask::GetSourceNode() const
 
 void RenderTask::SetStopperNode(Node* node)
 {
+  MarkFrameBufferUpdated();
+
   if(mStopperNode)
   {
     mStopperNode->RemoveObserver(*this);
@@ -102,6 +107,8 @@ Node* RenderTask::GetStopperNode() const
 
 void RenderTask::SetViewportGuideNode(Node* node)
 {
+  MarkFrameBufferUpdated();
+
   if(mViewportGuideNode)
   {
     mViewportGuideNode->RemoveObserver(*this);
@@ -123,6 +130,7 @@ Node* RenderTask::GetViewportGuideNode() const
 void RenderTask::SetRenderedScaleFactor(const Vector2& scaleFactor)
 {
   mRenderedScaleFactor = scaleFactor;
+  MarkFrameBufferUpdated();
 }
 
 Vector2 RenderTask::GetRenderedScaleFactor() const
@@ -132,6 +140,7 @@ Vector2 RenderTask::GetRenderedScaleFactor() const
 
 void RenderTask::SetExclusive(bool exclusive)
 {
+  MarkFrameBufferUpdated();
   mExclusive = exclusive;
 
   if(mSourceNode)
@@ -154,6 +163,8 @@ bool RenderTask::IsExclusive() const
 
 void RenderTask::SetCamera(Camera* cameraNode)
 {
+  MarkFrameBufferUpdated();
+
   if(mCameraNode)
   {
     mCameraNode->RemoveObserver(*this);
@@ -170,7 +181,9 @@ void RenderTask::SetCamera(Camera* cameraNode)
 
 void RenderTask::SetFrameBuffer(Render::FrameBuffer* frameBuffer)
 {
+  MarkFrameBufferUpdated();
   mFrameBuffer = frameBuffer;
+  MarkFrameBufferUpdated();
 }
 
 Render::FrameBuffer* RenderTask::GetFrameBuffer()
@@ -201,6 +214,7 @@ const Vector4& RenderTask::GetClearColor() const
 void RenderTask::SetClearEnabled(bool enabled)
 {
   mClearEnabled = enabled;
+  MarkFrameBufferUpdated();
 }
 
 bool RenderTask::GetClearEnabled() const
@@ -211,6 +225,7 @@ bool RenderTask::GetClearEnabled() const
 void RenderTask::SetCullMode(bool mode)
 {
   mCullMode = mode;
+  MarkFrameBufferUpdated();
 }
 
 bool RenderTask::GetCullMode() const
@@ -223,6 +238,7 @@ void RenderTask::SetRefreshRate(uint32_t refreshRate)
   DALI_LOG_TRACE_METHOD_FMT(gRenderTaskLogFilter, "this:%p RefreshRate:%d\n", this, refreshRate);
 
   mRefreshRate = refreshRate;
+  MarkFrameBufferUpdated();
 
   if(mRefreshRate > 0)
   {
@@ -397,6 +413,16 @@ RenderInstruction& RenderTask::PrepareRenderInstruction()
 
   TASK_LOG(Debug::General);
 
+  // Check if
+  // 1. RenderTask's animatable property changed
+  // 2. Camera's view / project matrix changed
+  // Note that if camera's position changed, then view matrix mark as updated.
+  if(Updated() ||
+     (mCameraNode && (ViewMatrixUpdated() || mCameraNode->ProjectionMatrixUpdated())))
+  {
+    MarkFrameBufferUpdated();
+  }
+
   BoundsInteger viewport;
   bool          viewportSet = QueryViewport(viewport);
 
@@ -447,9 +473,9 @@ void RenderTask::UpdateViewport(Vector2 sceneSize, Vector3 cameraPosition)
     Vector3 worldPosition = GetViewportGuideNode()->GetWorldPosition();
     worldPosition -= cameraPosition;
 
-    Vector3 nodeSize = GetViewportGuideNode()->GetSize() * GetViewportGuideNode()->GetWorldScale();
+    Vector2 nodeSize = Vector2(GetViewportGuideNode()->GetSize() * GetViewportGuideNode()->GetWorldScale());
     Vector2 halfSceneSize(sceneSize.width * 0.5f, sceneSize.height * 0.5f); // World position origin is center of scene
-    Vector3 halfNodeSize(nodeSize * 0.5f);
+    Vector2 halfNodeSize(nodeSize * 0.5f);
     Vector2 screenPosition(halfSceneSize.width + worldPosition.x - halfNodeSize.x,
                            halfSceneSize.height + worldPosition.y - halfNodeSize.y);
 
@@ -459,8 +485,23 @@ void RenderTask::UpdateViewport(Vector2 sceneSize, Vector3 cameraPosition)
      *
      * TODO : Need to make Resseter for these properties.
      */
-    mViewportPosition.Set(screenPosition);
-    mViewportSize.Set(Vector2(nodeSize));
+    bool viewportChanged = false;
+
+    if(GetViewportPosition() != screenPosition)
+    {
+      mViewportPosition.Set(screenPosition);
+      viewportChanged = true;
+    }
+    if(GetViewportSize() != nodeSize)
+    {
+      mViewportSize.Set(nodeSize);
+      viewportChanged = true;
+    }
+
+    if(viewportChanged)
+    {
+      MarkFrameBufferUpdated();
+    }
   }
 }
 
@@ -490,11 +531,21 @@ bool RenderTask::GetViewportEnabled() const
 void RenderTask::SetSyncRequired(bool requiresSync)
 {
   mRequiresSync = requiresSync;
+  MarkFrameBufferUpdated();
 }
 
 void RenderTask::SetRenderPassTag(uint32_t renderPassTag)
 {
   mRenderPassTag = renderPassTag;
+  MarkFrameBufferUpdated();
+}
+
+void RenderTask::MarkFrameBufferUpdated()
+{
+  if(mFrameBuffer)
+  {
+    mFrameBuffer->NotifyFrameBufferUpdated();
+  }
 }
 
 void RenderTask::Destroy()
@@ -648,6 +699,8 @@ void RenderTask::SetActiveStatus()
   {
     // Send resetter only if newly activated
     AddInitializeResetter(*mResetterManager);
+
+    MarkFrameBufferUpdated();
   }
 }
 

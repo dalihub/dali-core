@@ -173,6 +173,17 @@ inline void SetRenderedScaleFactorMessage(EventThreadServices& eventThreadServic
   new(slot) LocalType(&task, &RenderTask::SetRenderedScaleFactor, scaleFactor);
 }
 
+inline void MarkFrameBufferUpdatedMessage(EventThreadServices& eventThreadServices, const RenderTask& task)
+{
+  using LocalType = Message<RenderTask>;
+
+  // Reserve some memory inside the message queue
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new(slot) LocalType(&task, &RenderTask::MarkFrameBufferUpdated);
+}
+
 } //namespace DALI_NAMESPACE::Internal::SceneGraph
 
 #endif // DALI_INTERNAL_SCENE_GRAPH_RENDER_TASK_MESSAGES_H

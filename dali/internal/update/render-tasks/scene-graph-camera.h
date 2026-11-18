@@ -401,6 +401,11 @@ public:
    */
   bool ViewMatrixUpdated() const;
 
+  /**
+   * @return true if the projection matrix of camera is updated this or the previous frame
+   */
+  bool ProjectionMatrixUpdated() const;
+
 public:
   /**
    * @copydoc Dali::Internal::SceneGraph::PropertyOwner::AddInitializeResetter
