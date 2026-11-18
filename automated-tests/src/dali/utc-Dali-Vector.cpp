@@ -1736,3 +1736,221 @@ int UtcDaliVectorShrinkToFit(void)
 
   END_TEST;
 }
+
+int UtcDaliVectorInsertSelfCopy(void)
+{
+  tet_infoline("Testing Dali::Vector<int>::Insert(Iterator, const T&) with an element of the same vector");
+
+  Vector<int> vector;
+  vector.Reserve(8u); // no reallocation in this test
+  vector.PushBack(10);
+  vector.PushBack(20);
+  vector.PushBack(30);
+
+  // Source sits after the insertion point: the shift would overwrite it before it is copied.
+  vector.Insert(vector.Begin(), vector[1]); // {20,10,20,30}
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(4u), vector.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[0], 20, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[1], 10, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[2], 20, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[3], 30, TEST_LOCATION);
+
+  // Source is exactly at the insertion point.
+  vector.Insert(vector.Begin() + 3, vector[3]); // {20,10,20,30,30}
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(5u), vector.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[3], 30, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[4], 30, TEST_LOCATION);
+
+  // Source sits before the insertion point: nothing shifts it.
+  vector.Insert(vector.End(), vector[0]); // {20,10,20,30,30,20}
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(6u), vector.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[5], 20, TEST_LOCATION);
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(8u), vector.Capacity(), TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliVectorInsertSelfCopyRealloc(void)
+{
+  tet_infoline("Testing Dali::Vector<int>::Insert(Iterator, const T&) with an element of the same vector when the storage has to grow");
+
+  Vector<int> vector;
+  vector.Reserve(3u);
+  vector.PushBack(10);
+  vector.PushBack(20);
+  vector.PushBack(30);
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(3u), vector.Capacity(), TEST_LOCATION);
+
+  // Full: the insert reallocates, which invalidates the reference to vector[2].
+  vector.Insert(vector.Begin(), vector[2]); // {30,10,20,30}
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(4u), vector.Count(), TEST_LOCATION);
+  DALI_TEST_GREATER(vector.Capacity(), static_cast<Dali::VectorBase::SizeType>(3u), TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[0], 30, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[1], 10, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[2], 20, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[3], 30, TEST_LOCATION);
+
+  // Full again; the source sits before the insertion point so only the reallocation threatens it.
+  vector.ShrinkToFit();
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(4u), vector.Capacity(), TEST_LOCATION);
+  vector.Insert(vector.End(), vector[1]); // {30,10,20,30,10}
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(5u), vector.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[4], 10, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliVectorInsertSelfMoveRealloc(void)
+{
+  tet_infoline("Testing Dali::Vector<int>::Insert(Iterator, T&&) with an element of the same vector when the storage has to grow");
+
+  Vector<int> vector;
+  vector.Reserve(3u);
+  vector.PushBack(10);
+  vector.PushBack(20);
+  vector.PushBack(30);
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(3u), vector.Capacity(), TEST_LOCATION);
+
+  // Source before the insertion point, storage full.
+  vector.Insert(vector.End(), std::move(vector[0])); // {10,20,30,10}
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(4u), vector.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[0], 10, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[1], 20, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[2], 30, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[3], 10, TEST_LOCATION);
+
+  // Source after the insertion point, storage full.
+  vector.ShrinkToFit();
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(4u), vector.Capacity(), TEST_LOCATION);
+  vector.Insert(vector.Begin(), std::move(vector[2])); // {30,10,20,30,10}
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(5u), vector.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[0], 30, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[1], 10, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[2], 20, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[3], 30, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[4], 10, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliVectorPushBackSelf(void)
+{
+  tet_infoline("Testing Dali::Vector<int>::PushBack with an element of the same vector");
+
+  Vector<int> vector;
+  vector.Reserve(2u);
+  vector.PushBack(10);
+  vector.PushBack(20);
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(2u), vector.Capacity(), TEST_LOCATION);
+
+  // Full: the push reallocates, which invalidates the reference to vector[0].
+  vector.PushBack(vector[0]); // {10,20,10}
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(3u), vector.Count(), TEST_LOCATION);
+  DALI_TEST_GREATER(vector.Capacity(), static_cast<Dali::VectorBase::SizeType>(2u), TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[2], 10, TEST_LOCATION);
+
+  // Spare capacity: plain path.
+  vector.PushBack(vector.Back()); // {10,20,10,10}
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(4u), vector.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[3], 10, TEST_LOCATION);
+
+  // Full again, move overload.
+  vector.ShrinkToFit();
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(4u), vector.Capacity(), TEST_LOCATION);
+  vector.PushBack(std::move(vector[1])); // {10,20,10,10,20}
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(5u), vector.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[0], 10, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[1], 20, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[2], 10, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[3], 10, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[4], 20, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliVectorResizeSelf(void)
+{
+  tet_infoline("Testing Dali::Vector<int>::Resize with a fill value taken from the same vector");
+
+  Vector<int> vector;
+  vector.PushBack(7);
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(2u), vector.Capacity(), TEST_LOCATION);
+
+  // Grow with reallocation: the fill reference is invalidated by Reserve.
+  vector.Resize(6u, vector[0]);
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(6u), vector.Count(), TEST_LOCATION);
+  for(Dali::VectorBase::SizeType i = 0u; i < vector.Count(); ++i)
+  {
+    DALI_TEST_EQUALS(vector[i], 7, TEST_LOCATION);
+  }
+
+  // Shrink: the fill value is unused.
+  vector.Resize(2u, vector[0]);
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(2u), vector.Count(), TEST_LOCATION);
+
+  // Grow within the existing capacity: plain path.
+  vector.Resize(4u, vector[1]);
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(4u), vector.Count(), TEST_LOCATION);
+  for(Dali::VectorBase::SizeType i = 0u; i < vector.Count(); ++i)
+  {
+    DALI_TEST_EQUALS(vector[i], 7, TEST_LOCATION);
+  }
+
+  END_TEST;
+}
+
+int UtcDaliVectorExplicitNonTrivialTag(void)
+{
+  tet_infoline("Testing Dali::Vector<int, false>: a trivial type forced onto the non-trivial algorithms");
+
+  using TaggedVector = Vector<int, false>;
+  DALI_TEST_EQUALS(static_cast<bool>(TaggedVector::BaseType), false, TEST_LOCATION);
+
+  TaggedVector vector;
+  vector.PushBack(1);
+  vector.PushBack(2);
+  vector.PushBack(3);
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(3u), vector.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(vector.Front(), 1, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[1], 2, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector.Back(), 3, TEST_LOCATION);
+
+  // Non-const accessors write through.
+  vector.Front() = 10;
+  vector[1]      = 20;
+  vector.Back()  = 30;
+  DALI_TEST_EQUALS(vector[0], 10, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[1], 20, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[2], 30, TEST_LOCATION);
+
+  vector.Insert(vector.Begin(), vector[2]); // {30,10,20,30}
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(4u), vector.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[0], 30, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[3], 30, TEST_LOCATION);
+
+  // Self range insert goes through a temporary of the same vector type.
+  vector.Insert(vector.End(), vector.Begin(), vector.Begin() + 2); // {30,10,20,30,30,10}
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(6u), vector.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[4], 30, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[5], 10, TEST_LOCATION);
+
+  vector.Erase(vector.Begin()); // {10,20,30,30,10}
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(5u), vector.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[0], 10, TEST_LOCATION);
+
+  vector.Remove(vector.Begin()); // last element swapped in: {10,20,30,30}
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(4u), vector.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[0], 10, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[3], 30, TEST_LOCATION);
+
+  TaggedVector copy(vector);
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(4u), copy.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(copy[1], 20, TEST_LOCATION);
+
+  TaggedVector moved(std::move(copy));
+  DALI_TEST_EQUALS(ZERO, copy.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(4u), moved.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(moved[2], 30, TEST_LOCATION);
+
+  END_TEST;
+}
