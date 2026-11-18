@@ -18,14 +18,6 @@
  *
  */
 
-// The Windows SDK defines CopyMemory as an object-like macro.  Hide it while
-// declaring VectorBase, then restore the consumer's original macro state.
-#if defined(CopyMemory)
-#pragma push_macro("CopyMemory")
-#undef CopyMemory
-#define DALI_VECTOR_BASE_RESTORE_COPY_MEMORY_MACRO
-#endif
-
 // EXTERNAL INCLUDES
 #include <cstddef>
 #include <cstdint> // uint32_t
@@ -33,7 +25,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/type-traits.h>
-#include <dali/public-api/math/math-utils.h>
+#include <dali/public-api/math/math-utils.h> // kept for sources that reach it through this header
 
 /**
  * @brief For DALi internal use, asserts are enabled in debug builds.
@@ -64,6 +56,10 @@ namespace DALI_NAMESPACE
  * Memory layout is such that it has two SizeType values to hold the count
  * and capacity of the vector. VectorBase::mData is adjusted so that it points to the
  * beginning of the first real item so that iterating the items is quick.
+ *
+ * The algorithms (growth, shifting, erasing, copying) live in the library. The
+ * element type is reached through an ElementOperations table that the deriving
+ * template fills in, so a change to an algorithm reaches already built applications.
  * @SINCE_1_0.0
  */
 class DALI_CORE_API VectorBase
@@ -74,9 +70,38 @@ public: // Typedefs
 #else
   using SizeType = uint64_t; // 64-bit system
 #endif
-  using MemMoveFunctionType = void* (*)(void*, const void*, SizeType);
+
+  // ============================================================
+  // Inline contract shared by applications and the library (both sides compile this).
+  // WARNING: Do NOT change the block layout [capacity][count][data] that Count() reads.
+  // WARNING: Do NOT change the ElementOperations layout below; applications hand it to the library.
+  // ============================================================
 
   constexpr static uint32_t SHRINK_REQUIRED_RATIO = 4; ///< The ratio of auto shrink to fit calling. @SINCE_2_3.22
+
+protected: // Element operations
+  /**
+   * @brief Per-element operations the library calls back for the element type.
+   *
+   * A null function means the element type needs nothing for that operation:
+   * elements are then copied with memcpy/memmove and never destroyed.
+   * @SINCE_3_0.1
+   */
+  struct ElementOperations
+  {
+    using CopyConstructFunction = void (*)(void* destination, const void* source); ///< Copy-constructs one element at destination.
+    using MoveConstructFunction = void (*)(void* destination, void* source);       ///< Move-constructs one element at destination; the source is left moved-from.
+    using DestroyFunction       = void (*)(void* element);                         ///< Destroys one element.
+
+    SizeType              elementSize;         ///< Size of one element in bytes.
+    CopyConstructFunction copyConstruct;       ///< nullptr when a byte copy is enough.
+    MoveConstructFunction moveConstruct;       ///< nullptr when a byte copy is enough.
+    DestroyFunction       destroy;             ///< nullptr when nothing has to be destroyed.
+    const void*           extension = nullptr; ///< Reserved so the table can grow without changing its layout: a later library may read a versioned extension through it. Always nullptr today.
+  };
+
+  static_assert(sizeof(void*) != 8 || sizeof(ElementOperations) == 40, "ElementOperations layout is ABI-frozen");
+  static_assert(sizeof(void*) != 4 || sizeof(ElementOperations) == 20, "ElementOperations layout is ABI-frozen");
 
 protected: // Construction
   /**
@@ -160,39 +185,64 @@ protected: // for Derived classes
   /**
    * @brief Reserves space in the vector.
    *
-   * @SINCE_1_0.0
+   * Reserving less than the current capacity is a no-op.
+   * @SINCE_3_0.1
    * @param[in] count Count of elements to reserve
-   * @param[in] elementSize Size of a single element
+   * @param[in] operations Element operations used to relocate the existing elements
    */
-  void Reserve(SizeType count, SizeType elementSize);
+  void Reserve(SizeType count, const ElementOperations& operations);
 
   /**
-   * @brief Reserves space in the vector with custom memmove
+   * @brief Fits the capacity of the vector to its count.
    *
-   * @SINCE_2_5.10
-   * @param[in] count Count of elements to reserve
-   * @param[in] elementSize Size of a single element
-   * @param[in] memMoveFunction Custom memory move function when we allocate new memory
+   * @SINCE_3_0.1
+   * @param[in] operations Element operations used to relocate the existing elements
    */
-  void ReserveWithCustomMoveFunction(SizeType count, SizeType elementSize, MemMoveFunctionType memMoveFunction);
+  void ShrinkToFit(const ElementOperations& operations);
 
   /**
-   * @brief Fit the capacity of vector as item counts with custom move semantics.
+   * @brief Fits the capacity of the vector to its count when far more is reserved than used.
    *
-   * @SINCE_2_5.23
-   * @param[in] elementSize Size of a single element
-   * @param[in] memMoveFunction Custom memory move function when moving existing elements
+   * @SINCE_3_0.1
+   * @param[in] operations Element operations used to relocate the existing elements
    */
-  void ShrinkToFitWithCustomMoveFunction(SizeType elementSize, MemMoveFunctionType memMoveFunction);
+  void ShrinkToFitIfNeeded(const ElementOperations& operations);
 
   /**
-   * @brief Copy a vector.
+   * @brief Destroys every element. Does not change capacity.
    *
-   * @SINCE_1_0.0
+   * @SINCE_3_0.1
+   * @param[in] operations Element operations
+   */
+  void Clear(const ElementOperations& operations);
+
+  /**
+   * @brief Destroys every element and releases the data.
+   *
+   * @SINCE_3_0.1
+   * @param[in] operations Element operations
+   */
+  void Release(const ElementOperations& operations);
+
+  /**
+   * @brief Replaces the data with another vector's data block.
+   *
+   * The elements held so far are destroyed and their block released.
+   * @SINCE_3_0.1
+   * @param[in] newData Data block to adopt
+   * @param[in] operations Element operations
+   */
+  void Replace(void* newData, const ElementOperations& operations) noexcept;
+
+  /**
+   * @brief Copies a vector.
+   *
+   * The elements held so far are destroyed.
+   * @SINCE_3_0.1
    * @param[in] vector Vector to copy from
-   * @param[in] elementSize Size of a single element
+   * @param[in] operations Element operations
    */
-  void Copy(const VectorBase& vector, SizeType elementSize);
+  void Copy(const VectorBase& vector, const ElementOperations& operations);
 
   /**
    * @brief Swaps the contents of two vectors.
@@ -203,60 +253,51 @@ protected: // for Derived classes
   void Swap(VectorBase& vector);
 
   /**
-   * @brief Erases an element.
+   * @brief Appends one element, growing the storage when it is full.
    *
-   * Does not change capacity.
-   * @SINCE_1_0.0
-   * @param[in] address Address to erase from
-   * @param[in] elementSize Size to erase
-   * @pre Last element cannot be erased as there is nothing to move.
+   * \e element may live inside this vector.
+   * @SINCE_3_0.1
+   * @param[in] element Element to append
+   * @param[in] move true to move-construct from \e element, false to copy-construct
+   * @param[in] operations Element operations
    */
-  void Erase(uint8_t* address, SizeType elementSize);
+  void Append(const void* element, bool move, const ElementOperations& operations);
 
   /**
-   * @brief Erases a range of elements.
+   * @brief Appends copies of one element, reserving exactly the space needed.
    *
-   * Does not change capacity.
-   * @SINCE_1_0.0
-   * @param[in] first Address to the first element to be erased
-   * @param[in] last Address to the last element to be erased
-   * @param[in] elementSize Size of one of the elements to be erased
-   * @return Address pointing to the next element of the last one
+   * \e element may live inside this vector.
+   * @SINCE_3_0.1
+   * @param[in] element Element to copy
+   * @param[in] count Number of copies to append
+   * @param[in] operations Element operations
    */
-  uint8_t* Erase(uint8_t* first, uint8_t* last, SizeType elementSize);
+  void AppendCopies(const void* element, SizeType count, const ElementOperations& operations);
 
   /**
-   * @brief Copies a number of bytes from \e source to \e destination.
+   * @brief Inserts a range of elements, growing the storage when needed.
    *
-   * \e source and \e destination must not overlap.
-   *
-   * @SINCE_1_0.0
-   * @param[in] destination Pointer to the destination address
-   * @param[in] source Pointer to the source address
-   * @param[in] numberOfBytes The number of bytes to be copied
+   * The range [\e from, \e to) may lie inside this vector.
+   * @SINCE_3_0.1
+   * @param[in] at Address to insert at
+   * @param[in] from Address of the first element to insert
+   * @param[in] to Address one past the last element to insert
+   * @param[in] move true to move-construct from the range, false to copy-construct
+   * @param[in] operations Element operations
+   * @return Address of the first inserted element
    */
-  void CopyMemory(uint8_t* destination, const uint8_t* source, SizeType numberOfBytes);
+  uint8_t* Insert(uint8_t* at, const uint8_t* from, const uint8_t* to, bool move, const ElementOperations& operations);
 
   /**
-   * @brief Replace the data as new data address.
-   * After replace, release the old data.
+   * @brief Erases a range of elements. Does not change capacity.
    *
-   * It will be used when we want to keep the mData integrity.
-   *
-   * Does not call destructors on objects held.
-   * @SINCE_3_0.0
-   * @param[in] newData new data address to be replaced
+   * @SINCE_3_0.1
+   * @param[in] first Address of the first element to erase
+   * @param[in] last Address one past the last element to erase
+   * @param[in] operations Element operations
+   * @return Address of the element that followed the erased range
    */
-  void Replace(void* newData) noexcept;
-
-  /**
-   * @brief Fit the capacity of vector as item counts.
-   * It will be used when we want to remove unused memory.
-   *
-   * @SINCE_2_3.22
-   * @param[in] elementSize Size of a single element
-   */
-  void ShrinkToFit(SizeType elementSize);
+  uint8_t* Erase(uint8_t* first, uint8_t* last, const ElementOperations& operations);
 
 private:
   // not copyable as it does not know the size of elements
@@ -267,6 +308,31 @@ private:
   VectorBase(VectorBase&&)            = delete; ///< Deleted move constructor. @SINCE_1_9.25
   VectorBase& operator=(VectorBase&&) = delete; ///< Deleted copy assignment operator. @SINCE_1_9.25
 
+  /**
+   * @brief Allocates a block for \e capacity elements and relocates the current elements into it.
+   */
+  void Reallocate(SizeType capacity, const ElementOperations& operations);
+
+  /**
+   * @brief Destroys the elements in [\e first, \e last).
+   */
+  static void DestroyRange(uint8_t* first, uint8_t* last, const ElementOperations& operations);
+
+  /**
+   * @brief Copy-constructs \e count elements at \e destination from \e source. The ranges must not overlap.
+   */
+  static void CopyConstructRange(uint8_t* destination, const uint8_t* source, SizeType count, const ElementOperations& operations);
+
+  /**
+   * @brief Move-constructs \e count elements at \e destination from \e source, leaving the sources moved-from. The ranges must not overlap.
+   */
+  static void MoveConstructRange(uint8_t* destination, uint8_t* source, SizeType count, const ElementOperations& operations);
+
+  /**
+   * @brief Relocates \e count elements from \e source to \e destination: each is move-constructed at its new address and destroyed at the old one. The ranges may overlap.
+   */
+  static void RelocateRange(uint8_t* destination, uint8_t* source, SizeType count, const ElementOperations& operations);
+
 protected:     // Data
   void* mData; ///< Pointer to the data.
 };
@@ -275,10 +341,5 @@ protected:     // Data
  * @}
  */
 } //namespace DALI_NAMESPACE
-
-#if defined(DALI_VECTOR_BASE_RESTORE_COPY_MEMORY_MACRO)
-#pragma pop_macro("CopyMemory")
-#undef DALI_VECTOR_BASE_RESTORE_COPY_MEMORY_MACRO
-#endif
 
 #endif // DALI_VECTOR_BASE_H

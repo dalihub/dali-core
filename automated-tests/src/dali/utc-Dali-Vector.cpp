@@ -1954,3 +1954,71 @@ int UtcDaliVectorExplicitNonTrivialTag(void)
 
   END_TEST;
 }
+
+int UtcDaliVectorBaseLayout(void)
+{
+  tet_infoline("The VectorBase layout is an inline contract baked into applications: pin it");
+
+  // A vector is one pointer, which points just past the [capacity][count] metadata.
+  DALI_TEST_EQUALS(sizeof(Vector<int>), sizeof(void*), TEST_LOCATION);
+  DALI_TEST_EQUALS(sizeof(Vector<Dali::BaseHandle>), sizeof(void*), TEST_LOCATION);
+
+  Vector<int> vector;
+  DALI_TEST_CHECK(vector.Begin() == nullptr);
+
+  vector.Reserve(5u);
+  vector.PushBack(1);
+  vector.PushBack(2);
+
+  const Dali::VectorBase::SizeType* metadata = reinterpret_cast<const Dali::VectorBase::SizeType*>(vector.Begin());
+  DALI_TEST_EQUALS(metadata[-2], vector.Capacity(), TEST_LOCATION);
+  DALI_TEST_EQUALS(metadata[-1], vector.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(metadata[-2], static_cast<Dali::VectorBase::SizeType>(5u), TEST_LOCATION);
+  DALI_TEST_EQUALS(metadata[-1], static_cast<Dali::VectorBase::SizeType>(2u), TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliVectorShrinkToFitIfNeeded(void)
+{
+  tet_infoline("Testing Dali::Vector::ShrinkToFitIfNeeded shrinks only when far more is reserved than used");
+
+  using SizeType = Dali::VectorBase::SizeType;
+
+  Vector<int> vector;
+
+  // Nothing allocated: nothing to do.
+  vector.ShrinkToFitIfNeeded();
+  DALI_TEST_EQUALS(vector.Capacity(), static_cast<SizeType>(0u), TEST_LOCATION);
+
+  // Count * SHRINK_REQUIRED_RATIO == Capacity: kept as it is.
+  vector.Reserve(Dali::VectorBase::SHRINK_REQUIRED_RATIO);
+  vector.PushBack(1);
+  vector.ShrinkToFitIfNeeded();
+  DALI_TEST_EQUALS(vector.Capacity(), static_cast<SizeType>(Dali::VectorBase::SHRINK_REQUIRED_RATIO), TEST_LOCATION);
+  DALI_TEST_EQUALS(vector.Count(), static_cast<SizeType>(1u), TEST_LOCATION);
+
+  // Count * SHRINK_REQUIRED_RATIO < Capacity: shrunk to the count.
+  vector.Reserve(Dali::VectorBase::SHRINK_REQUIRED_RATIO + 1u);
+  vector.ShrinkToFitIfNeeded();
+  DALI_TEST_EQUALS(vector.Capacity(), static_cast<SizeType>(1u), TEST_LOCATION);
+  DALI_TEST_EQUALS(vector.Count(), static_cast<SizeType>(1u), TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[0], 1, TEST_LOCATION);
+
+  // Empty with spare capacity: released.
+  vector.Clear();
+  vector.Reserve(8u);
+  vector.ShrinkToFitIfNeeded();
+  DALI_TEST_EQUALS(vector.Capacity(), static_cast<SizeType>(0u), TEST_LOCATION);
+
+  // Complex elements are relocated into the smaller block.
+  Vector<Dali::BaseHandle> handles;
+  handles.Reserve(64u);
+  handles.PushBack(Dali::BaseHandle());
+  handles.PushBack(Dali::BaseHandle());
+  handles.ShrinkToFitIfNeeded();
+  DALI_TEST_EQUALS(handles.Capacity(), static_cast<SizeType>(2u), TEST_LOCATION);
+  DALI_TEST_EQUALS(handles.Count(), static_cast<SizeType>(2u), TEST_LOCATION);
+
+  END_TEST;
+}

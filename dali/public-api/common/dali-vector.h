@@ -18,14 +18,6 @@
  *
  */
 
-// The Windows SDK defines CopyMemory as an object-like macro.  Keep it hidden
-// across the vector implementation headers and restore it for the consumer.
-#if defined(CopyMemory)
-#pragma push_macro("CopyMemory")
-#undef CopyMemory
-#define DALI_VECTOR_RESTORE_COPY_MEMORY_MACRO
-#endif
-
 // EXTERNAL INCLUDES
 
 // INTERNAL INCLUDES
@@ -131,7 +123,7 @@ public: // API
   {
     if(this != &vector)
     {
-      VectorAlgorithms<BaseType, ItemType>::Copy(vector, sizeof(ItemType));
+      VectorBase::Copy(vector, VectorAlgorithms<BaseType, ItemType>::CopyOperations());
     }
     return *this;
   }
@@ -146,9 +138,8 @@ public: // API
   {
     if(this != &vector)
     {
-      // For trivial types: just swaps pointers
-      // For complex types: destruct existing elements first
-      VectorAlgorithms<BaseType, ItemType>::Replace(vector.mData, sizeof(ItemType));
+      // The elements held so far are destroyed, then the other block is adopted.
+      VectorBase::Replace(vector.mData, VectorAlgorithms<BaseType, ItemType>::MoveOperations());
       vector.mData = nullptr;
     }
     return *this;
@@ -319,34 +310,7 @@ public: // API
    */
   void PushBack(const ItemType& element)
   {
-    const SizeType count    = VectorBase::Count();
-    const SizeType newCount = count + 1u;
-    const SizeType capacity = VectorBase::Capacity();
-    if(newCount > capacity)
-    {
-      if(DALI_UNLIKELY(IsInside(&element)))
-      {
-        // element lives in this vector and the reallocation below would invalidate it,
-        // so copy it out first.
-        ItemType copy(element);
-        PushBack(static_cast<ItemType&&>(copy));
-        return;
-      }
-
-      // need more space
-      Reserve(newCount << 1u); // reserve double the current count
-    }
-
-    if constexpr(IsTrivialType)
-    {
-      // set new count first as otherwise the debug assert will hit us
-      VectorBase::SetCount(newCount);
-      operator[](count) = element;
-    }
-    else
-    {
-      Insert(End(), element);
-    }
+    VectorBase::Append(&element, false, VectorAlgorithms<BaseType, ItemType>::CopyOperations());
   }
 
   /**
@@ -362,34 +326,7 @@ public: // API
    */
   void PushBack(ItemType&& element)
   {
-    const SizeType count    = VectorBase::Count();
-    const SizeType newCount = count + 1u;
-    const SizeType capacity = VectorBase::Capacity();
-    if(newCount > capacity)
-    {
-      if(DALI_UNLIKELY(IsInside(&element)))
-      {
-        // element lives in this vector and the reallocation below would invalidate it,
-        // so move it out first.
-        ItemType moved(static_cast<ItemType&&>(element));
-        PushBack(static_cast<ItemType&&>(moved));
-        return;
-      }
-
-      // need more space
-      Reserve(newCount << 1u); // reserve double the current count
-    }
-
-    if constexpr(IsTrivialType)
-    {
-      // set new count first as otherwise the debug assert will hit us
-      VectorBase::SetCount(newCount);
-      operator[](count) = static_cast<ItemType&&>(element);
-    }
-    else
-    {
-      Insert(End(), static_cast<ItemType&&>(element));
-    }
+    VectorBase::Append(&element, true, VectorAlgorithms<BaseType, ItemType>::MoveOperations());
   }
 
   /**
@@ -411,22 +348,8 @@ public: // API
   {
     DALI_ASSERT_VECTOR((at <= End()) && (at >= Begin()) && "Iterator not inside vector");
 
-    if(DALI_UNLIKELY(InsertDisturbs(at, &element)))
-    {
-      // element lives in this vector and the reallocation or the shift below would
-      // invalidate it before it is copied in. Copy it out to a local first.
-      ItemType copy(element);
-      Insert(at, static_cast<ItemType&&>(copy));
-      return;
-    }
-
-    const SizeType size    = sizeof(ItemType);
-    uint8_t*       address = const_cast<uint8_t*>(reinterpret_cast<const uint8_t*>(&element));
-
-    VectorAlgorithms<BaseType, ItemType>::Insert(reinterpret_cast<uint8_t*>(at),
-                                                 address,
-                                                 address + size,
-                                                 size);
+    const uint8_t* address = reinterpret_cast<const uint8_t*>(&element);
+    VectorBase::Insert(reinterpret_cast<uint8_t*>(at), address, address + sizeof(ItemType), false, VectorAlgorithms<BaseType, ItemType>::CopyOperations());
   }
 
   /**
@@ -448,28 +371,8 @@ public: // API
   {
     DALI_ASSERT_VECTOR((at <= End()) && (at >= Begin()) && "Iterator not inside vector");
 
-    // If element is inside this vector, a reallocation invalidates it, and when at is
-    // at or before its position the shift moves (and destroys) it before we can
-    // move-construct from it. Move element out to a local first so the source is always valid.
-    if(DALI_UNLIKELY(InsertDisturbs(at, &element)))
-    {
-      ItemType       temp(static_cast<ItemType&&>(element));
-      const SizeType size    = sizeof(ItemType);
-      uint8_t*       address = reinterpret_cast<uint8_t*>(&temp);
-      VectorAlgorithms<BaseType, ItemType>::InsertMove(reinterpret_cast<uint8_t*>(at),
-                                                       address,
-                                                       address + size,
-                                                       size);
-      return;
-    }
-
-    const SizeType size    = sizeof(ItemType);
-    uint8_t*       address = reinterpret_cast<uint8_t*>(&element);
-
-    VectorAlgorithms<BaseType, ItemType>::InsertMove(reinterpret_cast<uint8_t*>(at),
-                                                     address,
-                                                     address + size,
-                                                     size);
+    const uint8_t* address = reinterpret_cast<const uint8_t*>(&element);
+    VectorBase::Insert(reinterpret_cast<uint8_t*>(at), address, address + sizeof(ItemType), true, VectorAlgorithms<BaseType, ItemType>::MoveOperations());
   }
 
   /**
@@ -488,38 +391,14 @@ public: // API
    * @pre Iterator \e at must be in the vector's range ( Vector::Begin(), Vector::End() ).
    * @pre Iterators \e from and \e to must be valid iterators.
    * @pre Iterator \e from must not be grater than Iterator \e to.
-   *
+   * @note The range may lie inside this vector.
    */
   void Insert(Iterator at, Iterator from, Iterator to)
   {
     DALI_ASSERT_VECTOR((at <= End()) && (at >= Begin()) && "Iterator not inside vector");
     DALI_ASSERT_VECTOR((from <= to) && "from address can't be greater than to");
 
-    if(from == to)
-    {
-      // nothing to copy.
-      return;
-    }
-
-    if(DALI_UNLIKELY(from >= Begin() && to <= End()))
-    {
-      // Self insert case where the source range belongs to this vector.
-      // Reserve may reallocate and invalidate the source pointers, so copy
-      // the range into a temporary vector first.
-      Vector temporary;
-      temporary.Insert(temporary.End(), from, to);
-
-      VectorAlgorithms<BaseType, ItemType>::Insert(reinterpret_cast<uint8_t*>(at),
-                                                   reinterpret_cast<uint8_t*>(temporary.Begin()),
-                                                   reinterpret_cast<uint8_t*>(temporary.End()),
-                                                   sizeof(ItemType));
-      return;
-    }
-
-    VectorAlgorithms<BaseType, ItemType>::Insert(reinterpret_cast<uint8_t*>(at),
-                                                 reinterpret_cast<uint8_t*>(from),
-                                                 reinterpret_cast<uint8_t*>(to),
-                                                 sizeof(ItemType));
+    VectorBase::Insert(reinterpret_cast<uint8_t*>(at), reinterpret_cast<const uint8_t*>(from), reinterpret_cast<const uint8_t*>(to), false, VectorAlgorithms<BaseType, ItemType>::CopyOperations());
   }
 
   /**
@@ -538,38 +417,14 @@ public: // API
    * @pre Iterator \e at must be in the vector's range ( Vector::Begin(), Vector::End() ).
    * @pre Iterators \e from and \e to must be valid iterators.
    * @pre Iterator \e from must not be grater than Iterator \e to.
-   *
+   * @note The range may lie inside this vector; those elements are left in a moved-from state.
    */
   void InsertMove(Iterator at, Iterator from, Iterator to)
   {
     DALI_ASSERT_VECTOR((at <= End()) && (at >= Begin()) && "Iterator not inside vector");
     DALI_ASSERT_VECTOR((from <= to) && "from address can't be greater than to");
 
-    if(from == to)
-    {
-      // nothing to copy.
-      return;
-    }
-
-    if(DALI_UNLIKELY(from >= Begin() && to <= End()))
-    {
-      // Self insert case where the source range belongs to this vector.
-      // Reserve may reallocate and invalidate the source pointers, so copy
-      // the range into a temporary vector first.
-      Vector temporary;
-      temporary.InsertMove(temporary.End(), from, to);
-
-      VectorAlgorithms<BaseType, ItemType>::InsertMove(reinterpret_cast<uint8_t*>(at),
-                                                       reinterpret_cast<uint8_t*>(temporary.Begin()),
-                                                       reinterpret_cast<uint8_t*>(temporary.End()),
-                                                       sizeof(ItemType));
-      return;
-    }
-
-    VectorAlgorithms<BaseType, ItemType>::InsertMove(reinterpret_cast<uint8_t*>(at),
-                                                     reinterpret_cast<uint8_t*>(from),
-                                                     reinterpret_cast<uint8_t*>(to),
-                                                     sizeof(ItemType));
+    VectorBase::Insert(reinterpret_cast<uint8_t*>(at), reinterpret_cast<const uint8_t*>(from), reinterpret_cast<const uint8_t*>(to), true, VectorAlgorithms<BaseType, ItemType>::MoveOperations());
   }
 
   /**
@@ -581,11 +436,11 @@ public: // API
    */
   void Reserve(SizeType count)
   {
-    VectorAlgorithms<BaseType, ItemType>::Reserve(count, sizeof(ItemType));
+    VectorBase::Reserve(count, VectorAlgorithms<BaseType, ItemType>::MoveOperations());
   }
 
   /**
-   * @brief Resizes the vector. Does not change capacity.
+   * @brief Resizes the vector. The storage is reallocated only when it has to grow.
    *
    * @SINCE_1_0.0
    * @param[in] count Count to resize to
@@ -630,22 +485,8 @@ public: // API
     }
     else if(count > oldCount)
     {
-      if(DALI_UNLIKELY(IsInside(&item)))
-      {
-        // item lives in this vector and the reallocation below would invalidate it,
-        // so copy it out first.
-        ItemType copy(item);
-        Resize(count, copy);
-        return;
-      }
-
       // Grow: add new elements
-      SizeType newItems = count - oldCount;
-      Reserve(count);
-      for(; newItems > 0u; --newItems)
-      {
-        PushBack(item);
-      }
+      VectorBase::AppendCopies(&item, count - oldCount, VectorAlgorithms<BaseType, ItemType>::CopyOperations());
     }
   }
 
@@ -724,15 +565,9 @@ public: // API
   Iterator Erase(Iterator iterator)
   {
     DALI_ASSERT_VECTOR((iterator < End()) && (iterator >= Begin()) && "Iterator not inside vector");
-    if(iterator < (End() - 1u))
-    {
-      VectorAlgorithms<BaseType, ItemType>::Erase(reinterpret_cast<uint8_t*>(iterator), sizeof(ItemType));
-    }
-    else
-    {
-      // just remove the element
-      Remove(iterator);
-    }
+
+    uint8_t* address = reinterpret_cast<uint8_t*>(iterator);
+    VectorBase::Erase(address, address + sizeof(ItemType), VectorAlgorithms<BaseType, ItemType>::MoveOperations());
     return iterator;
   }
 
@@ -757,33 +592,7 @@ public: // API
     DALI_ASSERT_VECTOR((last <= End()) && (last >= Begin()) && "Iterator not inside vector");
     DALI_ASSERT_VECTOR((first <= last) && "first iterator greater than last");
 
-    Iterator nextElement;
-
-    bool trivialCase = false;
-
-    if constexpr(IsTrivialType)
-    {
-      if(last == End())
-      {
-        trivialCase = true;
-      }
-    }
-
-    // early-out for trival cases.
-    if(trivialCase)
-    {
-      // Erase up to the end.
-      VectorBase::SetCount(VectorBase::Count() - (last - first));
-      nextElement = End();
-    }
-    else
-    {
-      nextElement = reinterpret_cast<Iterator>(VectorAlgorithms<BaseType, ItemType>::Erase(reinterpret_cast<uint8_t*>(first),
-                                                                                           reinterpret_cast<uint8_t*>(last),
-                                                                                           sizeof(ItemType)));
-    }
-
-    return nextElement;
+    return reinterpret_cast<Iterator>(VectorBase::Erase(reinterpret_cast<uint8_t*>(first), reinterpret_cast<uint8_t*>(last), VectorAlgorithms<BaseType, ItemType>::MoveOperations()));
   }
 
   /**
@@ -807,15 +616,7 @@ public: // API
     {
       Dali::Swap(*iterator, *last);
     }
-
-    if constexpr(IsTrivialType)
-    {
-      VectorBase::SetCount(VectorBase::Count() - 1u);
-    }
-    else
-    {
-      Erase(last, End());
-    }
+    Erase(last, End());
   }
 
   /**
@@ -835,7 +636,7 @@ public: // API
    */
   void Clear()
   {
-    VectorAlgorithms<BaseType, ItemType>::Clear(sizeof(ItemType));
+    VectorBase::Clear(VectorAlgorithms<BaseType, ItemType>::MoveOperations());
   }
 
   /**
@@ -844,7 +645,7 @@ public: // API
    */
   void Release()
   {
-    VectorAlgorithms<BaseType, ItemType>::Release(sizeof(ItemType));
+    VectorBase::Release(VectorAlgorithms<BaseType, ItemType>::MoveOperations());
   }
 
   /**
@@ -854,7 +655,7 @@ public: // API
    */
   void ShrinkToFit()
   {
-    VectorAlgorithms<BaseType, ItemType>::ShrinkToFit(sizeof(ItemType));
+    VectorBase::ShrinkToFit(VectorAlgorithms<BaseType, ItemType>::MoveOperations());
   }
 
   /**
@@ -866,32 +667,17 @@ public: // API
    */
   void ShrinkToFitIfNeeded()
   {
-    // Run ShrinkToFit only if VectorBase::Capacity() is bigger than the smallest malloc block size.
-    if(DALI_UNLIKELY(VectorBase::Count() * VectorBase::SHRINK_REQUIRED_RATIO < VectorBase::Capacity()))
-    {
-      VectorAlgorithms<BaseType, ItemType>::ShrinkToFit(sizeof(ItemType));
-    }
+    VectorBase::ShrinkToFitIfNeeded(VectorAlgorithms<BaseType, ItemType>::MoveOperations());
   }
 
 private:
   /**
-   * @brief Checks whether an element lives inside this vector's storage.
-   *
-   * Such an element is invalidated by a reallocation and shifted by an insertion before it.
+   * @brief Checks whether an element lives inside this vector's storage, where a
+   *        reallocation would invalidate it.
    */
   bool IsInside(const ItemType* element) const
   {
     return (element >= Begin()) && (element < End());
-  }
-
-  /**
-   * @brief Checks whether inserting one element at \e at would invalidate \e element
-   *        before it could be read: it lives inside this vector and either the storage
-   *        has to grow or it sits at or after the insertion point.
-   */
-  bool InsertDisturbs(ConstIterator at, const ItemType* element) const
-  {
-    return IsInside(element) && ((VectorBase::Count() + 1u > VectorBase::Capacity()) || (at <= element));
   }
 };
 
@@ -899,10 +685,5 @@ private:
  * @}
  */
 } //namespace DALI_NAMESPACE
-
-#if defined(DALI_VECTOR_RESTORE_COPY_MEMORY_MACRO)
-#pragma pop_macro("CopyMemory")
-#undef DALI_VECTOR_RESTORE_COPY_MEMORY_MACRO
-#endif
 
 #endif // DALI_VECTOR_H

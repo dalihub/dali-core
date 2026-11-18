@@ -19,8 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
-#include <cstdint> // for uint32_t
-#include <new>     // For new placement
+#include <new> // placement new
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-vector-base.h>
@@ -32,9 +31,10 @@ namespace DALI_NAMESPACE
 /**
  * @brief Vector algorithm variant for complex types.
  *
- * This implementation provides proper move semantics for complex types
- * (types with non-trivial constructors/destructors) by using copy/move constructors
- * and destructors instead of memcpy.
+ * Complex types (types with non-trivial constructors/destructors) are reached
+ * from the library through the copy/move constructor and destructor of T. The
+ * algorithms themselves live in VectorBase; only these three per-element
+ * primitives are compiled into the application.
  *
  * @SINCE_2_5.10
  */
@@ -43,7 +43,6 @@ class VectorAlgorithms<false, T> : public VectorBase
 {
 protected: // API for deriving classes
   using SizeType = VectorBase::SizeType;
-  using ItemType = T;
 
   /**
    * @brief Empty constructor.
@@ -58,263 +57,41 @@ protected: // API for deriving classes
   ~VectorAlgorithms() = default;
 
   /**
-   * @brief Copy vector contents.
+   * @brief Element operations for the paths that copy elements.
    *
-   * @SINCE_2_5.10
-   * @param[in] rhs Vector object to copy from
-   * @param[in] elementSize Size of the content
+   * Only the copying paths instantiate this, so a move-only T still compiles.
+   * @SINCE_3_0.1
    */
-  void Copy(const VectorAlgorithms<false, T>& rhs, SizeType elementSize)
+  static const ElementOperations& CopyOperations()
   {
-    // Remove old vector first.
-    Release(elementSize);
-    if(rhs.Capacity() > 0u)
-    {
-      Reserve(rhs.Capacity(), elementSize);
-    }
-    if(rhs.Count() > 0u)
-    {
-      Insert(reinterpret_cast<uint8_t*>(VectorBase::mData), reinterpret_cast<uint8_t*>(rhs.mData), reinterpret_cast<uint8_t*>(rhs.mData) + rhs.Count() * elementSize, elementSize);
-    }
+    static constexpr ElementOperations operations{sizeof(T), &CopyConstruct, &MoveConstruct, &Destroy};
+    return operations;
   }
 
   /**
-   * @brief Reserves space in the vector.
-   *
-   * For complex types, this properly handles move semantics instead of using memcpy.
-   *
-   * @SINCE_2_5.10
-   * @param[in] count Count of elements to reserve
-   * @param[in] elementSize Size of a single element
+   * @brief Element operations for the paths that only move or destroy elements.
+   * @SINCE_3_0.1
    */
-  void Reserve(SizeType count, SizeType elementSize)
+  static const ElementOperations& MoveOperations()
   {
-    VectorBase::ReserveWithCustomMoveFunction(count, elementSize, MoveItem);
-  }
-
-  void ShrinkToFit(SizeType elementSize)
-  {
-    VectorBase::ShrinkToFitWithCustomMoveFunction(elementSize, MoveItem);
-  }
-
-  /**
-   * @brief Clears the contents.
-   *
-   * @SINCE_2_5.10
-   */
-  void Clear(SizeType elementSize)
-  {
-    if(VectorBase::Count() > 0u)
-    {
-      Erase(reinterpret_cast<uint8_t*>(VectorBase::mData),
-            reinterpret_cast<uint8_t*>(VectorBase::mData) + VectorBase::Count() * elementSize,
-            elementSize);
-    }
-  }
-
-  /**
-   * @brief Releases the vector.
-   * @SINCE_2_5.10
-   */
-  void Release(SizeType elementSize)
-  {
-    Clear(elementSize);
-    VectorBase::Release();
-  }
-
-  /**
-   * @brief Replaces the vector data with new data.
-   *
-   * For complex types, clear existing elements first to call destructors.
-   * @SINCE_2_5.23
-   * @param[in] newData New data address to be replaced
-   * @param[in] elementSize Size of a single element
-   */
-  void Replace(void* newData, SizeType elementSize) noexcept
-  {
-    Clear(elementSize);
-    VectorBase::Replace(newData);
-  }
-
-  /**
-   * @brief Erases an element. Does not change capacity.
-   *
-   * @SINCE_2_5.10
-   * @param[in] address Address to erase from
-   * @param[in] elementSize Size to erase
-   */
-  void Erase(uint8_t* address, SizeType elementSize)
-  {
-    Erase(address, address + elementSize, elementSize);
-  }
-
-  /**
-   * @brief Erases a range of elements. Does not change capacity.
-   *
-   * @SINCE_2_5.10
-   * @param[in] first Address to the first element to be erased
-   * @param[in] last Address to the last element to be erased
-   * @param[in] elementSize Size of one of the elements to be erased
-   * @return Address pointing to the next element of the last one
-   */
-  uint8_t* Erase(uint8_t* first, uint8_t* last, SizeType elementSize)
-  {
-    const SizeType size     = last - first;
-    const SizeType count    = Count();
-    const SizeType newCount = count - size / elementSize;
-
-    const SizeType offset = first - reinterpret_cast<uint8_t*>(VectorBase::mData);
-
-    // Call destructors on erased elements
-    for(uint8_t* iter = first; iter != last; iter += elementSize)
-    {
-      (*reinterpret_cast<ItemType*>(iter)).~ItemType();
-    }
-
-    // Move remaining elements to fill the gap
-    if(size != 0u)
-    {
-      uint8_t*       currentEnd = (reinterpret_cast<uint8_t*>(mData) + count * elementSize);
-      const SizeType moveByte   = currentEnd - last;
-
-      MoveItemInternal<false>(first, last, moveByte, elementSize);
-    }
-
-    VectorBase::SetCount(newCount);
-
-    return reinterpret_cast<uint8_t*>(VectorBase::mData) + offset;
-  }
-
-  /**
-   * @brief Inserts the given elements into the vector.
-   *
-   * @SINCE_2_5.10
-   * @param[in] at Address where to insert the elements into the vector
-   * @param[in] from Address to the first element to be inserted
-   * @param[in] to Address to the last element to be inserted
-   * @param[in] elementSize Size of one of the elements to be inserted
-   */
-  void Insert(uint8_t* at, uint8_t* from, uint8_t* to, SizeType elementSize)
-  {
-    const SizeType size     = to - from;
-    const SizeType count    = Count();
-    const SizeType newCount = count + size / elementSize;
-
-    if(newCount > Capacity())
-    {
-      // Calculate the at offset as the pointer is invalid after the Reserve() call.
-      const SizeType offset = at - reinterpret_cast<uint8_t*>(mData);
-
-      // need more space
-      Reserve(NextPowerOfTwo(static_cast<uint32_t>(newCount)), elementSize); // reserve enough space to store at least the next power of two elements of the new required size.
-
-      // Set the new at pointer.
-      at = reinterpret_cast<uint8_t*>(mData) + offset;
-    }
-
-    // set new count first as otherwise the debug assert will hit us
-    VectorBase::SetCount(newCount);
-
-    if(size != 0u)
-    {
-      uint8_t*       currentEnd = (reinterpret_cast<uint8_t*>(mData) + count * elementSize);
-      uint8_t*       newEnd     = currentEnd + size;
-      const SizeType moveByte   = (currentEnd - at);
-
-      MoveItemInternal<true>(newEnd, currentEnd, moveByte, elementSize);
-    }
-    // Copy new elements from source range
-    while(from != to)
-    {
-      new(at) ItemType(static_cast<const ItemType&>(*(reinterpret_cast<const ItemType*>(from))));
-      from += elementSize;
-      at += elementSize;
-    }
-  }
-
-  /**
-   * @brief Inserts the given elements into the vector using move construction.
-   *
-   * Same as Insert but move-constructs new elements instead of copy-constructing.
-   * This allows inserting move-only types.
-   *
-   * @SINCE_2_5.16
-   * @param[in] at Address where to insert the elements into the vector
-   * @param[in] from Address to the first element to be inserted
-   * @param[in] to Address to the last element to be inserted
-   * @param[in] elementSize Size of one of the elements to be inserted
-   */
-  void InsertMove(uint8_t* at, uint8_t* from, uint8_t* to, SizeType elementSize)
-  {
-    const SizeType size     = to - from;
-    const SizeType count    = Count();
-    const SizeType newCount = count + size / elementSize;
-
-    if(newCount > Capacity())
-    {
-      const SizeType offset = at - reinterpret_cast<uint8_t*>(mData);
-
-      Reserve(NextPowerOfTwo(static_cast<uint32_t>(newCount)), elementSize);
-
-      at = reinterpret_cast<uint8_t*>(mData) + offset;
-    }
-
-    VectorBase::SetCount(newCount);
-
-    if(size != 0u)
-    {
-      uint8_t*       currentEnd = (reinterpret_cast<uint8_t*>(mData) + count * elementSize);
-      uint8_t*       newEnd     = currentEnd + size;
-      const SizeType moveByte   = (currentEnd - at);
-
-      MoveItemInternal<true>(newEnd, currentEnd, moveByte, elementSize);
-    }
-    // Move new elements from source range
-    while(from != to)
-    {
-      new(at) ItemType(static_cast<ItemType&&>(*(reinterpret_cast<ItemType*>(from))));
-      from += elementSize;
-      at += elementSize;
-    }
+    static constexpr ElementOperations operations{sizeof(T), nullptr, &MoveConstruct, &Destroy};
+    return operations;
   }
 
 private:
-  template<bool reverseMove>
-  static void MoveItemInternal(uint8_t* destination, uint8_t* source, SizeType moveByte, SizeType elementSize) noexcept
+  static void CopyConstruct(void* destination, const void* source)
   {
-    const SizeType moveCount = moveByte / elementSize;
-
-    for(SizeType i = 0u; i < moveCount; ++i)
-    {
-      // TODO : We need to check whether noexcept move constructor supported or not at type-traits.h.
-      //        Before support it, let we just use move constructor instead of copy constructor.
-
-      if constexpr(reverseMove)
-      {
-        destination -= elementSize;
-        source -= elementSize;
-      }
-
-      // Use move constructor to move elements
-      new(destination) ItemType(static_cast<ItemType&&>(*reinterpret_cast<ItemType*>(source)));
-      // Call destructor on moved element
-      (*reinterpret_cast<ItemType*>(source)).~ItemType();
-
-      if constexpr(!reverseMove)
-      {
-        source += elementSize;
-        destination += elementSize;
-      }
-    }
+    new(destination) T(*static_cast<const T*>(source));
   }
 
-  static void* MoveItem(void* destination, const void* source, SizeType moveByte) noexcept
+  static void MoveConstruct(void* destination, void* source)
   {
-    const SizeType elementSize = static_cast<SizeType>(sizeof(ItemType));
+    new(destination) T(static_cast<T&&>(*static_cast<T*>(source)));
+  }
 
-    MoveItemInternal<false>(reinterpret_cast<uint8_t*>(destination), const_cast<uint8_t*>(reinterpret_cast<const uint8_t*>(source)), moveByte, elementSize);
-
-    return destination;
+  static void Destroy(void* element)
+  {
+    static_cast<T*>(element)->~T();
   }
 };
 /// @endcond
