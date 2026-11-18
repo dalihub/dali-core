@@ -1,5 +1,5 @@
-#ifndef DALI_PUBLIC_API_COMMON_OPEN_HASH_MAP_MANAGED_H
-#define DALI_PUBLIC_API_COMMON_OPEN_HASH_MAP_MANAGED_H
+#ifndef DALI_INTEGRATION_API_OPEN_HASH_MAP_MANAGED_H
+#define DALI_INTEGRATION_API_OPEN_HASH_MAP_MANAGED_H
 
 /*
  * Copyright (c) 2026 Samsung Electronics Co., Ltd.
@@ -28,20 +28,16 @@
 
 namespace DALI_NAMESPACE
 {
-/**
- * @addtogroup dali_core_common
- * @{
- */
-
+namespace Integration
+{
 /**
  * @brief Entry state for ManagedOpenHashMap slots.
- * @SINCE_2_5.20
  */
 enum class EntryState : uint8_t
 {
-  EMPTY,    ///< Slot has never been occupied. @SINCE_2_5.20
-  OCCUPIED, ///< Slot contains a live key-value pair. @SINCE_2_5.20
-  TOMBSTONE ///< Slot was occupied but has been erased. @SINCE_2_5.20
+  EMPTY,    ///< Slot has never been occupied.
+  OCCUPIED, ///< Slot contains a live key-value pair.
+  TOMBSTONE ///< Slot was occupied but has been erased.
 };
 
 /**
@@ -127,7 +123,6 @@ enum class EntryState : uint8_t
  * @tparam Value    Mapped value type
  * @tparam Hash     Hash functor: size_t operator()(const Key&) const
  * @tparam KeyEqual Equality functor: bool operator()(const Key&, const Key&) const
- * @SINCE_2_5.20
  */
 template<typename Key, typename Value, typename Hash, typename KeyEqual>
 class ManagedOpenHashMap
@@ -135,7 +130,6 @@ class ManagedOpenHashMap
 public:
   /**
    * @brief A single entry in the hash table.
-   * @SINCE_2_5.20
    */
   struct Entry
   {
@@ -154,7 +148,6 @@ public:
    * Uses Dali::Pair so callers get the full Dali::Pair interface (comparison
    * operators, Swap, MakePair) and the familiar first/second field names without
    * depending on any bespoke type.
-   * @SINCE_2_5.20
    */
   using InsertResult = Dali::Pair<Value*, bool>;
 
@@ -191,7 +184,6 @@ public:
    *   it->key() / it->value()   — via operator-> on Iterator
    *   (*it).key() / (*it).value() — via operator* on Iterator
    *   kv.key() / kv.value()     — via range-for: for(auto& kv : map)
-   * @SINCE_2_5.20
    */
   struct KeyValuePair
   {
@@ -212,7 +204,6 @@ public:
    * @brief Value type exposed by ConstIterator.
    *
    * Provides stable const references to both key and value.
-   * @SINCE_2_5.20
    */
   struct ConstKeyValuePair
   {
@@ -249,7 +240,6 @@ public:
    *     DoSomething(kv.key(), kv.value());
    *   }
    * @endcode
-   * @SINCE_2_5.20
    */
   class Iterator
   {
@@ -342,7 +332,6 @@ public:
    *     DoSomething(it->key(), it->value());
    *   }
    * @endcode
-   * @SINCE_2_5.20
    */
   class ConstIterator
   {
@@ -414,7 +403,6 @@ public:
    *
    * Creates an empty map with no allocated table (capacity 0).
    * The table is allocated on the first Insert.
-   * @SINCE_2_5.20
    */
   ManagedOpenHashMap() = default;
 
@@ -422,7 +410,6 @@ public:
    * @brief Destructor.
    *
    * Destroys all live key-value pairs and frees the entry table.
-   * @SINCE_2_5.20
    */
   ~ManagedOpenHashMap()
   {
@@ -435,7 +422,6 @@ public:
    * ManagedOpenHashMap is not copyable because copying a hash map with
    * non-trivial key/value types is expensive and easily done unintentionally.
    * Use move semantics or manually copy entries via ForEach() + Insert().
-   * @SINCE_2_5.20
    */
   ManagedOpenHashMap(const ManagedOpenHashMap&) = delete;
 
@@ -444,7 +430,6 @@ public:
    *
    * ManagedOpenHashMap is not copy-assignable for the same reason as the
    * copy constructor.
-   * @SINCE_2_5.20
    */
   ManagedOpenHashMap& operator=(const ManagedOpenHashMap&) = delete;
 
@@ -458,7 +443,6 @@ public:
    * If either functor's move constructor can throw, std::terminate would be called.
    *
    * @param[in] rhs The map to move from
-   * @SINCE_2_5.20
    */
   ManagedOpenHashMap(ManagedOpenHashMap&& rhs) noexcept(IsNothrowMoveConstructible<Hash>::value && IsNothrowMoveConstructible<KeyEqual>::value)
   : mEntries(rhs.mEntries),
@@ -485,7 +469,6 @@ public:
    *
    * @param[in] rhs The map to move from
    * @return Reference to this map
-   * @SINCE_2_5.20
    */
   ManagedOpenHashMap& operator=(ManagedOpenHashMap&& rhs) noexcept(IsNothrowMoveAssignable<Hash>::value && IsNothrowMoveAssignable<KeyEqual>::value)
   {
@@ -520,7 +503,6 @@ public:
    * @param[in] key   The key to insert
    * @param[in] value The value to associate
    * @return Pointer to the inserted/updated entry's value
-   * @SINCE_2_5.20
    */
   Value* Insert(const Key& key, const Value& value)
   {
@@ -540,7 +522,6 @@ public:
    * @param[in] key   The key to insert (rvalue reference)
    * @param[in] value The value to associate (rvalue reference)
    * @return Pointer to the inserted/updated entry's value
-   * @SINCE_2_5.20
    */
   Value* Insert(Key&& key, Value&& value)
   {
@@ -560,7 +541,6 @@ public:
    * @param[in] key   The key to insert (rvalue reference)
    * @param[in] value The value to associate
    * @return Pointer to the inserted/updated entry's value
-   * @SINCE_2_5.20
    */
   Value* Insert(Key&& key, const Value& value)
   {
@@ -580,7 +560,6 @@ public:
    * @param[in] key   The key to insert
    * @param[in] value The value to associate (rvalue reference)
    * @return Pointer to the inserted/updated entry's value
-   * @SINCE_2_5.20
    */
   Value* Insert(const Key& key, Value&& value)
   {
@@ -604,7 +583,6 @@ public:
    *
    * @param[in] key The key to look up or insert
    * @return Reference to the value associated with key
-   * @SINCE_2_5.20
    */
   Value& operator[](const Key& key)
   {
@@ -620,7 +598,6 @@ public:
    *
    * @param[in] key The key to look up
    * @return Reference to the value associated with key
-   * @SINCE_2_5.20
    */
   Value& At(const Key& key)
   {
@@ -637,7 +614,6 @@ public:
    *
    * @param[in] key The key to look up
    * @return Const reference to the value associated with key
-   * @SINCE_2_5.20
    */
   const Value& At(const Key& key) const
   {
@@ -660,7 +636,6 @@ public:
    * @param[in] value The value to associate
    * @return InsertResult::first  — pointer to the value (existing or newly inserted)
    *         InsertResult::second — true if inserted, false if key already existed
-   * @SINCE_2_5.20
    */
   InsertResult TryInsert(const Key& key, const Value& value)
   {
@@ -673,7 +648,6 @@ public:
    * @param[in] key   The key to insert (rvalue reference)
    * @param[in] value The value to associate (rvalue reference)
    * @return InsertResult
-   * @SINCE_2_5.20
    */
   InsertResult TryInsert(Key&& key, Value&& value)
   {
@@ -686,7 +660,6 @@ public:
    * @param[in] key   The key to insert (rvalue reference)
    * @param[in] value The value to associate
    * @return InsertResult
-   * @SINCE_2_5.20
    */
   InsertResult TryInsert(Key&& key, const Value& value)
   {
@@ -699,7 +672,6 @@ public:
    * @param[in] key   The key to insert
    * @param[in] value The value to associate (rvalue reference)
    * @return InsertResult
-   * @SINCE_2_5.20
    */
   InsertResult TryInsert(const Key& key, Value&& value)
   {
@@ -710,7 +682,6 @@ public:
    * @brief Find a value by key.
    * @param[in] key The key to look up
    * @return Pointer to the value, or nullptr if not found
-   * @SINCE_2_5.20
    */
   Value* Find(const Key& key)
   {
@@ -745,7 +716,6 @@ public:
    * @brief Find a value by key (const).
    * @param[in] key The key to look up
    * @return Pointer to the value, or nullptr if not found
-   * @SINCE_2_5.20
    */
   const Value* Find(const Key& key) const
   {
@@ -780,7 +750,6 @@ public:
    * @brief Erase an entry by key.
    * @param[in] key The key to erase
    * @return true if the key was found and erased, false otherwise
-   * @SINCE_2_5.20
    */
   bool Erase(const Key& key)
   {
@@ -832,7 +801,6 @@ public:
    *   map.Clear();
    *   map.Rehash(); // releases the table buffer and all Key/Value storage immediately
    * @endcode
-   * @SINCE_2_5.20
    */
   void Clear()
   {
@@ -850,7 +818,6 @@ public:
   /**
    * @brief Call a functor for each live entry.
    * @param[in] functor Called with (const Key& key, Value& value) for each entry
-   * @SINCE_2_5.20
    */
   template<typename Functor>
   void ForEach(Functor&& functor)
@@ -868,7 +835,6 @@ public:
   /**
    * @brief Call a functor for each live entry (const version).
    * @param[in] functor Called with (const Key& key, const Value& value) for each entry
-   * @SINCE_2_5.20
    */
   template<typename Functor>
   void ForEach(Functor&& functor) const
@@ -885,7 +851,6 @@ public:
 
   /**
    * @return Number of live entries.
-   * @SINCE_2_5.20
    */
   uint32_t Size() const
   {
@@ -894,7 +859,6 @@ public:
 
   /**
    * @return true if there are no live entries.
-   * @SINCE_2_5.20
    */
   bool Empty() const
   {
@@ -903,7 +867,6 @@ public:
 
   /**
    * @return Current table capacity (always a power of 2, or 0).
-   * @SINCE_2_5.20
    */
   uint32_t Capacity() const
   {
@@ -917,7 +880,6 @@ public:
    *
    * @param[in] key The key to test
    * @return true if the key is present, false otherwise
-   * @SINCE_2_5.20
    */
   bool Contains(const Key& key) const
   {
@@ -932,7 +894,6 @@ public:
    *
    * @param[in] key The key to count
    * @return 1 if the key is present, 0 otherwise
-   * @SINCE_2_5.20
    */
   uint32_t Count(const Key& key) const
   {
@@ -944,7 +905,6 @@ public:
    *
    * Iteration order is unspecified (depends on hash distribution).
    * The iterator is invalidated by any operation that may grow or rehash the table.
-   * @SINCE_2_5.20
    */
   Iterator begin()
   {
@@ -953,7 +913,6 @@ public:
 
   /**
    * @brief Return a past-the-end iterator.
-   * @SINCE_2_5.20
    */
   Iterator end()
   {
@@ -962,7 +921,6 @@ public:
 
   /**
    * @brief Return a const iterator to the first live entry.
-   * @SINCE_2_5.20
    */
   ConstIterator begin() const
   {
@@ -971,7 +929,6 @@ public:
 
   /**
    * @brief Return a past-the-end const iterator.
-   * @SINCE_2_5.20
    */
   ConstIterator end() const
   {
@@ -980,7 +937,6 @@ public:
 
   /**
    * @brief Return a const iterator to the first live entry (explicit const).
-   * @SINCE_2_5.20
    */
   ConstIterator cbegin() const
   {
@@ -989,7 +945,6 @@ public:
 
   /**
    * @brief Return a past-the-end const iterator (explicit const).
-   * @SINCE_2_5.20
    */
   ConstIterator cend() const
   {
@@ -1022,7 +977,6 @@ public:
    * before this call.
    *
    * @param[in] targetCapacity Minimum desired capacity (0 to shrink to fit).
-   * @SINCE_2_5.20
    */
   void Rehash(uint32_t targetCapacity = 0u)
   {
@@ -1292,10 +1246,7 @@ private:
   DALI_NO_UNIQUE_ADDRESS KeyEqual mKeyEqual{};
 };
 
-/**
- * @}
- */
+} // namespace Integration
+} // namespace DALI_NAMESPACE
 
-} //namespace DALI_NAMESPACE
-
-#endif // DALI_PUBLIC_API_COMMON_OPEN_HASH_MAP_MANAGED_H
+#endif // DALI_INTEGRATION_API_OPEN_HASH_MAP_MANAGED_H

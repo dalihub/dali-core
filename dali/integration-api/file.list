@@ -58,6 +58,7 @@ SET( platform_abstraction_header_files
    ${platform_abstraction_src_dir}/input-options.h
    ${platform_abstraction_src_dir}/locale-numeric-guard.h
    ${platform_abstraction_src_dir}/lockless-buffer.h
+   ${platform_abstraction_src_dir}/open-hash-map-managed.h
    ${platform_abstraction_src_dir}/open-hash-map.h
    ${platform_abstraction_src_dir}/ordered-set.h
    ${platform_abstraction_src_dir}/pixel-buffer-integ.h

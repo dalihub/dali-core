@@ -23,9 +23,9 @@
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/common/singleton-service.h>
+#include <dali/integration-api/open-hash-map-managed.h>
 #include <dali/internal/event/common/scene-impl.h>
 #include <dali/internal/update/common/scene-graph-memory-pool-collection.h>
-#include <dali/public-api/common/open-hash-map-managed.h>
 #include <dali/public-api/object/type-info-id.h>
 #include <dali/public-api/rendering/renderer.h>
 #include <dali/public-api/update/update-proxy.h>
@@ -277,7 +277,7 @@ private:
       return info.GetId();
     }
   };
-  using SingletonContainer = ManagedOpenHashMap<TypeInfoId, BaseHandle, TypeInfoIdHash, std::equal_to<TypeInfoId>>;
+  using SingletonContainer = Integration::ManagedOpenHashMap<TypeInfoId, BaseHandle, TypeInfoIdHash, std::equal_to<TypeInfoId>>;
 
   SingletonContainer mSingletonContainer; ///< The container to look up singleton by its type name
 

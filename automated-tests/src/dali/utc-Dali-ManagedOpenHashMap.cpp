@@ -23,10 +23,11 @@
 
 // INTERNAL INCLUDES
 #include <dali-test-suite-utils.h>
+#include <dali/integration-api/open-hash-map-managed.h>
 #include <dali/public-api/common/dali-string.h>
-#include <dali/public-api/common/open-hash-map-managed.h>
 
 using namespace Dali;
+using Dali::Integration::ManagedOpenHashMap;
 
 void utc_dali_internal_managed_open_hash_map_startup(void)
 {
