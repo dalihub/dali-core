@@ -118,7 +118,7 @@ float StaticFloatCallbackFloatValueFloatValue(float value1, float value2)
   return value1 + value2;
 }
 
-int  totalCallbackCount = 0;
+int totalCallbackCount = 0;
 
 // Each callback must have a unique function body to prevent MSVC's
 // Identical COMDAT Folding (ICF) from merging them into a single address.
@@ -2751,6 +2751,20 @@ int UtcDaliSignalEmissionOrder(void)
   DALI_TEST_EQUALS(gEmitOrder[1], 2, TEST_LOCATION);
   DALI_TEST_EQUALS(gEmitOrder[2], 1, TEST_LOCATION);
   DALI_TEST_EQUALS(gEmitOrder[3], 0, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliSignalMixinLayout(void)
+{
+  TestApplication application;
+
+  tet_infoline("Every Signal<> carries the SignalMixin layout into applications: pin it to one BaseSignal pointer");
+
+  DALI_TEST_EQUALS(sizeof(SignalMixin), sizeof(void*), TEST_LOCATION);
+  DALI_TEST_EQUALS(sizeof(Signal<void()>), sizeof(void*), TEST_LOCATION);
+  DALI_TEST_EQUALS(sizeof(Signal<bool(float)>), sizeof(void*), TEST_LOCATION);
+  DALI_TEST_EQUALS(sizeof(Signal<void(int, float, bool)>), sizeof(void*), TEST_LOCATION);
 
   END_TEST;
 }

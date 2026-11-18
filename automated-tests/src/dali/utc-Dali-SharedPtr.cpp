@@ -1715,3 +1715,15 @@ int UtcDaliSharedPtrDeleteThroughBasePointer(void)
 
   END_TEST;
 }
+
+int UtcDaliEnableSharedFromThisLayout(void)
+{
+  TestApplication application;
+
+  tet_infoline("EnableSharedFromThis is a base of library classes and its WeakPtr is read by inline SharedFromThis(): pin its layout");
+
+  DALI_TEST_EQUALS(sizeof(EnableSharedFromThis<EnableSharedFromThisTestClass>), 2 * sizeof(void*), TEST_LOCATION);
+  DALI_TEST_EQUALS(sizeof(EnableSharedFromThis<const EnableSharedFromThisTestClass>), 2 * sizeof(void*), TEST_LOCATION);
+
+  END_TEST;
+}

@@ -191,6 +191,9 @@ private:
   BaseSignal* mImpl;
 };
 
+// Every Signal<> compiles this layout into applications; Empty(), GetConnectionCount() and Impl() read mImpl inline.
+static_assert(sizeof(SignalMixin) == sizeof(void*), "SignalMixin layout is ABI-frozen: one BaseSignal pointer");
+
 /**
  * @brief A template for Signals with no parameters or return value.
  * @SINCE_1_0.0
