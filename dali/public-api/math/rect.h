@@ -375,15 +375,15 @@ inline constexpr bool operator!=(const Rect<T>& lhs, const Rect<T>& rhs)
  * @SINCE_1_0.0
  * @param[in] lhs The first rectangle
  * @param[in] rhs The second rectangle
- * @return True if rectangles are exactly same
+ * @return True if every component differs by no more than the ranged epsilon
  */
 template<>
 inline constexpr bool operator==(const Rect<float>& lhs, const Rect<float>& rhs)
 {
-  return (Internal::MathUtils::Abs(lhs.x - rhs.x) < GetRangedEpsilon(lhs.x, rhs.x)) &&
-         (Internal::MathUtils::Abs(lhs.y - rhs.y) < GetRangedEpsilon(lhs.y, rhs.y)) &&
-         (Internal::MathUtils::Abs(lhs.width - rhs.width) < GetRangedEpsilon(lhs.width, rhs.width)) &&
-         (Internal::MathUtils::Abs(lhs.height - rhs.height) < GetRangedEpsilon(lhs.height, rhs.height));
+  return (Internal::MathUtils::Abs(lhs.x - rhs.x) <= GetRangedEpsilon(lhs.x, rhs.x)) &&
+         (Internal::MathUtils::Abs(lhs.y - rhs.y) <= GetRangedEpsilon(lhs.y, rhs.y)) &&
+         (Internal::MathUtils::Abs(lhs.width - rhs.width) <= GetRangedEpsilon(lhs.width, rhs.width)) &&
+         (Internal::MathUtils::Abs(lhs.height - rhs.height) <= GetRangedEpsilon(lhs.height, rhs.height));
 }
 
 /**

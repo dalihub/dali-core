@@ -144,10 +144,10 @@ public:
   {
     // start from w as its unlikely that any real rotation has w == 1
     // Uses a relaxed epsilon, as composition of rotation introduces error
-    return ((Internal::MathUtils::Abs(mVector.w - 1.0f) < Math::MACHINE_EPSILON_10) &&
-            (Internal::MathUtils::Abs(mVector.x) < Math::MACHINE_EPSILON_10) &&
-            (Internal::MathUtils::Abs(mVector.y) < Math::MACHINE_EPSILON_10) &&
-            (Internal::MathUtils::Abs(mVector.z) < Math::MACHINE_EPSILON_10));
+    return ((Internal::MathUtils::Abs(mVector.w - 1.0f) <= Math::MACHINE_EPSILON_10) &&
+            (Internal::MathUtils::Abs(mVector.x) <= Math::MACHINE_EPSILON_10) &&
+            (Internal::MathUtils::Abs(mVector.y) <= Math::MACHINE_EPSILON_10) &&
+            (Internal::MathUtils::Abs(mVector.z) <= Math::MACHINE_EPSILON_10));
   }
 
   /**

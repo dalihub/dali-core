@@ -199,3 +199,24 @@ int UtcDaliRadianCastOperatorLessThan(void)
 
   END_TEST;
 }
+
+int UtcDaliRadianOperatorEqualsAtEpsilonBoundary(void)
+{
+  TestApplication application;
+
+  tet_infoline("Radian equality follows the common rule: a difference of exactly the epsilon still compares equal");
+
+  const float radianEpsilon = Math::MACHINE_EPSILON_10;
+  DALI_TEST_CHECK(Radian(0.0f) == Radian(radianEpsilon));
+  DALI_TEST_CHECK(Radian(radianEpsilon) == Radian(0.0f));
+  DALI_TEST_CHECK(Radian(0.0f) != Radian(2.0f * radianEpsilon));
+
+  // Mixed comparisons convert the Degree side to radians and use their own epsilon
+  const float mixedEpsilon = Math::MACHINE_EPSILON_100;
+  DALI_TEST_CHECK(Radian(mixedEpsilon) == Degree(0.0f));
+  DALI_TEST_CHECK(Degree(0.0f) == Radian(mixedEpsilon));
+  DALI_TEST_CHECK(Radian(2.0f * mixedEpsilon) != Degree(0.0f));
+  DALI_TEST_CHECK(Degree(0.0f) != Radian(2.0f * mixedEpsilon));
+
+  END_TEST;
+}
