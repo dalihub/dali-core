@@ -1316,3 +1316,81 @@ int UtcDaliUniquePtrSizeComparisons(void)
 
   END_TEST;
 }
+
+namespace
+{
+
+// Pimpl pattern: the owner declares UniquePtr<Impl> while Impl is incomplete and
+// defines its special members where Impl is complete, as DALi's public pimpl classes do.
+class PimplOwner
+{
+public:
+  explicit PimplOwner(bool& destructorCalled);
+  ~PimplOwner();
+  PimplOwner(PimplOwner&& other) noexcept;
+  PimplOwner& operator=(PimplOwner&& other) noexcept;
+
+  bool HasImpl() const;
+
+private:
+  struct Impl;
+  UniquePtr<Impl> mImpl;
+};
+
+struct PimplOwner::Impl
+{
+  explicit Impl(bool& destructorCalled)
+  : mDestructorCalled(destructorCalled)
+  {
+    mDestructorCalled = false;
+  }
+
+  ~Impl()
+  {
+    mDestructorCalled = true;
+  }
+
+  bool& mDestructorCalled;
+};
+
+PimplOwner::PimplOwner(bool& destructorCalled)
+: mImpl(new Impl(destructorCalled))
+{
+}
+
+PimplOwner::~PimplOwner()                                      = default;
+PimplOwner::PimplOwner(PimplOwner&& other) noexcept            = default;
+PimplOwner& PimplOwner::operator=(PimplOwner&& other) noexcept = default;
+
+bool PimplOwner::HasImpl() const
+{
+  return mImpl.Get() != nullptr;
+}
+
+} // unnamed namespace
+
+int UtcDaliUniquePtrIncompleteTypeMember(void)
+{
+  TestApplication application;
+  bool            destructorCalled(false);
+
+  tet_infoline("UniquePtr<Impl> may be declared while Impl is incomplete; the deleter is only instantiated where Impl is complete");
+
+  {
+    PimplOwner owner(destructorCalled);
+    DALI_TEST_CHECK(owner.HasImpl());
+
+    PimplOwner moved(std::move(owner));
+    DALI_TEST_CHECK(!owner.HasImpl());
+    DALI_TEST_CHECK(moved.HasImpl());
+    DALI_TEST_CHECK(!destructorCalled);
+
+    owner = std::move(moved);
+    DALI_TEST_CHECK(owner.HasImpl());
+    DALI_TEST_CHECK(!moved.HasImpl());
+    DALI_TEST_CHECK(!destructorCalled);
+  }
+  DALI_TEST_CHECK(destructorCalled);
+
+  END_TEST;
+}

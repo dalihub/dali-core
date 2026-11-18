@@ -81,8 +81,15 @@ class EnableSharedFromThis;
  */
 struct RefCountControlBlock
 {
+  // ============================================================
+  // Inline contract shared by applications and the library (both sides compile this).
+  // WARNING: Do NOT change the layout {strongCount, weakCount} or the initial counts.
+  // WARNING: Do NOT change the protocol: the strong owners together hold one weak count, the last
+  //          strong release deletes the object, and the last weak release deletes this block.
+  // ============================================================
+
   uint32_t strongCount; ///< Number of SharedPtr references
-  uint32_t weakCount;   ///< Number of WeakPtr references
+  uint32_t weakCount;   ///< Number of WeakPtr references, plus one held jointly by the SharedPtr references
 
   RefCountControlBlock()
   : strongCount(1),
@@ -90,12 +97,20 @@ struct RefCountControlBlock
   {
   }
 };
+static_assert(sizeof(RefCountControlBlock) == 8, "RefCountControlBlock layout is ABI-frozen");
 
 /**
  * @brief Templated shared pointer class with a default deleter.
  *
+ * The managed object is deleted with @c delete through @p Type by whichever
+ * SharedPtr releases the last strong reference. SharedPtr does not record a
+ * deleter when it adopts the object.
+ *
  * @SINCE_2_5.16
  * @tparam Type The type of the pointer stored
+ * @warning A SharedPtr<Base> converted from a SharedPtr<Derived> may be the
+ * one that deletes the object, so Base must have a virtual destructor
+ * whenever a derived object is stored.
  */
 template<typename Type>
 class SharedPtr

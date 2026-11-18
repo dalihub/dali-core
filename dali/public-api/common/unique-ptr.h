@@ -67,6 +67,7 @@ struct DefaultDeleter
    */
   void operator()(Type* ptr) const
   {
+    static_assert(sizeof(Type) > 0, "UniquePtr cannot delete an incomplete type: define the owner's destructor where Type is complete");
     delete ptr;
   }
 };
@@ -88,6 +89,7 @@ public:
 
   static constexpr Deleter DefaultDeleter = [](Type* p)
   {
+    static_assert(sizeof(Type) > 0, "UniquePtr cannot delete an incomplete type: define the owner's destructor where Type is complete");
     delete p;
   }; ///< Default deleter
 

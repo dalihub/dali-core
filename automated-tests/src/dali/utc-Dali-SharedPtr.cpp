@@ -192,6 +192,27 @@ public:
   }
 };
 
+// Polymorphic pair that records whether the derived destructor ran
+struct VirtualBase
+{
+  explicit VirtualBase(int& derivedDestroyed)
+  : mDerivedDestroyed(derivedDestroyed)
+  {
+  }
+  virtual ~VirtualBase() = default;
+
+  int& mDerivedDestroyed;
+};
+
+struct VirtualDerived : public VirtualBase
+{
+  using VirtualBase::VirtualBase;
+  ~VirtualDerived() override
+  {
+    ++mDerivedDestroyed;
+  }
+};
+
 } // unnamed namespace
 
 int UtcDaliSharedPtrDefaultConstructor(void)
@@ -1601,6 +1622,96 @@ int UtcDaliWeakPtrMultipleWeakRefs(void)
   }
 
   DALI_TEST_CHECK(destructorCalled);
+
+  END_TEST;
+}
+
+int UtcDaliSharedPtrLayout(void)
+{
+  TestApplication application;
+
+  tet_infoline("SharedPtr, WeakPtr and the control block are compiled into applications: pin their layouts");
+
+  DALI_TEST_EQUALS(sizeof(RefCountControlBlock), 2 * sizeof(uint32_t), TEST_LOCATION);
+  DALI_TEST_EQUALS(sizeof(SharedPtr<TestClass>), 2 * sizeof(void*), TEST_LOCATION);
+  DALI_TEST_EQUALS(sizeof(WeakPtr<TestClass>), 2 * sizeof(void*), TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliSharedPtrCountProtocol(void)
+{
+  TestApplication application;
+  bool            destructorCalled(false);
+
+  tet_infoline("The strong/weak counting protocol is an inline contract: pin the observable transitions");
+
+  WeakPtr<TestClass> weak;
+  DALI_TEST_EQUALS(weak.UseCount(), 0u, TEST_LOCATION);
+  DALI_TEST_CHECK(weak.Expired());
+
+  {
+    SharedPtr<TestClass> first(new TestClass(destructorCalled));
+    DALI_TEST_EQUALS(first.UseCount(), 1u, TEST_LOCATION);
+
+    // A weak reference does not change the strong count.
+    weak = first;
+    DALI_TEST_EQUALS(first.UseCount(), 1u, TEST_LOCATION);
+    DALI_TEST_EQUALS(weak.UseCount(), 1u, TEST_LOCATION);
+    DALI_TEST_CHECK(!weak.Expired());
+
+    // Each strong copy adds one; Lock() is a strong copy.
+    SharedPtr<TestClass> second(first);
+    DALI_TEST_EQUALS(weak.UseCount(), 2u, TEST_LOCATION);
+    {
+      SharedPtr<TestClass> locked = weak.Lock();
+      DALI_TEST_CHECK(locked.Get() == first.Get());
+      DALI_TEST_EQUALS(weak.UseCount(), 3u, TEST_LOCATION);
+    }
+    DALI_TEST_EQUALS(weak.UseCount(), 2u, TEST_LOCATION);
+
+    // The object lives until the last strong reference goes, whichever one that is.
+    first.Reset();
+    DALI_TEST_EQUALS(weak.UseCount(), 1u, TEST_LOCATION);
+    DALI_TEST_CHECK(!destructorCalled);
+    second.Reset();
+    DALI_TEST_CHECK(destructorCalled);
+  }
+
+  // The weak reference outlives the object and observes its death; Lock() then fails.
+  DALI_TEST_EQUALS(weak.UseCount(), 0u, TEST_LOCATION);
+  DALI_TEST_CHECK(weak.Expired());
+  DALI_TEST_CHECK(weak.Lock().IsEmpty());
+
+  // Copying an expired weak reference keeps it expired; the block goes with the last one.
+  WeakPtr<TestClass> copy(weak);
+  DALI_TEST_CHECK(copy.Expired());
+  weak.Reset();
+  DALI_TEST_CHECK(copy.Expired());
+  DALI_TEST_CHECK(copy.Lock().IsEmpty());
+
+  END_TEST;
+}
+
+int UtcDaliSharedPtrDeleteThroughBasePointer(void)
+{
+  TestApplication application;
+  int             derivedDestroyed(0);
+
+  tet_infoline("No deleter is stored: the last SharedPtr deletes through its own Type, so a SharedPtr<Base> relies on Base's virtual destructor");
+
+  SharedPtr<VirtualBase> base;
+  {
+    SharedPtr<VirtualDerived> derived(new VirtualDerived(derivedDestroyed));
+    base = derived;
+    DALI_TEST_EQUALS(base.UseCount(), 2u, TEST_LOCATION);
+  }
+
+  // Only the Base-typed handle is left; releasing it must still run ~VirtualDerived.
+  DALI_TEST_EQUALS(base.UseCount(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(derivedDestroyed, 0, TEST_LOCATION);
+  base.Reset();
+  DALI_TEST_EQUALS(derivedDestroyed, 1, TEST_LOCATION);
 
   END_TEST;
 }
