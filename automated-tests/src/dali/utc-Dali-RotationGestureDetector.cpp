@@ -335,7 +335,7 @@ int UtcDaliRotationGestureSignalReceptionDownMotionLeave(void)
   DALI_TEST_EQUALS(GestureState::STARTED, data.receivedGesture.GetState(), TEST_LOCATION);
   DALI_TEST_EQUALS(0.244f, data.receivedGesture.GetRotation().radian, 0.01f, TEST_LOCATION);
   DALI_TEST_EQUALS(Vector2(12.5f, 17.5f), data.receivedGesture.GetScreenCenterPoint(), 0.01f, TEST_LOCATION);
-  DALI_TEST_EQUALS(Vector2(12.48f, 17.5f), data.receivedGesture.GetLocalCenterPoint(), 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(12.5f, 17.5f), data.receivedGesture.GetLocalCenterPoint(), 0.01f, TEST_LOCATION);
 
   // Continue the rotation within the actor's area - we should still receive the signal
   data.Reset();

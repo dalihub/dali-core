@@ -35,6 +35,39 @@ void utc_dali_internal_ray_test_cleanup(void)
   test_return_value = TET_PASS;
 }
 
+int UtcDaliRayTestActorLeftEdgeWithTranslation(void)
+{
+  TestApplication application;
+  Actor           actor = Actor::New();
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
+  actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 50.0f));
+  actor.SetProperty(Actor::Property::POSITION, Vector3(-950.0f, 0.0f, 0.0f));
+  application.GetScene().Add(actor);
+  application.SendNotification();
+  application.Render(0);
+
+  Vector4 rayDirection(-0.4f, 0.0f, -1.0f, 1.0f);
+  rayDirection.Normalize3();
+  Vector4 rayOrigin(0.0f, 0.0f, 2500.0f, 1.0f);
+  Vector2 hitPointLocal;
+  float   distance;
+
+  // The ray hits world X=-1000, the actor's left edge.
+  DALI_TEST_CHECK(Internal::RayTest::ActorTest(GetImplementation(actor), rayOrigin, rayDirection, hitPointLocal, distance));
+  DALI_TEST_EQUALS(hitPointLocal.x, 0.0f, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(hitPointLocal.y, 25.0f, 0.01f, TEST_LOCATION);
+
+  rayOrigin.x = -1.0f;
+  DALI_TEST_CHECK(!Internal::RayTest::ActorTest(GetImplementation(actor), rayOrigin, rayDirection, hitPointLocal, distance));
+
+  rayOrigin.x = 1.0f;
+  DALI_TEST_CHECK(Internal::RayTest::ActorTest(GetImplementation(actor), rayOrigin, rayDirection, hitPointLocal, distance));
+  DALI_TEST_EQUALS(hitPointLocal.x, 1.0f, 0.01f, TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliTapGestureActorBoundingBoxTestP(void)
 {
   TestApplication application;

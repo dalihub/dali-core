@@ -1588,6 +1588,62 @@ int UtcDaliGeoHoverMultipleCallbacksOnOneActor(void)
   END_TEST;
 }
 
+int UtcDaliGeoHoverPrimaryHitAtLeftEdge(void)
+{
+  TestApplication application(1920u, 1080u);
+  application.GetScene().SetGeometryHittestEnabled(true);
+
+  Actor back = Actor::New();
+  back.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 50.0f));
+  back.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
+  back.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  back.SetProperty(Actor::Property::POSITION, Vector2(-20.0f, 0.0f));
+  application.GetScene().Add(back);
+
+  Actor front = Actor::New();
+  front.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 50.0f));
+  front.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
+  front.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  application.GetScene().Add(front);
+
+  std::vector<Actor> motionReceivers;
+  bool               consumeHover = true;
+  const auto         onHover      = [&](Actor actor, const HoverEvent& event)
+  {
+    if(event.GetState(0u) == PointState::MOTION)
+    {
+      DALI_TEST_EQUALS(event.GetHitActor(0u), front, TEST_LOCATION);
+      motionReceivers.push_back(actor);
+    }
+    return consumeHover;
+  };
+  front.HoverEventSignal().Connect(&application, onHover);
+  back.HoverEventSignal().Connect(&application, onHover);
+
+  application.SendNotification();
+  application.Render();
+
+  for(const bool consume : {true, false})
+  {
+    consumeHover = consume;
+    std::vector<Actor> expectedReceivers{front};
+    if(!consumeHover)
+    {
+      expectedReceivers.push_back(back);
+    }
+
+    for(const float y : {5.0f, 6.0f, 10.0f})
+    {
+      motionReceivers.clear();
+      application.ProcessEvent(GenerateSingleHover(PointState::MOTION, Vector2(0.0f, y)));
+      DALI_TEST_CHECK(motionReceivers == expectedReceivers);
+    }
+    application.ProcessEvent(GenerateSingleHover(PointState::FINISHED, Vector2(0.0f, 10.0f)));
+  }
+
+  END_TEST;
+}
+
 int UtcDaliGeoHoverOverlappingCandidates(void)
 {
   TestApplication application;

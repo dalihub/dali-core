@@ -163,7 +163,8 @@ bool RayTest::ActorTest(const Internal::Actor& actor, const Vector4& rayOrigin, 
     invModelMatrix.Invert();
 
     Vector4 rayOriginLocal(invModelMatrix * rayOrigin);
-    Vector4 rayDirLocal(invModelMatrix * rayDir - invModelMatrix.GetTranslation());
+    // Use w=0 for the direction to avoid precision loss from cancelling translation.
+    Vector4 rayDirLocal(invModelMatrix * Vector4(rayDir.x, rayDir.y, rayDir.z, 0.0f));
 
     // Test with the actor's XY plane (Normal = 0 0 1 1).
     float a = -rayOriginLocal.z;
