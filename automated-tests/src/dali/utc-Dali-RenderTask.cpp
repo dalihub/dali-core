@@ -6354,6 +6354,161 @@ int UtcDaliRenderTaskSetPartialUpdate04(void)
   END_TEST;
 }
 
+int UtcDaliRenderTaskSetPartialUpdate05(void)
+{
+  TestApplication application(
+    TestApplication::DEFAULT_SURFACE_WIDTH,
+    TestApplication::DEFAULT_SURFACE_HEIGHT,
+    TestApplication::DEFAULT_HORIZONTAL_DPI,
+    TestApplication::DEFAULT_VERTICAL_DPI,
+    true,
+    true);
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
+
+  tet_infoline("Check dirty rects are updated when an offscreen render task capture 3d layer");
+
+  const TestGlAbstraction::ScissorParams& glScissorParams(application.GetGlAbstraction().GetScissorParams());
+  TraceCallStack&                         drawTrace = application.GetGlAbstraction().GetDrawTrace();
+  drawTrace.Enable(true);
+
+  constexpr uint32_t FRAME_BUFFER_SIZE = 16u;
+  const Size         cameraSize(TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT);
+
+  Texture     frameBufferTexture = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, FRAME_BUFFER_SIZE, FRAME_BUFFER_SIZE);
+  FrameBuffer frameBuffer        = FrameBuffer::New(FRAME_BUFFER_SIZE, FRAME_BUFFER_SIZE);
+  frameBuffer.AttachColorTexture(frameBufferTexture);
+
+  Layer layer3d = Layer::New();
+  layer3d.SetProperty(Layer::Property::BEHAVIOR, Dali::Layer::LAYER_3D);
+  application.GetScene().Add(layer3d);
+
+  Actor sourceActor = CreateRenderableActor();
+  sourceActor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
+  sourceActor.SetProperty(Actor::Property::SIZE, Vector3(FRAME_BUFFER_SIZE, FRAME_BUFFER_SIZE, 0.0f));
+  DevelActor::SetResizePolicy(sourceActor, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  layer3d.Add(sourceActor);
+
+  CameraActor cameraActor = CameraActor::New(cameraSize);
+  cameraActor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
+  cameraActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  layer3d.Add(cameraActor);
+
+  Actor screenActor = CreateRenderableActor();
+  screenActor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
+  screenActor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
+  screenActor.SetProperty(Actor::Property::SIZE, Vector3(FRAME_BUFFER_SIZE, FRAME_BUFFER_SIZE, 0.0f));
+  DevelActor::SetResizePolicy(screenActor, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  application.GetScene().Add(screenActor);
+  RenderTaskList taskList   = application.GetScene().GetRenderTaskList();
+  RenderTask     renderTask = taskList.CreateTask();
+  renderTask.SetCameraActor(cameraActor);
+  renderTask.SetSourceActor(layer3d);
+  renderTask.SetInputEnabled(false);
+  renderTask.SetClearColor(Vector4(0.0f, 0.0f, 0.0f, 0.0f));
+  renderTask.SetClearEnabled(true);
+  renderTask.SetExclusive(true);
+  renderTask.SetRefreshRate(RenderTask::REFRESH_ALWAYS);
+  renderTask.SetFrameBuffer(frameBuffer);
+  renderTask.SetOrderIndex(1);
+
+  std::vector<BoundsInteger> damagedRects;
+  BoundsInteger              clippingRect;
+
+  auto RenderAndCheckDirtyRects = [&](bool expectDirtyRects, const char* testLocation)
+  {
+    damagedRects.clear();
+    application.SendNotification();
+    application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+
+    DALI_TEST_EQUALS(damagedRects.size() > 0, expectDirtyRects, testLocation);
+
+    if(expectDirtyRects)
+    {
+      clippingRect = BoundsInteger(0, 752, 48, 48);
+      DALI_TEST_EQUALS(damagedRects.size(), 1, testLocation);
+      DirtyRectChecker(damagedRects, {clippingRect}, true, testLocation);
+      DALI_TEST_EQUALS<BoundsInteger>(clippingRect, damagedRects[0], testLocation);
+    }
+    else
+    {
+      DALI_TEST_EQUALS(damagedRects.size(), 0, testLocation);
+      clippingRect = BoundsInteger();
+    }
+    drawTrace.Reset();
+    application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+    if(expectDirtyRects)
+    {
+      DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, testLocation);
+      DALI_TEST_EQUALS(clippingRect.y, glScissorParams.y, testLocation);
+      DALI_TEST_EQUALS(clippingRect.width, glScissorParams.width, testLocation);
+      DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, testLocation);
+    }
+    else
+    {
+      DALI_TEST_CHECK(!drawTrace.FindMethod("DrawElements") && !drawTrace.FindMethod("DrawArrays"));
+    }
+    damagedRects.clear();
+  };
+
+  for(int i = 0; i < 10; ++i)
+  {
+    tet_printf("i:%d\n", i);
+    RenderAndCheckDirtyRects(i == 0, TEST_LOCATION);
+  }
+
+  TextureSet screenTextureSet = TextureSet::New();
+  screenTextureSet.SetTexture(0u, frameBufferTexture);
+  screenActor.GetRendererAt(0u).SetTextures(screenTextureSet);
+  for(int i = 0; i < 10; ++i)
+  {
+    tet_printf("i:%d\n", i);
+    RenderAndCheckDirtyRects(i == 0, TEST_LOCATION);
+  }
+
+  Actor childActor = CreateRenderableActor();
+  childActor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
+  childActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  childActor.SetProperty(Actor::Property::SIZE, Vector3(FRAME_BUFFER_SIZE, FRAME_BUFFER_SIZE, 0.0f));
+  DevelActor::SetResizePolicy(childActor, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  sourceActor.Add(childActor);
+  for(int i = 0; i < 10; ++i)
+  {
+    tet_printf("i:%d\n", i);
+    RenderAndCheckDirtyRects(i == 0, TEST_LOCATION);
+  }
+
+  childActor.SetProperty(Actor::Property::POSITION, Vector3(4.0f, 0.0f, 0.0f));
+  for(int i = 0; i < 10; ++i)
+  {
+    tet_printf("i:%d\n", i);
+    RenderAndCheckDirtyRects(i == 0, TEST_LOCATION);
+  }
+
+  Animation animation = Animation::New(TestApplication::RENDER_FRAME_INTERVAL * 10 * 0.001f);
+  animation.AnimateTo(Property(childActor, Actor::Property::POSITION), Vector3(8.0f, 0.0f, 0.0f));
+  animation.Play();
+  for(int i = 0; i < 10; ++i)
+  {
+    tet_printf("i:%d\n", i);
+    RenderAndCheckDirtyRects(true, TEST_LOCATION);
+  }
+  for(int i = 0; i < 10; ++i)
+  {
+    tet_printf("i:%d\n", i);
+    RenderAndCheckDirtyRects(i == 0, TEST_LOCATION);
+  }
+
+  sourceActor.Remove(childActor);
+  for(int i = 0; i < 10; ++i)
+  {
+    tet_printf("i:%d\n", i);
+    RenderAndCheckDirtyRects(i == 0, TEST_LOCATION);
+  }
+
+  END_TEST;
+}
+
 int UtcDaliRenderTaskFramebufferTrackerRefresh(void)
 {
   TestApplication application;
