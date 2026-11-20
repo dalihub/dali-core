@@ -22,8 +22,19 @@
 #include <stdlib.h>
 
 #include <iostream>
+#include <utility>
 
 using namespace Dali;
+
+void utc_dali_wheel_event_startup(void)
+{
+  test_return_value = TET_UNDEF;
+}
+
+void utc_dali_wheel_event_cleanup(void)
+{
+  test_return_value = TET_PASS;
+}
 
 namespace
 {
@@ -464,5 +475,39 @@ int UtcDaliWheelEventGeoInterceptMultipleCallbacks(void)
   // reached the actor below.
   DALI_TEST_EQUALS(false, actorData.functorCalled, TEST_LOCATION);
 
+  END_TEST;
+}
+
+int UtcDaliIntegrationWheelEventCopyAssignment(void)
+{
+  Integration::WheelEvent wheelSource(Integration::WheelEvent::CUSTOM_WHEEL, 1, 3u, Vector2(4.0f, 5.0f), -2, 789u);
+  Integration::WheelEvent wheelTarget;
+  DALI_TEST_CHECK(&(wheelTarget = wheelSource) == &wheelTarget);
+  DALI_TEST_EQUALS(static_cast<const Integration::Event&>(wheelTarget).type, Integration::Event::Wheel, TEST_LOCATION);
+  DALI_TEST_EQUALS(wheelTarget.type, wheelSource.type, TEST_LOCATION);
+  DALI_TEST_EQUALS(wheelTarget.direction, wheelSource.direction, TEST_LOCATION);
+  DALI_TEST_EQUALS(wheelTarget.modifiers, wheelSource.modifiers, TEST_LOCATION);
+  DALI_TEST_EQUALS(wheelTarget.point, wheelSource.point, TEST_LOCATION);
+  DALI_TEST_EQUALS(wheelTarget.delta, wheelSource.delta, TEST_LOCATION);
+  DALI_TEST_EQUALS(wheelTarget.timeStamp, wheelSource.timeStamp, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliIntegrationWheelEventMove(void)
+{
+  Integration::WheelEvent wheelSource(Integration::WheelEvent::CUSTOM_WHEEL, 1, 3u, Vector2(4.0f, 5.0f), -2, 789u);
+  Integration::WheelEvent wheelMoved(std::move(wheelSource));
+  DALI_TEST_EQUALS(static_cast<const Integration::Event&>(wheelMoved).type, Integration::Event::Wheel, TEST_LOCATION);
+  DALI_TEST_EQUALS(wheelMoved.type, Integration::WheelEvent::CUSTOM_WHEEL, TEST_LOCATION);
+  DALI_TEST_EQUALS(wheelMoved.point, Vector2(4.0f, 5.0f), TEST_LOCATION);
+  Integration::WheelEvent wheelTarget;
+  DALI_TEST_CHECK(&(wheelTarget = std::move(wheelMoved)) == &wheelTarget);
+  DALI_TEST_EQUALS(static_cast<const Integration::Event&>(wheelTarget).type, Integration::Event::Wheel, TEST_LOCATION);
+  DALI_TEST_EQUALS(wheelTarget.type, Integration::WheelEvent::CUSTOM_WHEEL, TEST_LOCATION);
+  DALI_TEST_EQUALS(wheelTarget.direction, 1, TEST_LOCATION);
+  DALI_TEST_EQUALS(wheelTarget.modifiers, 3u, TEST_LOCATION);
+  DALI_TEST_EQUALS(wheelTarget.point, Vector2(4.0f, 5.0f), TEST_LOCATION);
+  DALI_TEST_EQUALS(wheelTarget.delta, -2, TEST_LOCATION);
+  DALI_TEST_EQUALS(wheelTarget.timeStamp, 789u, TEST_LOCATION);
   END_TEST;
 }

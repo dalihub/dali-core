@@ -18,6 +18,9 @@
 // CLASS HEADER
 #include <dali/integration-api/events/hover-event-integ.h>
 
+// EXTERNAL INCLUDES
+#include <utility>
+
 // INTERNAL INCLUDES
 #include <dali/internal/event/events/hover-event-impl.h>
 
@@ -51,6 +54,23 @@ HoverEvent::HoverEvent(const Dali::HoverEvent& hoverEvent)
 HoverEvent::HoverEvent(const HoverEvent& rhs)
 : MultiPointEvent(Hover, rhs)
 {
+}
+
+HoverEvent::HoverEvent(HoverEvent&& rhs) noexcept
+: MultiPointEvent(Hover, std::move(rhs))
+{
+}
+
+HoverEvent& HoverEvent::operator=(const HoverEvent& rhs)
+{
+  MultiPointEvent::operator=(rhs);
+  return *this;
+}
+
+HoverEvent& HoverEvent::operator=(HoverEvent&& rhs) noexcept
+{
+  MultiPointEvent::operator=(std::move(rhs));
+  return *this;
 }
 
 HoverEvent::~HoverEvent() = default;

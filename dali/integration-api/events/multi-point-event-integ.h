@@ -58,11 +58,22 @@ protected:
    */
   MultiPointEvent(Type eventType, const MultiPointEvent& rhs);
 
+  /** Move constructor. */
+  MultiPointEvent(Type eventType, MultiPointEvent&& rhs) noexcept;
+
   /**
    * Constructor
    * @param[in]  time  The time the event occurred.
    */
   MultiPointEvent(Type eventType, uint32_t time);
+
+  /**
+   * Copy assignment operator.
+   */
+  MultiPointEvent& operator=(const MultiPointEvent& rhs);
+
+  /** Move assignment operator. */
+  MultiPointEvent& operator=(MultiPointEvent&& rhs) noexcept;
 
 public:
   // Data

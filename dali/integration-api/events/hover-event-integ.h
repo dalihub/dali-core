@@ -61,6 +61,17 @@ struct DALI_CORE_API HoverEvent : public MultiPointEvent
    */
   HoverEvent(const HoverEvent& rhs);
 
+  /** Move constructor. */
+  HoverEvent(HoverEvent&& rhs) noexcept;
+
+  /**
+   * Copy assignment operator.
+   */
+  HoverEvent& operator=(const HoverEvent& rhs);
+
+  /** Move assignment operator. */
+  HoverEvent& operator=(HoverEvent&& rhs) noexcept;
+
   /**
    * Virtual destructor
    */

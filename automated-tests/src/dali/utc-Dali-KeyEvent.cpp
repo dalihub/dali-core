@@ -22,6 +22,7 @@
 #include <stdlib.h>
 
 #include <iostream>
+#include <utility>
 
 using namespace Dali;
 
@@ -893,6 +894,97 @@ int UtcDaliKeyEventModifier(void)
   DALI_TEST_EQUALS(false, event.IsShiftModifier(), TEST_LOCATION);
   DALI_TEST_EQUALS(false, event.IsCtrlModifier(), TEST_LOCATION);
   DALI_TEST_EQUALS(true, event.IsAltModifier(), TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliIntegrationKeyEventCopyAssignment(void)
+{
+  Integration::KeyEvent keySource;
+  keySource.keyName            = "Return";
+  keySource.logicalKey         = "Enter";
+  keySource.keyString          = "\n";
+  keySource.keyCode            = 13;
+  keySource.keyModifier        = 2;
+  keySource.time               = 345u;
+  keySource.state              = Integration::KeyEvent::UP;
+  keySource.compose            = "composition";
+  keySource.deviceName         = "keyboard";
+  keySource.deviceClass        = Device::Class::KEYBOARD;
+  keySource.deviceSubclass     = Device::Subclass::NONE;
+  keySource.isRepeat           = true;
+  keySource.interceptProcessed = true;
+  keySource.windowId           = 9u;
+  keySource.receiveTime        = 346u;
+  keySource.rawKeyCode         = 36u;
+  Integration::KeyEvent keyTarget;
+  DALI_TEST_CHECK(&(keyTarget = keySource) == &keyTarget);
+  DALI_TEST_EQUALS(keyTarget.type, Integration::Event::Key, TEST_LOCATION);
+  DALI_TEST_EQUALS(keyTarget.keyName, keySource.keyName, TEST_LOCATION);
+  DALI_TEST_EQUALS(keyTarget.logicalKey, keySource.logicalKey, TEST_LOCATION);
+  DALI_TEST_EQUALS(keyTarget.keyString, keySource.keyString, TEST_LOCATION);
+  DALI_TEST_EQUALS(keyTarget.keyCode, keySource.keyCode, TEST_LOCATION);
+  DALI_TEST_EQUALS(keyTarget.keyModifier, keySource.keyModifier, TEST_LOCATION);
+  DALI_TEST_EQUALS(keyTarget.time, keySource.time, TEST_LOCATION);
+  DALI_TEST_EQUALS(keyTarget.state, keySource.state, TEST_LOCATION);
+  DALI_TEST_EQUALS(keyTarget.compose, keySource.compose, TEST_LOCATION);
+  DALI_TEST_EQUALS(keyTarget.deviceName, keySource.deviceName, TEST_LOCATION);
+  DALI_TEST_EQUALS(keyTarget.deviceClass, keySource.deviceClass, TEST_LOCATION);
+  DALI_TEST_EQUALS(keyTarget.deviceSubclass, keySource.deviceSubclass, TEST_LOCATION);
+  DALI_TEST_EQUALS(keyTarget.isRepeat, keySource.isRepeat, TEST_LOCATION);
+  DALI_TEST_EQUALS(keyTarget.interceptProcessed, keySource.interceptProcessed, TEST_LOCATION);
+  DALI_TEST_EQUALS(keyTarget.windowId, keySource.windowId, TEST_LOCATION);
+  DALI_TEST_EQUALS(keyTarget.receiveTime, keySource.receiveTime, TEST_LOCATION);
+  DALI_TEST_EQUALS(keyTarget.rawKeyCode, keySource.rawKeyCode, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliIntegrationKeyEventMove(void)
+{
+  Integration::KeyEvent keySource;
+  keySource.keyName            = "Return";
+  keySource.logicalKey         = "Enter";
+  keySource.keyString          = "value";
+  keySource.keyCode            = 13;
+  keySource.keyModifier        = 2;
+  keySource.time               = 345u;
+  keySource.state              = Integration::KeyEvent::UP;
+  keySource.compose            = "composition";
+  keySource.deviceName         = "keyboard";
+  keySource.deviceClass        = Device::Class::KEYBOARD;
+  keySource.deviceSubclass     = Device::Subclass::NONE;
+  keySource.isRepeat           = true;
+  keySource.interceptProcessed = true;
+  keySource.windowId           = 9u;
+  keySource.receiveTime        = 346u;
+  keySource.rawKeyCode         = 36u;
+  Integration::KeyEvent keyMoved(std::move(keySource));
+  DALI_TEST_EQUALS(keyMoved.type, Integration::Event::Key, TEST_LOCATION);
+  DALI_TEST_EQUALS(keyMoved.keyName, "Return", TEST_LOCATION);
+  DALI_TEST_EQUALS(keyMoved.logicalKey, "Enter", TEST_LOCATION);
+  DALI_TEST_EQUALS(keyMoved.keyString, "value", TEST_LOCATION);
+  DALI_TEST_EQUALS(keyMoved.compose, "composition", TEST_LOCATION);
+  DALI_TEST_EQUALS(keyMoved.deviceName, "keyboard", TEST_LOCATION);
+  Integration::KeyEvent keyTarget;
+  DALI_TEST_CHECK(&(keyTarget = std::move(keyMoved)) == &keyTarget);
+  DALI_TEST_EQUALS(keyTarget.type, Integration::Event::Key, TEST_LOCATION);
+  DALI_TEST_EQUALS(keyTarget.keyName, "Return", TEST_LOCATION);
+  DALI_TEST_EQUALS(keyTarget.logicalKey, "Enter", TEST_LOCATION);
+  DALI_TEST_EQUALS(keyTarget.keyString, "value", TEST_LOCATION);
+  DALI_TEST_EQUALS(keyTarget.keyCode, 13, TEST_LOCATION);
+  DALI_TEST_EQUALS(keyTarget.keyModifier, 2, TEST_LOCATION);
+  DALI_TEST_EQUALS(keyTarget.time, 345u, TEST_LOCATION);
+  DALI_TEST_EQUALS(keyTarget.state, Integration::KeyEvent::UP, TEST_LOCATION);
+  DALI_TEST_EQUALS(keyTarget.compose, "composition", TEST_LOCATION);
+  DALI_TEST_EQUALS(keyTarget.deviceName, "keyboard", TEST_LOCATION);
+  DALI_TEST_EQUALS(keyTarget.deviceClass, Device::Class::KEYBOARD, TEST_LOCATION);
+  DALI_TEST_EQUALS(keyTarget.deviceSubclass, Device::Subclass::NONE, TEST_LOCATION);
+  DALI_TEST_EQUALS(keyTarget.isRepeat, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(keyTarget.interceptProcessed, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(keyTarget.windowId, 9u, TEST_LOCATION);
+  DALI_TEST_EQUALS(keyTarget.receiveTime, 346u, TEST_LOCATION);
+  DALI_TEST_EQUALS(keyTarget.rawKeyCode, 36u, TEST_LOCATION);
 
   END_TEST;
 }

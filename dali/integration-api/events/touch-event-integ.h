@@ -60,6 +60,17 @@ struct DALI_CORE_API TouchEvent : public MultiPointEvent
    */
   TouchEvent(const TouchEvent& rhs);
 
+  /** Move constructor. */
+  TouchEvent(TouchEvent&& rhs) noexcept;
+
+  /**
+   * Copy assignment operator.
+   */
+  TouchEvent& operator=(const TouchEvent& rhs);
+
+  /** Move assignment operator. */
+  TouchEvent& operator=(TouchEvent&& rhs) noexcept;
+
   /**
    * Virtual destructor
    */

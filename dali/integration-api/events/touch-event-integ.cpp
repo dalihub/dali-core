@@ -18,6 +18,9 @@
 // CLASS HEADER
 #include <dali/integration-api/events/touch-event-integ.h>
 
+// EXTERNAL INCLUDES
+#include <utility>
+
 // INTERNAL INCLUDES
 #include <dali/internal/event/events/touch-event-impl.h>
 
@@ -51,6 +54,23 @@ TouchEvent::TouchEvent(const Dali::TouchEvent& touchEvent)
 TouchEvent::TouchEvent(const TouchEvent& rhs)
 : MultiPointEvent(Touch, rhs)
 {
+}
+
+TouchEvent::TouchEvent(TouchEvent&& rhs) noexcept
+: MultiPointEvent(Touch, std::move(rhs))
+{
+}
+
+TouchEvent& TouchEvent::operator=(const TouchEvent& rhs)
+{
+  MultiPointEvent::operator=(rhs);
+  return *this;
+}
+
+TouchEvent& TouchEvent::operator=(TouchEvent&& rhs) noexcept
+{
+  MultiPointEvent::operator=(std::move(rhs));
+  return *this;
 }
 
 TouchEvent::~TouchEvent() = default;

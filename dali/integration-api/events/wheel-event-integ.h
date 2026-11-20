@@ -78,6 +78,17 @@ struct DALI_CORE_API WheelEvent : public Event
    */
   WheelEvent(const WheelEvent& rhs);
 
+  /** Move constructor. */
+  WheelEvent(WheelEvent&& rhs) noexcept;
+
+  /**
+   * Copy assignment operator.
+   */
+  WheelEvent& operator=(const WheelEvent& rhs);
+
+  /** Move assignment operator. */
+  WheelEvent& operator=(WheelEvent&& rhs) noexcept;
+
   /**
    * Virtual destructor
    */

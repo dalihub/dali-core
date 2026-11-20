@@ -47,6 +47,7 @@ SET(TC_SOURCES
         utc-Dali-Handle.cpp
         utc-Dali-Hash.cpp
         utc-Dali-HitTestAlgorithm.cpp
+        utc-Dali-HoverEvent.cpp
         utc-Dali-HoverProcessing.cpp
         utc-Dali-Insets.cpp
         utc-Dali-IntPair.cpp

@@ -91,6 +91,17 @@ struct DALI_CORE_API KeyEvent : public Event
    */
   KeyEvent(const KeyEvent& rhs);
 
+  /** Move constructor. */
+  KeyEvent(KeyEvent&& rhs) noexcept;
+
+  /**
+   * Copy assignment operator.
+   */
+  KeyEvent& operator=(const KeyEvent& rhs);
+
+  /** Move assignment operator. */
+  KeyEvent& operator=(KeyEvent&& rhs) noexcept;
+
   /**
    * Virtual destructor
    */
