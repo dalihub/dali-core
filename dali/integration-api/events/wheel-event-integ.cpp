@@ -18,6 +18,9 @@
 // CLASS HEADER
 #include <dali/integration-api/events/wheel-event-integ.h>
 
+// EXTERNAL INCLUDES
+#include <utility>
+
 namespace DALI_NAMESPACE
 {
 namespace Integration
@@ -64,6 +67,41 @@ WheelEvent::WheelEvent(const WheelEvent& rhs)
   delta(rhs.delta),
   timeStamp(rhs.timeStamp)
 {
+}
+
+WheelEvent::WheelEvent(WheelEvent&& rhs) noexcept
+: Event(std::move(rhs)),
+  type(rhs.type),
+  direction(rhs.direction),
+  modifiers(rhs.modifiers),
+  point(std::move(rhs.point)),
+  delta(rhs.delta),
+  timeStamp(rhs.timeStamp)
+{
+}
+
+WheelEvent& WheelEvent::operator=(const WheelEvent& rhs)
+{
+  Event::operator=(rhs);
+  type      = rhs.type;
+  direction = rhs.direction;
+  modifiers = rhs.modifiers;
+  point     = rhs.point;
+  delta     = rhs.delta;
+  timeStamp = rhs.timeStamp;
+  return *this;
+}
+
+WheelEvent& WheelEvent::operator=(WheelEvent&& rhs) noexcept
+{
+  Event::operator=(std::move(rhs));
+  type      = rhs.type;
+  direction = rhs.direction;
+  modifiers = rhs.modifiers;
+  point     = std::move(rhs.point);
+  delta     = rhs.delta;
+  timeStamp = rhs.timeStamp;
+  return *this;
 }
 
 WheelEvent::~WheelEvent() = default;

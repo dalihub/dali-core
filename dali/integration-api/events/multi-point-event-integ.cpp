@@ -18,6 +18,9 @@
 // CLASS HEADER
 #include <dali/integration-api/events/multi-point-event-integ.h>
 
+// EXTERNAL INCLUDES
+#include <utility>
+
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 
@@ -44,7 +47,30 @@ MultiPointEvent::MultiPointEvent(Type eventType, const MultiPointEvent& rhs)
 {
 }
 
+MultiPointEvent::MultiPointEvent(Type eventType, MultiPointEvent&& rhs) noexcept
+: Event(eventType),
+  points(std::move(rhs.points)),
+  time(rhs.time)
+{
+}
+
 MultiPointEvent::~MultiPointEvent() = default;
+
+MultiPointEvent& MultiPointEvent::operator=(const MultiPointEvent& rhs)
+{
+  Event::operator=(rhs);
+  points = rhs.points;
+  time   = rhs.time;
+  return *this;
+}
+
+MultiPointEvent& MultiPointEvent::operator=(MultiPointEvent&& rhs) noexcept
+{
+  Event::operator=(std::move(rhs));
+  points = std::move(rhs.points);
+  time   = rhs.time;
+  return *this;
+}
 
 void MultiPointEvent::AddPoint(const Point& point)
 {

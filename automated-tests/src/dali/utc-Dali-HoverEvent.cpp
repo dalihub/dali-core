@@ -16,10 +16,12 @@
  */
 
 #include <dali-test-suite-utils.h>
+#include <dali/integration-api/events/hover-event-integ.h>
 #include <dali/public-api/dali-core.h>
 #include <stdlib.h>
 
 #include <iostream>
+#include <utility>
 
 void utc_dali_hover_event_startup(void)
 {
@@ -149,6 +151,40 @@ int UtcDaliHoverEventMoveConstructorWithPointP(void)
   DALI_TEST_CHECK(!hoverEvent);
   DALI_TEST_CHECK(hoverEvent2);
   DALI_TEST_EQUALS(refCount, hoverEvent2.GetBaseObject().ReferenceCount(), TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliIntegrationHoverEventCopyAssignment(void)
+{
+  Integration::Point point;
+  point.SetDeviceId(7);
+  Integration::HoverEvent hoverSource(234u);
+  hoverSource.AddPoint(point);
+  Integration::HoverEvent hoverTarget(567u);
+  DALI_TEST_CHECK(&(hoverTarget = hoverSource) == &hoverTarget);
+  DALI_TEST_EQUALS(hoverTarget.type, Integration::Event::Hover, TEST_LOCATION);
+  DALI_TEST_EQUALS(hoverTarget.time, 234u, TEST_LOCATION);
+  DALI_TEST_EQUALS(hoverTarget.GetPointCount(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(hoverTarget.GetPoint(0).GetDeviceId(), 7, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliIntegrationHoverEventMove(void)
+{
+  Integration::Point point;
+  point.SetDeviceId(11);
+  Integration::HoverEvent hoverSource(234u);
+  hoverSource.AddPoint(point);
+  Integration::HoverEvent hoverMoved(std::move(hoverSource));
+  DALI_TEST_EQUALS(hoverMoved.type, Integration::Event::Hover, TEST_LOCATION);
+  DALI_TEST_EQUALS(hoverMoved.time, 234u, TEST_LOCATION);
+  DALI_TEST_EQUALS(hoverMoved.GetPoint(0).GetDeviceId(), 11, TEST_LOCATION);
+  Integration::HoverEvent hoverTarget;
+  DALI_TEST_CHECK(&(hoverTarget = std::move(hoverMoved)) == &hoverTarget);
+  DALI_TEST_EQUALS(hoverTarget.time, 234u, TEST_LOCATION);
+  DALI_TEST_EQUALS(hoverTarget.GetPointCount(), 1u, TEST_LOCATION);
 
   END_TEST;
 }

@@ -16,11 +16,13 @@
  */
 
 #include <dali-test-suite-utils.h>
+#include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/events/touch-integ.h>
 #include <dali/public-api/dali-core.h>
 #include <stdlib.h>
 
 #include <iostream>
+#include <utility>
 
 void utc_dali_touch_event_startup(void)
 {
@@ -245,6 +247,43 @@ int UtcDaliTouchEventSetLocalPosition(void)
   touchEvent.SetLocalPosition(1, Vector2(25.0f, 35.0f));
   DALI_TEST_EQUALS(1u, touchEvent.GetPointCount(), TEST_LOCATION);
   DALI_TEST_EQUALS(Vector2(5.0f, 15.0f), touchEvent.GetLocalPosition(0), TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliIntegrationTouchEventCopyAssignment(void)
+{
+  Integration::TouchEvent touchSource(123u);
+  Integration::Point      point;
+  point.SetDeviceId(7);
+  touchSource.AddPoint(point);
+  Integration::TouchEvent touchTarget(456u);
+  DALI_TEST_CHECK(&(touchTarget = touchSource) == &touchTarget);
+  DALI_TEST_EQUALS(touchTarget.type, Integration::Event::Touch, TEST_LOCATION);
+  DALI_TEST_EQUALS(touchTarget.time, 123u, TEST_LOCATION);
+  DALI_TEST_EQUALS(touchTarget.GetPointCount(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(touchTarget.GetPoint(0).GetDeviceId(), 7, TEST_LOCATION);
+  touchSource.points.clear();
+  DALI_TEST_EQUALS(touchTarget.GetPointCount(), 1u, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliIntegrationTouchEventMove(void)
+{
+  Integration::Point point;
+  point.SetDeviceId(11);
+
+  Integration::TouchEvent touchSource(123u);
+  touchSource.AddPoint(point);
+  Integration::TouchEvent touchMoved(std::move(touchSource));
+  DALI_TEST_EQUALS(touchMoved.type, Integration::Event::Touch, TEST_LOCATION);
+  DALI_TEST_EQUALS(touchMoved.time, 123u, TEST_LOCATION);
+  DALI_TEST_EQUALS(touchMoved.GetPoint(0).GetDeviceId(), 11, TEST_LOCATION);
+  Integration::TouchEvent touchTarget;
+  DALI_TEST_CHECK(&(touchTarget = std::move(touchMoved)) == &touchTarget);
+  DALI_TEST_EQUALS(touchTarget.time, 123u, TEST_LOCATION);
+  DALI_TEST_EQUALS(touchTarget.GetPointCount(), 1u, TEST_LOCATION);
 
   END_TEST;
 }

@@ -61,6 +61,17 @@ protected: // Constructors only to be used by derived structures.
    * @param[in] eventType The type of event.
    */
   Event(Type eventType);
+
+  /** Move constructor. */
+  Event(Event&& rhs) noexcept;
+
+  /**
+   * Copy assignment operator.
+   */
+  Event& operator=(const Event& rhs);
+
+  /** Move assignment operator. */
+  Event& operator=(Event&& rhs) noexcept;
 };
 
 } // namespace Integration

@@ -29,6 +29,23 @@ Event::Event(Type eventType)
 {
 }
 
+Event::Event(Event&& rhs) noexcept
+: type(rhs.type)
+{
+}
+
+Event& Event::operator=(const Event& rhs)
+{
+  type = rhs.type;
+  return *this;
+}
+
+Event& Event::operator=(Event&& rhs) noexcept
+{
+  type = rhs.type;
+  return *this;
+}
+
 } // namespace Integration
 
 } //namespace DALI_NAMESPACE

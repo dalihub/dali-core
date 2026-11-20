@@ -18,6 +18,9 @@
 // CLASS HEADER
 #include <dali/integration-api/events/key-event-integ.h>
 
+// EXTERNAL INCLUDES
+#include <utility>
+
 // INTERNAL INCLUDES
 #include <dali/internal/event/events/key-event-impl.h>
 
@@ -117,6 +120,71 @@ KeyEvent::KeyEvent(const KeyEvent& rhs)
   receiveTime(rhs.receiveTime),
   rawKeyCode(rhs.rawKeyCode)
 {
+}
+
+KeyEvent::KeyEvent(KeyEvent&& rhs) noexcept
+: Event(std::move(rhs)),
+  keyName(std::move(rhs.keyName)),
+  logicalKey(std::move(rhs.logicalKey)),
+  keyString(std::move(rhs.keyString)),
+  keyCode(rhs.keyCode),
+  keyModifier(rhs.keyModifier),
+  time(rhs.time),
+  state(rhs.state),
+  compose(std::move(rhs.compose)),
+  deviceName(std::move(rhs.deviceName)),
+  deviceClass(rhs.deviceClass),
+  deviceSubclass(rhs.deviceSubclass),
+  isRepeat(rhs.isRepeat),
+  interceptProcessed(rhs.interceptProcessed),
+  windowId(rhs.windowId),
+  receiveTime(rhs.receiveTime),
+  rawKeyCode(rhs.rawKeyCode)
+{
+}
+
+KeyEvent& KeyEvent::operator=(const KeyEvent& rhs)
+{
+  Event::operator=(rhs);
+  keyName            = rhs.keyName;
+  logicalKey         = rhs.logicalKey;
+  keyString          = rhs.keyString;
+  keyCode            = rhs.keyCode;
+  keyModifier        = rhs.keyModifier;
+  time               = rhs.time;
+  state              = rhs.state;
+  compose            = rhs.compose;
+  deviceName         = rhs.deviceName;
+  deviceClass        = rhs.deviceClass;
+  deviceSubclass     = rhs.deviceSubclass;
+  isRepeat           = rhs.isRepeat;
+  interceptProcessed = rhs.interceptProcessed;
+  windowId           = rhs.windowId;
+  receiveTime        = rhs.receiveTime;
+  rawKeyCode         = rhs.rawKeyCode;
+  return *this;
+}
+
+KeyEvent& KeyEvent::operator=(KeyEvent&& rhs) noexcept
+{
+  Event::operator=(std::move(rhs));
+  keyName            = std::move(rhs.keyName);
+  logicalKey         = std::move(rhs.logicalKey);
+  keyString          = std::move(rhs.keyString);
+  keyCode            = rhs.keyCode;
+  keyModifier        = rhs.keyModifier;
+  time               = rhs.time;
+  state              = rhs.state;
+  compose            = std::move(rhs.compose);
+  deviceName         = std::move(rhs.deviceName);
+  deviceClass        = rhs.deviceClass;
+  deviceSubclass     = rhs.deviceSubclass;
+  isRepeat           = rhs.isRepeat;
+  interceptProcessed = rhs.interceptProcessed;
+  windowId           = rhs.windowId;
+  receiveTime        = rhs.receiveTime;
+  rawKeyCode         = rhs.rawKeyCode;
+  return *this;
 }
 
 KeyEvent::~KeyEvent() = default;
