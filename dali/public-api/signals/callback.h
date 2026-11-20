@@ -130,16 +130,16 @@ public:
     // so the library containing the code has to be loaded, otherwise we crash boom bang
     if(callback.mImpl.mObjectPointer)
     {
-      using Dispatcher = R (*)(CallbackBase&, Args...);
+      using TypedDispatcher = R (*)(CallbackBase&, Args...);
       // Cast through void(*)() which is compatible with every function type, to avoid -Wcast-function-type
-      Dispatcher dispatcher = reinterpret_cast<Dispatcher>(reinterpret_cast<void (*)()>(callback.mImpl.mMemberFunctionDispatcher));
+      TypedDispatcher dispatcher = reinterpret_cast<TypedDispatcher>(reinterpret_cast<void (*)()>(callback.mImpl.mMemberFunctionDispatcher));
       returnVal             = (*dispatcher)(callback, args...);
     }
     else if(callback.mStaticFunction)
     {
       // convert function type
-      using StaticFunction = R (*)(Args...);
-      returnVal            = (*(reinterpret_cast<StaticFunction>(callback.mStaticFunction)))(args...);
+      using TypedStaticFunction = R (*)(Args...);
+      returnVal            = (*(reinterpret_cast<TypedStaticFunction>(callback.mStaticFunction)))(args...);
     }
 
     return returnVal;
@@ -162,16 +162,16 @@ public:
     // so the library containing the code has to be loaded, otherwise we crash boom bang
     if(callback.mImpl.mObjectPointer)
     {
-      using Dispatcher = void (*)(CallbackBase&, Args...);
+      using TypedDispatcher = void (*)(CallbackBase&, Args...);
       // Cast through void(*)() which is compatible with every function type, to avoid -Wcast-function-type
-      Dispatcher dispatcher = reinterpret_cast<Dispatcher>(reinterpret_cast<void (*)()>(callback.mImpl.mMemberFunctionDispatcher));
+      TypedDispatcher dispatcher = reinterpret_cast<TypedDispatcher>(reinterpret_cast<void (*)()>(callback.mImpl.mMemberFunctionDispatcher));
       (*dispatcher)(callback, args...);
     }
     else if(callback.mStaticFunction)
     {
       // convert function type
-      using StaticFunction = void (*)(Args...);
-      (*(reinterpret_cast<StaticFunction>(callback.mStaticFunction)))(args...);
+      using TypedStaticFunction = void (*)(Args...);
+      (*(reinterpret_cast<TypedStaticFunction>(callback.mStaticFunction)))(args...);
     }
   }
 
