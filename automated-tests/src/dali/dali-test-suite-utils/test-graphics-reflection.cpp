@@ -127,7 +127,7 @@ TestGraphicsReflection::TestGraphicsReflection(TestGraphicsController& controlle
       for(Property::Map::SizeType j = 0; j < vertexFormat->Count(); ++j)
       {
         auto key = vertexFormat->GetKeyAt(j);
-        if(key.type == Property::Key::STRING)
+        if(key.type == Property::Key::Type::STRING)
         {
           mAttributes.push_back(ToStdString(key.stringKey));
         }
