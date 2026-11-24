@@ -994,16 +994,6 @@ void RenderTask::ClearRenderResult()
   }
 }
 
-Dali::PixelData RenderTask::GetRenderResult()
-{
-  Dali::PixelData pixelData;
-  if(mFrameBuffer)
-  {
-    pixelData = mFrameBuffer->GetRenderResult();
-  }
-  return pixelData;
-}
-
 Dali::PixelBuffer RenderTask::GetRenderResultBuffer()
 {
   Dali::PixelBuffer pixelBuffer;

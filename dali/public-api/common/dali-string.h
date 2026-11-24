@@ -292,10 +292,8 @@ private: // Not for use by application developer
   /// @cond internal
   friend class Internal::StringImpl;
 
-public: // Deprecated internal API
   /**
    * @brief Get the raw storage pointer (internal use only).
-   * @DEPRECATED_2_5.47 will be private
    *
    * This method provides access to the internal storage for internal
    * use within Dali
@@ -308,7 +306,6 @@ public: // Deprecated internal API
   }
   /// @endcond
 
-private:
   static constexpr uint32_t StorageSize  = DALI_STRING_STORAGE_SIZE; ///< Opaque storage sized for std::string (see platform-defines.h)
   static constexpr uint32_t StorageAlign = 8;                        ///< Opaque storage aligned for std::string
   alignas(StorageAlign) uint8_t mStorage[StorageSize];

@@ -122,10 +122,4 @@ Dali::String Any::DemangleTypeName(const char* mangledName)
   return Dali::String(demangled.c_str());
 }
 
-void Any::AssertAlways(const char* assertMessage)
-{
-  DALI_LOG_ERROR_NOFN(assertMessage);
-  throw Dali::DaliException(assertMessage, "");
-}
-
 } //namespace DALI_NAMESPACE

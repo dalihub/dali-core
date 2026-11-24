@@ -39,8 +39,6 @@ Debug::Filter* gPixelBufferFilter = Debug::Filter::New(Debug::NoLogging, false, 
 
 DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_IMAGE_PERFORMANCE_MARKER, false);
 
-Dali::Integration::PixelBufferGaussianBlurFunction gGaussianBlurFunction{nullptr};
-Dali::Integration::PixelBufferResizeFunction       gResizeFunction{nullptr};
 } // namespace
 
 #if defined(DEBUG_ENABLED)
@@ -288,23 +286,6 @@ void PixelBuffer::ReleaseBuffer()
     free(mBuffer);
     mBuffer = nullptr;
   }
-}
-
-void PixelBuffer::RegisterImageOperations(Dali::Integration::PixelBufferGaussianBlurFunction gaussianBlurFunction,
-                                          Dali::Integration::PixelBufferResizeFunction       resizeFunction)
-{
-  gGaussianBlurFunction = gaussianBlurFunction;
-  gResizeFunction       = resizeFunction;
-}
-
-Dali::Integration::PixelBufferGaussianBlurFunction PixelBuffer::GetGaussianBlurFunction()
-{
-  return gGaussianBlurFunction;
-}
-
-Dali::Integration::PixelBufferResizeFunction PixelBuffer::GetResizeFunction()
-{
-  return gResizeFunction;
 }
 
 } // namespace Internal

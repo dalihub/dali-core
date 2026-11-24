@@ -1952,10 +1952,6 @@ int UtcDaliActorCalculateScreenBounds(void)
   DALI_TEST_EQUALS(expectedExtent.width, actualExtent.width, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
   DALI_TEST_EQUALS(expectedExtent.height, actualExtent.height, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
 
-  // Deprecated names forward to the renamed APIs.
-  DALI_TEST_EQUALS(actor.CalculateScreenExtents(), actor.CalculateScreenBounds(), TEST_LOCATION);
-  DALI_TEST_EQUALS(DevelActor::CalculateCurrentScreenExtents(actor), actor.CalculateCurrentScreenBounds(), TEST_LOCATION);
-
   application.GetScene().Remove(actor);
   END_TEST;
 }

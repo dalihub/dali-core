@@ -842,11 +842,6 @@ Bounds Actor::CalculateCurrentScreenBounds() const
   return GetImplementation(*this).CalculateCurrentScreenBounds();
 }
 
-Bounds Actor::CalculateScreenExtents() const
-{
-  return CalculateScreenBounds();
-}
-
 void Actor::Raise()
 {
   GetImplementation(*this).Raise();

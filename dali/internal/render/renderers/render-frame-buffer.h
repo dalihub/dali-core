@@ -126,14 +126,6 @@ public:
   void ClearRenderResult();
 
   /**
-   * @brief Retrieves a copy of the rendered result as PixelData.
-   * @return Dali::PixelData that contains a copy of the rendered result.
-   * If the frame is not yet rendered, empty handle is returned.
-   * @note Kept for the deprecated Dali::RenderTask::GetRenderResult(); remove together.
-   */
-  Dali::PixelData GetRenderResult();
-
-  /**
    * @brief Retrieves the rendered result as a PixelBuffer, sharing ownership with this object.
    * @return Dali::PixelBuffer that contains the rendered result.
    * If the frame is not yet rendered, empty handle is returned.

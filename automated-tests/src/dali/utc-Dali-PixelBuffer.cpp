@@ -50,27 +50,6 @@ void utc_dali_pixel_buffer_cleanup(void)
 
 namespace
 {
-uint32_t gBlurCallCount   = 0;
-float    gBlurRadius      = 0.0f;
-uint32_t gResizeCallCount = 0;
-uint16_t gResizeWidth     = 0u;
-uint16_t gResizeHeight    = 0u;
-
-bool TestGaussianBlurOperation(Dali::PixelBuffer& pixelBuffer, float blurRadius)
-{
-  ++gBlurCallCount;
-  gBlurRadius = blurRadius;
-  return true;
-}
-
-bool TestResizeOperation(Dali::PixelBuffer& pixelBuffer, uint16_t width, uint16_t height)
-{
-  ++gResizeCallCount;
-  gResizeWidth  = width;
-  gResizeHeight = height;
-  return true;
-}
-
 // Uploads the given data to a texture and draws it, returning whether the texture got bound
 bool UploadAndDraw(TestApplication& application, PixelData pixelData)
 {
@@ -560,38 +539,6 @@ int UtcDaliPixelBufferIntegGetAllocationTotal(void)
   // Non-zero only when the library is built with DEBUG_ENABLED
   Integration::GetPixelBufferAllocationTotal();
   DALI_TEST_CHECK(true);
-
-  END_TEST;
-}
-
-int UtcDaliPixelBufferImageOperations(void)
-{
-  TestApplication application;
-
-  PixelBuffer pixelBuffer = PixelBuffer::New(10u, 10u, Pixel::RGBA8888);
-
-  // Without a platform layer, no image operations are registered, so the
-  // deprecated member functions fail
-  DALI_TEST_EQUALS(pixelBuffer.ApplyGaussianBlur(1.0f), false, TEST_LOCATION);
-  DALI_TEST_EQUALS(pixelBuffer.Resize(5u, 5u), false, TEST_LOCATION);
-
-  // With operations registered, the member functions route to them
-  gBlurCallCount = gResizeCallCount = 0u;
-  Integration::RegisterPixelBufferImageOperations(TestGaussianBlurOperation, TestResizeOperation);
-
-  DALI_TEST_EQUALS(pixelBuffer.ApplyGaussianBlur(3.0f), true, TEST_LOCATION);
-  DALI_TEST_EQUALS(gBlurCallCount, 1u, TEST_LOCATION);
-  DALI_TEST_EQUALS(gBlurRadius, 3.0f, TEST_LOCATION);
-
-  DALI_TEST_EQUALS(pixelBuffer.Resize(5u, 7u), true, TEST_LOCATION);
-  DALI_TEST_EQUALS(gResizeCallCount, 1u, TEST_LOCATION);
-  DALI_TEST_EQUALS(gResizeWidth, 5u, TEST_LOCATION);
-  DALI_TEST_EQUALS(gResizeHeight, 7u, TEST_LOCATION);
-
-  // Unregister, so that other test cases are not affected
-  Integration::RegisterPixelBufferImageOperations(nullptr, nullptr);
-  DALI_TEST_EQUALS(pixelBuffer.ApplyGaussianBlur(1.0f), false, TEST_LOCATION);
-  DALI_TEST_EQUALS(pixelBuffer.Resize(5u, 5u), false, TEST_LOCATION);
 
   END_TEST;
 }

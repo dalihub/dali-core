@@ -108,30 +108,6 @@ DALI_CORE_API void SetPixelBufferMetadata(Dali::PixelBuffer pixelBuffer, Propert
  */
 DALI_CORE_API uint32_t GetPixelBufferAllocationTotal();
 
-/**
- * The function that performs Dali::PixelBuffer::ApplyGaussianBlur().
- */
-using PixelBufferGaussianBlurFunction = bool (*)(Dali::PixelBuffer& pixelBuffer, float blurRadius);
-
-/**
- * The function that performs Dali::PixelBuffer::Resize().
- */
-using PixelBufferResizeFunction = bool (*)(Dali::PixelBuffer& pixelBuffer, uint16_t width, uint16_t height);
-
-/**
- * Registers the image operations that back the deprecated member functions
- * Dali::PixelBuffer::ApplyGaussianBlur() and Dali::PixelBuffer::Resize(), whose
- * implementations live in the platform layer. The platform layer registers them when
- * its library is loaded. While no functions are registered, the member functions fail
- * and return false.
- * @note Temporary: this registration is removed together with the deprecated member
- * functions.
- * @param[in] gaussianBlurFunction Function performing the Gaussian blur
- * @param[in] resizeFunction Function performing the resize
- */
-DALI_CORE_API void RegisterPixelBufferImageOperations(PixelBufferGaussianBlurFunction gaussianBlurFunction,
-                                                      PixelBufferResizeFunction       resizeFunction);
-
 } //namespace DALI_NAMESPACE::Integration
 
 #endif // DALI_PIXEL_BUFFER_INTEG_H

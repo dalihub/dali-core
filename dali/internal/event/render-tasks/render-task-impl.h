@@ -183,7 +183,8 @@ public:
   Vector2 GetViewportPosition() const;
 
   /**
-   * @copydoc Dali::RenderTask::GetCurrentViewportPosition
+   * @brief Retrieves the viewport position used when rendering (the update-side value).
+   * @return The viewport position
    */
   Vector2 GetCurrentViewportPosition() const;
 
@@ -198,12 +199,14 @@ public:
   Vector2 GetViewportSize() const;
 
   /**
-   * @copydoc Dali::RenderTask::GetCurrentViewportSize
+   * @brief Retrieves the viewport size used when rendering (the update-side value).
+   * @return The viewport size
    */
   Vector2 GetCurrentViewportSize() const;
 
   /**
-   * @copydoc Dali::RenderTask::SetViewport()
+   * @brief Sets the viewport position and size used when rendering.
+   * @param[in] viewport The new viewport
    */
   void SetViewport(const BoundsInteger& viewport);
 
@@ -340,11 +343,6 @@ public:
    * @copydoc Dali::RenderTask::ClearRenderResult
    */
   void ClearRenderResult();
-
-  /**
-   * @copydoc Dali::RenderTask::GetRenderResult
-   */
-  Dali::PixelData GetRenderResult();
 
   /**
    * @copydoc Dali::RenderTask::GetRenderResultBuffer

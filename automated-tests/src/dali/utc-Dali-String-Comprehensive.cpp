@@ -936,9 +936,9 @@ int UtcDaliString_StringToIntConversion(void)
   END_TEST;
 }
 
-int UtcDaliString_GetRawStorage_InternalUse(void)
+int UtcDaliString_IntegrationRoundTrip(void)
 {
-  tet_printf("Test GetRawStorage() for internal use");
+  tet_printf("Test Integration conversions round-trip the storage");
   TestApplication application;
   String          str("Hello");
 

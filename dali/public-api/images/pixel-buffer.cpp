@@ -106,26 +106,4 @@ bool PixelBuffer::IsAlphaPreMultiplied() const
   return GetImplementation(*this).IsAlphaPreMultiplied();
 }
 
-bool PixelBuffer::ApplyGaussianBlur(float blurRadius)
-{
-  auto gaussianBlurFunction = Internal::PixelBuffer::GetGaussianBlurFunction();
-  if(DALI_LIKELY(gaussianBlurFunction))
-  {
-    return gaussianBlurFunction(*this, blurRadius);
-  }
-  DALI_LOG_ERROR("No Gaussian blur operation is registered. The platform layer library is required.\n");
-  return false;
-}
-
-bool PixelBuffer::Resize(uint16_t width, uint16_t height)
-{
-  auto resizeFunction = Internal::PixelBuffer::GetResizeFunction();
-  if(DALI_LIKELY(resizeFunction))
-  {
-    return resizeFunction(*this, width, height);
-  }
-  DALI_LOG_ERROR("No resize operation is registered. The platform layer library is required.\n");
-  return false;
-}
-
 } //namespace DALI_NAMESPACE

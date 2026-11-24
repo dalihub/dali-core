@@ -153,11 +153,10 @@ struct DALI_CORE_API ConstraintSource
    */
   Handle GetObject() const;
 
-  SourceType sourceType; ///< The source type @DEPRECATED_2_5.47 will be private. Use GetSourceType() instead.
-
-  Property::Index propertyIndex; ///< The index of the source property @DEPRECATED_2_5.47 will be private. Use GetPropertyIndex() instead
-
-  Handle object; ///< The target object; only valid if sourceType == OBJECT_PROPERTY @DEPRECATED_2_5.47 will be private. Use GetObject() instead
+private:
+  SourceType      sourceType;    ///< The source type
+  Property::Index propertyIndex; ///< The index of the source property
+  Handle          object;        ///< The target object; only valid if sourceType == OBJECT_PROPERTY
 };
 
 /**
