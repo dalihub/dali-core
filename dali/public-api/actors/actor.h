@@ -2609,17 +2609,6 @@ public:
    */
   Bounds CalculateCurrentScreenBounds() const;
 
-  /**
-   * @brief Calculates the screen position and size of the actor using event-side properties.
-   *
-   * @SINCE_2_5.29
-   * @deprecated Use CalculateScreenBounds() instead.
-   * @return The Rect containing the position of the top-left corner on screen and the size,
-   *         or (0, 0, 0, 0) if the actor is not on the scene
-   * @pre The Actor has been initialized.
-   */
-  Bounds CalculateScreenExtents() const;
-
   // Sibling Order
 
   /**

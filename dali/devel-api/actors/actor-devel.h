@@ -245,11 +245,6 @@ enum Type
  */
 DALI_CORE_API Actor GetVisiblityChangedActor();
 
-/**
- * @deprecated Use Actor::CalculateCurrentScreenBounds() instead.
- */
-DALI_CORE_API Bounds CalculateCurrentScreenExtents(Actor actor);
-
 using ChildOrderChangedSignalType = Signal<void(Actor, Actor)>; ///< Used when the actor's children have changed order; first Actor is the parent, second is the child whose order changed
 
 using OnRelayoutSignalType = Signal<void(Actor)>; ///< Called when the actor is relaid out.

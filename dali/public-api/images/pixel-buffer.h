@@ -238,49 +238,6 @@ public:
    */
   bool IsAlphaPreMultiplied() const;
 
-  /**
-   * @DEPRECATED_2_5.47 Use the free function PixelBufferOperations::ApplyGaussianBlur() instead.
-   *
-   * @brief Applies a Gaussian blur to this pixel buffer with the given radius.
-   *
-   * The blur is applied in place, so the pointer returned by GetBuffer() and the
-   * dimensions of this object stay valid.
-   *
-   * @note A bigger radius will yield a blurrier image.
-   * @note A radius of 0 does nothing and succeeds. A negative radius does nothing
-   * and fails.
-   * @note Valid for the pixel formats A8, L8, LA88, RGB888, RGB8888, BGR8888,
-   * RGBA8888, BGRA8888, CHROMINANCE_U and CHROMINANCE_V. Fails otherwise.
-   *
-   * @SINCE_2_5.35
-   * @param[in] blurRadius The radius for the Gaussian blur
-   * @return @c false if the Gaussian blur fails (invalid radius, invalid pixel format,
-   * empty buffer or memory issues)
-   */
-  bool ApplyGaussianBlur(float blurRadius);
-
-  /**
-   * @DEPRECATED_2_5.47 Use the free function PixelBufferOperations::Resize() instead.
-   *
-   * @brief Resizes the buffer to the given dimensions.
-   *
-   * Uses either Lanczos4 for downscaling or Mitchell for upscaling.
-   *
-   * @warning The buffer is replaced, so the pointer returned by a previous GetBuffer()
-   * call becomes invalid. Call GetBuffer() again after resizing.
-   *
-   * @note Resizing to the current dimensions does nothing and succeeds.
-   * @note Valid for the pixel formats A8, L8, LA88, RGB888, RGB8888, BGR8888,
-   * RGBA8888, BGRA8888, CHROMINANCE_U and CHROMINANCE_V. Fails otherwise.
-   *
-   * @SINCE_2_5.35
-   * @param[in] width The new width in pixels
-   * @param[in] height The new height in pixels
-   * @return @c false if the resize fails (invalid dimensions, invalid pixel format,
-   * empty buffer or memory issues)
-   */
-  bool Resize(uint16_t width, uint16_t height);
-
 public:
   /// @cond internal
   /**

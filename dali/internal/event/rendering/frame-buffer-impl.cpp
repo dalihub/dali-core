@@ -173,11 +173,6 @@ void FrameBuffer::ClearRenderResult()
   }
 }
 
-Dali::PixelData FrameBuffer::GetRenderResult()
-{
-  return mRenderObject->GetRenderResult();
-}
-
 Dali::PixelBuffer FrameBuffer::GetRenderResultBuffer()
 {
   return mRenderObject->GetRenderResultBuffer();

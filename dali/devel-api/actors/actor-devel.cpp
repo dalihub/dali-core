@@ -25,11 +25,6 @@ namespace DALI_NAMESPACE
 {
 namespace DevelActor
 {
-Bounds CalculateCurrentScreenExtents(Actor actor)
-{
-  return GetImplementation(actor).CalculateCurrentScreenBounds();
-}
-
 Actor GetVisiblityChangedActor()
 {
   return Dali::Actor(Internal::Actor::GetVisiblityChangedActor().Get());

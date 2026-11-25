@@ -15,7 +15,6 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
 
 // EXTERNAL INCLUDES
@@ -62,15 +61,6 @@ public:
    * @SINCE_1_0.0
    */
   DALI_CORE_API ~Any();
-
-  /**
-   * @brief Passes Assert message.
-   *
-   * @SINCE_1_0.0
-   * @DEPRECATED_2_5.47 Use DALI_ABORT instead.
-   * @param[in] assertMessage Assert message to report
-   */
-  DALI_CORE_API static void AssertAlways(const char* assertMessage);
 
   /**
    * @brief Constructs a Any type with the given value.
@@ -303,10 +293,11 @@ public:
     return (nullptr == mContainer) ? true : false;
   }
 
-  struct AnyContainerBase;                                          // Forward declaration for typedef @DEPRECATED_2_5.47 will be private.
-  using CloneFunc = AnyContainerBase* (*)(const AnyContainerBase&); // @DEPRECATED_2_5.47 will be private.
-
-  using DeleteFunc = void (*)(const AnyContainerBase*); // @DEPRECATED_2_5.47 will be private.
+private:
+  /// @cond internal
+  struct AnyContainerBase; // Forward declaration for typedef
+  using CloneFunc  = AnyContainerBase* (*)(const AnyContainerBase&);
+  using DeleteFunc = void (*)(const AnyContainerBase*);
 
   // ============================================================
   // Inline contract shared by applications and the library (both sides compile this).
@@ -315,17 +306,12 @@ public:
 
   /**
    * @brief Base container to hold type for match verification and instance cloning function.
-   *
-   * @SINCE_1_0.0
-   * @DEPRECATED_2_5.47 will be private.
    */
   struct AnyContainerBase
   {
     /**
      * @brief Constructor of base container.
      *
-     * @SINCE_1_0.0
-     * @DEPRECATED_2_5.47 will be private.
      * @param[in] type TypeInfoId of container
      * @param[in] cloneFunc Cloning function to replicate this container type
      * @param[in] deleteFunc Deleting function to destroy this container type
@@ -340,8 +326,6 @@ public:
     /**
      * @brief Gets the TypeInfoId of this container.
      *
-     * @SINCE_1_0.0
-     * @DEPRECATED_2_5.47 will be private.
      * @return Type
      */
     const TypeInfoId& GetType() const
@@ -357,8 +341,6 @@ public:
   /**
    * @brief Templated Clone function from container base.
    *
-   * @SINCE_1_0.0
-   * @DEPRECATED_2_5.47 will be private.
    * @param[in] base The reference to container
    */
   template<typename Type>
@@ -373,8 +355,6 @@ public:
   /**
    * @brief Templated Delete function from container base.
    *
-   * @SINCE_1_0.0
-   * @DEPRECATED_2_5.47 will be private.
    * @param[in] base The pointer to container
    */
   template<typename Type>
@@ -388,9 +368,6 @@ public:
 
   /**
    * @brief Templated class to hold value for type.
-   *
-   * @SINCE_1_0.0
-   * @DEPRECATED_2_5.47 will be private.
    */
   template<typename Type>
   class AnyContainerImpl : public AnyContainerBase
@@ -399,8 +376,6 @@ public:
     /**
      * @brief Constructor to create container holding value of type Type.
      *
-     * @SINCE_1_0.0
-     * @DEPRECATED_2_5.47 will be private.
      * @param[in] value Value of Type
      */
     AnyContainerImpl(const Type& value)
@@ -414,8 +389,6 @@ public:
     /**
      * @brief Constructor to create new container of type from and existing container (cloning).
      *
-     * @SINCE_1_0.0
-     * @DEPRECATED_2_5.47 will be private.
      * @param[in] base The reference to base container to copy from
      */
     AnyContainerImpl(const AnyContainerBase& base)
@@ -429,8 +402,6 @@ public:
     /**
      * @brief Gets the container's stored value.
      *
-     * @SINCE_1_0.0
-     * @DEPRECATED_2_5.47 will be private.
      * @return Value of type Type
      */
     const Type& GetValue() const
@@ -441,8 +412,6 @@ public:
     /**
      * @brief Sets the container's stored value.
      *
-     * @SINCE_1_0.0
-     * @DEPRECATED_2_5.47 will be private.
      * @param[in] value Value of type Type
      */
     void SetValue(const Type& value)
@@ -453,8 +422,6 @@ public:
     /**
      * @brief Gets a pointer to the value held.
      *
-     * @SINCE_1_0.0
-     * @DEPRECATED_2_5.47 will be private.
      * @return Pointer to the value of type Type
      */
     Type* GetPointerToValue()
@@ -465,8 +432,6 @@ public:
     /**
      * @brief Gets a pointer to the value held.
      *
-     * @SINCE_1_0.0
-     * @DEPRECATED_2_5.47 will be private.
      * @return Pointer to the value of type Type
      */
     const Type* GetPointerToValue() const
@@ -478,8 +443,6 @@ public:
     Type mValue;
   };
 
-private:
-  /// @cond internal
   /**
    * @brief Demangles a typeid name to a human-readable class name.
    *

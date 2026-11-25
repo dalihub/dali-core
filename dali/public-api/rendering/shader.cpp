@@ -19,10 +19,7 @@
 #include <dali/public-api/rendering/shader.h> // Dali::Shader
 
 // INTERNAL INCLUDES
-#include <dali/integration-api/string-utils.h>
 #include <dali/internal/event/rendering/shader-impl.h> // Dali::Internal::Shader
-
-using Dali::Integration::ToDaliString;
 
 namespace DALI_NAMESPACE
 {
@@ -61,26 +58,6 @@ Shader& Shader::operator=(Shader&& rhs) noexcept = default;
 Shader::Shader(Internal::Shader* pointer)
 : Handle(pointer)
 {
-}
-
-uint32_t Shader::GetShaderLanguageVersion()
-{
-  return Dali::Internal::Shader::GetShaderLanguageVersion();
-}
-
-Dali::String Shader::GetShaderVersionPrefix()
-{
-  return ToDaliString(Dali::Internal::Shader::GetShaderVersionPrefix());
-}
-
-Dali::String Shader::GetVertexShaderPrefix()
-{
-  return ToDaliString(Dali::Internal::Shader::GetVertexShaderPrefix());
-}
-
-Dali::String Shader::GetFragmentShaderPrefix()
-{
-  return ToDaliString(Dali::Internal::Shader::GetFragmentShaderPrefix());
 }
 
 } //namespace DALI_NAMESPACE

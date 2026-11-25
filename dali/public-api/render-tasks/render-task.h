@@ -24,7 +24,6 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/images/pixel-buffer.h>
 #include <dali/public-api/images/pixel-data.h>
-#include <dali/public-api/math/viewport.h>
 #include <dali/public-api/object/handle.h>
 #include <dali/public-api/object/property-index-ranges.h>
 #include <dali/public-api/object/property-map.h>
@@ -209,13 +208,6 @@ public:
     BUILTIN_SOURCE_ACTOR,  ///< CameraActor set by SetBuiltinCameraActor with BuiltinCameraType::ATTACHED_TO_SOURCE_ACTOR. @SINCE_2_5.21
     BUILTIN_STOPPER_ACTOR, ///< CameraActor set by SetBuiltinCameraActor with BuiltinCameraType::ATTACHED_TO_STOPPER_ACTOR. @SINCE_2_5.21
   };
-
-  static const bool     DEFAULT_EXCLUSIVE;     ///< Default exclusive setting, false. @SINCE_2_5.46 @DEPRECATED_2_5.47
-  static const bool     DEFAULT_INPUT_ENABLED; ///< Default input enabled setting, true. @SINCE_2_5.46 @DEPRECATED_2_5.47
-  static const Vector4  DEFAULT_CLEAR_COLOR;   ///< Default clear color, Color::BLACK. @SINCE_2_5.46 @DEPRECATED_2_5.47
-  static const bool     DEFAULT_CLEAR_ENABLED; ///< Default clear enabled setting, false. @SINCE_2_5.46 @DEPRECATED_2_5.47
-  static const bool     DEFAULT_CULL_MODE;     ///< Default cull mode, true. @SINCE_2_5.46 @DEPRECATED_2_5.47
-  static const uint32_t DEFAULT_REFRESH_RATE;  ///< Default refresh rate, REFRESH_ALWAYS. @SINCE_2_5.46 @DEPRECATED_2_5.47
 
   /**
    * @brief Creates an empty RenderTask handle.
@@ -494,14 +486,6 @@ public:
   Vector2 GetViewportPosition() const;
 
   /**
-   * @brief Retrieves the viewport position used when rendering.
-   * @SINCE_1_0.0
-   * @DEPRECATED_2_5.46 Use GetViewportPosition() instead. For the value used for rendering, use GetCurrentProperty() with Property::VIEWPORT_POSITION.
-   * @return The viewport
-   */
-  Vector2 GetCurrentViewportPosition() const;
-
-  /**
    * @brief Sets the viewport size used when rendering.
    *
    * This specifies the transformation between normalized device coordinates and target window (or frame-buffer) coordinates.
@@ -520,34 +504,6 @@ public:
    * @see Property::VIEWPORT_SIZE
    */
   Vector2 GetViewportSize() const;
-
-  /**
-   * @brief Retrieves the viewport size used when rendering.
-   * @SINCE_1_0.0
-   * @DEPRECATED_2_5.46 Use GetViewportSize() instead. For the value used for rendering, use GetCurrentProperty() with Property::VIEWPORT_SIZE.
-   * @return The viewport
-   */
-  Vector2 GetCurrentViewportSize() const;
-
-  /**
-   * @brief Sets the viewport used when rendering.
-   *
-   * This specifies the transformation between normalized device coordinates and target window (or frame-buffer) coordinates.
-   * By default this will match the target window or frame-buffer size.
-   * @SINCE_1_0.0
-   * @DEPRECATED_2_5.46 Use SetViewportPosition and SetViewportSize instead.
-   * @param[in] viewport The new viewport
-   * @note Unlike the glViewport method, the x & y coordinates refer to the top-left of the viewport rectangle.
-   */
-  void SetViewport(Viewport viewport);
-
-  /**
-   * @brief Retrieves the viewport used when rendering.
-   * @SINCE_1_0.0
-   * @DEPRECATED_2_5.46 Use GetViewportPosition and GetViewportSize instead.
-   * @return The viewport
-   */
-  Viewport GetViewport() const;
 
   /**
    * @brief Sets the clear color used when SetClearEnabled(true) is used.
@@ -731,17 +687,6 @@ public:
    * @note Since the rendered result is kept in the render thread resource, this method asynchronously clears the result.
    */
   void ClearRenderResult();
-
-  /**
-   * @DEPRECATED_2_5.47 Use GetRenderResultBuffer() instead.
-   *
-   * @brief Retrieves a copy of the rendered result as PixelData.
-   * @SINCE_2_3.51
-   * @return Dali::PixelData that contains a copy of the rendered result.
-   * @note This method is only available after the FinishedSignal is emitted.
-   * If this method is called before the FinishedSignal is emitted, an empty handle is returned.
-   */
-  Dali::PixelData GetRenderResult();
 
   /**
    * @brief Retrieves the rendered result as a PixelBuffer, whose pixels the application

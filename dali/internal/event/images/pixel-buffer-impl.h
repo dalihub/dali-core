@@ -222,25 +222,6 @@ public:
    */
   bool IsAlphaPreMultiplied() const;
 
-public: // Image operations registered by the platform layer
-  /**
-   * @brief Stores the image operations that back the deprecated public member functions.
-   * @param[in] gaussianBlurFunction Function performing Dali::PixelBuffer::ApplyGaussianBlur()
-   * @param[in] resizeFunction Function performing Dali::PixelBuffer::Resize()
-   */
-  static void RegisterImageOperations(Dali::Integration::PixelBufferGaussianBlurFunction gaussianBlurFunction,
-                                      Dali::Integration::PixelBufferResizeFunction       resizeFunction);
-
-  /**
-   * @brief Gets the registered Gaussian blur operation, or nullptr if none is registered.
-   */
-  static Dali::Integration::PixelBufferGaussianBlurFunction GetGaussianBlurFunction();
-
-  /**
-   * @brief Gets the registered resize operation, or nullptr if none is registered.
-   */
-  static Dali::Integration::PixelBufferResizeFunction GetResizeFunction();
-
 protected:
   /**
    * @brief Constructor.

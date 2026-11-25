@@ -195,17 +195,6 @@ void FrameBuffer::StoreRenderResult()
 }
 
 // Called from Main thread.
-Dali::PixelData FrameBuffer::GetRenderResult()
-{
-  Dali::Mutex::ScopedLock lock(mRenderResultMutex);
-  Dali::PixelData         pixelData;
-  if(!mIsRenderResultRequested && mRenderedPixelBuffer)
-  {
-    pixelData = GetImplementation(mRenderedPixelBuffer).CreatePixelData();
-  }
-  return pixelData;
-}
-
 // Called from Main thread.
 Dali::PixelBuffer FrameBuffer::GetRenderResultBuffer()
 {

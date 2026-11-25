@@ -71,10 +71,4 @@ uint32_t GetPixelBufferAllocationTotal()
   return Internal::PixelBuffer::GetTotalAllocatedSize();
 }
 
-void RegisterPixelBufferImageOperations(PixelBufferGaussianBlurFunction gaussianBlurFunction,
-                                        PixelBufferResizeFunction       resizeFunction)
-{
-  Internal::PixelBuffer::RegisterImageOperations(gaussianBlurFunction, resizeFunction);
-}
-
 } //namespace DALI_NAMESPACE::Integration

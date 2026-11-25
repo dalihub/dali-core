@@ -42,13 +42,6 @@ static bool FullScreenFrameBufferFunction(Vector2& coordinates)
 RenderTask::ConstScreenToFrameBufferFunction RenderTask::DEFAULT_SCREEN_TO_FRAMEBUFFER_FUNCTION = DefaultScreenToFrameBufferFunction;
 RenderTask::ConstScreenToFrameBufferFunction RenderTask::FULLSCREEN_FRAMEBUFFER_FUNCTION        = FullScreenFrameBufferFunction;
 
-const bool     RenderTask::DEFAULT_EXCLUSIVE     = false;
-const bool     RenderTask::DEFAULT_INPUT_ENABLED = true;
-const Vector4  RenderTask::DEFAULT_CLEAR_COLOR   = Vector4(0.0f, 0.0f, 0.0f, 1.0f); // cannot use Color::Black because it may or may not be initialized yet
-const bool     RenderTask::DEFAULT_CLEAR_ENABLED = false;
-const bool     RenderTask::DEFAULT_CULL_MODE     = true;
-const uint32_t RenderTask::DEFAULT_REFRESH_RATE  = REFRESH_ALWAYS;
-
 static constexpr int32_t MIN_ORDER_INDEX = -1000;
 static constexpr int32_t MAX_ORDER_INDEX = 1000;
 
@@ -207,11 +200,6 @@ Vector2 RenderTask::GetViewportPosition() const
   return GetImplementation(*this).GetViewportPosition();
 }
 
-Vector2 RenderTask::GetCurrentViewportPosition() const
-{
-  return GetImplementation(*this).GetCurrentViewportPosition();
-}
-
 void RenderTask::SetViewportSize(Vector2 size)
 {
   GetImplementation(*this).SetViewportSize(size);
@@ -220,23 +208,6 @@ void RenderTask::SetViewportSize(Vector2 size)
 Vector2 RenderTask::GetViewportSize() const
 {
   return GetImplementation(*this).GetViewportSize();
-}
-
-Vector2 RenderTask::GetCurrentViewportSize() const
-{
-  return GetImplementation(*this).GetCurrentViewportSize();
-}
-
-void RenderTask::SetViewport(Viewport viewport)
-{
-  GetImplementation(*this).SetViewport(viewport);
-}
-
-Viewport RenderTask::GetViewport() const
-{
-  Viewport result;
-  GetImplementation(*this).GetViewport(result);
-  return result;
 }
 
 void RenderTask::SetClearColor(const Vector4& color)
@@ -362,11 +333,6 @@ void RenderTask::KeepRenderResult()
 void RenderTask::ClearRenderResult()
 {
   GetImplementation(*this).ClearRenderResult();
-}
-
-PixelData RenderTask::GetRenderResult()
-{
-  return GetImplementation(*this).GetRenderResult();
 }
 
 PixelBuffer RenderTask::GetRenderResultBuffer()

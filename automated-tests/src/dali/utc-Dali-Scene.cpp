@@ -1532,7 +1532,7 @@ int UtcDaliSceneSurfaceResizedMultipleRenderTasks(void)
   application.Render(0);
   glAbstraction.ResetViewportCallStack();
 
-  Vector2 initialViewportSize = newTask.GetCurrentViewportSize();
+  Vector2 initialViewportSize = newTask.GetCurrentProperty<Vector2>(RenderTask::Property::VIEWPORT_SIZE);
   int     initialWidth        = static_cast<int>(std::roundf(initialViewportSize.width));
   int     initialHeight       = static_cast<int>(std::roundf(initialViewportSize.height));
   DALI_TEST_EQUALS(initialWidth, testWidth, TEST_LOCATION);
@@ -1557,7 +1557,7 @@ int UtcDaliSceneSurfaceResizedMultipleRenderTasks(void)
   DALI_TEST_CHECK(callStack.FindMethodAndGetParameters("Viewport", viewportParams));
 
   // Second render-task should not be affected
-  Vector2 viewportSize = newTask.GetCurrentViewportSize();
+  Vector2 viewportSize = newTask.GetCurrentProperty<Vector2>(RenderTask::Property::VIEWPORT_SIZE);
   int     width        = static_cast<int>(std::roundf(viewportSize.width));
   int     height       = static_cast<int>(std::roundf(viewportSize.height));
   DALI_TEST_EQUALS(width, testWidth, TEST_LOCATION);
@@ -3334,8 +3334,8 @@ int UtcDaliSceneSurfaceResizedWithOverlayLayer(void)
   DALI_TEST_EQUALS(scene.GetRootLayer(), defaultTask.GetSourceActor(), TEST_LOCATION);
 
   Vector2 sceneSize               = scene.GetSize();
-  Vector2 defaultViewportPosition = defaultTask.GetCurrentViewportPosition();
-  Vector2 defaultViewportSize     = defaultTask.GetCurrentViewportSize();
+  Vector2 defaultViewportPosition = defaultTask.GetCurrentProperty<Vector2>(RenderTask::Property::VIEWPORT_POSITION);
+  Vector2 defaultViewportSize     = defaultTask.GetCurrentProperty<Vector2>(RenderTask::Property::VIEWPORT_SIZE);
   DALI_TEST_EQUALS(defaultViewportPosition, Vector2::ZERO, TEST_LOCATION);
   DALI_TEST_EQUALS(defaultViewportSize, sceneSize, TEST_LOCATION);
 
@@ -3343,8 +3343,8 @@ int UtcDaliSceneSurfaceResizedWithOverlayLayer(void)
   // There should be 2 task by default.
   DALI_TEST_EQUALS(tasks.GetTaskCount(), 2u, TEST_LOCATION);
   RenderTask overlayTask             = tasks.GetTask(1u);
-  Vector2    overlayViewportPosition = overlayTask.GetCurrentViewportPosition();
-  Vector2    overlayViewportSize     = overlayTask.GetCurrentViewportSize();
+  Vector2    overlayViewportPosition = overlayTask.GetCurrentProperty<Vector2>(RenderTask::Property::VIEWPORT_POSITION);
+  Vector2    overlayViewportSize     = overlayTask.GetCurrentProperty<Vector2>(RenderTask::Property::VIEWPORT_SIZE);
   DALI_TEST_EQUALS(defaultViewportPosition, overlayViewportPosition, TEST_LOCATION);
   DALI_TEST_EQUALS(defaultViewportSize, overlayViewportSize, TEST_LOCATION);
 
@@ -3353,10 +3353,10 @@ int UtcDaliSceneSurfaceResizedWithOverlayLayer(void)
   DALI_TEST_CHECK(scene.GetSize() != newSize);
   scene.SurfaceResized(newSize.width, newSize.height);
   BoundsInteger newViewport(0, 0, static_cast<int>(newSize.x), static_cast<int>(newSize.y));
-  DALI_TEST_EQUALS(Vector2::ZERO, defaultTask.GetCurrentViewportPosition(), TEST_LOCATION);
-  DALI_TEST_EQUALS(Vector2::ZERO, overlayTask.GetCurrentViewportPosition(), TEST_LOCATION);
-  DALI_TEST_EQUALS(newSize, defaultTask.GetCurrentViewportSize(), TEST_LOCATION);
-  DALI_TEST_EQUALS(newSize, overlayTask.GetCurrentViewportSize(), TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2::ZERO, defaultTask.GetCurrentProperty<Vector2>(RenderTask::Property::VIEWPORT_POSITION), TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2::ZERO, overlayTask.GetCurrentProperty<Vector2>(RenderTask::Property::VIEWPORT_POSITION), TEST_LOCATION);
+  DALI_TEST_EQUALS(newSize, defaultTask.GetCurrentProperty<Vector2>(RenderTask::Property::VIEWPORT_SIZE), TEST_LOCATION);
+  DALI_TEST_EQUALS(newSize, overlayTask.GetCurrentProperty<Vector2>(RenderTask::Property::VIEWPORT_SIZE), TEST_LOCATION);
 
   END_TEST;
 }
