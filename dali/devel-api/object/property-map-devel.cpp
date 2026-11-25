@@ -34,12 +34,12 @@ Property::Map CreatePropertyMap(std::initializer_list<KeyValuePair> values)
     const auto& key = value.first;
     switch(key.type)
     {
-      case Property::Key::INDEX:
+      case Property::Key::Type::INDEX:
       {
         map.Insert(key.indexKey, value.second);
         break;
       }
-      case Property::Key::STRING:
+      case Property::Key::Type::STRING:
       {
         map.Insert(ToDaliString(key.stringKey), value.second);
         break;

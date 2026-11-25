@@ -245,7 +245,7 @@ void VertexBuffer::Initialize(const Dali::Property::Map& formatMap)
     KeyValuePair component = formatMap.GetKeyValue(i);
 
     // Get the name
-    if(component.first.type == Property::Key::INDEX)
+    if(component.first.type == Property::Key::Type::INDEX)
     {
       continue;
     }

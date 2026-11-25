@@ -231,7 +231,7 @@ Property::Index Object::GetPropertyIndex(KeyRef key) const
 {
   Property::Index index = Property::INVALID_INDEX;
 
-  if(key.mType == Property::Key::STRING)
+  if(key.mType == Property::Key::Type::STRING)
   {
     const TypeInfo* typeInfo(GetTypeInfo());
     if(typeInfo)
@@ -248,8 +248,8 @@ Property::Index Object::GetPropertyIndex(KeyRef key) const
     {
       CustomPropertyMetadata* custom = static_cast<CustomPropertyMetadata*>(*iter);
 
-      if((key.mType == Property::Key::STRING && custom->name == key.mString) ||
-         (key.mType == Property::Key::INDEX && custom->key == key.mIndex))
+      if((key.mType == Property::Key::Type::STRING && custom->name == key.mString) ||
+         (key.mType == Property::Key::Type::INDEX && custom->key == key.mIndex))
       {
         if(custom->childPropertyIndex != Property::INVALID_INDEX)
         {
@@ -653,7 +653,7 @@ void Object::SetProperties(const Property::Map& properties)
     // Iterating twice to get the value we want should still be fairly quick in a Property::Map.
 
     const auto& key           = properties.GetKeyAt(position);
-    const auto  propertyIndex = (key.type == Property::Key::INDEX) ? key.indexKey : GetPropertyIndex(key);
+    const auto  propertyIndex = (key.type == Property::Key::Type::INDEX) ? key.indexKey : GetPropertyIndex(key);
 
     if(propertyIndex != Property::INVALID_INDEX)
     {
