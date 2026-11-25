@@ -30,6 +30,7 @@ TouchEventPtr TouchEvent::Clone(const TouchEvent& other)
   TouchEventPtr touchEvent(new TouchEvent);
   touchEvent->mPoints = other.mPoints;
   touchEvent->mTime   = other.mTime;
+  touchEvent->mAllowDelayedGestureClaim = other.mAllowDelayedGestureClaim;
   return touchEvent;
 }
 

@@ -198,6 +198,16 @@ public:
     return mRenderTask;
   }
 
+  /**
+   * @brief Checks whether an already detected asynchronous gesture can claim this touch stream
+   *        through automatic geometry touch delivery.
+   * @return True if a delayed claim is allowed.
+   */
+  bool IsAllowDelayedGestureClaim() const
+  {
+    return mAllowDelayedGestureClaim;
+  }
+
   // Setters
 
   /**
@@ -209,6 +219,15 @@ public:
   void SetRenderTask(Dali::RenderTask renderTask)
   {
     mRenderTask = renderTask;
+  }
+
+  /**
+   * @brief Sets whether the geometry recipient can claim touch through a delayed gesture.
+   * @param[in] allowed True if a delayed claim is allowed.
+   */
+  void SetAllowDelayedGestureClaim(bool allowed)
+  {
+    mAllowDelayedGestureClaim = allowed;
   }
 
   /**
@@ -252,6 +271,7 @@ private:
   std::vector<Integration::Point> mPoints;     ///< Container of the points for this touch event.
   Dali::RenderTask                mRenderTask; ///< The render task used to generate this touch event.
   uint32_t                        mTime{0u};   ///< The time (in ms) that the touch event occurred.
+  bool                            mAllowDelayedGestureClaim{true}; ///< Whether geometry delivery allows delayed claims.
 };
 
 } // namespace Internal

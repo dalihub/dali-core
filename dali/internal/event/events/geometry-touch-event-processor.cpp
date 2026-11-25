@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <algorithm>
+#include <unordered_set>
 #include <utility>
 #if defined(DEBUG_ENABLED)
 #include <sstream>
@@ -138,6 +139,34 @@ void BuildRootToTargetPath(Dali::Actor target, std::list<ActorPtr>& path)
   }
 }
 
+/**
+ * Captures recipients that may observe touch but may not claim it through a delayed gesture.
+ * An ancestor of a foreground hit remains eligible, including ancestors of a mapping actor
+ * represented in the hit candidates.
+ */
+std::vector<uint32_t> CaptureDelayedGestureClaimExclusions(const std::list<ActorPtr>& candidates)
+{
+  std::vector<uint32_t> exclusions;
+  if(candidates.size() > 1u)
+  {
+    std::unordered_set<const Actor*> foregroundActors;
+    for(auto candidate = candidates.rbegin(); candidate != candidates.rend(); ++candidate)
+    {
+      const Actor* actor = candidate->Get();
+      if(candidate != candidates.rbegin() && foregroundActors.find(actor) == foregroundActors.end())
+      {
+        exclusions.push_back(actor->GetId());
+      }
+
+      while(actor && foregroundActors.insert(actor).second)
+      {
+        actor = actor->GetParent();
+      }
+    }
+  }
+  return exclusions;
+}
+
 Dali::Actor EmitGeoInterceptTouchSignals(const std::list<ActorPtr>& rootToTargetPath,
                                          GeometryTouchStreamState&  streamState,
                                          const Dali::TouchEvent&    touchEvent,
@@ -205,12 +234,16 @@ Dali::Actor EmitGeoTouchSignalsWithTracking(const std::list<ActorPtr>& actorList
         TransferInterceptRecipientToTouch(streamState, actorImpl);
       }
 
+      const auto& exclusions               = streamState.delayedGestureClaimExcludedActors;
+      const bool  allowDelayedGestureClaim = !streamState.interceptedRootToTarget.empty() ||
+                                            std::find(exclusions.begin(), exclusions.end(), actorImpl->GetId()) == exclusions.end();
       DALI_TRACE_SCOPE(gTraceFilter, "DALI_EMIT_TOUCH_EVENT_SIGNAL");
       if(TouchRecipientDispatcher::DispatchGeometryTouch(*actorImpl,
                                                          renderTask,
                                                          touchEvent,
                                                          initialHitActor,
-                                                         touchEvent.GetState(0u)))
+                                                         touchEvent.GetState(0u),
+                                                         allowDelayedGestureClaim))
       {
         // One of this actor's listeners has consumed the event so set this actor as the consumed actor.
         consumedActor = Dali::Actor(actorImpl);
@@ -949,6 +982,7 @@ bool GeometryTouchEventProcessor::ProcessTouchEvent(const Integration::TouchEven
     {
       auto          initialCandidates = std::move(mStreamState.candidatesRootToFront);
       auto          initialBoundaries = std::move(mStreamState.touchPropagationBoundaries);
+      auto          initialGestureClaimExclusions = std::move(mStreamState.delayedGestureClaimExcludedActors);
       TouchEventPtr restartEvent(TouchEvent::New(event.time));
       for(const auto& point : event.points)
       {
@@ -960,6 +994,7 @@ bool GeometryTouchEventProcessor::ProcessTouchEvent(const Integration::TouchEven
       mStreamState.phase                      = GeometryTouchStreamPhase::UNOWNED;
       mStreamState.candidatesRootToFront      = std::move(initialCandidates);
       mStreamState.touchPropagationBoundaries = std::move(initialBoundaries);
+      mStreamState.delayedGestureClaimExcludedActors = std::move(initialGestureClaimExclusions);
       preserveBoundarySnapshot                = true;
     }
   }
@@ -993,6 +1028,11 @@ bool GeometryTouchEventProcessor::ProcessTouchEvent(const Integration::TouchEven
         mStreamState.phase           = GeometryTouchStreamPhase::UNOWNED;
         mStreamState.initialHitActor = ActorPtr(&GetImplementation(hitTestResults.actor));
         BuildRootToTargetPath(hitTestResults.actor, mStreamState.initialHitPathRootToTarget);
+        // A restart without a captured boundary can hit a different set of actors.
+        if(!preserveBoundarySnapshot || mStreamState.touchPropagationBoundaries.empty())
+        {
+          mStreamState.delayedGestureClaimExcludedActors = CaptureDelayedGestureClaimExclusions(mStreamState.candidatesRootToFront);
+        }
       }
 
       // Start with the task of the primary hit actor. An established owner route overrides it below.
@@ -1134,6 +1174,7 @@ void GeometryTouchEventProcessor::Clear(bool keepLastPrimaryObserver)
   mStreamState.interceptedRootToTarget.clear();
   mStreamState.candidatesRootToFront.clear();
   mStreamState.touchPropagationBoundaries.clear();
+  mStreamState.delayedGestureClaimExcludedActors.clear();
   mStreamState.recipientsInDispatchOrder.clear();
   mStreamState.interceptRecipientsInDispatchOrder.clear();
   mObservedActorDisconnected = false;

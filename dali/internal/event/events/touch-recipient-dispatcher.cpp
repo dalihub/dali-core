@@ -129,7 +129,8 @@ bool TouchRecipientDispatcher::DispatchGeometryTouch(Actor&                  act
                                                      RenderTask*             renderTask,
                                                      const Dali::TouchEvent& sourceEvent,
                                                      Actor*                  initialHitActor,
-                                                     PointState::Type        primaryState)
+                                                     PointState::Type        primaryState,
+                                                     bool                    allowDelayedGestureClaim)
 {
   // Decide before building the recipient event, so that a rejected candidate costs no clone and no
   // per-point coordinate conversion.
@@ -137,7 +138,9 @@ bool TouchRecipientDispatcher::DispatchGeometryTouch(Actor&                  act
   {
     return false;
   }
-  return actor.DispatchTouchEvent(CreateRecipientEvent(actor, renderTask, sourceEvent, initialHitActor, primaryState));
+  Dali::TouchEvent recipientEvent = CreateRecipientEvent(actor, renderTask, sourceEvent, initialHitActor, primaryState);
+  GetImplementation(recipientEvent).SetAllowDelayedGestureClaim(allowDelayedGestureClaim);
+  return actor.DispatchTouchEvent(recipientEvent);
 }
 
 bool TouchRecipientDispatcher::DispatchGeometryIntercept(Actor&                  actor,

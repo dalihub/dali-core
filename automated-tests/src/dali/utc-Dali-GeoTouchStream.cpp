@@ -546,6 +546,181 @@ int UtcDaliGeoTouchStreamInterruptedInterceptPrecedesRecipientTermination(void)
   END_TEST;
 }
 
+int UtcDaliGeoTouchStreamRearLongPressCannotClaimFromFrontPan(void)
+{
+  for(bool boundaryEnabled : {false, true})
+  {
+    TestApplication application;
+    auto            scene = application.GetScene();
+    scene.SetGeometryHittestEnabled(true);
+    TouchTrace     touchTrace;
+    PanTrace       frontPan;
+    PanTrace       rearPan;
+    LongPressTrace rearLongPress;
+    Actor          background = CreateTouchableActor("background");
+    Actor          rear       = CreateTouchableActor("rear");
+    Actor          front      = CreateTouchableActor("front");
+    rear.SetTouchPropagationBlocked(boundaryEnabled);
+    scene.Add(background);
+    scene.Add(rear);
+    scene.Add(front);
+    background.TouchEventSignal().Connect(&application, TouchTraceFunctor(touchTrace, "background", false));
+    front.TouchEventSignal().Connect(&application, TouchTraceFunctor(touchTrace, "front", false));
+
+    auto frontDetector     = PanGestureDetector::New();
+    auto rearPanDetector   = PanGestureDetector::New();
+    auto rearPressDetector = LongPressGestureDetector::New();
+    frontDetector.DetectedSignal().Connect(&application, PanTraceFunctor(frontPan));
+    rearPanDetector.DetectedSignal().Connect(&application, PanTraceFunctor(rearPan));
+    rearPressDetector.DetectedSignal().Connect(&application, LongPressTraceFunctor(rearLongPress));
+    frontDetector.Attach(front);
+    rearPanDetector.Attach(rear);
+    rearPressDetector.Attach(rear);
+    PrepareScene(application);
+
+    auto sendTouch = [&](PointState::Type state, float y, uint32_t time)
+    {
+      auto event = GenerateSingleTouch(state, Vector2(20.0f, y));
+      event.time = time;
+      application.ProcessEvent(event);
+      application.SendNotification();
+      application.Render();
+    };
+
+    sendTouch(PointState::DOWN, 20.0f, 100u);
+    application.GetPlatform().TriggerTimer();
+    DALI_TEST_EQUALS(1u, rearLongPress.Count(GestureState::STARTED), TEST_LOCATION);
+    sendTouch(PointState::MOTION, 22.0f, 701u);
+    DALI_TEST_EQUALS(0u, frontPan.Count(GestureState::STARTED), TEST_LOCATION);
+    DALI_TEST_EQUALS(0u, touchTrace.Count("front", CallbackKind::TOUCH, PointState::INTERRUPTED), TEST_LOCATION);
+    sendTouch(PointState::MOTION, 39.0f, 721u);
+    sendTouch(PointState::MOTION, 57.0f, 741u);
+    sendTouch(PointState::MOTION, 74.0f, 761u);
+    sendTouch(PointState::UP, 74.0f, 781u);
+
+    DALI_TEST_EQUALS(1u, frontPan.Count(GestureState::STARTED), TEST_LOCATION);
+    DALI_TEST_EQUALS(1u, frontPan.Count(GestureState::FINISHED), TEST_LOCATION);
+    DALI_TEST_EQUALS(0u, rearPan.Count(GestureState::STARTED), TEST_LOCATION);
+    DALI_TEST_EQUALS(1u, rearLongPress.Count(GestureState::FINISHED), TEST_LOCATION);
+    DALI_TEST_EQUALS(boundaryEnabled ? 0u : 1u, touchTrace.Count("background", CallbackKind::TOUCH, PointState::DOWN), TEST_LOCATION);
+
+    sendTouch(PointState::DOWN, 20.0f, 900u);
+    sendTouch(PointState::INTERRUPTED, 20.0f, 950u);
+    application.GetPlatform().TriggerTimer();
+    DALI_TEST_EQUALS(1u, rearLongPress.Count(GestureState::STARTED), TEST_LOCATION);
+    sendTouch(PointState::DOWN, 20.0f, 1000u);
+    application.GetPlatform().TriggerTimer();
+    sendTouch(PointState::UP, 20.0f, 1700u);
+    DALI_TEST_EQUALS(2u, rearLongPress.Count(GestureState::STARTED), TEST_LOCATION);
+    DALI_TEST_EQUALS(2u, rearLongPress.Count(GestureState::FINISHED), TEST_LOCATION);
+    DALI_TEST_EQUALS(1u, touchTrace.Count("front", CallbackKind::TOUCH, PointState::INTERRUPTED), TEST_LOCATION);
+  }
+  END_TEST;
+}
+
+int UtcDaliGeoTouchStreamLongPressKeepsInitialBranchAndExplicitClaims(void)
+{
+  enum class Route
+  {
+    DIRECT_HIT,
+    ANCESTOR,
+    MANUAL_FEED,
+  };
+  for(Route route : {Route::DIRECT_HIT, Route::ANCESTOR, Route::MANUAL_FEED})
+  {
+    TestApplication application;
+    auto            scene = application.GetScene();
+    scene.SetGeometryHittestEnabled(true);
+    TouchTrace     touchTrace;
+    LongPressTrace longPressTrace;
+    Actor          pressActor = CreateTouchableActor("press");
+    Actor          otherActor = CreateTouchableActor("other");
+    otherActor.TouchEventSignal().Connect(&application, TouchTraceFunctor(touchTrace, "other", false));
+    if(route == Route::DIRECT_HIT)
+    {
+      scene.Add(otherActor);
+      scene.Add(pressActor);
+    }
+    else
+    {
+      scene.Add(pressActor);
+      if(route == Route::ANCESTOR)
+      {
+        pressActor.Add(otherActor);
+      }
+      else
+      {
+        scene.Add(otherActor);
+      }
+    }
+
+    auto detector = LongPressGestureDetector::New();
+    detector.DetectedSignal().Connect(&application, LongPressTraceFunctor(longPressTrace));
+    if(route == Route::MANUAL_FEED)
+    {
+      pressActor.TouchEventSignal().Connect(&application, [&](Actor actor, TouchEvent event)
+      { return detector.HandleEvent(actor, event); });
+    }
+    else
+    {
+      detector.Attach(pressActor);
+    }
+    PrepareScene(application);
+
+    application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 20.0f)));
+    application.GetPlatform().TriggerTimer();
+    application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 22.0f)));
+    DALI_TEST_EQUALS(1u, touchTrace.Count("other", CallbackKind::TOUCH, PointState::INTERRUPTED), TEST_LOCATION);
+    application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(20.0f, 22.0f)));
+    DALI_TEST_EQUALS(1u, longPressTrace.Count(GestureState::STARTED), TEST_LOCATION);
+    DALI_TEST_EQUALS(1u, longPressTrace.Count(GestureState::FINISHED), TEST_LOCATION);
+  }
+  END_TEST;
+}
+
+int UtcDaliGeoTouchStreamRestartReclassifiesRearLongPress(void)
+{
+  TestApplication application;
+  auto            scene = application.GetScene();
+  scene.SetGeometryHittestEnabled(true);
+  TouchTrace     touchTrace;
+  LongPressTrace longPressTrace;
+  Actor          rear  = CreateTouchableActor("rear");
+  Actor          front = CreateTouchableActor("front");
+  rear.SetProperty(Actor::Property::VISIBLE, false);
+  scene.Add(rear);
+  scene.Add(front);
+  front.TouchEventSignal().Connect(&application, TouchTraceFunctor(touchTrace, "front", false));
+
+  auto detector = LongPressGestureDetector::New();
+  detector.DetectedSignal().Connect(&application, LongPressTraceFunctor(longPressTrace));
+  detector.Attach(rear);
+  PrepareScene(application);
+
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f), 1));
+  front.SetSensitive(false);
+  PrepareScene(application);
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(11.0f, 11.0f), 1));
+  DALI_TEST_EQUALS(1u, touchTrace.Count("front", CallbackKind::TOUCH, PointState::INTERRUPTED), TEST_LOCATION);
+  touchTrace.Clear();
+
+  // A new DOWN restarts delivery after every recipient has been terminated. The re-hit
+  // includes the newly visible rear actor in the same stream as the first device.
+  rear.SetProperty(Actor::Property::VISIBLE, true);
+  front.SetSensitive(true);
+  PrepareScene(application);
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f), 2));
+  application.GetPlatform().TriggerTimer();
+  DALI_TEST_EQUALS(1u, longPressTrace.Count(GestureState::STARTED), TEST_LOCATION);
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(11.0f, 11.0f), 2));
+  DALI_TEST_EQUALS(0u, touchTrace.Count("front", CallbackKind::TOUCH, PointState::INTERRUPTED), TEST_LOCATION);
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(11.0f, 11.0f), 2));
+  DALI_TEST_EQUALS(1u, touchTrace.Count("front", CallbackKind::TOUCH, PointState::UP), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, longPressTrace.Count(GestureState::FINISHED), TEST_LOCATION);
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(11.0f, 11.0f), 1));
+  END_TEST;
+}
+
 int UtcDaliGeoTouchStreamBoundaryKeepsRecipientsWithoutConsuming(void)
 {
   TestApplication application;

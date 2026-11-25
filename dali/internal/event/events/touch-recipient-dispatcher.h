@@ -53,7 +53,8 @@ public:
                                     RenderTask*             renderTask,
                                     const Dali::TouchEvent& sourceEvent,
                                     Actor*                  initialHitActor,
-                                    PointState::Type        primaryState);
+                                    PointState::Type        primaryState,
+                                    bool                    allowDelayedGestureClaim = true);
   static bool DispatchGeometryIntercept(Actor&                  actor,
                                         RenderTask*             renderTask,
                                         const Dali::TouchEvent& sourceEvent,
