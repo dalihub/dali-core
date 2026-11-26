@@ -91,7 +91,7 @@ public:
  */
 inline constexpr bool operator==(const Degree& lhs, const Degree& rhs)
 {
-  return Internal::MathUtils::Abs(lhs.degree - rhs.degree) < Math::MACHINE_EPSILON_1000; // expect degree angles to be between 0 and 1000
+  return Internal::MathUtils::Abs(lhs.degree - rhs.degree) <= Math::MACHINE_EPSILON_1000; // expect degree angles to be between 0 and 1000
 }
 
 /**

@@ -1141,3 +1141,23 @@ int UtcDaliQuaternionOStreamOperatorP(void)
   DALI_TEST_EQUALS(oss.str(), expectedOutput, TEST_LOCATION);
   END_TEST;
 }
+
+int UtcDaliQuaternionIsIdentityAtEpsilonBoundaryP(void)
+{
+  TestApplication application;
+
+  tet_infoline("Quaternion::IsIdentity follows the common rule: a component off by exactly the epsilon still counts as identity");
+
+  const float epsilon = Math::MACHINE_EPSILON_10;
+  DALI_TEST_CHECK(Quaternion(1.0f + epsilon, 0.0f, 0.0f, 0.0f).IsIdentity());
+  DALI_TEST_CHECK(Quaternion(1.0f, epsilon, 0.0f, 0.0f).IsIdentity());
+  DALI_TEST_CHECK(Quaternion(1.0f, 0.0f, epsilon, 0.0f).IsIdentity());
+  DALI_TEST_CHECK(Quaternion(1.0f, 0.0f, 0.0f, epsilon).IsIdentity());
+
+  DALI_TEST_CHECK(!Quaternion(1.0f + 2.0f * epsilon, 0.0f, 0.0f, 0.0f).IsIdentity());
+  DALI_TEST_CHECK(!Quaternion(1.0f, 2.0f * epsilon, 0.0f, 0.0f).IsIdentity());
+  DALI_TEST_CHECK(!Quaternion(1.0f, 0.0f, 2.0f * epsilon, 0.0f).IsIdentity());
+  DALI_TEST_CHECK(!Quaternion(1.0f, 0.0f, 0.0f, 2.0f * epsilon).IsIdentity());
+
+  END_TEST;
+}

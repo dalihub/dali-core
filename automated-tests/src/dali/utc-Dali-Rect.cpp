@@ -544,3 +544,27 @@ int UtcDaliRectInsetP(void)
 
   END_TEST;
 }
+
+int UtcDaliRectEqualsAtEpsilonBoundaryP(void)
+{
+  TestApplication application;
+
+  tet_infoline("Rect<float> equality follows the common rule: a difference of exactly the ranged epsilon still compares equal");
+
+  // 1.0f and 1.0f + FLT_EPSILON are both below 2.0f, so the ranged epsilon is Epsilon<1> == FLT_EPSILON
+  const float       epsilon = GetRangedEpsilon(1.0f, 1.0f + Math::MACHINE_EPSILON_1);
+  const Rect<float> base(1.0f, 1.0f, 1.0f, 1.0f);
+  DALI_TEST_EQUALS(epsilon, Math::MACHINE_EPSILON_1, TEST_LOCATION);
+
+  DALI_TEST_CHECK(base == Rect<float>(1.0f + epsilon, 1.0f, 1.0f, 1.0f));
+  DALI_TEST_CHECK(base == Rect<float>(1.0f, 1.0f + epsilon, 1.0f, 1.0f));
+  DALI_TEST_CHECK(base == Rect<float>(1.0f, 1.0f, 1.0f + epsilon, 1.0f));
+  DALI_TEST_CHECK(base == Rect<float>(1.0f, 1.0f, 1.0f, 1.0f + epsilon));
+
+  DALI_TEST_CHECK(base != Rect<float>(1.0f + 2.0f * epsilon, 1.0f, 1.0f, 1.0f));
+  DALI_TEST_CHECK(base != Rect<float>(1.0f, 1.0f + 2.0f * epsilon, 1.0f, 1.0f));
+  DALI_TEST_CHECK(base != Rect<float>(1.0f, 1.0f, 1.0f + 2.0f * epsilon, 1.0f));
+  DALI_TEST_CHECK(base != Rect<float>(1.0f, 1.0f, 1.0f, 1.0f + 2.0f * epsilon));
+
+  END_TEST;
+}

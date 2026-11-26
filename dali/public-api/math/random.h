@@ -22,8 +22,8 @@
 #include <dali/public-api/math/vector4.h>
 
 // EXTERNAL INCLUDES
-#include <cstdlib> ///< for srand() and rand()
-#include <ctime>   ///< for time(nullptr)
+#include <cstdlib> ///< kept for applications that relied on this header for srand() and rand()
+#include <ctime>   ///< kept for applications that relied on this header for time()
 
 namespace DALI_NAMESPACE
 {
@@ -47,24 +47,7 @@ namespace Random
  * @param[in] f1 The upper bound
  * @return A random value between the lower and upper bound
  */
-inline float Range(float f0, float f1)
-{
-  float minf = f0 < f1 ? f0 : f1;
-  float maxf = f0 > f1 ? f0 : f1;
-
-  // Ensure we initialize only once. As it's inlined, this static variable will exist in the code-block using it, thus,
-  // will be created and then initialized again when another code-block uses this.
-  static bool initialized(false);
-  if(!initialized)
-  {
-    uint32_t seed = static_cast<uint32_t>(time(nullptr));
-    srand(seed);
-    initialized = true;
-  }
-
-  int32_t randValue = rand();
-  return static_cast<float>(randValue & 0xfff) * (1.0f / 4095.0f) * (maxf - minf) + minf;
-}
+DALI_CORE_API float Range(float f0, float f1);
 
 /**
  * @brief Function to return a normalized axis in a random direction.
@@ -72,21 +55,7 @@ inline float Range(float f0, float f1)
  * @SINCE_1_0.0
  * @return The axis
  */
-inline Vector4 Axis()
-{
-  Vector4 axis;
-  // This function needs to return a vector with direction, that is to say a non-zero vector
-  // There is a possibility that a random vector will be a zero vector, so a loop is needed to ensure that a non-zero vector is returned
-  do
-  {
-    axis.x = Range(-1.0f, 1.0f);
-    axis.y = Range(0.0f, 1.0f);
-    axis.z = Range(0.0f, 1.0f);
-    axis.w = 0.0f;
-  } while(axis == Vector4::ZERO);
-  axis.Normalize3();
-  return axis;
-}
+DALI_CORE_API Vector4 Axis();
 
 } // namespace Random
 

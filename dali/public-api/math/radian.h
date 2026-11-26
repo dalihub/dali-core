@@ -134,7 +134,7 @@ constexpr Degree::Degree(Radian value)
  */
 inline constexpr bool operator==(Radian lhs, Radian rhs)
 {
-  return Internal::MathUtils::Abs(lhs.radian - rhs.radian) < Math::MACHINE_EPSILON_10; // expect Radian angles to be between 0 and 10 (multiplies of Math::PI)
+  return Internal::MathUtils::Abs(lhs.radian - rhs.radian) <= Math::MACHINE_EPSILON_10; // expect Radian angles to be between 0 and 10 (multiplies of Math::PI)
 }
 
 /**
@@ -160,7 +160,7 @@ inline constexpr bool operator!=(Radian lhs, Radian rhs)
  */
 inline constexpr bool operator==(Radian lhs, Degree rhs)
 {
-  return Internal::MathUtils::Abs(lhs.radian - Radian(rhs).radian) < Math::MACHINE_EPSILON_100; // expect Degree angles to be between 0 and 999
+  return Internal::MathUtils::Abs(lhs.radian - Radian(rhs).radian) <= Math::MACHINE_EPSILON_100; // expect Degree angles to be between 0 and 999
 }
 
 /**
@@ -186,7 +186,7 @@ inline constexpr bool operator!=(Radian lhs, Degree rhs)
  */
 inline constexpr bool operator==(Degree lhs, Radian rhs)
 {
-  return Internal::MathUtils::Abs(Radian(lhs).radian - rhs.radian) < Math::MACHINE_EPSILON_100; // expect Degree angles to be between 0 and 999
+  return Internal::MathUtils::Abs(Radian(lhs).radian - rhs.radian) <= Math::MACHINE_EPSILON_100; // expect Degree angles to be between 0 and 999
 }
 
 /**

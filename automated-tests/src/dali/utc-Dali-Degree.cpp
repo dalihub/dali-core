@@ -151,3 +151,17 @@ int UtcDaliDegreeOperatorNotEquals(void)
   DALI_TEST_EQUALS(a != c, true, TEST_LOCATION);
   END_TEST;
 }
+
+int UtcDaliDegreeOperatorEqualsAtEpsilonBoundary(void)
+{
+  TestApplication application;
+
+  tet_infoline("Degree equality follows the common rule: a difference of exactly the epsilon still compares equal");
+
+  const float epsilon = Math::MACHINE_EPSILON_1000;
+  DALI_TEST_CHECK(Degree(0.0f) == Degree(epsilon));
+  DALI_TEST_CHECK(Degree(epsilon) == Degree(0.0f));
+  DALI_TEST_CHECK(Degree(0.0f) != Degree(2.0f * epsilon));
+
+  END_TEST;
+}

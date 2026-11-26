@@ -20,6 +20,17 @@
 
 namespace DALI_NAMESPACE
 {
+// The layout of CallbackBase is compiled into applications (see the WARNING in callback.h).
+// The Windows build compiles with /vmg, so under the Microsoft ABI the pointer-to-member in the
+// union takes its most general form (24 bytes on x64, 16 bytes with 8-byte alignment on x86).
+#if defined(_MSC_VER)
+static_assert(sizeof(void*) != 8 || sizeof(CallbackBase) == 56, "CallbackBase layout is ABI-frozen");
+static_assert(sizeof(void*) != 4 || sizeof(CallbackBase) == 40, "CallbackBase layout is ABI-frozen");
+#else
+static_assert(sizeof(void*) != 8 || sizeof(CallbackBase) == 48, "CallbackBase layout is ABI-frozen");
+static_assert(sizeof(void*) != 4 || sizeof(CallbackBase) == 24, "CallbackBase layout is ABI-frozen");
+#endif
+
 // CallbackBase
 
 CallbackBase::CallbackBase()

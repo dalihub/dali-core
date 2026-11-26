@@ -381,3 +381,23 @@ int UtcDaliCallbackMemberDestroysObjectCopyP(void)
 
   END_TEST;
 }
+
+int UtcDaliCallbackBaseLayout(void)
+{
+  TestApplication application;
+
+  tet_infoline("The CallbackBase layout is compiled into applications by the inline Execute() templates: pin its size");
+
+  // A vtable pointer, Impl (object pointer + two dispatcher pointers) and the function / member-function union.
+  // The Windows build compiles with /vmg, so under the Microsoft ABI the pointer-to-member takes its most
+  // general form (24 bytes on x64, 16 bytes with 8-byte alignment on x86) and the layout is larger.
+#if defined(_MSC_VER)
+  const size_t expectedSize = (sizeof(void*) == 8) ? 56u : 40u;
+#else
+  const size_t expectedSize = (sizeof(void*) == 8) ? 48u : 24u;
+  DALI_TEST_CHECK(sizeof(CallbackBase) == 4 * sizeof(void*) + sizeof(void (CallbackBase::*)()));
+#endif
+  DALI_TEST_EQUALS(sizeof(CallbackBase), expectedSize, TEST_LOCATION);
+
+  END_TEST;
+}
