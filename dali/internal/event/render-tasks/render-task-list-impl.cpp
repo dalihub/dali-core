@@ -201,9 +201,9 @@ void RenderTaskList::UpdateExclusiveRegistration(RenderTask* task, bool exclusiv
 
 void RenderTaskList::RemoveExclusiveSource(RenderTask* task, ExclusiveRegistration& registration)
 {
-  if(registration.source)
+  auto found = mExclusiveSources.find(registration.source);
+  if(found != mExclusiveSources.end())
   {
-    auto  found  = mExclusiveSources.find(registration.source);
     auto& source = found->second;
     if(registration.isMappingTask)
     {
