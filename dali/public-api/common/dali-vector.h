@@ -310,7 +310,7 @@ public: // API
    */
   void PushBack(const ItemType& element)
   {
-    VectorBase::Append(&element, false, VectorAlgorithms<BaseType, ItemType>::CopyOperations());
+    VectorBase::Append(__builtin_addressof(element), false, VectorAlgorithms<BaseType, ItemType>::CopyOperations());
   }
 
   /**
@@ -326,7 +326,7 @@ public: // API
    */
   void PushBack(ItemType&& element)
   {
-    VectorBase::Append(&element, true, VectorAlgorithms<BaseType, ItemType>::MoveOperations());
+    VectorBase::Append(__builtin_addressof(element), true, VectorAlgorithms<BaseType, ItemType>::MoveOperations());
   }
 
   /**
@@ -348,7 +348,7 @@ public: // API
   {
     DALI_ASSERT_VECTOR((at <= End()) && (at >= Begin()) && "Iterator not inside vector");
 
-    const uint8_t* address = reinterpret_cast<const uint8_t*>(&element);
+    const uint8_t* address = reinterpret_cast<const uint8_t*>(__builtin_addressof(element));
     VectorBase::Insert(reinterpret_cast<uint8_t*>(at), address, address + sizeof(ItemType), false, VectorAlgorithms<BaseType, ItemType>::CopyOperations());
   }
 
@@ -371,7 +371,7 @@ public: // API
   {
     DALI_ASSERT_VECTOR((at <= End()) && (at >= Begin()) && "Iterator not inside vector");
 
-    const uint8_t* address = reinterpret_cast<const uint8_t*>(&element);
+    const uint8_t* address = reinterpret_cast<const uint8_t*>(__builtin_addressof(element));
     VectorBase::Insert(reinterpret_cast<uint8_t*>(at), address, address + sizeof(ItemType), true, VectorAlgorithms<BaseType, ItemType>::MoveOperations());
   }
 
@@ -486,7 +486,7 @@ public: // API
     else if(count > oldCount)
     {
       // Grow: add new elements
-      VectorBase::AppendCopies(&item, count - oldCount, VectorAlgorithms<BaseType, ItemType>::CopyOperations());
+      VectorBase::AppendCopies(__builtin_addressof(item), count - oldCount, VectorAlgorithms<BaseType, ItemType>::CopyOperations());
     }
   }
 
@@ -526,7 +526,7 @@ public: // API
     }
     else if(count > oldCount)
     {
-      if(DALI_UNLIKELY(IsInside(&item)))
+      if(DALI_UNLIKELY(IsInside(__builtin_addressof(item))))
       {
         // item lives in this vector and the reallocation below would invalidate it,
         // so move it out first.

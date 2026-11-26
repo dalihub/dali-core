@@ -70,23 +70,31 @@ protected: // API for deriving classes
 
   /**
    * @brief Element operations for the paths that only move or destroy elements.
+   *
+   * Holds no copy constructor of T, so a move-only T still compiles.
+   * Copying through this table aborts.
    * @SINCE_3_0.1
    */
   static const ElementOperations& MoveOperations()
   {
-    static constexpr ElementOperations operations{sizeof(T), nullptr, &MoveConstruct, &Destroy};
+    static constexpr ElementOperations operations{sizeof(T), &CopyUnavailable, &MoveConstruct, &Destroy};
     return operations;
   }
 
 private:
   static void CopyConstruct(void* destination, const void* source)
   {
-    new(destination) T(*static_cast<const T*>(source));
+    ::new(destination) T(*static_cast<const T*>(source));
+  }
+
+  static void CopyUnavailable(void* /* destination */, const void* /* source */)
+  {
+    DALI_ABORT("Dali::Vector copied an element through operations that cannot copy");
   }
 
   static void MoveConstruct(void* destination, void* source)
   {
-    new(destination) T(static_cast<T&&>(*static_cast<T*>(source)));
+    ::new(destination) T(static_cast<T&&>(*static_cast<T*>(source)));
   }
 
   static void Destroy(void* element)

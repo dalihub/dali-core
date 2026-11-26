@@ -2022,3 +2022,55 @@ int UtcDaliVectorShrinkToFitIfNeeded(void)
 
   END_TEST;
 }
+
+int UtcDaliVectorOverloadedAddressOf(void)
+{
+  struct OverloadedAddress
+  {
+    int value;
+
+    OverloadedAddress* operator&()
+    {
+      return this + 1;
+    }
+
+    const OverloadedAddress* operator&() const
+    {
+      return this + 1;
+    }
+  };
+
+  OverloadedAddress         items[] = {{10}, {99}};
+  Vector<OverloadedAddress> vector;
+  vector.Reserve(2u);
+  vector.PushBack(items[0]);
+  vector.PushBack(std::move(items[0]));
+  DALI_TEST_EQUALS(vector[0].value, 10, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[1].value, 10, TEST_LOCATION);
+
+  struct DeletedAddress
+  {
+    int value;
+
+    DeletedAddress*       operator&()       = delete;
+    const DeletedAddress* operator&() const = delete;
+  };
+
+  const DeletedAddress   fill{7};
+  Vector<DeletedAddress> trivial;
+  trivial.PushBack(fill);
+  trivial.Insert(trivial.End(), DeletedAddress{8});
+  trivial.Insert(trivial.Begin(), trivial.Back());
+  trivial.Resize(5u, trivial[1]);
+  DALI_TEST_EQUALS(trivial.Front().value, 8, TEST_LOCATION);
+  DALI_TEST_EQUALS(trivial.Back().value, 7, TEST_LOCATION);
+
+  Vector<DeletedAddress, false> complex;
+  complex.Reserve(1u);
+  complex.PushBack(DeletedAddress{5});
+  complex.Resize(3u, std::move(complex.Front()));
+  DALI_TEST_EQUALS(complex[1].value, 5, TEST_LOCATION);
+  DALI_TEST_EQUALS(complex[2].value, 0, TEST_LOCATION);
+
+  END_TEST;
+}

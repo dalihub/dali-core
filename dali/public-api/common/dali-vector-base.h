@@ -83,8 +83,9 @@ protected: // Element operations
   /**
    * @brief Per-element operations the library calls back for the element type.
    *
-   * A null function means the element type needs nothing for that operation:
-   * elements are then copied with memcpy/memmove and never destroyed.
+   * A null function means the operation is trivial: elements are copied or moved
+   * with memcpy/memmove, and nothing is destroyed. An operation the element type
+   * does not support must therefore be a function that aborts, not null.
    * @SINCE_3_0.1
    */
   struct ElementOperations
@@ -308,30 +309,34 @@ private:
   VectorBase(VectorBase&&)            = delete; ///< Deleted move constructor. @SINCE_1_9.25
   VectorBase& operator=(VectorBase&&) = delete; ///< Deleted copy assignment operator. @SINCE_1_9.25
 
+  // The helpers below are used only inside the library and are not exported.
+
   /**
    * @brief Allocates a block for \e capacity elements and relocates the current elements into it.
    */
-  void Reallocate(SizeType capacity, const ElementOperations& operations);
+  DALI_INTERNAL void Reallocate(SizeType capacity, const ElementOperations& operations);
 
   /**
    * @brief Destroys the elements in [\e first, \e last).
    */
-  static void DestroyRange(uint8_t* first, uint8_t* last, const ElementOperations& operations);
+  static DALI_INTERNAL void DestroyRange(uint8_t* first, uint8_t* last, const ElementOperations& operations);
 
   /**
    * @brief Copy-constructs \e count elements at \e destination from \e source. The ranges must not overlap.
+   *
+   * When \e repeatSource is true, copies the first source element into every slot.
    */
-  static void CopyConstructRange(uint8_t* destination, const uint8_t* source, SizeType count, const ElementOperations& operations);
+  static DALI_INTERNAL void CopyConstructRange(uint8_t* destination, const uint8_t* source, SizeType count, const ElementOperations& operations, bool repeatSource = false);
 
   /**
    * @brief Move-constructs \e count elements at \e destination from \e source, leaving the sources moved-from. The ranges must not overlap.
    */
-  static void MoveConstructRange(uint8_t* destination, uint8_t* source, SizeType count, const ElementOperations& operations);
+  static DALI_INTERNAL void MoveConstructRange(uint8_t* destination, uint8_t* source, SizeType count, const ElementOperations& operations);
 
   /**
    * @brief Relocates \e count elements from \e source to \e destination: each is move-constructed at its new address and destroyed at the old one. The ranges may overlap.
    */
-  static void RelocateRange(uint8_t* destination, uint8_t* source, SizeType count, const ElementOperations& operations);
+  static DALI_INTERNAL void RelocateRange(uint8_t* destination, uint8_t* source, SizeType count, const ElementOperations& operations);
 
 protected:     // Data
   void* mData; ///< Pointer to the data.
