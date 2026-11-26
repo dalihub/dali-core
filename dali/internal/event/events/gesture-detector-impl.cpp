@@ -453,7 +453,11 @@ bool GestureDetector::OnTouchEvent(Dali::Actor actor, Dali::TouchEvent touch)
 {
   // A callback may detach the actor and release the last application handle.
   GestureDetectorPtr guard(this);
-  return HandleEvent(actor, touch);
+  // Long press STARTED comes from a timer. Keep delivering its lifecycle events even when
+  // the router does not allow the previous detection to take ownership of this stream.
+  const bool delayedLongPressClaim = mType == GestureType::LONG_PRESS && IsDetected();
+  const bool consumed              = HandleEvent(actor, touch);
+  return consumed && (!delayedLongPressClaim || GetImplementation(touch).IsAllowDelayedGestureClaim());
 }
 
 void GestureDetector::ProcessTouchEvent(Scene& scene, const Integration::TouchEvent& event)

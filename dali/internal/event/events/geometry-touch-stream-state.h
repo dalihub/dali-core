@@ -58,6 +58,7 @@ struct GeometryTouchStreamState
   std::list<ActorPtr>                 interceptedRootToTarget;
   std::list<ActorPtr>                 candidatesRootToFront;
   std::vector<ActorPtr>               touchPropagationBoundaries;
+  std::vector<uint32_t>               delayedGestureClaimExcludedActors; ///< Initial hit candidates behind unrelated input branches.
   std::vector<GeometryTouchRecipient> recipientsInDispatchOrder;
   std::vector<GeometryTouchRecipient> interceptRecipientsInDispatchOrder;
 };
